@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'KNotes.views.home'),
+    url(r'^$', 'notes.views.home'),
     # url(r'^KNotes/', include('KNotes.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

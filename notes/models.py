@@ -4,23 +4,23 @@ from django.db.models.signals import post_save
 
 
 class School(models.Model):
-    name = models.CharField()
-    location = models.CharField(blank=True, null=True)
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
 
 class Course(models.Model):
     school = models.ForeignKey(School, blank=True, null=True)
-    title = models.CharField()
-    field = models.CharField(blank=True)
+    title = models.CharField(max_length=255)
+    field = models.CharField(max_length=255, blank=True)
     academic_year = models.IntegerField(blank=True, null=True)
     #professor = models.ForeignKey()
     def __unicode__(self):
         return self.title, self.school
 
-class Notes(models.Model):
-    title = models.CharField()
+class Note(models.Model):
+    title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, blank=True, null=True)
     school = models.ForeignKey(School, blank=True, null=True)
     html = models.TextField(blank=True, null=True)
@@ -49,8 +49,8 @@ class UserProfile(models.Model):
 
     # Optional fields:
     gravatar = models.URLField(blank=True) # Profile glitter
-    grad_year = models.CharField(blank=True, null=True)
-    fb_id = models.CharField(blank=True, null=True)
+    grad_year = models.CharField(max_length=255, blank=True, null=True)
+    fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField()
     can_read = models.BooleanField()
     can_vote = models.BooleanField()

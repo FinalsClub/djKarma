@@ -1,10 +1,279 @@
+<!DOCTYPE HTML>
 <html>
 <head>
-<title>
-KarmaNotes, now powered by Django and unicorns
-</title>
+<meta charset="utf-8">
+<!-- Bootstrap CSS Toolkit styles -->
+<link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap.min.css">
+<title>Karma Notes</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="js/vendor/jquery.ui.widget.js"></script>
+<script src="js/jquery.iframe-transport.js"></script>
+<script src="js/jquery.fileupload.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<!-- Le fav and touch icons -->
+<link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+<style type="text/css">
+  #container {
+    margin-top:60px;
+    font-size: 18px;
+    text-align: center;
+  }
+  header {
+    font: bold 350% Helvetica;
+    color: #025DB8;
+  }
+  #drop-area {
+    height: 360px;
+    position: relative;
+    z-index: 0;
+  }
+  #drop-instruction {
+    font: bold 24px Helvetica;
+    padding-bottom: 20px;
+  }
+  #ohm-image {
+    opacity: 0.1;
+    width: 300px;
+  }
+  #browseForNotes {
+    display: none;
+    height: 306px;
+    margin-top: 3em;
+  }
+  #searchBySchool{
+    width:500px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .schoolBtn {
+    width: 600px;
+    background-color: #C2DFFF;
+    border: 1px solid black;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 5px 5px 5px 10px;
+  }
+  .coursesOfSchool {
+    display: none;
+    width: 600px;
+    margin-left: 20px;
+    cursor: pointer;
+  }
+  .courseBtn {
+    padding: 5px 5px 5px 10px;
+    background-color: #BDEDFF;
+  }
+  .notesOfCourse{
+    font-size:14px;
+    margin-left: 40px;
+    text-align:left;
+  }
+  footer {
+    padding: 20px;
+  }
+  #searchForNotesBtn,
+  #profileBtn,
+  #aboutBtn {
+    font-size: 20px;    
+  }
+</style>
 </head>
+
 <body>
-<h1>:(){ :|:& };:</h1>
-</body>
+<div id="container" class="container-fluid">
+  <header>
+    Karma Notes   
+  </header>
+
+  <div id="drop-area">
+    <div id="drop-instruction">drop your notes below to share!</div>
+    <img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/>
+  </div>
+  
+  <div id="browseForNotes">
+    <div id="searchBySchool"></div>
+    <div id="searchByTags"></div>
+  </div><!-- browseForNotes -->
+  
+  <footer>
+    <p><a class="btn" id="searchForNotesBtn">search for notes</a>&nbsp;&nbsp;
+       <a class="btn" id="profileBtn" href="">profile</a>&nbsp;&nbsp;
+       <a class="btn" id="aboutBtn" href="">about</a>
+    </p>
+  </footer>
+  
+  <table id="file-list" style="background:#ffffff;opacity:1;width:70%;cell-padding:5px;margin-left:auto;margin-right:auto;margin-top:-320px;z-index:1">
+  </table>
+</div> <!-- /container -->
+
+<!-- Also allow form file selection?
+    <input class="btn" id="fileupload" type="file" name="files[]" multiple>
+<div class="progress progress-striped active">
+  <div class="bar" id="progress" style="width: 0%;"></div>
+</div>
+-->
+
+<script>
+$(document).ready(function() {
+  // get school and course info: (example)
+  // <div id="4e5bb37258200ed9aabc6d65-Btn" class="schoolBtn">Brown</div>
+  // <div id="Brown-Courses" class="coursesOfSchool">
+  //   <div id="4e5bb37258200ed9aabc5d65" class="courseBtn">Accounting 101</div>
+  //   <div id="4e5bb37258200ed9aabc5d66" class="courseBtn">Computer Science 50</div>
+  //   <div id="4e5bb37258200ed9aabc5d67" class="courseBtn">Economics 10</div>
+  // </div><!-- Brown-Courses -->
+  $.getJSON('/searchBySchool', function(schoolsArr) {
+    $.each(schoolsArr, function(idx, school) {
+      // add a schoolBtn for each school;
+      $('#searchBySchool').prepend(
+        $('<div/>', {class:'schoolBtn',
+                     id:   school._id + "-Btn",
+                     text: school.name})
+      );
+      // add a coursesOfSchool div immediately following;
+      $('#' + school._id + '-Btn').after(
+        $('<div/>', {class:'coursesOfSchool',
+                     id: school.name + '-Courses'})
+      );
+      // add the courses inside coursesOfSchool;
+      $.each(school.courses, function(idx, course) {
+        $('#' + school.name + '-Courses').append(
+          $('<div/>', {id: course._id,
+                       class: 'courseBtn',
+                       text: course.title})
+        );
+      });
+    });
+  });
+  
+  // =========================================================================
+  // toggle to browseForNotes "page" and back;
+  $('#searchForNotesBtn').click(function (event) { 
+    // $('#drop-area').fadeToggle();
+    // $('#browseForNotes').fadeToggle();
+    if ($("#searchForNotesBtn").text() == "search for notes") {
+      $('#drop-area').hide();
+      $('#browseForNotes').fadeIn(1000);
+      $("#searchForNotesBtn").text("upload notes");
+    } else {
+      $('#browseForNotes').hide();
+      $('#drop-area').fadeIn(1000);
+      $("#searchForNotesBtn").text("search for notes");
+    }
+  });
+
+  // =========================================================================
+  // schoolBtn click handler: 1) clicking on open school closes it; clicking on
+  // closed school opens it and closes any open school; 2) retrieves notes for
+  // all courses of the school;
+  $('#searchBySchool').on("click", ".schoolBtn", function() {
+    var clickedWasNotOpen = !$(this).hasClass('open');
+    // target 'em all (tough for the CPU);
+    $('.coursesOfSchool').slideUp('normal');
+    // again, do 'em all!
+    $('.schoolBtn').removeClass('open');
+    if (clickedWasNotOpen) {
+      $(this).addClass('open').next().slideDown('normal');
+    }
+    // fetch the notes if not already loaded;
+    if (!$(this).hasClass('hasNotes')) {
+      $(this).addClass('hasNotes');
+      var schoolID = this.id.slice(0, -4);
+      $.getJSON('/notesOfSchool/' + schoolID, function(schoolArr) {
+        // returns a one-element array: [ {
+        //   id: xxx,
+        //   name: "Harvard",
+        //   courses: [ {...}, {...}, {....} ]
+        // } ]
+        $.each(schoolArr[0].courses, function(idx, course) {
+          var listItems = "";
+          $.each(course.notes, function(idx, note){
+            listItems += "<li>" + note.notedesc + "</li>";
+          });
+          $('#' + course._id).after(
+              $('<div class="notesOfCourse" style="display: none;"><ul>' +
+                listItems + '</ul></div>')
+          );
+        });
+      });
+    }
+  });
+  
+  //=================================
+  // courseBtn click handler: clicking on open course closes it; clicking on
+  // closed course opens it and closes any open course;
+  $('#searchBySchool').on("click", ".courseBtn", function() {
+    // open course accordion to display notes;
+    var clickedWasNotOpen = !$(this).hasClass('open');
+    // target 'em all (tough for the CPU);
+    $('.notesOfCourse').slideUp('normal');
+    // again, do 'em all!
+    $('.courseBtn').removeClass('open');
+    if (clickedWasNotOpen) {
+      $(this).addClass('open').next().slideDown('normal');
+    }
+  });
+
+  
+  var fileListHeaderDrawn = false;
+  function nodeToString ( node ) {
+    var tmpNode = document.createElement( "div" );
+    tmpNode.appendChild( node.cloneNode( true ) );
+    var str = tmpNode.innerHTML;
+    tmpNode = node = null; // prevent memory leaks in IE
+    return str;
+  }
+
+  $(function () {
+    progressBarContainer = document.createElement("div"),
+    progressBar = document.createElement("div");
+    $('#file-list').fileupload({
+      dataType: 'json',
+      url: 'http://karmanotes.org:8080',
+      done: function (e, data) {
+          $.each(data.result, function (index, file) {
+            fileList = document.getElementById("file-list");
+            tr = document.createElement("tr");
+            
+            progressBarContainer.className = "progress progress-striped active";
+            progressBar.className = "bar";
+            progressBarContainer.appendChild(progressBar);
+
+            if (fileListHeaderDrawn == false){
+              headerRow = document.createElement("tr");
+              headerRow.innerHTML = "<td><b>Name</b></td><td><b>Size</b></td><td><b>Progress</b></td>"
+              fileList.appendChild(headerRow);
+              fileListHeaderDrawn = true;
+            }
+              
+            fileInfo = "<td>"+file.name +"</td>";
+            fileInfo += "<td>"+ (Math.round(file.size/(100000))/10) + " MB</td>";
+            fileInfo += "<td>" + nodeToString( progressBarContainer)+"</td>";
+            tr.innerHTML = fileInfo;
+            fileList.appendChild(tr);
+          });
+      },
+      progress: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        progressBar.style.width = progress+"%";
+        //alert(progressBar.style.width);
+        if (progress == 100){
+          progressBar.style.width = "0%";
+          progressBarContainer.innerHTML = "Done";
+        }
+      } // end progress
+    }); // end file list populating
+  }); // end file drag-n-drop
+
+}); // $(document).ready
+</script>
+</body> 
 </html>
