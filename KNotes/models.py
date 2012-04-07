@@ -2,15 +2,28 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
-class Course(models.Model):
-    title = models.CharField()
-    #professor = models.ForeignKey()
-    field = models.CharField(blank=True)
-    academic_year = models.IntegerField(blank=True, null=True)
 
 class School(models.Model):
     name = models.CharField()
     location = models.CharField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Course(models.Model):
+    school = models.ForeignKey(School, blank=True, null=True)
+    title = models.CharField()
+    field = models.CharField(blank=True)
+    academic_year = models.IntegerField(blank=True, null=True)
+    #professor = models.ForeignKey()
+    def __unicode__(self):
+        return self.title, self.school
+
+class Notes(models.Model):
+    title = models.CharField()
+    course = models.ForeignKey(Course, blank=True, null=True)
+    school = models.ForeignKey(School, blank=True, null=True)
+    html = models.TextField(blank=True, null=True)
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
