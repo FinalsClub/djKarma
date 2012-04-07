@@ -17,13 +17,18 @@ class Course(models.Model):
     academic_year = models.IntegerField(blank=True, null=True)
     #professor = models.ForeignKey()
     def __unicode__(self):
-        return self.title, self.school
+        #Note these must be unicode objects
+        return u"%s at %s" % (self.title, self.school)
 
 class Note(models.Model):
     title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, blank=True, null=True)
     school = models.ForeignKey(School, blank=True, null=True)
     html = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        #Note these must be unicode objects
+        return u"%s at %s" % (self.title, self.course)
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
