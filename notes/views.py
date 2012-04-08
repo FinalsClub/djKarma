@@ -10,7 +10,6 @@ from utils import jsonifyModel
 def home(request):
     return render_to_response('index.html', {})
 
-
 def searchBySchool(request):
     response_json = []
 
@@ -37,3 +36,12 @@ def notesOfSchool(request, school_pk):
 
             #response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
+
+def all_notes(request):
+    response = {}
+    for school in School.objects.all():
+        response[school.name] = {}
+        for course in Course.objects.filter(school = school).all():
+            notes = Note.objects.filter(course = course).all()
+            response[school.name][course.title] = notes
+    return render_to_response('notes.html', response)

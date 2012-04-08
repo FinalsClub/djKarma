@@ -7,6 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'notes.views.home'),
+    url(r'^notes', 'notes.views.all_notes'),
     url(r'^searchBySchool', 'notes.views.searchBySchool'),
     url(r'^notesOfSchool/(\d{1,99})', 'notes.views.notesOfSchool'),
     # url(r'^KNotes/', include('KNotes.foo.urls')),
