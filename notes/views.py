@@ -14,8 +14,7 @@ def home(request):
 def searchBySchool(request):
     response_json = []
 
-    #if request.is_ajax():
-    if 0 == 0:
+    if request.is_ajax():
         schools = School.objects.all()
         for school in schools:
             school_json = jsonifyModel(school, depth=1)
@@ -31,8 +30,7 @@ def searchBySchool(request):
 def notesOfSchool(request, school_pk):
     response_json = []
 
-    #if request.is_ajax():
-    if 0 == 0:
+    if request.is_ajax():
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
         response_json.append(jsonifyModel(school, depth=2))

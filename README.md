@@ -14,13 +14,13 @@ models.py:
 
 views.py:
 
- + splashpage
- + view all notes by school and course
+ + XXX splashpage
+ + XXX view all notes by school and course
 
 ./templates:
 
  + simple base.html template for header
- + index.html for splashpage with current KN logo frontpage as-is
+ + XXX index.html for splashpage with current KN logo frontpage as-is
  + new notes.html template for rendering a list of notes
  + new note.html template for rendering a note and it's metadata
 

@@ -1,10 +1,10 @@
 from models import School, Course, Note
 
-
 # model is a Django Model
 # depth is how many levels of foreignKey introspection should be performed
 # jsonifyModel(School, 1) returns school json at course detail
 # jsonifyModel(School, 2) returns school json at note detail
+
 
 def jsonifyModel(model, depth=0):
     json_result = {}
