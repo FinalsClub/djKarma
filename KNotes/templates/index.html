@@ -82,37 +82,39 @@
   #searchForNotesBtn,
   #profileBtn,
   #aboutBtn {
-    font-size: 20px;    
+    font-size: 20px;
   }
 </style>
 </head>
 
 <body>
 <div id="container" class="container-fluid">
+  {% block content %}
   <header>
-    Karma Notes   
+    Karma Notes
   </header>
 
   <div id="drop-area">
     <div id="drop-instruction">drop your notes below to share!</div>
     <img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/>
   </div>
-  
+
   <div id="browseForNotes">
     <div id="searchBySchool"></div>
     <div id="searchByTags"></div>
   </div><!-- browseForNotes -->
-  
+
   <footer>
     <p><a class="btn" id="searchForNotesBtn">search for notes</a>&nbsp;&nbsp;
        <a class="btn" id="profileBtn" href="">profile</a>&nbsp;&nbsp;
        <a class="btn" id="aboutBtn" href="">about</a>
     </p>
   </footer>
-  
+
   <table id="file-list" style="background:#ffffff;opacity:1;width:70%;cell-padding:5px;margin-left:auto;margin-right:auto;margin-top:-320px;z-index:1">
   </table>
 </div> <!-- /container -->
+{% endblock %}
 
 <!-- Also allow form file selection?
     <input class="btn" id="fileupload" type="file" name="files[]" multiple>
@@ -153,10 +155,10 @@ $(document).ready(function() {
       });
     });
   });
-  
+
   // =========================================================================
   // toggle to browseForNotes "page" and back;
-  $('#searchForNotesBtn').click(function (event) { 
+  $('#searchForNotesBtn').click(function (event) {
     // $('#drop-area').fadeToggle();
     // $('#browseForNotes').fadeToggle();
     if ($("#searchForNotesBtn").text() == "search for notes") {
@@ -206,7 +208,7 @@ $(document).ready(function() {
       });
     }
   });
-  
+
   //=================================
   // courseBtn click handler: clicking on open course closes it; clicking on
   // closed course opens it and closes any open course;
@@ -222,7 +224,7 @@ $(document).ready(function() {
     }
   });
 
-  
+
   var fileListHeaderDrawn = false;
   function nodeToString ( node ) {
     var tmpNode = document.createElement( "div" );
@@ -242,7 +244,7 @@ $(document).ready(function() {
           $.each(data.result, function (index, file) {
             fileList = document.getElementById("file-list");
             tr = document.createElement("tr");
-            
+
             progressBarContainer.className = "progress progress-striped active";
             progressBar.className = "bar";
             progressBarContainer.appendChild(progressBar);
@@ -253,7 +255,7 @@ $(document).ready(function() {
               fileList.appendChild(headerRow);
               fileListHeaderDrawn = true;
             }
-              
+
             fileInfo = "<td>"+file.name +"</td>";
             fileInfo += "<td>"+ (Math.round(file.size/(100000))/10) + " MB</td>";
             fileInfo += "<td>" + nodeToString( progressBarContainer)+"</td>";
@@ -275,5 +277,5 @@ $(document).ready(function() {
 
 }); // $(document).ready
 </script>
-</body> 
+</body>
 </html>

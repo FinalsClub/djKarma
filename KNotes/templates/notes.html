@@ -1,0 +1,16 @@
+{% extends 'index.html' %}
+{% block content %}
+<ul>
+  {% for school in schools %}
+    <h4>{{ school.name }}</h5>
+    {% for course in courses %}
+      <h5>{{ course.title }}</h5>
+      <ul>
+      {% for note in notes %}
+        <li>{# TODO: add a link here to html #}{{ note.title }}</li>
+      {% endfor %} {# end note #}
+      </ul>
+    {% endfor %} {# end course #}
+  {% endfor %} {# end school #}
+
+{% endblock %}
