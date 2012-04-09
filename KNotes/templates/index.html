@@ -14,7 +14,7 @@
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <!-- Le fav and touch icons -->
-<link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+<!--<link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'> -->
 <link rel="shortcut icon" href="images/favicon.ico">
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
@@ -25,8 +25,8 @@
     font-size: 18px;
     text-align: center;
   }
-  header {
-    font: bold 350% Helvetica;
+  .header {
+    font-size:50px;
     color: #025DB8;
   }
   #drop-area {
@@ -53,10 +53,10 @@
     text-align: left;
   }
   .schoolBtn {
-    width: 600px;
-    background-color: #C2DFFF;
-    border: 1px solid black;
+    width: 100%;
+    background-color: #4D4E4F;
     cursor: pointer;
+    color: white;
     font-weight: bold;
     font-size: 18px;
     padding: 5px 5px 5px 10px;
@@ -68,8 +68,9 @@
     cursor: pointer;
   }
   .courseBtn {
+    width:100%;
     padding: 5px 5px 5px 10px;
-    background-color: #BDEDFF;
+    background-color: #ffffff;
   }
   .notesOfCourse{
     font-size:14px;
@@ -90,9 +91,7 @@
 <body>
 <div id="container" class="container-fluid">
   
-  <header>
-    Karma Notes
-  </header>
+  <h1 class="header">Karma Notes</h1>
   {% block content %}
 
   <div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
@@ -206,11 +205,11 @@ $(document).ready(function() {
         $.each(schoolArr[0].courses, function(idx, course) {
           var listItems = "";
           $.each(course.notes, function(idx, note){
-            listItems += "<li>" + note.notedesc + "</li>";
+            listItems += "<div><a href=\"/note/"+note._id+"\">" + note.notedesc + "</a></div>";
           });
           $('#' + course._id).after(
-              $('<div class="notesOfCourse" style="display: none;"><ul>' +
-                listItems + '</ul></div>')
+              $('<div class="notesOfCourse" style="display: none;">' +
+                listItems + '</div>')
           );
         });
       });
@@ -231,7 +230,6 @@ $(document).ready(function() {
       $(this).addClass('open').next().slideDown('normal');
     }
   });
-
 
   var fileListHeaderDrawn = false;
   function nodeToString ( node ) {

@@ -40,6 +40,7 @@ def convertWithGDocs(Note):
     f = open(Note.file.path+'.html')
     Note.html = f.read()
     Note.save()
+    f.close()
     #document_query = gdata.docs.service.DocumentQuery()
     #print document_query.ToUri()
     #documents_feed = client.GetDocumentListFeed()
@@ -60,16 +61,3 @@ def convertWithGDocs(Note):
       #xml = xml.dom.minidom.parseString(str(document_entry))
       #toPrint = xml.toprettyxml()
       #print str(document_entry)
-
-def UploadResourceSample():
-  """Upload a document, and convert to Google Docs."""
-  doc = gdata.docs.data.Resource(type='document', title='My Sample Doc')
-  # This is a convenient MS Word doc that we know exists
-  path = _GetDataFilePath('test.0.doc')
-  print 'Selected file at: %s' % path
-  # Create a MediaSource, pointing to the file
-  media = gdata.data.MediaSource()
-  media.SetFileHandle(path, 'application/msword')
-  # Pass the MediaSource when creating the new Resource
-  doc = client.CreateResource(entry=doc, media=media)
-  print 'Created, and uploaded:', doc.title.text, doc.resource_id.text

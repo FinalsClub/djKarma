@@ -27,3 +27,12 @@ views.py:
 users:
 
  + login
+
+ Note on Google Documents API
+ ============================
+
+ To authorize the Google Documents script to act on behalf of the target google account, verfication will have to be granted by visiting:
+
+ https://accounts.google.com/DisplayUnlockCaptcha
+
+ In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
