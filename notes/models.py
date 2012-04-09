@@ -24,6 +24,7 @@ class Note(models.Model):
     title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, blank=True, null=True)
     school = models.ForeignKey(School, blank=True, null=True)
+    file = models.FileField(upload_to="docs/notes")
     html = models.TextField(blank=True, null=True)
 
     def __unicode__(self):

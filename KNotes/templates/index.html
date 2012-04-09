@@ -94,9 +94,14 @@
     Karma Notes
   </header>
 
-  <div id="drop-area">
-    <div id="drop-instruction">drop your notes below to share!</div>
-    <img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/>
+  <div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
+    <div id="drop-instruction">upload your notes to share!</div>
+    <form enctype="multipart/form-data" action="/" method="post">{% csrf_token %}
+      {{ message }}
+      {{ form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Submit" />
+    </form>
+    <!--<img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/> -->
   </div>
 
   <div id="browseForNotes">
