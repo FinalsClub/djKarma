@@ -89,10 +89,11 @@
 
 <body>
 <div id="container" class="container-fluid">
-  {% block content %}
+  
   <header>
     Karma Notes
   </header>
+  {% block content %}
 
   <div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
     <div id="drop-instruction">upload your notes to share!</div>
@@ -118,8 +119,9 @@
 
   <table id="file-list" style="background:#ffffff;opacity:1;width:70%;cell-padding:5px;margin-left:auto;margin-right:auto;margin-top:-320px;z-index:1">
   </table>
-</div> <!-- /container -->
 {% endblock %}
+</div> <!-- /container -->
+
 
 <!-- Also allow form file selection?
     <input class="btn" id="fileupload" type="file" name="files[]" multiple>
@@ -128,6 +130,7 @@
 </div>
 -->
 
+{% block scripts %}
 <script>
 $(document).ready(function() {
   // get school and course info: (example)
@@ -282,5 +285,6 @@ $(document).ready(function() {
 
 }); // $(document).ready
 </script>
+{% endblock %}
 </body>
 </html>

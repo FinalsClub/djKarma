@@ -2,3 +2,5 @@
 *.swp
 .DS_Store
 *.sql
+*credentials.py
+/uploads

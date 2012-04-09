@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+
+{% block scripts %} {% endblock %}
+
+{% block content %}
+	<h1> {{ note.title }} </h1>
+	<h2> {{ note.course.title }} </h2>
+	<h3> {{ note.school }} </h3>
+	<div class='hero-unit'>
+		{{ note.html|safe }}
+	</div>
+{% endblock %}

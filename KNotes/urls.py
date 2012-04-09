@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     # Be mindful of overly broad url patterns
     # Prior, ^notes was pre-empting ^notesOfSchool/
     # Remember the trailing $ to avoid partial match
+    url(r'^note/(\d{1,99})$', 'notes.views.note'),
     url(r'^notes$', 'notes.views.all_notes'),
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
     url(r'^notesOfSchool/(\d{1,99})', 'notes.views.notesOfSchool'),

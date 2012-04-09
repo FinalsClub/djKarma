@@ -6,6 +6,7 @@ from models import School, Course, Note
 from utils import jsonifyModel
 from forms import UploadFileForm
 from gdocs import convertWithGDocs
+from django.http import Http404
 
 #from django.core import serializers
 
@@ -14,17 +15,24 @@ def home(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            newNote = Note.objects.create(title=request.POST['title'], 
-                                course= Course.objects.get(pk=request.POST['course']), 
+            newNote = Note.objects.create(title=request.POST['title'],
+                                course= Course.objects.get(pk=request.POST['course']),
                                 school = School.objects.get(pk=request.POST['school']),
                                 file=request.FILES['note_file'])
-            #convertWithGDocs(newNote)
+            convertWithGDocs(newNote)
             print "upload handled!"
             return render_to_response('index.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
     else:
         form = UploadFileForm()
     return render_to_response('index.html', {'form': form}, context_instance=RequestContext(request))
 
+
+def note(request, note_pk):
+    try:
+        note = Note.objects.get(pk=note_pk)
+    except:
+        raise Http404
+    return render_to_response('note.html', {'note': note}, context_instance=RequestContext(request))
 
 def searchBySchool(request):
     response_json = []
