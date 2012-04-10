@@ -4,7 +4,7 @@ import json
 from django.template import RequestContext
 from models import School, Course, Note
 from utils import jsonifyModel
-from forms import UploadFileForm
+from forms import UploadFileForm, SelectTagsForm
 from gdocs import convertWithGDocs
 from django.http import Http404
 
@@ -12,19 +12,21 @@ from django.http import Http404
 
 
 def home(request):
+    tag_form = SelectTagsForm()
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            newNote = Note.objects.create(title=request.POST['title'],
-                                course= Course.objects.get(pk=request.POST['course']),
-                                school = School.objects.get(pk=request.POST['school']),
+            newNote = Note.objects.create(title=form.cleaned_data['title'],
+                                course=form.cleaned_data['course'],
+                                school=form.cleaned_data['school'],
                                 file=request.FILES['note_file'])
+            newNote.tags = form.cleaned_data['tags']
             convertWithGDocs(newNote)
             print "upload handled!"
-            return render_to_response('index.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
+            return render_to_response('index.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form, 'tag_form' : tag_form}, context_instance=RequestContext(request))
     else:
         form = UploadFileForm()
-    return render_to_response('index.html', {'form': form}, context_instance=RequestContext(request))
+    return render_to_response('index.html', {'form': form, 'tag_form': tag_form}, context_instance=RequestContext(request))
 
 
 def note(request, note_pk):
@@ -33,6 +35,22 @@ def note(request, note_pk):
     except:
         raise Http404
     return render_to_response('note.html', {'note': note}, context_instance=RequestContext(request))
+
+def searchByTag(request):
+    if request.method == 'POST':
+        form = SelectTagsForm(request.POST)
+        if form.is_valid():
+            response = {}
+            tags = form.cleaned_data['tags']
+            notes = Note.objects.filter(tags__in=tags).distinct()
+            '''
+            To fill seth's notes.html template. Got an error so whippped up a quick temp notes2.html
+            for n in notes:
+                response[n.school.name] = {}
+                response[n.school.name][n.course.title] = n
+            '''
+            return render_to_response('notes2.html', {'notes' : notes}, context_instance=RequestContext(request))
+    raise Http404
 
 def searchBySchool(request):
     response_json = []
@@ -72,4 +90,4 @@ def all_notes(request):
         for course in Course.objects.filter(school=school).all():
             notes = Note.objects.filter(course=course).all()
             response[school.name][course.title] = notes
-    return render_to_response('notes.html', response)
+    return render_to_response('notes.html', response, context_instance=RequestContext(request))

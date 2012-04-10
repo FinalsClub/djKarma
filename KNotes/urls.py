@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
     url(r'^notesOfSchool/(\d{1,99})', 'notes.views.notesOfSchool'),
     url(r'^$', 'notes.views.home'),
+    url(r'^searchNotesByTag', 'notes.views.searchByTag'),
 
     # url(r'^KNotes/', include('KNotes.foo.urls')),
 

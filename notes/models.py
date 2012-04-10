@@ -1,11 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-
+import datetime
 
 class School(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Tag(models.Model):
+    name = models.CharField(max_length=160)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -26,6 +33,8 @@ class Note(models.Model):
     school = models.ForeignKey(School, blank=True, null=True)
     file = models.FileField(upload_to="uploads/notes")
     html = models.TextField(blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    timestamp = models.DateTimeField(default=datetime.datetime.now())
 
     def __unicode__(self):
         #Note these must be unicode objects

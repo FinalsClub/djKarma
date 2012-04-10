@@ -7,6 +7,7 @@ import models
 admin.site.register(models.School)
 admin.site.register(models.Course)
 admin.site.register(models.Note)
+admin.site.register(models.Tag)
 admin.site.unregister(User)
 
 
