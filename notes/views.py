@@ -40,10 +40,15 @@ def notesOfSchool(request, school_pk):
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
 
 def all_notes(request):
+    print "using the all_notes view"
     response = {}
+    response['schools'] = {}
     for school in School.objects.all():
-        response[school.name] = {}
+        print school
+        response['schools'][school.name] = {}
         for course in Course.objects.filter(school = school).all():
+            print course
             notes = Note.objects.filter(course = course).all()
-            response[school.name][course.title] = notes
+            response['schools'][school.name][course.title] = notes
+    print response
     return render_to_response('notes.html', response)
