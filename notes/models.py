@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 import datetime
+import re
 
 class School(models.Model):
     name = models.CharField(max_length=255)
@@ -39,6 +40,12 @@ class Note(models.Model):
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.title, self.course)
+
+    def save(self, *args, **kwargs):
+        if(self.html != None):
+            self.html = re.escape(self.html)
+
+        super(Note, self).save(*args, **kwargs)
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
