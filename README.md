@@ -14,19 +14,28 @@ models.py:
 
 views.py:
 
- + splashpage             DONE
- + view all notes by school and course      1/2
+ + XXX splashpage
+ + XXX view all notes by school and course
 
 ./templates:
 
- + simple base.html template for header       DONE
- + index.html for splashpage with current KN logo frontpage as-is   DONE
- + new notes.html template for rendering a list of notes          DONE
- + new note.html template for rendering a note and it's metadata    1/2
+ + simple base.html template for header
+ + XXX index.html for splashpage with current KN logo frontpage as-is
+ + new notes.html template for rendering a list of notes
+ + new note.html template for rendering a note and it's metadata
 
 users:
 
- + login              1/2
+ + login
+
+Note on Google Documents API
+============================
+
+ To authorize the Google Documents script to act on behalf of the target google account, verfication will have to be granted by visiting:
+
+ https://accounts.google.com/DisplayUnlockCaptcha
+
+ In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
 
 
 Priorities for Tuesday
