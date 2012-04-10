@@ -44,7 +44,6 @@
     width: 300px;
   }
   #browseForNotes {
-    display: none;
     height: 306px;
     margin-top: 3em;
   }
@@ -102,7 +101,8 @@
           <a style="vertical-align:middle"class="brand" href="#"><img style="vertical-align:middle" src="/static/img/ohm_icon.png"></a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li><a id="searchForNotesBtn" href="#">Search</a></li>
+              <li><a id="uploadNotesBtn" href="/">Upload</a></li>
+              <li><a id="searchForNotesBtn" href="/search">Search</a></li>
               <li><a id="profileBtn" href="#">Profile</a></li>
               <li><a id="aboutBtn" href="#">About</a></li>
             </ul>
@@ -113,31 +113,7 @@
 <div id="container" class="container-fluid">
 
   {% block content %}
-
-  <div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
-    <div id="drop-instruction"><h1>Upload Your Notes to Share!</h1></div>
-    <form enctype="multipart/form-data" action="/" method="post">{% csrf_token %}
-      {{ message }}
-      {{ form.as_p }}
-      <input class="btn btn-primary" type="submit" value="Upload!" />
-    </form>
-    <!--<img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/> -->
-  </div>
-
-  <div id="browseForNotes">
-    <h1>Browse by School and Course</h1>
-    <div id="searchBySchool"></div>
-    <div id="searchByTags"></div>
-    <br/>
-    <h2> - or - </h2>
-    <br/>
-    <h1>Search By Tag</h1>
-      <form enctype="multipart/form-data" action="/searchNotesByTag" method="post">{% csrf_token %}
-      {{ message }}
-      {{ tag_form.as_p }}
-      <input class="btn btn-primary" type="submit" value="Search!" />
-    </form>
-  </div><!-- browseForNotes -->
+  
 
   <table id="file-list" style="background:#ffffff;opacity:1;width:70%;cell-padding:5px;margin-left:auto;margin-right:auto;margin-top:-320px;z-index:1">
   </table>
@@ -193,15 +169,18 @@ $(document).ready(function() {
   $('#searchForNotesBtn').click(function (event) {
     // $('#drop-area').fadeToggle();
     // $('#browseForNotes').fadeToggle();
-    if ($("#searchForNotesBtn").text() == "search for notes") {
+    //if ($("#searchForNotesBtn").text() == "Search") {
       $('#drop-area').hide();
       $('#browseForNotes').fadeIn(1000);
-      $("#searchForNotesBtn").text("upload notes");
-    } else {
+      //$("#searchForNotesBtn").text("Upload");
+    //} else {
+    //  $('#browseForNotes').hide();
+    //  $('#drop-area').fadeIn(1000);
+    //  $("#searchForNotesBtn").text("Search");
+    });
+  $('#uploadNotesBtn').click(function (event) {
       $('#browseForNotes').hide();
       $('#drop-area').fadeIn(1000);
-      $("#searchForNotesBtn").text("search for notes");
-    }
   });
 
   // =========================================================================

@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<div id="browseForNotes">
+    <h1>Browse by School and Course</h1>
+    <div id="searchBySchool"></div>
+    <div id="searchByTags"></div>
+    <br/>
+    <h2> - or - </h2>
+    <br/>
+    <h1>Search By Tag</h1>
+      <form enctype="multipart/form-data" action="/searchNotesByTag" method="post">{% csrf_token %}
+      {{ message }}
+      {{ tag_form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Search!" />
+    </form>
+  </div>
+{% endblock %}

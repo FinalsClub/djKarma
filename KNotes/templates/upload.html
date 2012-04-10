@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
+    <div id="drop-instruction"><h1>Upload Your Notes to Share!</h1></div>
+    <form enctype="multipart/form-data" action="/" method="post">{% csrf_token %}
+      {{ message }}
+      {{ form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Upload!" />
+    </form>
+    <!--<img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/> -->
+  </div>
+
+{% endblock %}

@@ -12,7 +12,6 @@ from django.http import Http404
 
 
 def home(request):
-    tag_form = SelectTagsForm()
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -23,10 +22,15 @@ def home(request):
             newNote.tags = form.cleaned_data['tags']
             convertWithGDocs(newNote)
             print "upload handled!"
-            return render_to_response('index.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form, 'tag_form' : tag_form}, context_instance=RequestContext(request))
+            return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
     else:
         form = UploadFileForm()
-    return render_to_response('index.html', {'form': form, 'tag_form': tag_form}, context_instance=RequestContext(request))
+    return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
+
+
+def search(request):
+    tag_form = SelectTagsForm()
+    return render_to_response('search.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
 
 
 def note(request, note_pk):
@@ -35,6 +39,7 @@ def note(request, note_pk):
     except:
         raise Http404
     return render_to_response('note.html', {'note': note}, context_instance=RequestContext(request))
+
 
 def searchByTag(request):
     if request.method == 'POST':
