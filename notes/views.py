@@ -28,9 +28,22 @@ def home(request):
     return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
 
 
+def schools(request):
+    schools = School.objects.all()
+    response = []
+    for school in schools:
+        response.append((school.pk, school.name))
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def search(request):
     tag_form = SelectTagsForm()
     return render_to_response('search.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
+
+
+def jquery(request):
+    tag_form = SelectTagsForm()
+    return render_to_response('jqueryTest.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
 
 
 def note(request, note_pk):

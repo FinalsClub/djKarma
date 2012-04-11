@@ -79,6 +79,9 @@ class UserProfile(models.Model):
     can_comment = models.BooleanField()
     can_moderate = models.BooleanField()
 
+    #user-submitted notes
+    #notes = models.ManyToManyField(Note, blank=True, null=True)
+
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))

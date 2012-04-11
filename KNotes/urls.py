@@ -17,6 +17,14 @@ urlpatterns = patterns('',
     url(r'^search$', 'notes.views.search'),
     url(r'^searchNotesByTag', 'notes.views.searchByTag'),
 
+    # For autocomplete modelChoice fields
+    url(r'^schools$', 'notes.views.schools'),
+    url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
+    #url(r'^autocomplete/', include('autocomplete.urls')),
+
+    #TESTING
+    url(r'^jquery/', 'notes.views.jquery'),
+
     # url(r'^KNotes/', include('KNotes.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

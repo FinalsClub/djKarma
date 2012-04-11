@@ -7,6 +7,7 @@
 <title>Karma Notes</title>
 <meta name="google-site-verification" content="uVEr4TwuWwovidBozQG-TRZblTLEsi0l4qxxi5rw71w" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <!--<script src="js/vendor/jquery.ui.widget.js"></script>
 <script src="js/jquery.iframe-transport.js"></script>
 <script src="js/jquery.fileupload.js"></script> -->
@@ -21,6 +22,13 @@
 <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
 <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 <style type="text/css">
+  .ui-menu-item{
+    background-color: #ffffff;
+    margin:0px;
+    opacity:.8;
+    width:200px;
+  }
+
   #container {
     margin-top:60px;
     font-size: 18px;
@@ -87,6 +95,8 @@
 
   }
 </style>
+{% block header %}
+{% endblock %}
 </head>
 
 <body>
