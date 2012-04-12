@@ -1,6 +1,6 @@
 from django import forms
 from models import School, Course, Note, Tag
-from autocomplete.widgets import AutocompleteSelectMultiple
+#from autocomplete.widgets import AutocompleteSelectMultiple
 from simple_autocomplete.widgets import AutoCompleteWidget
 
 
