@@ -134,9 +134,9 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
-LOGIN_URL          = '/login/'
-LOGIN_REDIRECT_URL = '/login/'
-LOGIN_ERROR_URL    = '/login/'
+#LOGIN_URL          = '/login/'
+#LOGIN_REDIRECT_URL = '/login/'
+#LOGIN_ERROR_URL    = '/login/'
 SOCIAL_AUTH_COMPLETE_URL_NAME  = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 

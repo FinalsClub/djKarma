@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<div class="hero-unit" style="text-align:center;">
+	<h1>Come on in!</h1>
+    <br/><br/>
+
+    <a href="{% url "socialauth_begin" "facebook" %}"><img src="{{STATIC_URL}}img/fb_connect.png"/></a>
+    <br/><br/>
+    or
+    <br/><br/>
+	{% if form.errors %}
+		<p>Check your username and password.</p>
+	{% endif %}
+
+	<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+	{% csrf_token %}
+	<table style="margin-left:auto;margin-right:auto;text-align:center;">
+	<tr>
+	    <td>{{ form.username.label_tag }}</td>
+	    <td>{{ form.username }}</td>
+	</tr>
+	<tr>
+	    <td>{{ form.password.label_tag }}</td>
+	    <td>{{ form.password }}</td>
+	</tr>
+	</table>
+
+	<input class="btn btn-primary" type="submit" value="Login" />
+	<input type="hidden" name="next" value="{{ next }}" />
+	</form>
+</div>
+
+{% endblock %}
