@@ -8,14 +8,15 @@
     <a href="{% url socialauth_begin 'facebook' %}">Login with Facebook</a>    
 </div>
 <div>
-  <form action="" method="post">
+  <form action="/login" method="post">
       {% csrf_token %}
       <p>
           <label for="id_username">Username</label>
           <input type="text" name="username" id="id_username" value="" />
+          <input type="password" name="password" id="id_password" value="" />
       </p>
 
-      <input type="submit" value="Send" />
+      <input class="btn-primary" type="submit" value="Send" />
   </form>
 </div>
 

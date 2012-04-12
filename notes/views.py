@@ -31,11 +31,9 @@ def home(request):
             return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
     #If a note has not been uploaded (GET request), show the upload form.
     else:
+        print request.user.username
         form = UploadFileForm()
     return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
-
-def login(request):
-    return render_to_response('login.html', context_instance=RequestContext(request))
 
 
 def schools(request):

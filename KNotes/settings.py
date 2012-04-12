@@ -134,9 +134,9 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
-LOGIN_URL          = '/login/'
-LOGIN_REDIRECT_URL = '/login/'
-LOGIN_ERROR_URL    = '/login/'
+#LOGIN_URL          = '/login/'
+#LOGIN_REDIRECT_URL = '/login/'
+#LOGIN_ERROR_URL    = '/login/'
 SOCIAL_AUTH_COMPLETE_URL_NAME  = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 
@@ -160,6 +160,12 @@ TEMPLATE_DIRS = (
     # Wherever you go, there you are
     os.path.join(os.path.dirname(__file__), 'templates'),
     './templates'
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.request", #Makes request accessible to templates
+    #"django.core.context_processors.static",
 )
 
 INSTALLED_APPS = (
