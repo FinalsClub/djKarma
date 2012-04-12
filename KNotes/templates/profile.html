@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<div class="hero-unit" style="text-align:center;">
+	<h1>Hey {{request.user.username}}</h1>
+    <br/><br/>
+
+    
+</div>
+
+{% endblock %}

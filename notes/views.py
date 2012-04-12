@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 
 #from django.core import serializers
 
+
 @login_required
 def home(request):
     # If user is authenticated, home view should be upload-notes page
@@ -35,6 +36,10 @@ def home(request):
         form = UploadFileForm()
     return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
 
+
+@login_required
+def profile(request):
+    return render_to_response('profile.html', context_instance=RequestContext(request))
 
 def schools(request):
     schools = School.objects.all()

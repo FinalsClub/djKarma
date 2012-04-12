@@ -12,10 +12,13 @@ urlpatterns = patterns('',
     url(r'^note/(\d{1,99})$', 'notes.views.note'),
     url(r'^notes$', 'notes.views.all_notes'),
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
-    url(r'^notesOfSchool/(\d{1,99})', 'notes.views.notesOfSchool'),
+    url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),
     url(r'^$', 'notes.views.home'),
     url(r'^search$', 'notes.views.search'),
-    url(r'^searchNotesByTag', 'notes.views.searchByTag'),
+    url(r'^searchNotesByTag$', 'notes.views.searchByTag'),
+
+    #Profile
+    url(r'^profile$', 'notes.views.profile'),
 
     # Auth
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
@@ -29,8 +32,6 @@ urlpatterns = patterns('',
 
     #TESTING
     url(r'^jquery/', 'notes.views.jquery'),
-
-    # url(r'^KNotes/', include('KNotes.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
