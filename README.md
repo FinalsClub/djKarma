@@ -28,6 +28,21 @@ users:
 
  + login
 
+
+Dependencies
+============
+
+The starred dependencies are the root packages you must install with pip or easy_isntall. The rest are dependencies of the starred packages.
+
+* Django==1.4
+* django-simple-autocomplete==0.2.unreleased
+* django-social-auth==0.6.7
+* gdata==2.0.16
+httplib2==0.7.4
+oauth2==1.5.211
+python-openid==2.2.5
+wsgiref==0.1.2
+
 Note on Database migrations
 ============================
 
@@ -46,7 +61,6 @@ Note on Google Documents API
  https://accounts.google.com/DisplayUnlockCaptcha
 
  In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
-
 
 Priorities for Tuesday
 ======================
