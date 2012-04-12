@@ -41,12 +41,33 @@ def home(request):
 def profile(request):
     return render_to_response('profile.html', context_instance=RequestContext(request))
 
+# NOTE: There is currently a css conflict between Twitter Bootstrap and Jquery UI
+#       Which prevents the jquery autocomplete from displaying properly.
+#       See https://github.com/twitter/bootstrap/issues/156
+#       I'll look at fixing this issue shortly
+# Handles ajax queries from the School autocomplete form field
 def schools(request):
-    schools = School.objects.all()
-    response = []
-    for school in schools:
-        response.append((school.pk, school.name))
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    if request.is_ajax():
+        query = request.GET.get('q')
+        schools = School.objects.filter(name__contains=query).distinct()
+        response = []
+        for school in schools:
+            response.append((school.pk, school.name))
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    raise Http404
+
+# Handles ajax queries from the Course autocomplete form field
+def courses(request):
+    if request.is_ajax():
+        query = request.GET.get('q')
+        courses = Course.objects.filter(title__contains=query).distinct()
+        response = []
+        for course in courses:
+            response.append((course.pk, course.title))
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    raise Http404
 
 
 def search(request):

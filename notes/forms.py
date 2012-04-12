@@ -6,7 +6,15 @@ from simple_autocomplete.widgets import AutoCompleteWidget
 
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
-    course = forms.ModelChoiceField(queryset=Course.objects.all(), empty_label="")
+    #course = forms.ModelChoiceField(queryset=Course.objects.all(), empty_label="")
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        initial=3,
+        widget=AutoCompleteWidget(
+            url='/courses',
+            initial_display=''
+        )
+    )
     #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
     school = forms.ModelChoiceField(
         queryset=School.objects.all(),

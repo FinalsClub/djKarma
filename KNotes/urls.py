@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'', include('social_auth.urls')),
 
     # For autocomplete modelChoice fields
+    url(r'^courses$', 'notes.views.courses'),
     url(r'^schools$', 'notes.views.schools'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     #url(r'^autocomplete/', include('autocomplete.urls')),
