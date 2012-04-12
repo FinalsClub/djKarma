@@ -1,2 +1,11 @@
 Django>=1.4
 gdata==2.0.16
+django-simple-autocomplete==0.2.unreleased
+django-social-auth==0.6.7
+
+-- dependencies of the above --
+
+httplib2==0.7.4
+oauth2==1.5.211
+python-openid==2.2.5
+wsgiref==0.1.2
