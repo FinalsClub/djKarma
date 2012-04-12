@@ -17,6 +17,10 @@ urlpatterns = patterns('',
     url(r'^search$', 'notes.views.search'),
     url(r'^searchNotesByTag', 'notes.views.searchByTag'),
 
+    # Auth
+    url(r'^login', 'notes.views.login'),
+    url(r'', include('social_auth.urls')),
+
     # For autocomplete modelChoice fields
     url(r'^schools$', 'notes.views.schools'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),

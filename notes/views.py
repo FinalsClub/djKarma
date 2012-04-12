@@ -7,11 +7,17 @@ from utils import jsonifyModel
 from forms import UploadFileForm, SelectTagsForm
 from gdocs import convertWithGDocs
 from django.http import Http404
+from django.contrib.auth.decorators import login_required
 
 #from django.core import serializers
 
-
+@login_required
 def home(request):
+    # If user is authenticated, home view should be upload-notes page
+    # Else go to login page
+
+    # If a note has been uploaded (POST request), process it and report success.
+    # Return user to upload screen
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -23,9 +29,13 @@ def home(request):
             convertWithGDocs(newNote)
             print "upload handled!"
             return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
+    #If a note has not been uploaded (GET request), show the upload form.
     else:
         form = UploadFileForm()
     return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
+
+def login(request):
+    return render_to_response('login.html', context_instance=RequestContext(request))
 
 
 def schools(request):
@@ -45,7 +55,7 @@ def jquery(request):
     tag_form = SelectTagsForm()
     return render_to_response('jqueryTest.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
 
-
+@login_required
 def note(request, note_pk):
     try:
         note = Note.objects.get(pk=note_pk)
