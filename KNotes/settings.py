@@ -135,8 +135,11 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'
-#LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
 #LOGIN_ERROR_URL    = '/login/'
+
+#If we want a different redirect for social login:
+#SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profile'
 SOCIAL_AUTH_COMPLETE_URL_NAME  = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 
