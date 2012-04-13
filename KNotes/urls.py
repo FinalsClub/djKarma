@@ -18,10 +18,13 @@ urlpatterns = patterns('',
     url(r'^searchNotesByTag$', 'notes.views.searchByTag'),
 
     #Profile
-    url(r'^profile$', 'notes.views.profile'),
+    url(r'^profile$', 'notes.views.profile', name='profile'),
 
     # Auth
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/profile'}, name='auth_logout'),
+    # This logout allows us to pass a redirect:
+    # <a href="{% url auth_logout_next /some/location %}">Logout</a>
+    #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
     url(r'^accounts/register/$', 'notes.views.register', name='register'),
     url(r'', include('social_auth.urls')),
