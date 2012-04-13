@@ -8,6 +8,7 @@ from forms import UploadFileForm, SelectTagsForm
 from gdocs import convertWithGDocs
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import forms, authenticate, login
 
 #from django.core import serializers
 
@@ -40,6 +41,33 @@ def home(request):
 @login_required
 def profile(request):
     return render_to_response('profile.html', context_instance=RequestContext(request))
+
+# Display user login and signup screens
+# the registration/login.html template redirects login attempts
+# to django's built-in login view (django.contrib.auth.views.login)
+# and user registration is handled by this view (because there is no built-in)
+def register(request):
+    if request.method == 'POST':
+        #Fill form with POSTed data
+        form = forms.UserCreationForm(request.POST)
+        if form.is_valid():
+            print 'form valid'
+            #Save the new user from form data
+            new_user = form.save()
+            #Authenticate the new user
+            new_user = authenticate(username=request.POST['username'],
+                                    password=request.POST['password1'])
+            #Login in the new user
+            login(request, new_user)
+            return HttpResponseRedirect("/profile")
+        else:
+            return render_to_response("registration/register.html", {
+        'form': form}, context_instance=RequestContext(request))
+
+    form = forms.UserCreationForm()
+    return render_to_response("registration/register.html", {
+        'form': form}, context_instance=RequestContext(request))
+
 
 # NOTE: There is currently a css conflict between Twitter Bootstrap and Jquery UI
 #       Which prevents the jquery autocomplete from displaying properly.

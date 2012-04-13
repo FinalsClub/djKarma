@@ -21,8 +21,9 @@ urlpatterns = patterns('',
     url(r'^profile$', 'notes.views.profile'),
 
     # Auth
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/profile'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/register/$', 'notes.views.register', name='register'),
     url(r'', include('social_auth.urls')),
 
     # For autocomplete modelChoice fields
