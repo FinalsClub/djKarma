@@ -35,17 +35,17 @@ def home(request):
             newNote.tags = form.cleaned_data['tags']
             convertWithGDocs(newNote)
             print "upload handled!"
-            return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
+            return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
         print request.user.username
         form = UploadFileForm()
-    return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
+    return render_to_response('upload.html', {'form': form, })
 
 
 @login_required
 def profile(request):
-    return render_to_response('profile.html', context_instance=RequestContext(request))
+    return render_to_response('profile.html')
 
 # Display user login and signup screens
 # the registration/login.html template redirects login attempts
@@ -105,12 +105,12 @@ def courses(request):
 
 def search(request):
     tag_form = SelectTagsForm()
-    return render_to_response('search.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
+    return render_to_response('search.html', {'tag_form': tag_form})
 
 
 def jquery(request):
     tag_form = SelectTagsForm()
-    return render_to_response('jqueryTest.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
+    return render_to_response('jqueryTest.html', {'tag_form': tag_form})
 
 @login_required
 def note(request, note_pk):
@@ -118,7 +118,7 @@ def note(request, note_pk):
         note = Note.objects.get(pk=note_pk)
     except:
         raise Http404
-    return render_to_response('note.html', {'note': note}, context_instance=RequestContext(request))
+    return render_to_response('note.html', {'note': note})
 
 
 def searchByTag(request):
@@ -134,7 +134,7 @@ def searchByTag(request):
                 response[n.school.name] = {}
                 response[n.school.name][n.course.title] = n
             '''
-            return render_to_response('notes2.html', {'notes' : notes}, context_instance=RequestContext(request))
+            return render_to_response('notes2.html', {'notes' : notes})
     raise Http404
 
 def searchBySchool(request):
