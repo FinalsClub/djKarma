@@ -1,50 +1,55 @@
 The KarmaNotes Django Experiment
---------------------------------
+================================
 
-What must be accomplished this weekend
-======================================
+What needs to be done:
+----------------------
 
-
-models.py:
-
- + notes schema                   DONE
- + user\_profile hooked up (add to settings.py)
- + schools and courses need to be fkey'd correctly DONE
- * Optional: karma and karma\_actions
 
 views.py:
 
- + splashpage	DONE
- + view all notes by school and course 	DONE
-
-./templates:
-
- + simple base.html template for header DONE
- + index.html for splashpage with current KN logo frontpage as-is DONE
- + new notes.html template for rendering a list of notes
- + new note.html template for rendering a note and it's metadata
+ + TODO: make list of routes we know that we have to implement
 
 users:
 
- + login
+ + TODO: find user interaction cases we haven't added yet
+
+./templates:
+
+ + Base template
+ + Profile page
+
+Lightboxes (lightboxen)
+
+ + Login
+
+Upload
+
+ + create course on file upload
+ + create user on file upload
+ + create school on file upload
+   + create approved flag on school model, only show in UI once admin approves school
 
 
 Dependencies
-============
+------------
 
-The starred dependencies are the root packages you must install with pip or easy_isntall. The rest are dependencies of the starred packages.
+ + Python2.7
+ + django1.4
 
-* Django==1.4
-* django-simple-autocomplete==0.2.unreleased
-* django-social-auth==0.6.7
-* gdata==2.0.16
-httplib2==0.7.4
-oauth2==1.5.211
-python-openid==2.2.5
-wsgiref==0.1.2
+
+To install python package dependencies run:
+
+    pip install -r requirements.txt
+
+TODO: add deployment dependcies
+
+Deployment
+----------
+
+ + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
 Note on Database migrations
-============================
+----------------------------
 
 I've installed South to help ease database migrations whenever the models.py file is altered.
 South's workflow is as follows for changes to the 'notes' app:
@@ -54,7 +59,7 @@ South's workflow is as follows for changes to the 'notes' app:
 3) ./manage.py migrate notes
 
 Note on Google Documents API
-============================
+----------------------------
 
  To authorize the Google Documents script to act on behalf of the target google account, verfication will have to be granted by visiting:
 
@@ -62,11 +67,3 @@ Note on Google Documents API
 
  In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
 
-Priorities for Tuesday
-======================
-1. tags         DONE
-2. prettier, design
-3. users
-4. profile page and 
-
-add 10 things tomorrow, 100 things friday
