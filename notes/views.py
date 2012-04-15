@@ -7,11 +7,19 @@ from utils import jsonifyModel
 from forms import UploadFileForm, SelectTagsForm
 from gdocs import convertWithGDocs
 from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import forms, authenticate, login
 
 #from django.core import serializers
 
 
+@login_required
 def home(request):
+    # If user is authenticated, home view should be upload-notes page
+    # Else go to login page
+
+    # If a note has been uploaded (POST request), process it and report success.
+    # Return user to upload screen
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -23,17 +31,71 @@ def home(request):
             convertWithGDocs(newNote)
             print "upload handled!"
             return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form}, context_instance=RequestContext(request))
+    #If a note has not been uploaded (GET request), show the upload form.
     else:
+        print request.user.username
         form = UploadFileForm()
     return render_to_response('upload.html', {'form': form, }, context_instance=RequestContext(request))
 
 
+@login_required
+def profile(request):
+    return render_to_response('profile.html', context_instance=RequestContext(request))
+
+# Display user login and signup screens
+# the registration/login.html template redirects login attempts
+# to django's built-in login view (django.contrib.auth.views.login)
+# and user registration is handled by this view (because there is no built-in)
+def register(request):
+    if request.method == 'POST':
+        #Fill form with POSTed data
+        form = forms.UserCreationForm(request.POST)
+        if form.is_valid():
+            print 'form valid'
+            #Save the new user from form data
+            new_user = form.save()
+            #Authenticate the new user
+            new_user = authenticate(username=request.POST['username'],
+                                    password=request.POST['password1'])
+            #Login in the new user
+            login(request, new_user)
+            return HttpResponseRedirect("/profile")
+        else:
+            return render_to_response("registration/register.html", {
+        'form': form}, context_instance=RequestContext(request))
+
+    form = forms.UserCreationForm()
+    return render_to_response("registration/register.html", {
+        'form': form}, context_instance=RequestContext(request))
+
+
+# NOTE: There is currently a css conflict between Twitter Bootstrap and Jquery UI
+#       Which prevents the jquery autocomplete from displaying properly.
+#       See https://github.com/twitter/bootstrap/issues/156
+#       I'll look at fixing this issue shortly
+# Handles ajax queries from the School autocomplete form field
 def schools(request):
-    schools = School.objects.all()
-    response = []
-    for school in schools:
-        response.append((school.pk, school.name))
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    if request.is_ajax():
+        query = request.GET.get('q')
+        schools = School.objects.filter(name__contains=query).distinct()
+        response = []
+        for school in schools:
+            response.append((school.pk, school.name))
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    raise Http404
+
+# Handles ajax queries from the Course autocomplete form field
+def courses(request):
+    if request.is_ajax():
+        query = request.GET.get('q')
+        courses = Course.objects.filter(title__contains=query).distinct()
+        response = []
+        for course in courses:
+            response.append((course.pk, course.title))
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    raise Http404
 
 
 def search(request):
@@ -45,7 +107,7 @@ def jquery(request):
     tag_form = SelectTagsForm()
     return render_to_response('jqueryTest.html', {'tag_form': tag_form}, context_instance=RequestContext(request))
 
-
+@login_required
 def note(request, note_pk):
     try:
         note = Note.objects.get(pk=note_pk)

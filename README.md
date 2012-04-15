@@ -14,19 +14,44 @@ models.py:
 
 views.py:
 
- + XXX splashpage
- + XXX view all notes by school and course
+ + splashpage	DONE
+ + view all notes by school and course 	DONE
 
 ./templates:
 
- + simple base.html template for header
- + XXX index.html for splashpage with current KN logo frontpage as-is
+ + simple base.html template for header DONE
+ + index.html for splashpage with current KN logo frontpage as-is DONE
  + new notes.html template for rendering a list of notes
  + new note.html template for rendering a note and it's metadata
 
 users:
 
  + login
+
+
+Dependencies
+============
+
+The starred dependencies are the root packages you must install with pip or easy_isntall. The rest are dependencies of the starred packages.
+
+* Django==1.4
+* django-simple-autocomplete==0.2.unreleased
+* django-social-auth==0.6.7
+* gdata==2.0.16
+httplib2==0.7.4
+oauth2==1.5.211
+python-openid==2.2.5
+wsgiref==0.1.2
+
+Note on Database migrations
+============================
+
+I've installed South to help ease database migrations whenever the models.py file is altered.
+South's workflow is as follows for changes to the 'notes' app:
+
+1) Alter models.py as needed
+2) ./manage.py schemamigration notes --auto
+3) ./manage.py migrate notes
 
 Note on Google Documents API
 ============================
@@ -36,7 +61,6 @@ Note on Google Documents API
  https://accounts.google.com/DisplayUnlockCaptcha
 
  In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
-
 
 Priorities for Tuesday
 ======================

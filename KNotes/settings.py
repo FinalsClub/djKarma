@@ -107,6 +107,49 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+######################
+# Begin Auth Settings
+#######################
+
+AUTHENTICATION_BACKENDS = (
+#   Auth backends courtesy django-social-auth
+
+#   'social_auth.backends.twitter.TwitterBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+#    'social_auth.backends.google.GoogleOAuthBackend',
+#    'social_auth.backends.google.GoogleOAuth2Backend',
+#    'social_auth.backends.google.GoogleBackend',
+#    'social_auth.backends.yahoo.YahooBackend',
+#    'social_auth.backends.browserid.BrowserIDBackend',
+#    'social_auth.backends.contrib.linkedin.LinkedinBackend',
+#    'social_auth.backends.contrib.livejournal.LiveJournalBackend',
+#    'social_auth.backends.contrib.orkut.OrkutBackend',
+#    'social_auth.backends.contrib.foursquare.FoursquareBackend',
+#    'social_auth.backends.contrib.dropbox.DropboxBackend',
+#    'social_auth.backends.contrib.flickr.FlickrBackend',
+#    'social_auth.backends.contrib.instagram.InstagramBackend',
+#    'social_auth.backends.OpenIDBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
+
+#LOGIN_URL          = '/login/'
+LOGIN_REDIRECT_URL = '/'
+#LOGIN_ERROR_URL    = '/login/'
+
+#If we want a different redirect for social login:
+#SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profile'
+SOCIAL_AUTH_COMPLETE_URL_NAME  = 'socialauth_complete'
+SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
+
+FACEBOOK_APP_ID              = '324162827650119'
+FACEBOOK_API_SECRET          = 'dba7325b1a179ed25937c1377850fbf2'
+
+######################
+# End Auth Settings
+#######################
+
 ROOT_URLCONF = 'KNotes.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -122,6 +165,12 @@ TEMPLATE_DIRS = (
     './templates'
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.request", #Makes request accessible to templates
+    #"django.core.context_processors.static",
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,6 +182,8 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'notes',
     'simple_autocomplete',
+    'social_auth',
+    'south',
     #'autocomplete',
 )
 

@@ -1,0 +1,25 @@
+{% extends "index.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<div class="row-fluid" style="text-align:center;">
+	<h1>Hey {{request.user.username}}</h1>
+    <br/><br/>
+</div>
+	  <div class="row-fluid">
+	    <div class="span2">
+	      user profile
+	    </div>
+	    <div class="span10" style="height:200px">
+	      upload form? May be redundant since "Upload" button is visible in navbar.
+	    </div>
+	  </div>
+	  <div class="row-fluid">
+	  	<div class="span12" style="margin:20px;padding:10px;">
+	      My uploads / Activity feed?
+	    </div>
+	  </div>
+
+
+{% endblock %}
