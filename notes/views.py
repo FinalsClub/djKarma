@@ -1,14 +1,19 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
+# Standard lib imports
 import json
-from django.template import RequestContext
-from models import School, Course, Note
 from utils import jsonifyModel
-from forms import UploadFileForm, SelectTagsForm
-from gdocs import convertWithGDocs
-from django.http import Http404
+# Django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms, authenticate, login
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.http import Http404
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+# External lib imports
+from gdocs import convertWithGDocs
+# Local imports
+from models import School, Course, Note
+from forms import UploadFileForm, SelectTagsForm
 
 #from django.core import serializers
 
