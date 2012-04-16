@@ -7,8 +7,7 @@ from django.contrib.auth import forms, authenticate, login
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
@@ -18,6 +17,7 @@ from forms import UploadFileForm, SelectTagsForm
 #from django.core import serializers
 
 
+# Landing Page
 @login_required
 def home(request):
     # If user is authenticated, home view should be upload-notes page
@@ -34,23 +34,23 @@ def home(request):
                                 file=request.FILES['note_file'])
             newNote.tags = form.cleaned_data['tags']
             convertWithGDocs(newNote)
-            print "upload handled!"
-            return render_to_response('upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form})
+            return render(request, 'upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
         print request.user.username
         form = UploadFileForm()
-    return render_to_response('upload.html', {'form': form, })
+    return render(request, 'upload.html', {'form': form, })
 
-
+# User Profile
 @login_required
 def profile(request):
-    return render_to_response('profile.html')
+    return render(request, 'profile.html')
+
 
 # Display user login and signup screens
 # the registration/login.html template redirects login attempts
-# to django's built-in login view (django.contrib.auth.views.login)
-# and user registration is handled by this view (because there is no built-in)
+# to django's built-in login view (django.contrib.auth.views.login).
+# new user registration is handled by this view (because there is no built-in)
 def register(request):
     if request.method == 'POST':
         #Fill form with POSTed data
@@ -66,19 +66,14 @@ def register(request):
             login(request, new_user)
             return HttpResponseRedirect("/profile")
         else:
-            return render_to_response("registration/register.html", {
-        'form': form}, context_instance=RequestContext(request))
+            return render(request, "registration/register.html", {
+        'form': form})
+    else:
+        form = forms.UserCreationForm()
+        return render(request, "registration/register.html", {'form': form})
 
-    form = forms.UserCreationForm()
-    return render_to_response("registration/register.html", {
-        'form': form}, context_instance=RequestContext(request))
 
-
-# NOTE: There is currently a css conflict between Twitter Bootstrap and Jquery UI
-#       Which prevents the jquery autocomplete from displaying properly.
-#       See https://github.com/twitter/bootstrap/issues/156
-#       I'll look at fixing this issue shortly
-# Handles ajax queries from the School autocomplete form field
+# Ajax: School autcomplete form field
 def schools(request):
     if request.is_ajax():
         query = request.GET.get('q')
@@ -90,7 +85,8 @@ def schools(request):
 
     raise Http404
 
-# Handles ajax queries from the Course autocomplete form field
+
+# Ajax: Course autocomplete form field
 def courses(request):
     if request.is_ajax():
         query = request.GET.get('q')
@@ -103,40 +99,36 @@ def courses(request):
     raise Http404
 
 
+# Browse and Search Notes
 def search(request):
-    tag_form = SelectTagsForm()
-    return render_to_response('search.html', {'tag_form': tag_form})
+    # If the SelectTagsForm form has been submitted, display search result
+    if request.method == 'POST':
+        tag_form = SelectTagsForm(request.POST)
+        if tag_form.is_valid():
+            tags = tag_form.cleaned_data['tags']
+            notes = Note.objects.filter(tags__in=tags).distinct()
+            return render(request, 'notes2.html', {'notes': notes})
+        else:
+            return render(request, 'search.html', {'tag_form': tag_form})
+
+    # If this is a GET request, display the SelectTagsForm
+    else:
+        tag_form = SelectTagsForm()
+        return render(request, 'search.html', {'tag_form': tag_form})
 
 
-def jquery(request):
-    tag_form = SelectTagsForm()
-    return render_to_response('jqueryTest.html', {'tag_form': tag_form})
-
+# View Note HTML
 @login_required
 def note(request, note_pk):
     try:
         note = Note.objects.get(pk=note_pk)
     except:
         raise Http404
-    return render_to_response('note.html', {'note': note})
+    return render(request, 'note.html', {'note': note})
 
 
-def searchByTag(request):
-    if request.method == 'POST':
-        form = SelectTagsForm(request.POST)
-        if form.is_valid():
-            response = {}
-            tags = form.cleaned_data['tags']
-            notes = Note.objects.filter(tags__in=tags).distinct()
-            '''
-            To fill seth's notes.html template. Got an error so whippped up a quick temp notes2.html
-            for n in notes:
-                response[n.school.name] = {}
-                response[n.school.name][n.course.title] = n
-            '''
-            return render_to_response('notes2.html', {'notes' : notes})
-    raise Http404
-
+# Ajax: Return all schools and courses in JSON
+# Used by search page javascript
 def searchBySchool(request):
     response_json = []
 
@@ -146,6 +138,8 @@ def searchBySchool(request):
             school_json = jsonifyModel(school, depth=1)
             response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
+    else:
+        raise Http404
 
         #A nicer way to do this would be to override the queryset serializer
         #data = serializers.serialize("json", School.objects.all())
@@ -153,12 +147,12 @@ def searchBySchool(request):
         #json_serializer = serializers.get_serializer("json")()
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
-
+# Ajax: Return all notes belonging to a school
+# Used by search page javascript
 def notesOfSchool(request, school_pk):
     response_json = []
     print 'wtf'
-    #if request.is_ajax():
-    if 0 == 0:
+    if request.is_ajax():
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
         print jsonifyModel(school, depth=2)
@@ -166,8 +160,10 @@ def notesOfSchool(request, school_pk):
 
             #response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
+    else:
+        raise Http404
 
-
+# Display all notes
 def all_notes(request):
     print "using the all_notes view"
     response = {}

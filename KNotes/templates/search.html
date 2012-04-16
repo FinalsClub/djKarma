@@ -10,9 +10,13 @@
     <h2> - or - </h2>
     <br/>
     <h1>Search By Tag</h1>
-      <form enctype="multipart/form-data" action="/searchNotesByTag" method="post">{% csrf_token %}
+      <form enctype="multipart/form-data" action="/search" method="post">{% csrf_token %}
       {{ message }}
-      {{ tag_form.as_p }}
+      {% for field in tag_form %}
+        <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+        {{ field.label_tag }} 
+        {{ field }}
+      {% endfor %}<br/>
       <input class="btn btn-primary" type="submit" value="Search!" />
     </form>
   </div>

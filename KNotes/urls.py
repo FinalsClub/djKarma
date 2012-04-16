@@ -1,24 +1,34 @@
 from django.conf.urls import patterns, include, url
 import notes.views
 
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
+# Be mindful of overly broad url patterns
+# Remember the trailing $ to avoid partial match
+
 urlpatterns = patterns('',
-    # Be mindful of overly broad url patterns
-    # Prior, ^notes was pre-empting ^notesOfSchool/
-    # Remember the trailing $ to avoid partial match
+
+    # Landing page (Note Upload Form)
+    url(r'^$', 'notes.views.home'),
+
+     # Browse by School / Search by Tag view
+    url(r'^search$', 'notes.views.search'),
+
+    # User Profile
+    url(r'^profile$', 'notes.views.profile', name='profile'),
+
+    # Note View
     url(r'^note/(\d{1,99})$', 'notes.views.note'),
-    url(r'^notes$', 'notes.views.all_notes'),
+
+    # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
     url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),
-    url(r'^$', 'notes.views.home'),
-    url(r'^search$', 'notes.views.search'),
-    url(r'^searchNotesByTag$', 'notes.views.searchByTag'),
 
-    #Profile
-    url(r'^profile$', 'notes.views.profile', name='profile'),
+    # Ajax requests from note upload form for autocomplete fields
+    url(r'^courses$', 'notes.views.courses'),
+    url(r'^schools$', 'notes.views.schools'),
+    url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
 
     # Auth
     # This logout allows us to pass a redirect:
@@ -29,18 +39,13 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$', 'notes.views.register', name='register'),
     url(r'', include('social_auth.urls')),
 
-    # For autocomplete modelChoice fields
-    url(r'^courses$', 'notes.views.courses'),
-    url(r'^schools$', 'notes.views.schools'),
-    url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
-    #url(r'^autocomplete/', include('autocomplete.urls')),
 
-    #TESTING
-    url(r'^jquery/', 'notes.views.jquery'),
+    # View all notes (unused)
+    # url(r'^notes$', 'notes.views.all_notes'),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
+    # admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
+    # admin:
     url(r'^admin/', include(admin.site.urls)),
 )
