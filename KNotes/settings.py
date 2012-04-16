@@ -182,7 +182,7 @@ INSTALLED_APPS = (
     'simple_autocomplete',
     'social_auth',
     'south',
-    #'autocomplete',
+    'gunicorn',
 )
 
 # A sample logging configuration. The only tangible logging
