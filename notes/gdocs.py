@@ -22,6 +22,9 @@ def convertWithGDocs(Note):
     (file_type, encoding) = mimetypes.guess_type(Note.file.path)
     # file_type = 'text/plain', encoding = None
 
+    if file_type == None:
+        raise Exception('File extension required.')
+
     #Encapsulate the upload file as Google requires
     fileToUpload = gdata.data.MediaSource(file_path=Note.file.path, content_type=file_type)
 

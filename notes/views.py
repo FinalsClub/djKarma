@@ -33,7 +33,12 @@ def home(request):
                                 school=form.cleaned_data['school'],
                                 file=request.FILES['note_file'])
             newNote.tags = form.cleaned_data['tags']
-            convertWithGDocs(newNote)
+            try:
+                convertWithGDocs(newNote)
+            except:
+                newNote.delete()
+                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
+
             return render(request, 'upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
