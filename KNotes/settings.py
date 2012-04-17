@@ -1,3 +1,4 @@
+# settings.py is part of Karma Notes
 # Django settings for KNotes project.
 # Copyright (C) 2012  FinalsClub Foundation
 #
