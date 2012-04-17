@@ -9,7 +9,6 @@ class UploadFileForm(forms.Form):
     #course = forms.ModelChoiceField(queryset=Course.objects.all(), empty_label="")
     course = forms.ModelChoiceField(
         queryset=Course.objects.all(),
-        initial=3,
         widget=AutoCompleteWidget(
             url='/courses',
             initial_display=''
@@ -18,11 +17,12 @@ class UploadFileForm(forms.Form):
     #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
     school = forms.ModelChoiceField(
         queryset=School.objects.all(),
-        initial=3,
         widget=AutoCompleteWidget(
             url='/schools',
             initial_display=''
-        )
+        ),
+        # TODO: Figure out how to override the default invalid message.
+        error_messages={'invalid': 'Enter a valid course. Begin typing a course name to see available choices.'},
     )
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'))
     #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )

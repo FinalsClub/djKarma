@@ -43,7 +43,9 @@ def home(request):
     #If a note has not been uploaded (GET request), show the upload form.
     else:
         print request.user.username
-        form = UploadFileForm()
+        # Provide bogus default school and course data to ensure
+        # legitimate data is chosen
+        form = UploadFileForm(initial={'course': -1, 'school': -1})
     return render(request, 'upload.html', {'form': form, })
 
 # User Profile
