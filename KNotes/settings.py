@@ -18,7 +18,7 @@
 
 
 
-
+from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET
 import os
 
 DEBUG = True
@@ -161,8 +161,8 @@ LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_COMPLETE_URL_NAME  = 'socialauth_complete'
 SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 
-FACEBOOK_APP_ID              = '324162827650119'
-FACEBOOK_API_SECRET          = 'dba7325b1a179ed25937c1377850fbf2'
+FACEBOOK_APP_ID              = FACEBOOK_ID
+FACEBOOK_API_SECRET          = FACEBOOK_SECRET
 
 ######################
 # End Auth Settings

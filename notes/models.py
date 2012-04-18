@@ -19,6 +19,27 @@ from django.db.models.signals import post_save
 import datetime
 import re
 
+# Used to incrementally tally site statistics
+# For display on landing page, etc.
+# This is more efficient then calculating totals on every request
+class SiteStats(models.Model):
+    numNotes = models.IntegerField(default=0)
+    numStudyGuides = models.IntegerField(default=0)
+    numSyllabi = models.IntegerField(default=0)
+    numAssignments = models.IntegerField(default=0)
+    numExams = models.IntegerField(default=0)
+
+    numCourses = models.IntegerField(default=0)
+    numSchools = models.IntegerField(default=0)
+
+    def decrement(self, sender):
+        if isinstance(sender, Note):
+            self.numNotes -= 1
+        elif isinstance(sender, School):
+            self.numSchools -= 1
+
+
+
 # This class represents a meta-tag of a note
 # Used for searching
 class Tag(models.Model):
@@ -56,6 +77,15 @@ class School(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # If a new School is being saved, increment SiteStat School count
+            SiteStats.numSchools += 1
+        super(School, self).save(*args, **kwargs)
+
+post_delete.connect(SiteStats.decrement(sender), sender=School)
+
 
 
 class Course(models.Model):

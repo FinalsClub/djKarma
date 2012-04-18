@@ -20,7 +20,7 @@ import gdata.docs.service
 import gdata.docs.data
 import gdata.data
 import mimetypes
-from credentials import USER, PASS
+from credentials import GOOGLE_USER, GOOGLE_PASS
 from KNotes.settings import MEDIA_ROOT
 
 
@@ -30,7 +30,7 @@ def convertWithGDocs(Note):
     # Create a client class which will make HTTP requests with Google Docs server.
     client = gdata.docs.service.DocsService()
     # Authenticate using your Google Docs email address and password.
-    client.ClientLogin(USER, PASS)
+    client.ClientLogin(GOOGLE_USER, GOOGLE_PASS)
 
     (file_type, encoding) = mimetypes.guess_type(Note.file.path)
     # file_type = 'text/plain', encoding = None

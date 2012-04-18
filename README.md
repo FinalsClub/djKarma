@@ -54,6 +54,19 @@ Note on Database migrations
 I've installed South to help ease database migrations whenever the models.py file is altered.
 South's workflow is as follows for changes to the 'notes' app:
 
+To initialize South:
+
+New project:
+
+1) ./manage.py schemamigration notes --initial
+
+Existing project:
+
+1) ./manage.py convert_to_south notes
+
+
+To perform migrations with South:
+
 1) Alter models.py as needed
 2) ./manage.py schemamigration notes --auto
 3) ./manage.py migrate notes

@@ -4,3 +4,4 @@
 *.sql
 *credentials.py
 /uploads
+/notes/migrations
