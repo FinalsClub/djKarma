@@ -25,6 +25,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
+    # Landing page. Temporarily redirect to upload
+    url(r'^$', 'notes.views.upload'),
+
     # Upload page (Note Upload Form)
     url(r'^upload$', 'notes.views.upload'),
 
