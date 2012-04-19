@@ -201,7 +201,7 @@ INSTALLED_APPS = (
     'notes',
     'simple_autocomplete',
     'social_auth',
-    'south',
+   # 'south',
     'gunicorn',
 )
 

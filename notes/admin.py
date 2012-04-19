@@ -21,9 +21,10 @@ import models
 
 admin.site.register(models.School)
 admin.site.register(models.Course)
-admin.site.register(models.Note)
+admin.site.register(models.File)
 admin.site.register(models.Tag)
 admin.site.register(models.ReputationEventType)
+admin.site.register(models.SiteStats)
 admin.site.unregister(User)
 
 

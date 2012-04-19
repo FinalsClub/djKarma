@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from models import School, Course, Note
+from models import School, Course, File
 
 # Returns a python dictionary representation of a model
 # The resulting model is ready for json.dumps()
@@ -41,7 +41,7 @@ def jsonifyModel(model, depth=0):
             for note in model.note_set.all():
                 note_json = jsonifyModel(note)
                 json_result["notes"].append(note_json)
-    elif isinstance(model, Note):
+    elif isinstance(model, File):
         json_result["_id"] = model.pk
         json_result["notedesc"] = model.title
     return json_result

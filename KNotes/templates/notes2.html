@@ -2,7 +2,7 @@
 {% block content %}
 <h1>Search Results </h1>
 <br/><br/>
-{% for note in notes %}
-<h1><a href="/note/{{note.pk}}"> {{note.title}}</a><h1>
+{% for file in files %}
+<h1><a href="/file/{{file.pk}}"> {{file.title}}</a><h1>
 {% endfor %}
 {% endblock %}

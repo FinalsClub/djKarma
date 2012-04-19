@@ -26,7 +26,7 @@ from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
-from models import School, Course, Note
+from models import School, Course, File, Instructor
 from forms import UploadFileForm, SelectTagsForm
 
 #from django.core import serializers
@@ -43,7 +43,7 @@ def home(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            newNote = Note.objects.create(title=form.cleaned_data['title'],
+            newNote = File.objects.create(title=form.cleaned_data['title'],
                                 course=form.cleaned_data['course'],
                                 school=form.cleaned_data['school'],
                                 file=request.FILES['note_file'])
@@ -54,7 +54,7 @@ def home(request):
                 newNote.delete()
                 return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
 
-            return render(request, 'upload.html', {'message': 'Note Successfully Uploaded! Add another!', 'form': form})
+            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
         print request.user.username
@@ -62,6 +62,7 @@ def home(request):
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return render(request, 'upload.html', {'form': form, })
+
 
 # User Profile
 @login_required
@@ -93,6 +94,19 @@ def register(request):
     else:
         form = forms.UserCreationForm()
         return render(request, "registration/register.html", {'form': form})
+
+
+# Ajax: Instructor autcomplete form field
+def instructors(request):
+    if request.is_ajax():
+        query = request.GET.get('q')
+        instructors = Instructor.objects.filter(name__contains=query).distinct()
+        response = []
+        for instructor in instructors:
+            response.append((instructor.pk, instructor.name))
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    raise Http404
 
 
 # Ajax: School autcomplete form field
@@ -128,8 +142,8 @@ def search(request):
         tag_form = SelectTagsForm(request.POST)
         if tag_form.is_valid():
             tags = tag_form.cleaned_data['tags']
-            notes = Note.objects.filter(tags__in=tags).distinct()
-            return render(request, 'notes2.html', {'notes': notes})
+            files = File.objects.filter(tags__in=tags).distinct()
+            return render(request, 'notes2.html', {'files': files})
         else:
             return render(request, 'search.html', {'tag_form': tag_form})
 
@@ -143,7 +157,7 @@ def search(request):
 @login_required
 def note(request, note_pk):
     try:
-        note = Note.objects.get(pk=note_pk)
+        note = File.objects.get(pk=note_pk)
     except:
         raise Http404
     return render(request, 'note.html', {'note': note})
@@ -169,6 +183,7 @@ def searchBySchool(request):
         #json_serializer = serializers.get_serializer("json")()
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
+
 # Ajax: Return all notes belonging to a school
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
@@ -185,6 +200,7 @@ def notesOfSchool(request, school_pk):
     else:
         raise Http404
 
+
 # Display all notes
 def all_notes(request):
     print "using the all_notes view"
@@ -193,9 +209,9 @@ def all_notes(request):
     for school in School.objects.all():
         print school
         response['schools'][school.name] = {}
-        for course in Course.objects.filter(school = school).all():
+        for course in Course.objects.filter(school=school).all():
             print course
-            notes = Note.objects.filter(course = course).all()
+            notes = File.objects.filter(course=course).all()
             response['schools'][school.name][course.title] = notes
     print response
-    return render_to_response('notes.html', response)
+    return render(request, 'notes.html', response)

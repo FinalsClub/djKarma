@@ -25,21 +25,21 @@ from KNotes.settings import MEDIA_ROOT
 
 
 # given a filePath, upload the file to Google Docs and retrieve html
-def convertWithGDocs(Note):
+def convertWithGDocs(File):
     #print Note.file.path
     # Create a client class which will make HTTP requests with Google Docs server.
     client = gdata.docs.service.DocsService()
     # Authenticate using your Google Docs email address and password.
     client.ClientLogin(GOOGLE_USER, GOOGLE_PASS)
 
-    (file_type, encoding) = mimetypes.guess_type(Note.file.path)
+    (file_type, encoding) = mimetypes.guess_type(File.file.path)
     # file_type = 'text/plain', encoding = None
 
     if file_type == None:
         raise Exception('File extension required.')
 
     #Encapsulate the upload file as Google requires
-    fileToUpload = gdata.data.MediaSource(file_path=Note.file.path, content_type=file_type)
+    fileToUpload = gdata.data.MediaSource(file_path=File.file.path, content_type=file_type)
 
     #Create a collection (folder) in the root directory
     #collection = client.CreateFolder(title='API Generated Folder')
@@ -51,11 +51,11 @@ def convertWithGDocs(Note):
 
     #Upload a document to a folder
     #uploaded_file = client.Upload(media_source=fileToUpload, title=Note.title, folder_or_uri=collection_child)
-    uploaded_file = client.Upload(media_source=fileToUpload, title=Note.title)
-    client.Download(entry_or_id_or_url=uploaded_file, file_path=Note.file.path+'.html')
-    f = open(Note.file.path+'.html')
-    Note.html = f.read()
-    Note.save()
+    uploaded_file = client.Upload(media_source=fileToUpload, title=File.title)
+    client.Download(entry_or_id_or_url=uploaded_file, file_path=File.file.path + '.html')
+    f = open(File.file.path + '.html')
+    File.html = f.read()
+    File.save()
     f.close()
     #document_query = gdata.docs.service.DocumentQuery()
     #print document_query.ToUri()

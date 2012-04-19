@@ -15,13 +15,15 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 import datetime
 import re
 
 # Used to incrementally tally site statistics
 # For display on landing page, etc.
 # This is more efficient then calculating totals on every request
+# Upon installing the app we should initialize ONE instance of SiteStats
+# The increment/decrement methods will act only on the first instance (pk=1)
 class SiteStats(models.Model):
     numNotes = models.IntegerField(default=0)
     numStudyGuides = models.IntegerField(default=0)
@@ -32,11 +34,29 @@ class SiteStats(models.Model):
     numCourses = models.IntegerField(default=0)
     numSchools = models.IntegerField(default=0)
 
-    def decrement(self, sender):
-        if isinstance(sender, Note):
-            self.numNotes -= 1
-        elif isinstance(sender, School):
-            self.numSchools -= 1
+# Decrease the appropriate stat given a Model
+# Called in Model save() and post_delete()
+def decrement(sender, **kwargs):
+    stats = SiteStats.objects.get(pk=1)
+    print stats.numNotes
+    if isinstance(sender, Note):
+        stats.numNotes -= 1
+    elif isinstance(sender, School):
+        stats.numSchools -= 1
+    elif isinstance(sender, Course):
+        stats.numSchools -= 1
+    stats.save()
+
+def increment(sender, **kwargs):
+    stats = SiteStats.objects.get(pk=1)
+    print stats.numNotes
+    if isinstance(sender, Note):
+        stats.numNotes += 1
+    elif isinstance(sender, School):
+        stats.numSchools += 1
+    elif isinstance(sender, Course):
+        stats.numSchools += 1
+    stats.save()
 
 
 
@@ -79,13 +99,18 @@ class School(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        # If a new School is being saved, increment SiteStat School count
         if not self.pk:
-            # If a new School is being saved, increment SiteStat School count
-            SiteStats.numSchools += 1
+            increment(self)
         super(School, self).save(*args, **kwargs)
 
-post_delete.connect(SiteStats.decrement(sender), sender=School)
+# On School delete, decrement numSchools
+post_delete.connect(decrement, sender=School)
 
+
+class Instructor(models.Model):
+    name = models.CharField(max_length=255)
+    school = models.ForeignKey(School, blank=True, null=True)
 
 
 class Course(models.Model):
@@ -93,13 +118,33 @@ class Course(models.Model):
     title = models.CharField(max_length=255)
     field = models.CharField(max_length=255, blank=True)
     academic_year = models.IntegerField(blank=True, null=True)
-    #professor = models.ForeignKey()
+    instructor = models.ForeignKey()
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.title, self.school)
 
-class Note(models.Model):
+    def save(self, *args, **kwargs):
+        # If a new Course is being saved, increment SiteStat Course count
+        if not self.pk:
+            increment(self)
+        super(Course, self).save(*args, **kwargs)
+
+# On Course delete, decrement numCourses
+post_delete.connect(decrement, sender=Course)
+
+
+class File(models.Model):
+
+    FILE_TYPES = (
+    ('N', 'Note'),
+    ('S', 'Syllabus'),
+    ('E', 'Exam'),
+    ('G', 'Study Guide'),
+    ('A', 'Assignment'),
+    )
+
     title = models.CharField(max_length=255)
+    description = models.TextField(max_length=511)
     course = models.ForeignKey(Course, blank=True, null=True)
     school = models.ForeignKey(School, blank=True, null=True)
     file = models.FileField(upload_to="uploads/notes")
@@ -108,14 +153,22 @@ class Note(models.Model):
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     viewCount = models.IntegerField(default=0)
     votes = models.ManyToManyField(Vote, blank=True, null=True)
+    type = models.CharField(max_length=1, choices=FILE_TYPES)
+
+    # has the html content been escaped?
+    # This is to assure we don't double escape characters
+    cleaned = models.BooleanField(default=False)
 
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.title, self.course)
 
     def save(self, *args, **kwargs):
-        if(self.html != None):
+        # Escape html field only once
+        if(self.html != None and not self.cleaned):
+            # HEY! Check this security
             self.html = re.escape(self.html)
+            self.cleaned = True
 
         super(Note, self).save(*args, **kwargs)
 
@@ -156,8 +209,8 @@ class UserProfile(models.Model):
     can_comment = models.BooleanField(default=False)
     can_moderate = models.BooleanField(default=False)
 
-    #user-submitted notes
-    notes = models.ManyToManyField(Note, blank=True, null=True)
+    #user-submitted files
+    files = models.ManyToManyField(File, blank=True, null=True)
 
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):

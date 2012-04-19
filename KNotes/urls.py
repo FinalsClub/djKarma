@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^profile$', 'notes.views.profile', name='profile'),
 
     # Note View
-    url(r'^note/(\d{1,99})$', 'notes.views.note'),
+    url(r'^file/(\d{1,99})$', 'notes.views.note'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
