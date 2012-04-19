@@ -19,6 +19,7 @@ from django.db.models.signals import post_save, post_delete
 import datetime
 import re
 
+
 # Used to incrementally tally site statistics
 # For display on landing page, etc.
 # This is more efficient then calculating totals on every request
@@ -34,30 +35,51 @@ class SiteStats(models.Model):
     numCourses = models.IntegerField(default=0)
     numSchools = models.IntegerField(default=0)
 
+
 # Decrease the appropriate stat given a Model
-# Called in Model save() and post_delete()
+# Called in Model save() and post_delete() (not delete() due to queryset behavior)
 def decrement(sender, **kwargs):
     stats = SiteStats.objects.get(pk=1)
     print stats.numNotes
-    if isinstance(sender, Note):
-        stats.numNotes -= 1
+    if isinstance(sender, File):
+        if File.type == 'N':
+            stats.numNotes -= 1
+        elif File.type == 'G':
+            stats.numStudyGuides -= 1
+        elif File.type == 'S':
+            stats.numSyllabi -= 1
+        elif File.type == 'A':
+            stats.numAssignments -= 1
+        elif File.type == 'E':
+            stats.numExams -= 1
     elif isinstance(sender, School):
         stats.numSchools -= 1
     elif isinstance(sender, Course):
         stats.numSchools -= 1
     stats.save()
 
+
+# Increment the appropriate stat given a Model
+# Called in Model save() and post_delete() (not delete() due to queryset behavior)
 def increment(sender, **kwargs):
     stats = SiteStats.objects.get(pk=1)
     print stats.numNotes
-    if isinstance(sender, Note):
-        stats.numNotes += 1
+    if isinstance(sender, File):
+        if File.type == 'N':
+            stats.numNotes += 1
+        elif File.type == 'G':
+            stats.numStudyGuides += 1
+        elif File.type == 'S':
+            stats.numSyllabi += 1
+        elif File.type == 'A':
+            stats.numAssignments += 1
+        elif File.type == 'E':
+            stats.numExams += 1
     elif isinstance(sender, School):
         stats.numSchools += 1
     elif isinstance(sender, Course):
         stats.numSchools += 1
     stats.save()
-
 
 
 # This class represents a meta-tag of a note
@@ -69,13 +91,15 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
-# This class will allow us to model different user actions and the 
+
+# This class will allow us to model different user actions and the
 # karma they should receive. This model will only be altered from the
 # admin interface. Every User will have a collection of Reputation Events
 # that can be used to re-calculate reputation as our metric changes
 class ReputationEventType(models.Model):
     title = models.SlugField(max_length=160, unique=True)
     karma = models.IntegerField(default=0)
+
 
 # User objects will have a collection of these events
 # Used to calculate reputation
@@ -84,12 +108,14 @@ class ReputationEvent(models.Model):
     event = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+
 # Represents a vote cast on a Note
 # if up is true, it is an upvote
 # else, a downvote
 class Vote(models.Model):
     user = models.ForeignKey(User)
     up = models.BooleanField(default=True)
+
 
 class School(models.Model):
     name = models.CharField(max_length=255)
@@ -114,11 +140,19 @@ class Instructor(models.Model):
 
 
 class Course(models.Model):
+    SEMESTERS = (
+    (1, 'Fall'),
+    (2, 'Winter'),
+    (3, 'Spring'),
+    (4, 'Summer'),
+    )
     school = models.ForeignKey(School, blank=True, null=True)
     title = models.CharField(max_length=255)
     field = models.CharField(max_length=255, blank=True)
+    semester = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year = models.IntegerField(blank=True, null=True)
-    instructor = models.ForeignKey()
+    instructor = models.ForeignKey(Instructor, blank=True, null=True)
+
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.title, self.school)
@@ -141,6 +175,16 @@ class File(models.Model):
     ('E', 'Exam'),
     ('G', 'Study Guide'),
     ('A', 'Assignment'),
+    )
+
+    # Display point values in upload form
+    # TODO: Tie this to ReputationEventType
+    FILE_PTS = (
+    ('N', 'Note (+5 pts)'),
+    ('S', 'Syllabus (+10 pts)'),
+    ('E', 'Exam (+10 pts)'),
+    ('G', 'Study Guide (+25 pts)'),
+    ('A', 'Assignment (+5 pts)'),
     )
 
     title = models.CharField(max_length=255)
@@ -170,7 +214,8 @@ class File(models.Model):
             self.html = re.escape(self.html)
             self.cleaned = True
 
-        super(Note, self).save(*args, **kwargs)
+        super(File, self).save(*args, **kwargs)
+
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
@@ -200,7 +245,7 @@ class UserProfile(models.Model):
     reputationEvennts = models.ManyToManyField(ReputationEvent, blank=True, null=True)
 
     # Optional fields:
-    gravatar = models.URLField(blank=True) # Profile glitter
+    gravatar = models.URLField(blank=True)  # Profile glitter
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField(default=True)
@@ -211,6 +256,7 @@ class UserProfile(models.Model):
 
     #user-submitted files
     files = models.ManyToManyField(File, blank=True, null=True)
+
 
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):

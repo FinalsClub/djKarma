@@ -25,8 +25,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    # Landing page (Note Upload Form)
-    url(r'^$', 'notes.views.home'),
+    # Upload page (Note Upload Form)
+    url(r'^upload$', 'notes.views.upload'),
 
      # Browse by School / Search by Tag view
     url(r'^search$', 'notes.views.search'),
@@ -44,7 +44,11 @@ urlpatterns = patterns('',
     # Ajax requests from note upload form for autocomplete fields
     url(r'^courses$', 'notes.views.courses'),
     url(r'^schools$', 'notes.views.schools'),
+    url(r'^instructors$', 'notes.views.instructors'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
+
+    # Add Course, School forms
+    url(r'^add', 'notes.views.addCourseOrSchool', name='add'),
 
     # Auth
     # This logout allows us to pass a redirect:

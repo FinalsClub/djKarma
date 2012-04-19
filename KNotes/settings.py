@@ -203,6 +203,7 @@ INSTALLED_APPS = (
     'social_auth',
    # 'south',
     'gunicorn',
+    'simplemathcaptcha',
 )
 
 # A sample logging configuration. The only tangible logging

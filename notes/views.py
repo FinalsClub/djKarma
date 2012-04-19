@@ -27,14 +27,14 @@ from django.shortcuts import render
 from gdocs import convertWithGDocs
 # Local imports
 from models import School, Course, File, Instructor
-from forms import UploadFileForm, SelectTagsForm
+from forms import UploadFileForm, SelectTagsForm, CourseForm, SchoolForm, InstructorForm
 
 #from django.core import serializers
 
 
 # Landing Page
 @login_required
-def home(request):
+def upload(request):
     # If user is authenticated, home view should be upload-notes page
     # Else go to login page
 
@@ -43,9 +43,13 @@ def home(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            newNote = File.objects.create(title=form.cleaned_data['title'],
+            newNote = File.objects.create(
+                                type=form.cleaned.data['type'],
+                                title=form.cleaned_data['title'],
+                                description=form.cleaned.data['description'],
                                 course=form.cleaned_data['course'],
                                 school=form.cleaned_data['school'],
+                                instructor=form.cleaned.data['instructor'],
                                 file=request.FILES['note_file'])
             newNote.tags = form.cleaned_data['tags']
             try:
@@ -53,21 +57,55 @@ def home(request):
             except:
                 newNote.delete()
                 return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
-
-            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form})
+            courseForm = CourseForm()
+            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form, 'cform': courseForm})
+        else:
+            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
         print request.user.username
         # Provide bogus default school and course data to ensure
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
-    return render(request, 'upload.html', {'form': form, })
+        courseForm = CourseForm()
+        return render(request, 'upload.html', {'form': form, 'cform': courseForm})
 
 
 # User Profile
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+# handles user creation (via HTML forms) of auxillary objects: 
+# School, Course, and Instructor. Called by /upload
+def addCourseOrSchool(request):
+    if request.method == 'POST':
+        type = request.POST['type']
+        if type == "Course":
+            form = CourseForm(request.POST)
+        elif type == "School":
+            form = SchoolForm(request.POST)
+        elif type == "Instructor":
+            form = InstructorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Return to /upload page after object added
+            # TODO: auto fill form with created object
+            return HttpResponseRedirect("/upload")
+        else:
+            return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
+    else:
+        type = request.GET.get('type')
+        if type == "Course":
+            form = CourseForm()
+        elif type == "School":
+            form = SchoolForm()
+        elif type == "Instructor":
+            form = InstructorForm()
+        else:
+            raise Http404
+        return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
 
 # Display user login and signup screens

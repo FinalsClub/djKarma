@@ -21,6 +21,7 @@ import models
 
 admin.site.register(models.School)
 admin.site.register(models.Course)
+admin.site.register(models.Instructor)
 admin.site.register(models.File)
 admin.site.register(models.Tag)
 admin.site.register(models.ReputationEventType)

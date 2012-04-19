@@ -17,12 +17,32 @@ from django import forms
 from models import School, Course, File, Tag, Instructor
 #from autocomplete.widgets import AutocompleteSelectMultiple
 from simple_autocomplete.widgets import AutoCompleteWidget
+from simplemathcaptcha.fields import MathCaptchaField
+
+
+class SchoolForm(forms.ModelForm):
+
+    class Meta:
+        model = School
+
+
+class CourseForm(forms.ModelForm):
+
+    class Meta:
+        model = Course
+        #fields = ('title', 'school')
+
+
+class InstructorForm(forms.ModelForm):
+
+    class Meta:
+        model = Instructor
 
 
 class UploadFileForm(forms.Form):
-    type = forms.CharField(max_length=1, choices=File.FILE_TYPES)
-    title = forms.CharField(max_length=50)
-    description = forms.TextField(max_length=511)
+    type = forms.ChoiceField(choices=File.FILE_PTS)
+    title = forms.CharField(max_length=50, error_messages={'required': 'Enter a title.'})
+    description = forms.CharField(max_length=511, error_messages={'required': 'Enter a description.'})
     #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
     school = forms.ModelChoiceField(
         queryset=School.objects.all(),
@@ -30,8 +50,8 @@ class UploadFileForm(forms.Form):
             url='/schools',
             initial_display=''
         ),
-        # TODO: Figure out how to override the default invalid message.
-        error_messages={'invalid': 'Enter a valid course. Begin typing a course name to see available choices.'},
+        error_messages={'invalid_choice': 'Enter a valid school. Begin typing a course name to see available choices.',
+                        'required': 'Enter a school.'},
     )
     #course = forms.ModelChoiceField(queryset=Course.objects.all(), empty_label="")
     course = forms.ModelChoiceField(
@@ -39,19 +59,27 @@ class UploadFileForm(forms.Form):
         widget=AutoCompleteWidget(
             url='/courses',
             initial_display=''
-        )
+        ),
+        error_messages={'invalid_choice': 'Enter a valid course. Begin typing a course name to see available choices.',
+                        'required': 'Enter a course.'},
     )
     instructor = forms.ModelChoiceField(
         queryset=Instructor.objects.all(),
         widget=AutoCompleteWidget(
             url='/instructors',
             initial_display=''
-        )
+        ),
+        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing a course name to see available choices.',
+                        'required': 'Enter an instructor.'},
     )
     # TODO: Try autocomplete widget for tags
-    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'))
+    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'),
+                                          error_messages={'required': 'Help us organize. Add some tags.'}, )
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Only a human could solve this'})
+    agree = forms.BooleanField(required=True, label='I Agree to the Terms of Use',
+                               error_messages={'required': 'We aren\'t evil, check out the Terms.'})
     #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
-    note_file = forms.FileField(label='File')
+    note_file = forms.FileField(label='File', error_messages={'required': 'Attach a file'})
 
 
 class SelectTagsForm(forms.Form):

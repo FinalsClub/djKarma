@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<div id="course-form">
+	<form enctype="multipart/form-data" action="/addCourse" method="post">{% csrf_token %}
+		{{ cform.as_p }}
+	  <input class="btn btn-primary" type="submit" value="Create Course!" />
+	</form>
+</div>
+
+
+{% endblock %}
