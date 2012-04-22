@@ -65,6 +65,7 @@ create database karmanotes owner djkarma encoding 'UTF8';
 # add this line to your postgres install's /etc/postgresql/9.1/main/pg_hba.conf
 local   karmanotes      djkarma                                 md5
 sudo service postgresql restart
+./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
 ```
 
 Note on Database migrations
