@@ -53,8 +53,22 @@ Deployment
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
+### Deployment database ###
+To initially deploy the postgres backup on a fresh debian based system:
+```
+sudo apt-get install postgresql-9.1 python-psycopg2
+sudo passwd postgres
+sudo su postgres
+sudo -u postgres createuser -P djkarma
+psql template1
+create database karmanotes owner djkarma encoding 'UTF8';
+# add this line to your postgres install's /etc/postgresql/9.1/main/pg_hba.conf
+local   karmanotes      djkarma                                 md5
+sudo service postgresql restart
+```
+
 Note on Database migrations
-----------------------------
+---------------------------
 
 I've installed South to help ease database migrations whenever the models.py file is altered.
 South's workflow is as follows for changes to the 'notes' app:
