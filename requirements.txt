@@ -10,3 +10,4 @@ python-openid==2.2.5
 wsgiref==0.1.2
 simplejson==2.5.0
 django-simple-math-captcha==1.0.2
+gunicorn==0.14.2
