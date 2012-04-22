@@ -1,27 +1,10 @@
 # settings.py is part of Karma Notes
 # Django settings for KNotes project.
-# Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
 
 from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -52,7 +35,7 @@ SIMPLE_AUTOCOMPLETE_MODELS = ('notes.School', 'notes.Course')
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -235,6 +218,7 @@ LOGGING = {
 }
 
 try:
+    # For development, mv the initial file `dev_settings.py` to be named `local_settings.py`
     from local_settings import *
 except ImportError:
     pass
