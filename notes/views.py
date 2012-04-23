@@ -92,10 +92,12 @@ def addCourseOrSchool(request):
             model = form.save()
             # Return to /upload page after object added
             # TODO: Have form reflect pre-populated value
-            # Currently, the value is set to the form
+            # With below line uncommented, the value is set to the form
             # But the autocomplete field does not reflect this in its display
-            print "type: " + str(type).lower() + " model: " + str(model)
-            form = UploadFileForm(initial={'title': 'why does this work', str(type).lower(): [model.pk, str(model)]})
+            form = UploadFileForm(initial={str(type).lower(): model})
+            #print "type: " + str(type).lower() + " model: " + str(model)
+            # Trying to format the model properly for display in modelchoicefield
+            #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
             return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})

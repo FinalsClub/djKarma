@@ -152,6 +152,8 @@
             <p class="navbar-text pull-right">
               {% if request.user.is_authenticated %}
                 {{request.user.username}} <a  href="{% url auth_logout %}">Log out</a>
+              {% else %}
+                <a  href="{% url django.contrib.auth.views.login %}">Log in</a>
               {% endif %}
             </p>
             

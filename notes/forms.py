@@ -15,8 +15,7 @@
 
 from django import forms
 from models import School, Course, File, Tag, Instructor
-#from autocomplete.widgets import AutocompleteSelectMultiple
-from simple_autocomplete.widgets import AutoCompleteWidget
+from simple_autocomplete.widgets import AutoCompleteWidget, AutoCompleteMultipleWidget
 from simplemathcaptcha.fields import MathCaptchaField
 
 
@@ -74,7 +73,19 @@ class UploadFileForm(forms.Form):
     )
     # TODO: Try autocomplete widget for tags
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'),
-                                          error_messages={'required': 'Help us organize. Add some tags.'}, )
+                                        error_messages={'required': 'Help us organize. Add some tags.'}, )
+    '''
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=AutoCompleteMultipleWidget(
+            url='/tags',
+            initial_display=''
+        ),
+        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing a course name to see available choices.',
+                        'required': 'Enter an instructor.'},
+    )
+    '''
+
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     agree = forms.BooleanField(required=True, label='I Agree to the Terms of Use',
                                error_messages={'required': 'We aren\'t evil, check out the Terms.'})
