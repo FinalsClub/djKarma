@@ -25,11 +25,11 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    # Landing page. Temporarily redirect to upload
-    url(r'^$', 'notes.views.upload'),
+    # Landing page.
+    url(r'^$', 'notes.views.home'),
 
     # Upload page (Note Upload Form)
-    url(r'^upload$', 'notes.views.upload'),
+    url(r'^upload$', 'notes.views.upload', name='upload'),
 
      # Browse by School / Search by Tag view
     url(r'^search$', 'notes.views.search'),

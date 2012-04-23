@@ -49,7 +49,7 @@ class UploadFileForm(forms.Form):
             url='/schools',
             initial_display=''
         ),
-        error_messages={'invalid_choice': 'Enter a valid school. Begin typing a course name to see available choices.',
+        error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
                         'required': 'Enter a school.'},
     )
     #course = forms.ModelChoiceField(queryset=Course.objects.all(), empty_label="")
@@ -62,15 +62,17 @@ class UploadFileForm(forms.Form):
         error_messages={'invalid_choice': 'Enter a valid course. Begin typing a course name to see available choices.',
                         'required': 'Enter a course.'},
     )
+    '''
     instructor = forms.ModelChoiceField(
         queryset=Instructor.objects.all(),
         widget=AutoCompleteWidget(
             url='/instructors',
             initial_display=''
         ),
-        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing a course name to see available choices.',
+        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing an instructor name to see available choices.',
                         'required': 'Enter an instructor.'},
     )
+    '''
     # TODO: Try autocomplete widget for tags
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'),
                                         error_messages={'required': 'Help us organize. Add some tags.'}, )
@@ -81,7 +83,7 @@ class UploadFileForm(forms.Form):
             url='/tags',
             initial_display=''
         ),
-        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing a course name to see available choices.',
+        error_messages={'invalid_choice': 'Enter a valid tag. Begin typing a tag name to see available choices.',
                         'required': 'Enter an instructor.'},
     )
     '''

@@ -138,6 +138,10 @@ class Instructor(models.Model):
     name = models.CharField(max_length=255)
     school = models.ForeignKey(School, blank=True, null=True)
 
+    def __unicode__(self):
+        #Note these must be unicode objects
+        return u"%s" % (self.name)
+
 
 class Course(models.Model):
     SEMESTERS = (

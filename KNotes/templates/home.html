@@ -1,9 +1,29 @@
 {% extends "index.html" %}
+{% load url from future %}
 
 {% block content %}
 
 <div id="home">
-    <h1>Welcome to KarmaNotes</h1>
-    
+    <h1 style="font-size:3  00%">KarmaNotes.org</h1>
+    <br/><br/>
+    <img src="/static/img/ohm.png"/>
+    <br/><br/>
+    <h2>{{stats.numStudyGuides}} Study Guides and {{stats.numNotes}} Notes</h2>
+    <br/>
+    <a class="btn btn-primary" href="{% url 'upload' %}">Upload a Note</a>
+    <br/><br/>
+
+    {% if recent_files %}
+      <h3>Recently Uploaded Files</h3>
+      <div id="recent-files" style="width:80%;text-align:center;margin-left:auto;margin-right:auto;">
+    {% endif %}
+
+    {% for file in recent_files %}
+      <div style="display:inline-block">
+        <div>{{file.title}}</div>
+        <div>{{file.type}} | {{file.school}}</div>
+      </div>
+    {% endfor %}
+    </div>
   </div>
 {% endblock %}

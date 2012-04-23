@@ -26,13 +26,23 @@ from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
-from models import School, Course, File, Instructor
+from models import School, Course, File, Instructor, SiteStats
 from forms import UploadFileForm, SelectTagsForm, CourseForm, SchoolForm, InstructorForm
 
 #from django.core import serializers
 
 
 # Landing Page
+def home(request):
+    # Get the 'singleton' SiteStats instance
+    stats = SiteStats.objects.get(pk=1)
+
+    #Get recently uploaded files
+    recent_files = File.objects.order_by('-timestamp')[:7]
+
+    return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+
+# Upload Page
 @login_required
 def upload(request):
     # If user is authenticated, home view should be upload-notes page
@@ -44,12 +54,12 @@ def upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             newNote = File.objects.create(
-                                type=form.cleaned.data['type'],
+                                type=form.cleaned_data['type'],
                                 title=form.cleaned_data['title'],
-                                description=form.cleaned.data['description'],
+                                description=form.cleaned_data['description'],
                                 course=form.cleaned_data['course'],
                                 school=form.cleaned_data['school'],
-                                instructor=form.cleaned.data['instructor'],
+                                #instructor=form.cleaned_data['instructor'],
                                 file=request.FILES['note_file'])
             newNote.tags = form.cleaned_data['tags']
             try:
