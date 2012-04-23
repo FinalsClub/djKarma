@@ -1,1 +1,47 @@
-[{"pk": 1, "model": "notes.sitestats", "fields": {"numAssignments": 0, "numSchools": 0, "numSyllabi": 0, "numCourses": 0, "numExams": 0, "numNotes": 0, "numStudyGuides": 0}}]
+[
+    {
+        "fields": {
+            "numAssignments": 0,
+            "numCourses": 0,
+            "numExams": 0,
+            "numNotes": 0,
+            "numSchools": 4,
+            "numStudyGuides": 0,
+            "numSyllabi": 0
+        },
+        "model": "notes.sitestats",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "location": "Cambridge, Ma",
+            "name": "Harvard"
+        },
+        "model": "notes.school",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "location": "Cambridge, Ma",
+            "name": "MIT"
+        },
+        "model": "notes.school",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "location": "New Haven, CT",
+            "name": "Yale"
+        },
+        "model": "notes.school",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "location": "New York, NY",
+            "name": "Columba"
+        },
+        "model": "notes.school",
+        "pk": 4
+    }
+]
