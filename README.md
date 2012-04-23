@@ -4,30 +4,34 @@ The KarmaNotes Django Experiment
 What needs to be done:
 ----------------------
 
+#### Static pages ####
 
-views.py:
+ + Find andrew's about & legal page text and put them in git
+ + Finalize static page template
+ + Add statics to extend static page template
 
- + TODO: make list of routes we know that we have to implement
+#### Uploads ####
 
-users:
+ + pass list of tags, courses, professors, schools to the upload form. 
+    With caching this should not be expensive
+    This is so we can tab-complete everything that already exists
+ + If we can't autocomplete to text we already have, accept it in the JS and POST the response
+ + on return, check if exists, if it doesn't create it (create an abstract logic for this)
+    + Create course on return
+    + Create tag on return
+    + Create professor on return
+#### tmpls ####
 
- + TODO: find user interaction cases we haven't added yet
+ + Convert base template to use bootstrap grid
+ + adapt the upload page to a span-6
+ + adapt search page to span-8 (centered?)
+ + Add text explaining the landing/upload page
+ + lightboxes
+    + Find and report how bootstrap does lightboxes / modal dialogs
+    + Create login and register lightboxes
 
-./templates:
-
- + Base template
- + Profile page
-
-Lightboxes (lightboxen)
-
- + Login
-
-Upload
-
- + create course on file upload
- + create user on file upload
- + create school on file upload
-   + create approved flag on school model, only show in UI once admin approves school
+#### Upload FC archive ####
+TODO: Document steps required, location of current archive
 
 
 Dependencies
