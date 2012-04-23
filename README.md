@@ -20,6 +20,7 @@ What needs to be done:
     + Create course on return
     + Create tag on return
     + Create professor on return
+
 #### tmpls ####
 
  + Convert base template to use bootstrap grid

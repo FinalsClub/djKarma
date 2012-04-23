@@ -26,13 +26,23 @@ from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
-from models import School, Course, File, Instructor
+from models import School, Course, File, Instructor, SiteStats
 from forms import UploadFileForm, SelectTagsForm, CourseForm, SchoolForm, InstructorForm
 
 #from django.core import serializers
 
 
 # Landing Page
+def home(request):
+    # Get the 'singleton' SiteStats instance
+    stats = SiteStats.objects.get(pk=1)
+
+    #Get recently uploaded files
+    recent_files = File.objects.order_by('-timestamp')[:7]
+
+    return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+
+# Upload Page
 @login_required
 def upload(request):
     # If user is authenticated, home view should be upload-notes page
@@ -44,12 +54,12 @@ def upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             newNote = File.objects.create(
-                                type=form.cleaned.data['type'],
+                                type=form.cleaned_data['type'],
                                 title=form.cleaned_data['title'],
-                                description=form.cleaned.data['description'],
+                                description=form.cleaned_data['description'],
                                 course=form.cleaned_data['course'],
                                 school=form.cleaned_data['school'],
-                                instructor=form.cleaned.data['instructor'],
+                                #instructor=form.cleaned_data['instructor'],
                                 file=request.FILES['note_file'])
             newNote.tags = form.cleaned_data['tags']
             try:
@@ -89,10 +99,16 @@ def addCourseOrSchool(request):
         elif type == "Instructor":
             form = InstructorForm(request.POST)
         if form.is_valid():
-            form.save()
+            model = form.save()
             # Return to /upload page after object added
-            # TODO: auto fill form with created object
-            return HttpResponseRedirect("/upload")
+            # TODO: Have form reflect pre-populated value
+            # With below line uncommented, the value is set to the form
+            # But the autocomplete field does not reflect this in its display
+            form = UploadFileForm(initial={str(type).lower(): model})
+            #print "type: " + str(type).lower() + " model: " + str(model)
+            # Trying to format the model properly for display in modelchoicefield
+            #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
+            return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
     else:

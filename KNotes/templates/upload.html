@@ -1,34 +1,6 @@
 {% extends "index.html" %}
 {% load url from future %}
 
-{% block scripts %}
-<script>
-
-$(document).ready(function() {
-	// Hide model create forms on load
-	// set transparency to 0 as well for nice fade-in
-	//$("#course-form").hide();
-	//$("#course-form").slideUp();
-	//$("#course-form").animate({opacity:0},1);
-});
-
-// Add Course Form click listener
-$('#add-course-btn').click(function (event) {
-	if (!$(this).hasClass('expanded')) {
-		$(this).addClass('expanded');
-		$("#course-form").show("slow");
-    	//$('#course-form').fadeIn(1000);
-     	//$('#course-form').slideDown();
-    }
-    else{
-    	$(this).removeClass('expanded');
-    	//$('#course-form').slideUp();
-    	$('#course-form').hide("slow");
-    }
-});
-
-</script>
-{% endblock %}
 
 {% block content %}
 <div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">

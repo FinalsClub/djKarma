@@ -4,7 +4,38 @@
 from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
 import os
 
-DEBUG = False
+# Is this running on the karmanotes.org box?
+DEPLOY = False
+
+if DEPLOY:
+    DEBUG = False
+
+    DATABASES = {
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'karmanotes',
+        'USER': 'djkarma',
+        'PASSWORD': DB_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
+
+else:
+    DEBUG = True
+
+    # Local sqlite3 db config
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'karmaNotes.sql',
+        }
+    }
+
+    # Local static file hosting
+    # TODO: configure django to host local static files when in dev mode, but to rely on nginx in deployment
+    #       Static file midlewares and helpers should be disabled in production
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -13,17 +44,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'karmanotes',
-        'USER': 'djkarma',
-        'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
 
 # For autocomplete
 SIMPLE_AUTOCOMPLETE_MODELS = ('notes.School', 'notes.Course')
@@ -65,7 +85,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
