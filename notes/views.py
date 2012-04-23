@@ -89,10 +89,14 @@ def addCourseOrSchool(request):
         elif type == "Instructor":
             form = InstructorForm(request.POST)
         if form.is_valid():
-            form.save()
+            model = form.save()
             # Return to /upload page after object added
-            # TODO: auto fill form with created object
-            return HttpResponseRedirect("/upload")
+            # TODO: Have form reflect pre-populated value
+            # Currently, the value is set to the form
+            # But the autocomplete field does not reflect this in its display
+            print "type: " + str(type).lower() + " model: " + str(model)
+            form = UploadFileForm(initial={'title': 'why does this work', str(type).lower(): [model.pk, str(model)]})
+            return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
     else:
