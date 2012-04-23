@@ -4,6 +4,7 @@
 from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
 import os
 
+# Is this running on the karmanotes.org box?
 DEPLOY = False
 
 if DEPLOY:

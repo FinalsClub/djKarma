@@ -21,20 +21,20 @@ from simplemathcaptcha.fields import MathCaptchaField
 
 
 class SchoolForm(forms.ModelForm):
-
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     class Meta:
         model = School
 
 
 class CourseForm(forms.ModelForm):
-
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     class Meta:
         model = Course
         #fields = ('title', 'school')
 
 
 class InstructorForm(forms.ModelForm):
-
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     class Meta:
         model = Instructor
 
@@ -75,7 +75,7 @@ class UploadFileForm(forms.Form):
     # TODO: Try autocomplete widget for tags
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'),
                                           error_messages={'required': 'Help us organize. Add some tags.'}, )
-    captcha = MathCaptchaField(required=True, error_messages={'required': 'Only a human could solve this'})
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     agree = forms.BooleanField(required=True, label='I Agree to the Terms of Use',
                                error_messages={'required': 'We aren\'t evil, check out the Terms.'})
     #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
