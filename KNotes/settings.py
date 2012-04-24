@@ -5,7 +5,7 @@ from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
 import os
 
 # Is this running on the karmanotes.org box?
-DEPLOY = False
+DEPLOY = True
 
 if DEPLOY:
     DEBUG = False
@@ -155,7 +155,7 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'
-LOGIN_REDIRECT_URL = '/'
+#LOGIN_REDIRECT_URL = '/'
 #LOGIN_ERROR_URL    = '/login/'
 
 #If we want a different redirect for social login:
@@ -203,7 +203,7 @@ INSTALLED_APPS = (
     'notes',
     'simple_autocomplete',
     'social_auth',
-   # 'south',
+    #'south',
     'gunicorn',
     'simplemathcaptcha',
 )

@@ -13,7 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from models import School, Course, File
+from models import School, Course, File, Tag
+from django.template.defaultfilters import slugify
 
 # Returns a python dictionary representation of a model
 # The resulting model is ready for json.dumps()
@@ -38,10 +39,30 @@ def jsonifyModel(model, depth=0):
         json_result["title"] = model.title
         json_result["notes"] = []
         if(depth > 0):
-            for note in model.note_set.all():
+            for note in model.file_set.all():
                 note_json = jsonifyModel(note)
                 json_result["notes"].append(note_json)
     elif isinstance(model, File):
         json_result["_id"] = model.pk
         json_result["notedesc"] = model.title
     return json_result
+
+
+# file: a File object , csvString: a csv string of Tags
+# Retrieve or Create a tag corresponding to each string
+# and assign it to file
+
+def processCsvTags(file, csvString):
+    if not isinstance(file, File):
+        return False
+    tagStrs = csvString.split(',')
+    for tagStr in tagStrs:
+        # If the tag is empty, ignore it
+        if slugify(tagStr) == "":
+            continue
+        #print tagStr + " : " + str(slugify(tagStr))
+        tag, created = Tag.objects.get_or_create(name=slugify(tagStr))
+        #print "tag created: " + str(created)
+        #print "tag name: " + tag.name
+        file.tags.add(tag)
+    return True

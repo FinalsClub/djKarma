@@ -15,7 +15,7 @@
 
 # Standard lib imports
 import json
-from utils import jsonifyModel
+from utils import jsonifyModel, processCsvTags
 # Django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms, authenticate, login
@@ -61,9 +61,16 @@ def upload(request):
                                 school=form.cleaned_data['school'],
                                 #instructor=form.cleaned_data['instructor'],
                                 file=request.FILES['note_file'])
-            newNote.tags = form.cleaned_data['tags']
+
+            # Get or Create a Tag for each 'tag' given in the CharField (as csv)
+            processCsvTags(newNote, form.cleaned_data['tags'])
+
+            # The below line is used if Tags is data from a ModelMultipleChoiceField
+            #newNote.tags = form.cleaned_data['tags']
             try:
-                convertWithGDocs(newNote)
+                # TESTING: Comment pass, enable gDoc conversion
+                pass
+                #convertWithGDocs(newNote)
             except:
                 newNote.delete()
                 return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
@@ -242,7 +249,6 @@ def searchBySchool(request):
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
     response_json = []
-    print 'wtf'
     if request.is_ajax():
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)

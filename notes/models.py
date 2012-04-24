@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 import datetime
 import re
+from django.template.defaultfilters import slugify
 
 
 # Used to incrementally tally site statistics
@@ -85,11 +86,18 @@ def increment(sender, **kwargs):
 # This class represents a meta-tag of a note
 # Used for searching
 class Tag(models.Model):
-    name = models.CharField(max_length=160)
+    #Ensure no tag by same name exist
+    name = models.SlugField(max_length=160)
     description = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        #Ensure slugs are properly formatted
+        # "This Equals" -> "this-equals"
+        self.name = slugify(self.name)
+        super(Tag, self).save(*args, **kwargs)
 
 
 # This class will allow us to model different user actions and the
@@ -201,7 +209,7 @@ class File(models.Model):
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     viewCount = models.IntegerField(default=0)
     votes = models.ManyToManyField(Vote, blank=True, null=True)
-    type = models.CharField(max_length=1, choices=FILE_TYPES)
+    type = models.CharField(max_length=1, choices=FILE_PTS)
 
     # has the html content been escaped?
     # This is to assure we don't double escape characters
@@ -212,6 +220,7 @@ class File(models.Model):
         return u"%s at %s" % (self.title, self.course)
 
     def save(self, *args, **kwargs):
+
         # Escape html field only once
         if(self.html != None and not self.cleaned):
             # HEY! Check this security
@@ -219,6 +228,12 @@ class File(models.Model):
             self.cleaned = True
 
         super(File, self).save(*args, **kwargs)
+
+# On File delete, decrement appropriate stat
+post_delete.connect(decrement, sender=File)
+# We cannot access File fields until after save, so 
+# Do incrementing post save
+post_save.connect(increment, sender=File)
 
 
 class UserProfile(models.Model):
