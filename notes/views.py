@@ -68,14 +68,19 @@ def upload(request):
             # The below line is used if Tags is data from a ModelMultipleChoiceField
             #newNote.tags = form.cleaned_data['tags']
             try:
-                # TESTING: Comment pass, enable gDoc conversion
-                pass
-                #convertWithGDocs(newNote)
+                # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
+                #pass
+                convertWithGDocs(newNote)
             except:
+                # TODO: More granular exception handling
                 newNote.delete()
                 return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
-            courseForm = CourseForm()
-            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form, 'cform': courseForm})
+
+            # After the document is accepted by convertWithGDocs, credit the user
+            user_profile = request.user.get_profile()
+            # Credit the user with this note. See models.UserProfile.addFile
+            user_profile.addFile(newNote)
+            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form})
         else:
             return render(request, 'upload.html', {'message': 'Please check your form entries.', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.

@@ -74,7 +74,7 @@ class UploadFileForm(forms.Form):
     )
     '''
     # TODO: Try autocomplete widget for tags
-    tags = forms.CharField(max_length=511, error_messages={'required': 'Help us organize. Add some tags.'})
+    tags = forms.CharField(max_length=511, label="Tags (separated with commas)", error_messages={'required': 'Help us organize. Add some tags.'})
     '''
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'),
                                         error_messages={'required': 'Help us organize. Add some tags.'}, )

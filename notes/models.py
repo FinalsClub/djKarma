@@ -36,6 +36,9 @@ class SiteStats(models.Model):
     numCourses = models.IntegerField(default=0)
     numSchools = models.IntegerField(default=0)
 
+    def __unicode__(self):
+        return u"%d Notes, %d Guides, %d Syllabi, %d Assignments, %d Exams for %d total Courses at %d Schools" % (self.numNotes, self.numStudyGuides, self.numSyllabi, self.numAssignments, self.numExams, self.numCourses, self.numSchools)
+
 
 # Decrease the appropriate stat given a Model
 # Called in Model save() and post_delete() (not delete() due to queryset behavior)
@@ -106,14 +109,20 @@ class Tag(models.Model):
 # that can be used to re-calculate reputation as our metric changes
 class ReputationEventType(models.Model):
     title = models.SlugField(max_length=160, unique=True)
-    karma = models.IntegerField(default=0)
+    # Karma on person committing action. i.e: User who casts downvote
+    actor_karma = models.IntegerField(default=0)
+    # Karma on person targeted by action. i.e: User who receives downvote
+    target_karma = models.IntegerField(default=0, blank=True, null=True)
+
+    def __unicode__(self):
+        #Note these must be unicode objects
+        return u"%s Actor: %spts Target: %spts" % (self.title, self.actor_karma, self.target_karma)
 
 
 # User objects will have a collection of these events
 # Used to calculate reputation
 class ReputationEvent(models.Model):
-    #type is a reserved keyword in python :(
-    event = models.ForeignKey(ReputationEventType)
+    type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
@@ -160,7 +169,8 @@ class Course(models.Model):
     )
     school = models.ForeignKey(School, blank=True, null=True)
     title = models.CharField(max_length=255)
-    field = models.CharField(max_length=255, blank=True)
+    url = models.URLField(max_length=511)
+    field = models.CharField(max_length=255, blank=True, null=True)
     semester = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year = models.IntegerField(blank=True, null=True)
     instructor = models.ForeignKey(Instructor, blank=True, null=True)
@@ -223,7 +233,7 @@ class File(models.Model):
 
         # Escape html field only once
         if(self.html != None and not self.cleaned):
-            # HEY! Check this security
+            # TODO: Check this security
             self.html = re.escape(self.html)
             self.cleaned = True
 
@@ -261,7 +271,7 @@ class UserProfile(models.Model):
     # it is more efficient to incrementally tally the total value
     # vs summing all ReputationEvents every time karma is needed
     karma = models.IntegerField(default=0)
-    reputationEvennts = models.ManyToManyField(ReputationEvent, blank=True, null=True)
+    reputationEvents = models.ManyToManyField(ReputationEvent, blank=True, null=True)
 
     # Optional fields:
     gravatar = models.URLField(blank=True)  # Profile glitter
@@ -275,6 +285,38 @@ class UserProfile(models.Model):
 
     #user-submitted files
     files = models.ManyToManyField(File, blank=True, null=True)
+
+    # TODO: ove all reputation-related activity
+    # To a separate file
+
+    # Called by notes.views.upload after saving File
+    # Generates the appropriate ReputationEvent, and modifies
+    # the user's karma
+    def addFile(self, File):
+        # Associate this file with the user
+        self.files.add(File)
+        # Generate a reputation event
+        title = ""
+        if File.type == 'N':
+            title = 'lecture-note'
+        elif File.type == 'G':
+            title = 'mid-term-study-guide'
+        elif File.type == 'S':
+            title = 'syllabus'
+        elif File.type == 'A':
+            title = 'assignment'
+        elif File.type == 'E':
+            title = 'exam-or-quiz'
+
+        # Remember to load all ReputationEventTypes with
+        # python manage.py loaddata ./fixtures/data.json
+        repType = ReputationEventType.objects.get(title=title)
+        repEvent = ReputationEvent.objects.create(type=repType)
+        self.reputationEvents.add(repEvent)
+
+        # Assign user points as prescribed by ReputationEventType
+        self.karma += repType.actor_karma
+        self.save()
 
 
 def ensure_profile_exists(sender, **kwargs):
