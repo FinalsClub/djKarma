@@ -54,7 +54,7 @@ Deployment
 1. checkout the git repository, we use `/var/www/djKarma` and will refer to this as the root of the repo
 2. install requirements with `sudo pip install -r requirements.txt`
 3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations
-4. If a new deployment install the initial data (schools, courses, sample data, and a SiteStat object) `./manage.py loaddata ./notes/fixtures.json`
+4. If a new deployment install the initial data (schools, courses, sample data, a SiteStat object, and ReputationEventTypes). School data: `./manage.py loaddata ./notes/fixtures.json`. Blank SiteStats and ReputationEventTypes: `./manage.py loaddata ./fixtures/siteStatsAndRETs.json`
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
