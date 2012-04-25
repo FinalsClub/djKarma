@@ -152,6 +152,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# Tell Django where our UserProfile is defined
+AUTH_PROFILE_MODULE = 'notes.UserProfile'
+
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'

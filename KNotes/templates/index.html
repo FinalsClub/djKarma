@@ -270,7 +270,7 @@ $(document).ready(function() {
         $.each(schoolArr[0].courses, function(idx, course) {
           var listItems = "";
           $.each(course.notes, function(idx, note){
-            listItems += "<div><a href=\"/note/"+note._id+"\">" + note.notedesc + "</a></div>";
+            listItems += "<div><a href=\"/file/"+note._id+"\">" + note.notedesc + "</a></div>";
           });
           $('#' + course._id).after(
               $('<div class="notesOfCourse" style="display: none;">' +
