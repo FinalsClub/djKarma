@@ -2,7 +2,64 @@
 {% block content %}
 <h1>Search Results </h1>
 <br/><br/>
-{% for file in files %}
-<h1><a href="/file/{{file.pk}}"> {{file.title}}</a><h1>
-{% endfor %}
+<div class="row-fluid">
+	<table class="table"><!-- Begin table -->
+		<tr>
+		<td class="span3">
+			<h1>Document<h1>
+		</td>
+		<td class="span3">
+			<h1>School<h1>
+		</td>
+		<td class="span3">
+			<h1>Course<h1>
+		</td>
+		<td class="span3">
+			<h1>Semester<h1>
+		</td>
+	</tr>
+	
+
+	{% for file in files %}
+	<tr><!-- Begin 1st row-fluid -->
+		<td class="span3">
+			<h2><a href="/file/{{file.pk}}"> {{file.title}}</h2>
+		</td>
+		<td class="span3">
+			<h2>{{file.school}}</h2>
+		</td>
+		<td class="span3">
+			<h2>{{file.course.title}}</h2>
+		</td>
+		<td class="span3">
+			<h2>{% if file.course.semester == 1 %}
+					Fall
+				{% elif file.course.semester == 2 %}
+					Winter
+				{% elif file.course.semester == 3 %}
+					Spring
+				{% elif file.course.semester == 4 %}
+					Summer
+				{% endif %}
+				{{file.course.academic_year}}
+			</h2>
+		</td>
+	</tr> <!-- End 1st row-fluid -->
+	<tr><!-- Begin 2nd row-fluid -->
+	<td colspan="4">
+	{% for tag in file.tags.all %}
+		  {% if forloop.first %}
+		  <b>Tags:</b>
+		  {% elif not forloop.last %}
+	   		{{ tag }},
+	   	  {% else %}
+	   	    {{ tag }}
+	   	  {% endif %}
+	{% endfor %}
+	</td>
+	</tr><!-- End 2nd row fuid -->
+	{% endfor %}
+	</table> <!-- End table -->
+</div>
+
 {% endblock %}

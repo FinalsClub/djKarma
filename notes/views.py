@@ -27,7 +27,7 @@ from django.shortcuts import render
 from gdocs import convertWithGDocs
 # Local imports
 from models import School, Course, File, Instructor, SiteStats
-from forms import UploadFileForm, SelectTagsForm, CourseForm, SchoolForm, InstructorForm
+from forms import UploadFileForm, SelectTagsForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm
 
 #from django.core import serializers
 
@@ -205,9 +205,12 @@ def courses(request):
 def search(request):
     # If the SelectTagsForm form has been submitted, display search result
     if request.method == 'POST':
-        tag_form = SelectTagsForm(request.POST)
+        # Use SelectTagsForm for a SelectMultiple Widget
+        #tag_form = SelectTagsForm(request.POST)
+        tag_form = TypeTagsForm(request.POST)
         if tag_form.is_valid():
             tags = tag_form.cleaned_data['tags']
+            print "tags! " + str(tags)
             files = File.objects.filter(tags__in=tags).distinct()
             return render(request, 'notes2.html', {'files': files})
         else:
@@ -215,7 +218,9 @@ def search(request):
 
     # If this is a GET request, display the SelectTagsForm
     else:
-        tag_form = SelectTagsForm()
+        # Use SelectTagsForm for a SelectMultiple Widget
+        #tag_form = SelectTagsForm()
+        tag_form = TypeTagsForm()
         return render(request, 'search.html', {'tag_form': tag_form})
 
 

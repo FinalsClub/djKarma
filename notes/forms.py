@@ -15,29 +15,37 @@
 
 from django import forms
 from models import School, Course, File, Tag, Instructor
-from simple_autocomplete.widgets import AutoCompleteWidget, AutoCompleteMultipleWidget
+from simple_autocomplete.widgets import AutoCompleteWidget
 from simplemathcaptcha.fields import MathCaptchaField
+from django.template.defaultfilters import slugify
 
 
+# Create school form
 class SchoolForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+
     class Meta:
         model = School
 
 
+# Create course form
 class CourseForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+
     class Meta:
         model = Course
         #fields = ('title', 'school')
 
 
+# Create Instructor form
 class InstructorForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+
     class Meta:
         model = Instructor
 
 
+# Upload file form
 class UploadFileForm(forms.Form):
     type = forms.ChoiceField(choices=File.FILE_PTS)
     title = forms.CharField(max_length=50, error_messages={'required': 'Enter a title.'})
@@ -97,5 +105,36 @@ class UploadFileForm(forms.Form):
     note_file = forms.FileField(label='File', error_messages={'required': 'Attach a file'})
 
 
+# Form to search tags by selecting in multiple-choice select widget
 class SelectTagsForm(forms.Form):
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.order_by('name'))
+
+
+class CsvTagField(forms.CharField):
+    # Convert text input to Array of Tag objects
+    # For form TypeTagsForm.is_valid() to be true, let's make sure at least one
+    # existing tag is entered
+    def clean(self, value):
+        values = value.split(',')
+        result = []
+        # Iterate through submitted tags
+        for value in values:
+            # If the tag is empty, ignore it
+            if slugify(value) == "":
+                continue
+            try:
+                # Return if tag matching query found
+                result.append(Tag.objects.get(name=slugify(value)))
+            except:
+                pass
+                # If the tag does not exist, move on
+        if len(result) == 0:
+            # If we don't recognize any of the tags, raise Error
+            raise forms.ValidationError("Sorry, those tags aren't in our system... yet.")
+        #print "field clean result: " + str(result)
+        return result
+
+
+# Form to search tags by typing csv separated tags
+class TypeTagsForm(forms.Form):
+    tags = CsvTagField(max_length=511, label="Tags (separated with commas)", error_messages={'required': 'Enter tags to search.'})
