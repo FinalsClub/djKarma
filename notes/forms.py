@@ -25,11 +25,12 @@ from django.template.defaultfilters import slugify
 class ProfileForm(forms.Form):
 
     school = forms.ModelChoiceField(
+        required=False,
         queryset=School.objects.all(),
         error_messages={'invalid_choice': 'Select a valid school.',
                         'required': 'Select a school.'},
     )
-    grad_year = forms.ChoiceField()
+    grad_year = forms.ChoiceField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)

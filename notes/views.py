@@ -109,13 +109,33 @@ def profile(request):
 
     #Pre-populate ProfileForm with user's data
     profile_data = {}
+    recent_files = []
     if request.user.get_profile().school != None:
         profile_data['school'] = request.user.get_profile().school
+
+        # If user has a school selected, fetch recent additions to School
+        # For the user's news feed
+        recent_files = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
     if request.user.get_profile().grad_year != None:
         profile_data['grad_year'] = request.user.get_profile().grad_year
 
-    profile_form = ProfileForm(initial=profile_data)
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form})
+    # The profile form has been submitted with updated profile info
+    if request.method == 'POST':
+        profile_form = ProfileForm(request.POST)
+        if profile_form.is_valid():
+            # Update user profile with form data
+            profile = request.user.get_profile()
+            profile.school = profile_form.cleaned_data['school']
+            profile.grad_year = profile_form.cleaned_data['grad_year']
+            profile.save()
+        else:
+            # Return profile page with form + errors
+            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+    else:
+        # Populate Profileform with existing profile data
+        profile_form = ProfileForm(initial=profile_data)
+
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
 
 
 # handles user creation (via HTML forms) of auxillary objects: 
