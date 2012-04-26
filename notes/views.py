@@ -26,8 +26,8 @@ from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
-from models import School, Course, File, Instructor, SiteStats
-from forms import UploadFileForm, SelectTagsForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm
+from models import School, Course, File, Instructor, SiteStats, Level
+from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
 
@@ -96,7 +96,26 @@ def upload(request):
 # User Profile
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    # Calculate User's progress towards next Karma level
+    # Depends on models.Level objects
+    user_karma = request.user.get_profile().karma
+    levels = Level.objects.all()
+    for level in levels:
+        if user_karma < level.karma:
+            next_level = level
+            break
+    progress = (user_karma / float(next_level.karma)) * 100
+    #print int(progress)
+
+    #Pre-populate ProfileForm with user's data
+    profile_data = {}
+    if request.user.get_profile().school != None:
+        profile_data['school'] = request.user.get_profile().school
+    if request.user.get_profile().grad_year != None:
+        profile_data['grad_year'] = request.user.get_profile().grad_year
+
+    profile_form = ProfileForm(initial=profile_data)
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form})
 
 
 # handles user creation (via HTML forms) of auxillary objects: 

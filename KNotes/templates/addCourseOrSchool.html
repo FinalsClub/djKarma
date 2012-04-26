@@ -11,6 +11,9 @@
     	<div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
 		            {{ field.label_tag }} 
 		            {{ field }}
+		            {% if field.label == 'Instructor' %}
+		            	<a href="{% url 'add' %}?type=Instructor"style="color:green" id="add-course-btn"><b>+</b></a>
+		            {% endif %}
     	{% endfor %}<br/>
 	  <input class="btn btn-primary" type="submit" value="Create {{ type }}!" />
 	</form>

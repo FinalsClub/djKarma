@@ -26,6 +26,7 @@ admin.site.register(models.File)
 admin.site.register(models.Tag)
 admin.site.register(models.ReputationEventType)
 admin.site.register(models.SiteStats)
+admin.site.register(models.Level)
 admin.site.unregister(User)
 
 

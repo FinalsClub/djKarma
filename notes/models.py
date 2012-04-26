@@ -21,6 +21,16 @@ import re
 from django.template.defaultfilters import slugify
 
 
+# Define User Levels
+# Each slug title is related to a minimum karma level
+class Level(models.Model):
+    title = models.SlugField(max_length=255)
+    karma = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return u"%s %d" % (self.title, self.karma)
+
+
 # Used to incrementally tally site statistics
 # For display on landing page, etc.
 # This is more efficient then calculating totals on every request

@@ -4,6 +4,12 @@ The KarmaNotes Django Experiment
 What needs to be done:
 ----------------------
 
+### Proper Search ###
++ Currently notes.views.search returns a union of all tags entered
+
+### Initial Data in Autocomplete ###
++ Currently, the Autocomplete fields do not reflect initial-value populating. Until this is remedied the profile page form will not be autocomplete (because the most common case is the user all ready has their profile info entered)
+
 #### Static pages ####
 
  + Find andrew's about & legal page text and put them in git
