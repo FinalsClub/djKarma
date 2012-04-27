@@ -106,7 +106,9 @@ def profile(request):
                 # By UserProfile model
                 profile = request.user.get_profile()
                 profile.school = profile_form.cleaned_data['school']
-                profile.grad_year = profile_form.cleaned_data['grad_year']
+                #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
+                if not profile_form.cleaned_data['grad_year'] == "":
+                    profile.grad_year = profile_form.cleaned_data['grad_year']
                 profile.save()
 
     # Calculate User's progress towards next Karma level
@@ -280,7 +282,9 @@ def search(request):
 def note(request, note_pk):
     # Check that user has permission to read
     profile = request.user.get_profile()
-    if not profile.can_read:
+    # If the user does not have read permission, and the
+    # Requested files is not theirs
+    if not profile.can_read and not profile.files.filter(pk=note_pk).exists():
         user_karma = request.user.get_profile().karma
         level = Level.objects.get(title='Prospect')
         print level.karma
