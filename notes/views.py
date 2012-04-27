@@ -96,6 +96,19 @@ def upload(request):
 # User Profile
 @login_required
 def profile(request):
+    # If user profile data has been submitted:
+    if request.method == 'POST':
+            #This must go before profile data calc
+            profile_form = ProfileForm(request.POST)
+            if profile_form.is_valid():
+                # Update user profile with form data
+                # Karma points will be added as necessary
+                # By UserProfile model
+                profile = request.user.get_profile()
+                profile.school = profile_form.cleaned_data['school']
+                profile.grad_year = profile_form.cleaned_data['grad_year']
+                profile.save()
+
     # Calculate User's progress towards next Karma level
     # Depends on models.Level objects
     user_karma = request.user.get_profile().karma
@@ -127,20 +140,11 @@ def profile(request):
 
     # The profile form has been submitted with updated profile info
     if request.method == 'POST':
-        profile_form = ProfileForm(request.POST)
-        if profile_form.is_valid():
-            # Update user profile with form data
-            # Karma points will be added as necessary
-            # By UserProfile model
-            profile = request.user.get_profile()
-            profile.school = profile_form.cleaned_data['school']
-            profile.grad_year = profile_form.cleaned_data['grad_year']
-            profile.save()
-        else:
+        if not profile_form.is_valid():
             # Return profile page with form + errors
             return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
     else:
-        # Populate Profileform with existing profile data
+        # If GET, Populate Profileform with existing profile data
         profile_form = ProfileForm(initial=profile_data)
 
     return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
@@ -275,7 +279,8 @@ def search(request):
 @login_required
 def note(request, note_pk):
     # Check that user has permission to read
-    if not request.user.get_profile().can_read:
+    profile = request.user.get_profile()
+    if not profile.can_read:
         user_karma = request.user.get_profile().karma
         level = Level.objects.get(title='Prospect')
         print level.karma
@@ -283,12 +288,21 @@ def note(request, note_pk):
         return render(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
         note = File.objects.get(pk=note_pk)
-        # Increment note view count
-        note.viewCount += 1
-        # Note-View Reputation EVent
-        request.user.get_profile().awardKarma('view-file')
     except:
         raise Http404
+    # Increment note view count
+    note.viewCount += 1
+    note.save()
+
+    # If this file is not in the user's collection, karmic purchase occurs
+    if(not profile.files.filter(pk=note.pk).exists()):
+        # Buy Note viewing privelege for karma
+        # awardKarma will handle deducting appropriate karma
+        profile.awardKarma('view-file')
+        # Add 'purchased' file to user's collection
+        profile.files.add(note)
+        profile.save()
+
     return render(request, 'note.html', {'note': note})
 
 

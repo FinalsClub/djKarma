@@ -233,6 +233,8 @@ class File(models.Model):
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     viewCount = models.IntegerField(default=0)
     votes = models.ManyToManyField(Vote, blank=True, null=True)
+    numUpVotes = models.IntegerField(default=0)
+    numDownVotes = models.IntegerField(default=0)
     type = models.CharField(max_length=1, choices=FILE_PTS)
 
     # has the html content been escaped?
@@ -298,7 +300,7 @@ class UserProfile(models.Model):
     can_comment = models.BooleanField(default=False)
     can_moderate = models.BooleanField(default=False)
 
-    #user-submitted files
+    #user-submitted files and those the user has "paid for"
     files = models.ManyToManyField(File, blank=True, null=True)
 
     # Keep record of if user has added school / grad_year
@@ -332,7 +334,6 @@ class UserProfile(models.Model):
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()
-            #self.save()
             return True
         except:
             return False
@@ -384,6 +385,10 @@ class UserProfile(models.Model):
         # Add read permissions if Prospect karma level is reached
         if self.can_read == False and self.karma >= Level.objects.get(title='Prospect').karma:
             self.can_read = True
+
+        # Add vote permissions if Prospect karma level is reached
+        #if self.can_vote == False and self.karma >= Level.objects.get(title='Prospect').karma:
+        #    self.can_vote = True
 
         # TODO: Add other permissions...
 

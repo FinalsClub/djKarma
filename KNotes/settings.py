@@ -158,7 +158,7 @@ AUTH_PROFILE_MODULE = 'notes.UserProfile'
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'
-#LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/profile'
 #LOGIN_ERROR_URL    = '/login/'
 
 #If we want a different redirect for social login:
