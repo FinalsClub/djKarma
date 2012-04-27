@@ -5,7 +5,7 @@ from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
 import os
 
 # Is this running on the karmanotes.org box?
-DEPLOY = False
+DEPLOY = True
 
 if DEPLOY:
     DEBUG = False
@@ -206,7 +206,7 @@ INSTALLED_APPS = (
     'notes',
     'simple_autocomplete',
     'social_auth',
-    #'south',
+    'south',
     'gunicorn',
     'simplemathcaptcha',
 )
