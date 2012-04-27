@@ -27,9 +27,9 @@
 	    				<span> {{ field }}</span>
 	    				</td>
 	    				<td style="padding-left:5px">
-	    				{% if field.label == 'School' and not request.user.get_profile.school%}
+	    				{% if field.label == 'School' and not request.user.get_profile.school and not request.user.get_profile.submitted_school %}
 	    				<span class="addpts">+2 Pts</span>
-	    				{% elif field.label = 'Grad year' and not request.user.get_profile.grad_year %}
+	    				{% elif field.label = 'Grad year' and not request.user.get_profile.grad_year and not request.user.get_profile.submitted_grad_year %}
 	    				<span class="addpts">+2 Pts</span>
 	    				{% endif %}
 	    				</td>
@@ -99,15 +99,16 @@
 	    	</table>
 	    	{% endif %}
 	    </div>
-	    <div class="span2" style="height:200px">
+	    <div class="span2" style="">
 	    	<div style="float:right;">
 	    		<div id="Karma"><h1 class="pts">{{request.user.get_profile.karma}}</h1> Karma Points</div>
-		    	<div class="progress" style="margin-right: -top:5px">
+		    	<div class="progress" style="border-style:solid;border-width:2px;margin-right: -top:5px">
 
 	  				<div class="bar" style="width: {{ progress }}%;"></div>
 				</div>
-	      		
+	      		{% if next_level %}
 	      		<div id="Karma"><h4>Next Level: {{next_level.title}} ({{next_level.karma}} Pts.)</h4></div>
+	      		{% endif %}
 	      	</div>
 	    </div>
 	  </div>

@@ -100,12 +100,18 @@ def profile(request):
     # Depends on models.Level objects
     user_karma = request.user.get_profile().karma
     levels = Level.objects.all()
+
+    next_level = None
     for level in levels:
         if user_karma < level.karma:
             next_level = level
             break
-    progress = (user_karma / float(next_level.karma)) * 100
-    #print int(progress)
+
+    # The user has reached the top level
+    if not next_level:
+        progress = 100
+    else:
+        progress = (user_karma / float(next_level.karma)) * 100
 
     #Pre-populate ProfileForm with user's data
     profile_data = {}
@@ -124,6 +130,8 @@ def profile(request):
         profile_form = ProfileForm(request.POST)
         if profile_form.is_valid():
             # Update user profile with form data
+            # Karma points will be added as necessary
+            # By UserProfile model
             profile = request.user.get_profile()
             profile.school = profile_form.cleaned_data['school']
             profile.grad_year = profile_form.cleaned_data['grad_year']
@@ -266,8 +274,19 @@ def search(request):
 # View Note HTML
 @login_required
 def note(request, note_pk):
+    # Check that user has permission to read
+    if not request.user.get_profile().can_read:
+        user_karma = request.user.get_profile().karma
+        level = Level.objects.get(title='Prospect')
+        print level.karma
+        progress = (user_karma / float(level.karma)) * 100
+        return render(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
         note = File.objects.get(pk=note_pk)
+        # Increment note view count
+        note.viewCount += 1
+        # Note-View Reputation EVent
+        request.user.get_profile().awardKarma('view-file')
     except:
         raise Http404
     return render(request, 'note.html', {'note': note})
@@ -303,7 +322,6 @@ def notesOfSchool(request, school_pk):
         school = School.objects.get(pk=school_pk)
         print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(school, depth=2))
-
             #response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
