@@ -39,7 +39,7 @@
     {
         "fields": {
             "location": "New York, NY",
-            "name": "Columba"
+            "name": "Columbia"
         },
         "model": "notes.school",
         "pk": 4
