@@ -23,10 +23,12 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
+from django import forms as djangoforms
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
 from models import School, Course, File, Instructor, SiteStats, Level
+from simple_autocomplete.widgets import AutoCompleteWidget
 from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
@@ -85,12 +87,33 @@ def upload(request):
             return render(request, 'upload.html', {'message': 'Please check your form entries.', 'form': form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
-        print request.user.username
+        return upload_form(request)
+
+def upload_form(request):
+    #print request.user.username
+    selected_school = None
+    user_profile = request.user.get_profile()
+    if user_profile.school:
+        print "The user has a school, so we will auto populate it"
+        # This isn't the ideal way to override the field system. I would rather extend or replicate the existing UploadFileForm, but I am slightly unsure how to do that
+        # Alternatively, I could figure out how to use the 'school' kv argument
+        form = UploadFileForm(initial={'course': -1, 'school': -1})
+        form.fields['school'] = djangoforms.ModelChoiceField(
+                queryset = School.objects.all(),
+                widget=AutoCompleteWidget(
+                    url='/schools',
+                    initial_display = user_profile.school.name
+                ),
+                error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
+                                'required': 'Enter a school.'},
+            )
+        selected_school = user_profile.school.name
+    else:
         # Provide bogus default school and course data to ensure
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
-        courseForm = CourseForm()
-        return render(request, 'upload.html', {'form': form, 'cform': courseForm})
+    courseForm = CourseForm()
+    return render(request, 'upload.html', {'form': form, 'cform': courseForm, 'selected_school': selected_school })
 
 
 # User Profile
