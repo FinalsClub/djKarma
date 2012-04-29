@@ -39,11 +39,11 @@
     {
         "fields": {
             "location": "New York, NY",
-            "name": "Columba"
+            "name": "Columbia"
         },
         "model": "notes.school",
         "pk": 4
-    }
+    },
     {"pk":1,
      "model":"notes.reputationeventtype",
      "fields":
@@ -157,13 +157,13 @@
      "fields":
         {"actor_karma":-2,
          "target_karma":0,
-         "title":"view-file"}}
+         "title":"view-file"}},
     {"pk":20,
      "model":"notes.reputationeventtype",
      "fields":
         {"actor_karma":2,
          "target_karma":0,
-         "title":"profile-grad-year"}}
+         "title":"profile-grad-year"}},
     {"pk":21,
      "model":"notes.reputationeventtype",
      "fields":
@@ -224,5 +224,5 @@
      "model":"notes.level",
      "fields":
         {"karma":15000,
-         "title":"Karma-Guru"}},
+         "title":"Karma-Guru"}}
 ]

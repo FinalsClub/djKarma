@@ -13,11 +13,34 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 from django import forms
 from models import School, Course, File, Tag, Instructor
 from simple_autocomplete.widgets import AutoCompleteWidget
 from simplemathcaptcha.fields import MathCaptchaField
 from django.template.defaultfilters import slugify
+
+
+# User Profile form
+class ProfileForm(forms.Form):
+
+    school = forms.ModelChoiceField(
+        required=False,
+        queryset=School.objects.all(),
+        error_messages={'invalid_choice': 'Select a valid school.',
+                        'required': 'Select a school.'},
+    )
+    grad_year = forms.ChoiceField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+        # Auto populate the graduation_year choiceField with
+        # a 75 year range
+        #birth_day = forms.ChoiceField(choices=((str(x), x) for x in range(1,32)))
+        years = range(datetime.datetime.now().year - 30, datetime.datetime.now().year + 5)
+        years.insert(0, '')
+        year_tuples = ((str(x), x) for x in years)
+        self.fields['grad_year'].choices = year_tuples
 
 
 # Create school form

@@ -26,8 +26,8 @@ from django.shortcuts import render
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
-from models import School, Course, File, Instructor, SiteStats
-from forms import UploadFileForm, SelectTagsForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm
+from models import School, Course, File, Instructor, SiteStats, Level
+from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
 
@@ -96,7 +96,60 @@ def upload(request):
 # User Profile
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    # If user profile data has been submitted:
+    if request.method == 'POST':
+            #This must go before profile data calc
+            profile_form = ProfileForm(request.POST)
+            if profile_form.is_valid():
+                # Update user profile with form data
+                # Karma points will be added as necessary
+                # By UserProfile model
+                profile = request.user.get_profile()
+                profile.school = profile_form.cleaned_data['school']
+                #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
+                if not profile_form.cleaned_data['grad_year'] == "":
+                    profile.grad_year = profile_form.cleaned_data['grad_year']
+                profile.save()
+
+    # Calculate User's progress towards next Karma level
+    # Depends on models.Level objects
+    user_karma = request.user.get_profile().karma
+    levels = Level.objects.all()
+
+    next_level = None
+    for level in levels:
+        if user_karma < level.karma:
+            next_level = level
+            break
+
+    # The user has reached the top level
+    if not next_level:
+        progress = 100
+    else:
+        progress = (user_karma / float(next_level.karma)) * 100
+
+    #Pre-populate ProfileForm with user's data
+    profile_data = {}
+    recent_files = []
+    if request.user.get_profile().school != None:
+        profile_data['school'] = request.user.get_profile().school
+
+        # If user has a school selected, fetch recent additions to School
+        # For the user's news feed
+        recent_files = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
+    if request.user.get_profile().grad_year != None:
+        profile_data['grad_year'] = request.user.get_profile().grad_year
+
+    # The profile form has been submitted with updated profile info
+    if request.method == 'POST':
+        if not profile_form.is_valid():
+            # Return profile page with form + errors
+            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+    else:
+        # If GET, Populate Profileform with existing profile data
+        profile_form = ProfileForm(initial=profile_data)
+
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
 
 
 # handles user creation (via HTML forms) of auxillary objects: 
@@ -227,10 +280,33 @@ def search(request):
 # View Note HTML
 @login_required
 def note(request, note_pk):
+    # Check that user has permission to read
+    profile = request.user.get_profile()
+    # If the user does not have read permission, and the
+    # Requested files is not theirs
+    if not profile.can_read and not profile.files.filter(pk=note_pk).exists():
+        user_karma = request.user.get_profile().karma
+        level = Level.objects.get(title='Prospect')
+        print level.karma
+        progress = (user_karma / float(level.karma)) * 100
+        return render(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
         note = File.objects.get(pk=note_pk)
     except:
         raise Http404
+    # Increment note view count
+    note.viewCount += 1
+    note.save()
+
+    # If this file is not in the user's collection, karmic purchase occurs
+    if(not profile.files.filter(pk=note.pk).exists()):
+        # Buy Note viewing privelege for karma
+        # awardKarma will handle deducting appropriate karma
+        profile.awardKarma('view-file')
+        # Add 'purchased' file to user's collection
+        profile.files.add(note)
+        profile.save()
+
     return render(request, 'note.html', {'note': note})
 
 
@@ -264,7 +340,6 @@ def notesOfSchool(request, school_pk):
         school = School.objects.get(pk=school_pk)
         print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(school, depth=2))
-
             #response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:

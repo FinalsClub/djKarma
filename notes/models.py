@@ -21,6 +21,16 @@ import re
 from django.template.defaultfilters import slugify
 
 
+# Define User Levels
+# Each slug title is related to a minimum karma level
+class Level(models.Model):
+    title = models.SlugField(max_length=255)
+    karma = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return u"%s %d" % (self.title, self.karma)
+
+
 # Used to incrementally tally site statistics
 # For display on landing page, etc.
 # This is more efficient then calculating totals on every request
@@ -46,20 +56,20 @@ def decrement(sender, **kwargs):
     stats = SiteStats.objects.get(pk=1)
     print stats.numNotes
     if isinstance(sender, File):
-        if File.type == 'N':
+        if sender.type == 'N':
             stats.numNotes -= 1
-        elif File.type == 'G':
+        elif sender.type == 'G':
             stats.numStudyGuides -= 1
-        elif File.type == 'S':
+        elif sender.type == 'S':
             stats.numSyllabi -= 1
-        elif File.type == 'A':
+        elif sender.type == 'A':
             stats.numAssignments -= 1
-        elif File.type == 'E':
+        elif sender.type == 'E':
             stats.numExams -= 1
     elif isinstance(sender, School):
         stats.numSchools -= 1
     elif isinstance(sender, Course):
-        stats.numSchools -= 1
+        stats.numCourses -= 1
     stats.save()
 
 
@@ -69,20 +79,21 @@ def increment(sender, **kwargs):
     stats = SiteStats.objects.get(pk=1)
     print stats.numNotes
     if isinstance(sender, File):
-        if File.type == 'N':
+        print sender.type
+        if sender.type == 'N':
             stats.numNotes += 1
-        elif File.type == 'G':
+        elif sender.type == 'G':
             stats.numStudyGuides += 1
-        elif File.type == 'S':
+        elif sender.type == 'S':
             stats.numSyllabi += 1
-        elif File.type == 'A':
+        elif sender.type == 'A':
             stats.numAssignments += 1
-        elif File.type == 'E':
+        elif sender.type == 'E':
             stats.numExams += 1
     elif isinstance(sender, School):
         stats.numSchools += 1
     elif isinstance(sender, Course):
-        stats.numSchools += 1
+        stats.numCourses += 1
     stats.save()
 
 
@@ -112,7 +123,7 @@ class ReputationEventType(models.Model):
     # Karma on person committing action. i.e: User who casts downvote
     actor_karma = models.IntegerField(default=0)
     # Karma on person targeted by action. i.e: User who receives downvote
-    target_karma = models.IntegerField(default=0, blank=True, null=True)
+    target_karma = models.IntegerField(default=0)
 
     def __unicode__(self):
         #Note these must be unicode objects
@@ -124,6 +135,9 @@ class ReputationEventType(models.Model):
 class ReputationEvent(models.Model):
     type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u"%s" % (self.type.title)
 
 
 # Represents a vote cast on a Note
@@ -219,6 +233,8 @@ class File(models.Model):
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     viewCount = models.IntegerField(default=0)
     votes = models.ManyToManyField(Vote, blank=True, null=True)
+    numUpVotes = models.IntegerField(default=0)
+    numDownVotes = models.IntegerField(default=0)
     type = models.CharField(max_length=1, choices=FILE_PTS)
 
     # has the html content been escaped?
@@ -231,6 +247,10 @@ class File(models.Model):
 
     def save(self, *args, **kwargs):
 
+        # If this is a new file, increment SiteStat
+        if not self.pk:
+            increment(self)
+
         # Escape html field only once
         if(self.html != None and not self.cleaned):
             # TODO: Check this security
@@ -241,9 +261,6 @@ class File(models.Model):
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
-# We cannot access File fields until after save, so 
-# Do incrementing post save
-post_save.connect(increment, sender=File)
 
 
 class UserProfile(models.Model):
@@ -283,11 +300,43 @@ class UserProfile(models.Model):
     can_comment = models.BooleanField(default=False)
     can_moderate = models.BooleanField(default=False)
 
-    #user-submitted files
+    #user-submitted files and those the user has "paid for"
     files = models.ManyToManyField(File, blank=True, null=True)
 
-    # TODO: ove all reputation-related activity
+    # Keep record of if user has added school / grad_year
+    # Filling out these fields awards karma
+    # Disallow rewarding karma for re-entering these fields
+    # While stil allowing user to switch school /year
+    submitted_school = models.BooleanField(default=False)
+    submitted_grad_year = models.BooleanField(default=False)
+    # TODO: On post_save, check to see if school, grad year not NOne
+    # set appropriate Bool True and award karma points
+
+    # TODO: store all reputation-related activity
     # To a separate file
+
+    # Award user karma given a ReputationEventType slug title
+    # and add a new ReputationEvent to UserProfile.reputationEvents
+    # event is the slug title corresponding to a ReputationEventType
+    # target_user is a User object corresponding to the target (if applicable)
+    # Does not call UserProfile.save() because it is used in 
+    # The UserProfile save() method
+    def awardKarma(self, event, target_user=None):
+        try:
+            ret = ReputationEventType.objects.get(title=event)
+            self.karma += ret.actor_karma
+            if target_user:
+                target_profile = target_user.get_profile()
+                target_profile.karma += ret.target_karma
+                target_profile.save()
+            # Generate new ReputationEvent, add to UserProfile
+            event = ReputationEvent.objects.create(type=ret)
+            self.reputationEvents.add(event)
+            # Don't self.save(), because this method is called
+            # from UserProfile.save()
+            return True
+        except:
+            return False
 
     # Called by notes.views.upload after saving File
     # Generates the appropriate ReputationEvent, and modifies
@@ -317,6 +366,33 @@ class UserProfile(models.Model):
         # Assign user points as prescribed by ReputationEventType
         self.karma += repType.actor_karma
         self.save()
+
+
+    # Check if school, grad_year fields have been set
+    # Automatically called on UserProfile post_save
+    def save(self, *args, **kwargs):
+        # Grad year was set for the first time, award karma
+        if self.grad_year != None and not self.submitted_grad_year:
+            self.submitted_grad_year = True
+            self.awardKarma('profile-grad-year')
+
+        # School set for first time, award karma
+        if self.school != None and not self.submitted_school:
+            print "submitted school!"
+            self.submitted_school = True
+            self.awardKarma('profile-school')
+
+        # Add read permissions if Prospect karma level is reached
+        if self.can_read == False and self.karma >= Level.objects.get(title='Prospect').karma:
+            self.can_read = True
+
+        # Add vote permissions if Prospect karma level is reached
+        #if self.can_vote == False and self.karma >= Level.objects.get(title='Prospect').karma:
+        #    self.can_vote = True
+
+        # TODO: Add other permissions...
+
+        super(UserProfile, self).save(*args, **kwargs)
 
 
 def ensure_profile_exists(sender, **kwargs):

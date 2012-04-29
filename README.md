@@ -4,6 +4,15 @@ The KarmaNotes Django Experiment
 What needs to be done:
 ----------------------
 
+### Proper Search ###
++ Currently notes.views.search returns a union of all tags entered
+
+### Form Polish ###
++ The upload form state should be preserved when a user leaves to create a Course/School/Instructor.
+
+### Initial Data in Autocomplete ###
++ Currently, the Autocomplete fields do not reflect initial-value populating. Until this is remedied the profile page form will not be autocomplete (because the most common case is the user all ready has their profile info entered)
+
 #### Static pages ####
 
  + Find andrew's about & legal page text and put them in git
@@ -53,8 +62,9 @@ Deployment
 
 1. checkout the git repository, we use `/var/www/djKarma` and will refer to this as the root of the repo
 2. install requirements with `sudo pip install -r requirements.txt`
-3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations
-4. If a new deployment install the initial data (schools, courses, sample data, a SiteStat object, and ReputationEventTypes). School data: `./manage.py loaddata ./notes/fixtures.json`. Blank SiteStats and ReputationEventTypes: `./manage.py loaddata ./fixtures/siteStatsAndRETs.json`
+3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations. NOTE: You can't create a superuser BEFORE loading the fixtures.
+4. If a new deployment install the initial data (schools, courses, sample data, a SiteStat object, and ReputationEventTypes). `./manage.py loaddata ./fixtures/fixtures.json`. 
+5. Create superuser. `./manage.py createsuperuser
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 

@@ -20,7 +20,7 @@
 
     {% for file in recent_files %}
       <div style="display:inline-block; padding:8px;border:1px solid gray;">
-        <div>{{file.title}}</div>
+        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
         <div>
         {% if file.type == "N" %}
         Note
