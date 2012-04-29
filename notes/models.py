@@ -169,7 +169,7 @@ class Course(models.Model):
     )
     school = models.ForeignKey(School, blank=True, null=True)
     title = models.CharField(max_length=255)
-    url = models.URLField(max_length=511)
+    url = models.URLField(max_length=511, blank=True)
     field = models.CharField(max_length=255, blank=True, null=True)
     semester = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year = models.IntegerField(blank=True, null=True)
