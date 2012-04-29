@@ -91,7 +91,6 @@ def upload(request):
 
 def upload_form(request):
     #print request.user.username
-    selected_school = None
     user_profile = request.user.get_profile()
     if user_profile.school:
         print "The user has a school, so we will auto populate it"
@@ -107,13 +106,12 @@ def upload_form(request):
                 error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
                                 'required': 'Enter a school.'},
             )
-        selected_school = user_profile.school.name
     else:
         # Provide bogus default school and course data to ensure
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     courseForm = CourseForm()
-    return render(request, 'upload.html', {'form': form, 'cform': courseForm, 'selected_school': selected_school })
+    return render(request, 'upload.html', {'form': form, 'cform': courseForm})
 
 
 # User Profile
