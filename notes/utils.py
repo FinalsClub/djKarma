@@ -14,6 +14,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from models import School, Course, File, Tag
+from forms import UploadFileForm
+from django import forms as djangoforms
+from simple_autocomplete.widgets import AutoCompleteWidget
 from django.template.defaultfilters import slugify
 
 # Returns a python dictionary representation of a model
@@ -66,3 +69,31 @@ def processCsvTags(file, csvString):
         #print "tag name: " + tag.name
         file.tags.add(tag)
     return True
+
+
+# Creates an UploadFileForm and pre-populates the school field
+# With the uer's school, if available
+
+
+def uploadForm(user):
+    #print request.user.username
+    user_profile = user.get_profile()
+    if user_profile.school:
+        print "The user has a school, so we will auto populate it"
+        # This isn't the ideal way to override the field system. I would rather extend or replicate the existing UploadFileForm, but I am slightly unsure how to do that
+        # Alternatively, I could figure out how to use the 'school' kv argument
+        form = UploadFileForm(initial={'course': -1, 'school': user_profile.school.pk})
+        form.fields['school'] = djangoforms.ModelChoiceField(
+                queryset=School.objects.all(),
+                widget=AutoCompleteWidget(
+                    url='/schools',
+                    initial_display=user_profile.school.name
+                ),
+                error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
+                                'required': 'Enter a school.'},
+            )
+    else:
+        # Provide bogus default school and course data to ensure
+        # legitimate data is chosen
+        form = UploadFileForm(initial={'course': -1, 'school': -1})
+    return form

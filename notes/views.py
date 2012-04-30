@@ -15,7 +15,7 @@
 
 # Standard lib imports
 import json
-from utils import jsonifyModel, processCsvTags
+from utils import jsonifyModel, processCsvTags, uploadForm
 # Django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms, authenticate, login
@@ -23,12 +23,11 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
-from django import forms as djangoforms
+from django.template.response import TemplateResponse
 # External lib imports
 from gdocs import convertWithGDocs
 # Local imports
 from models import School, Course, File, Instructor, SiteStats, Level
-from simple_autocomplete.widgets import AutoCompleteWidget
 from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
@@ -52,20 +51,26 @@ def upload(request):
 
     # If a note has been uploaded (POST request), process it and report success.
     # Return user to upload screen
+
+    course_form = CourseForm()
+    school_form = SchoolForm()
+    instructor_form = InstructorForm()
+
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
+        file_form = UploadFileForm(request.POST, request.FILES)
+
+        if file_form.is_valid():
             newNote = File.objects.create(
-                                type=form.cleaned_data['type'],
-                                title=form.cleaned_data['title'],
-                                description=form.cleaned_data['description'],
-                                course=form.cleaned_data['course'],
-                                school=form.cleaned_data['school'],
+                                type=file_form.cleaned_data['type'],
+                                title=file_form.cleaned_data['title'],
+                                description=file_form.cleaned_data['description'],
+                                course=file_form.cleaned_data['course'],
+                                school=file_form.cleaned_data['school'],
                                 #instructor=form.cleaned_data['instructor'],
                                 file=request.FILES['note_file'])
 
             # Get or Create a Tag for each 'tag' given in the CharField (as csv)
-            processCsvTags(newNote, form.cleaned_data['tags'])
+            processCsvTags(newNote, file_form.cleaned_data['tags'])
 
             # The below line is used if Tags is data from a ModelMultipleChoiceField
             #newNote.tags = form.cleaned_data['tags']
@@ -76,44 +81,20 @@ def upload(request):
             except:
                 # TODO: More granular exception handling
                 newNote.delete()
-                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
+                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
 
             # After the document is accepted by convertWithGDocs, credit the user
             user_profile = request.user.get_profile()
             # Credit the user with this note. See models.UserProfile.addFile
             user_profile.addFile(newNote)
-            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form})
+            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
         else:
-            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'form': form})
+            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
-        return upload_form(request)
-
-def upload_form(request):
-    #print request.user.username
-    selected_school = None
-    user_profile = request.user.get_profile()
-    if user_profile.school:
-        print "The user has a school, so we will auto populate it"
-        # This isn't the ideal way to override the field system. I would rather extend or replicate the existing UploadFileForm, but I am slightly unsure how to do that
-        # Alternatively, I could figure out how to use the 'school' kv argument
-        form = UploadFileForm(initial={'course': -1, 'school': -1})
-        form.fields['school'] = djangoforms.ModelChoiceField(
-                queryset = School.objects.all(),
-                widget=AutoCompleteWidget(
-                    url='/schools',
-                    initial_display = user_profile.school.name
-                ),
-                error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
-                                'required': 'Enter a school.'},
-            )
-        selected_school = user_profile.school.name
-    else:
-        # Provide bogus default school and course data to ensure
-        # legitimate data is chosen
-        form = UploadFileForm(initial={'course': -1, 'school': -1})
-    courseForm = CourseForm()
-    return render(request, 'upload.html', {'form': form, 'cform': courseForm, 'selected_school': selected_school })
+        # uploadForm() pre-populates the School field with the user
+        file_form = uploadForm(request.user)
+        return render(request, 'upload.html', {'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
 
 
 # User Profile
@@ -177,6 +158,8 @@ def profile(request):
 
 # handles user creation (via HTML forms) of auxillary objects: 
 # School, Course, and Instructor. Called by /upload
+# UPDATED: Now also handles ajax requests from combined form page
+# i.e: If ajax, just return updated form, not entire html page
 def addCourseOrSchool(request):
     if request.method == 'POST':
         type = request.POST['type']
@@ -196,9 +179,21 @@ def addCourseOrSchool(request):
             #print "type: " + str(type).lower() + " model: " + str(model)
             # Trying to format the model properly for display in modelchoicefield
             #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
-            return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
+
+            # If ajax request, return success message
+            if request.is_ajax():
+                return HttpResponse("success")
+            else:
+                return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
-            return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
+            # If ajax, return only the form with errors
+            if request.is_ajax():
+                #return HttpResponse(form.errors)
+                return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': type})
+                #return render(request, 'ajaxFormResponse.html', {'form': form})
+            # If not ajax, render entire form page
+            else:
+                return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
     else:
         type = request.GET.get('type')
         if type == "Course":

@@ -1,26 +1,174 @@
 {% extends "index.html" %}
 {% load url from future %}
 
+{% block scripts %}
+<script>
+
+// Add Course button
+$("#add-course-btn").click(function() {
+  $("#file-div").fadeOut('fast',function(){
+    $("#course-div").fadeIn('fast');
+  });
+});
+
+// Add School button
+$("#add-school-btn").click(function() {
+  $("#file-div").fadeOut('fast',function(){
+    $("#school-div").fadeIn('fast');
+  });
+});
+
+// Add Instructor button
+$("#add-instructor-btn").click(function() {
+  $("#course-div").fadeOut('fast',function(){
+    $("#instructor-div").fadeIn('fast');
+  });
+});
+
+// Back Button -- Return to file-form
+// jquery on() method allows live-binding to 
+// elements created in the future! (as opposed to .click)
+// The #container element exists in the inherited index.html template
+$("#container").on("click", ".back-btn", function() {
+  // If back btn clicked on Instructor form, return to course div
+  if($(this).parent()[0].id == "instructor-div"){
+    $("#instructor-div").fadeOut('fast',function(){
+      $("#course-div").fadeIn('fast');
+    });
+  }
+  // If the back button is clicked on course/school form, return to file div
+  else{
+    //$(".form").fadeOut('slow',function(){
+    $($(this).parent()[0]).fadeOut('fast',function(){
+      $("#file-div").fadeIn('fast');
+    });
+  }
+});
+
+// Override submit behavior for School/Course/Instructor Forms
+// If user doesn't have javascript, object will still be created
+// but 'success page' will not display correctly
+$('#container').on("submit", "form", function(){
+    var containing_div_id = $(this).closest("div")[0].id;
+    // For now, the file form remains a synchronous POST 
+    if(containing_div_id == "file-div")
+        return true;
+      var form_data = $(this).serializeArray();
+      $.post('/add', form_data,
+          function(data){
+            if(data == "success"){
+                //$('school-div').html(data);
+                alert("success");
+            }
+            else{
+               //alert('fail');
+                $('#'+containing_div_id).html(data);
+            }
+          }
+      );
+      return false;
+});
+/*
+$('form').submit(function() {
+  var containing_div_id = $(this).closest("div")[0].id;
+  var form_data = $(this).serializeArray();
+  $.post('/add', form_data,
+      function(data){
+        if(data == "success"){
+            //$('school-div').html(data);
+            alert("success");
+        }
+        else{
+           //alert('fail');
+            $('#'+containing_div_id).html(data);
+        }
+      }
+  );
+  return false;
+});*/
+
+</script>
+{% endblock %}
 
 {% block content %}
-<div id="drop-area" height="600px" style="background-image:static/img/ohm/svg">
-  <div id="drop-instruction"><h1>Upload Your Notes to Share!</h1></div>
+<div class="form" id="file-div" >
+  <div id="drop-instruction"><h1>Upload File</h1></div>
   <p>{{ message }}</p>
-  <form enctype="multipart/form-data" action="/upload" method="post">{% csrf_token %}
-    {% for field in form %}
-    <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-      {{ field.label_tag }} {{ field }}
-      {% if field.label == 'Course' %}
-        <a href="{% url 'add' %}?type=Course"style="color:green" id="add-course-btn"><b>+</b></a>
-      {% elif field.label == 'School' %}
-        <a href="{% url 'add' %}?type=School"style="color:green" id="add-course-btn"><b>+</b></a>
-      {% elif field.label == 'Instructor' %}
-        <a href="{% url 'add' %}?type=Instructor"style="color:green" id="add-course-btn"><b>+</b></a>
+  <form enctype="multipart/form-data" action="/upload" method="post">
+    <fieldset>
+      {% csrf_token %}
+      {% for field in file_form %}
+      <div class="control-group">
+        <div style="font-weight:bold;margin-left:auto;margin-right:auto;">{{ field.errors }}</div>
+        <label style="font-size:15px"class="control-label">{{field.label}}</label>
+        <div class="controls">{{ field }}
+        {% if field.label == 'Course' %}
+          <a style="color:green" id="add-course-btn"><b>+</b></a>
+        {% elif field.label == 'School' %}
+        <a style="color:green" id="add-school-btn"><b>+</b></a>
+        {% elif field.label == 'Instructor' %}
+        <a style="color:green" id="add-instructor-btn"><b>+</b></a>
       {% endif %}
+      </div>
+      </div>
     {% endfor %}<br/>
     <input class="btn btn-primary" type="submit" value="Upload!" />
+    </fieldset>
   </form>
   <!--<img id="ohm-image" src="http://karmanotes.org/img/ohm.svg"/> -->
+  </div>
+
+  <!-- Add School -->
+    <div style="display:none" class="form" id="school-div">
+        <h1>Add School</h1>
+        <form id="school-form"enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
+            <input type='hidden' name='type' value='School' />
+            {% for field in school_form %}
+            <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+                        {{ field.label_tag }} 
+                        {{ field }}
+                        {% if field.label == 'Instructor' %}
+                            <a style="color:green" id="add-instructor-btn"><b>+</b></a>
+                        {% endif %}
+            {% endfor %}<br/>
+          <input class="btn btn-primary" type="submit" value="Create School!" />
+        </form>
+        <a class="btn btn-inverse back-btn" id="instructor-back-btn" >Back</a>
+    </div>
+
+    <!-- Add Course -->
+    <div style="display:none" class="form" id="course-div">
+        <h1>Add Course</h1>
+        <form id="course-form" enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
+            <input type='hidden' name='type' value='Course' />
+            {% for field in course_form %}
+            <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+                        {{ field.label_tag }} 
+                        {{ field }}
+                        {% if field.label == 'Instructor' %}
+                            <a style="color:green" id="add-instructor-btn"><b>+</b></a>
+                        {% endif %}
+            {% endfor %}<br/>
+          <input class="btn btn-primary" type="submit" value="Create Course!" />
+        </form>
+        <a class="btn btn-inverse back-btn" id="course-back-btn">Back</a>
+    </div>
+
+    <!-- Add Instructor -->
+    <div style="display:none" class="form" id="instructor-div">
+        <h1>Add Instructor</h1>
+    <form id="instructor-form" enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
+        <input type='hidden' name='type' value='Instructor' />
+        {% for field in instructor_form %}
+        <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+                    {{ field.label_tag }} 
+                    {{ field }}
+        {% endfor %}<br/>
+      <input class="btn btn-primary" type="submit" value="Create Instructor!" />
+    </form>
+    <a class="btn btn-inverse back-btn" id="instructor-back-btn">Back</a>
 </div>
+
+
 
 {% endblock %}
