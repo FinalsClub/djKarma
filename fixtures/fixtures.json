@@ -121,7 +121,7 @@
      "fields":
         {"actor_karma":5,
          "target_karma":0,
-         "title":"syllabi"}},
+         "title":"syllabus"}},
     {"pk":14,
      "model":"notes.reputationeventtype",
      "fields":
@@ -170,6 +170,12 @@
         {"actor_karma":2,
          "target_karma":0,
          "title":"profile-school"}},
+    {"pk":22,
+     "model":"notes.reputationeventtype",
+     "fields":
+        {"actor_karma":5,
+         "target_karma":0,
+         "title":"assignment"}},
     {"pk":1,
      "model":"notes.level",
      "fields":

@@ -39,8 +39,10 @@
       			<input class="btn btn-primary" type="submit" value="Save" />
     			</form>
 	    </div>
-	    <div class="span6" style="height:200px">
-	    	{% if request.user.get_profile.school %}
+	    <div class="span6" style="">
+	    	{% if not request.user.get_profile.school %}
+	    	<h2> Select your school to view activity</h2>
+	    	{% else %}
 	    	<h2>New at {{request.user.get_profile.school}}</h2>
 	    	
 	    	<table class="table" style="width:80%;margin-left:auto;margin-right:auto;">

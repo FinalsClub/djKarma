@@ -49,23 +49,31 @@ $("#container").on("click", ".back-btn", function() {
 // If user doesn't have javascript, object will still be created
 // but 'success page' will not display correctly
 $('#container').on("submit", "form", function(){
+    alert('submit caught');
     var containing_div_id = $(this).closest("div")[0].id;
+    var nearest_back_btn_id = $(this).closest(".back-btn")[0].id;
     // For now, the file form remains a synchronous POST 
-    if(containing_div_id == "file-div")
-        return true;
+    var url = '/add'
+    //if(containing_div_id == "file-div")
+    //    url = '/upload'
       var form_data = $(this).serializeArray();
-      $.post('/add', form_data,
-          function(data){
+      $.ajax({
+          type: "POST",
+          headers: [{"X-Requested-With":"XMLHttpRequest"}],
+          url: "/add", 
+          data: form_data,
+          success: function(data){
             if(data == "success"){
-                //$('school-div').html(data);
-                alert("success");
+                // return to previous form
+                //$('#'+nearest_back_btn_id).click();
             }
             else{
                //alert('fail');
                 $('#'+containing_div_id).html(data);
             }
-          }
-      );
+          },
+          crossDomain: false
+      });
       return false;
 });
 /*

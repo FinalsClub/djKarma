@@ -43,6 +43,7 @@ def home(request):
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
+
 # Upload Page
 @login_required
 def upload(request):
@@ -162,6 +163,10 @@ def profile(request):
 # i.e: If ajax, just return updated form, not entire html page
 def addCourseOrSchool(request):
     if request.method == 'POST':
+        if request.is_ajax():
+            print "ajax request"
+        else:
+            print "non-ajax request"
         type = request.POST['type']
         if type == "Course":
             form = CourseForm(request.POST)

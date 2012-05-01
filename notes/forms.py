@@ -54,6 +54,15 @@ class SchoolForm(forms.ModelForm):
 # Create course form
 class CourseForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+    instructor = forms.ModelChoiceField(
+        queryset=Instructor.objects.all(),
+        widget=AutoCompleteWidget(
+            url='/instructors',
+            initial_display=''
+        ),
+        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing an instructor name to see available choices.',
+                        'required': 'Enter an instructor.'},
+    )
 
     class Meta:
         model = Course
