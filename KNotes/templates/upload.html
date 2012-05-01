@@ -49,7 +49,26 @@ $("#container").on("click", ".back-btn", function() {
 // If user doesn't have javascript, object will still be created
 // but 'success page' will not display correctly
 $('#container').on("submit", "form", function(){
-    alert('submit caught');
+    var containing_div_id = $(this).closest("div")[0].id;
+    //var nearest_back_btn_id = $(this).closest(".back-btn")[0].id;
+    // For now, the file form remains a synchronous POST 
+    if(containing_div_id == "file-div")
+        return true;
+      var form_data = $(this).serializeArray();
+      $.post('/add', form_data,
+          function(data){
+            if(data == "success"){
+                alert('success');
+            }
+            else{
+               //alert('fail');
+                $('#'+containing_div_id).html(data);
+            }
+          }
+      );
+      return false;
+});
+    /*
     var containing_div_id = $(this).closest("div")[0].id;
     var nearest_back_btn_id = $(this).closest(".back-btn")[0].id;
     // For now, the file form remains a synchronous POST 
@@ -74,8 +93,10 @@ $('#container').on("submit", "form", function(){
           },
           crossDomain: false
       });
+
       return false;
-});
+});*/
+
 /*
 $('form').submit(function() {
   var containing_div_id = $(this).closest("div")[0].id;
