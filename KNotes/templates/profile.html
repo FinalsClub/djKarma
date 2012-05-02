@@ -16,7 +16,7 @@
     			{% for field in profile_form %}
     				<tr>
     					<td colspan="3">
-    					<div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+    					<div style="font-weight:bold;margin-left:auto;margin-right:auto;">{{ field.errors }}</div>
     					</td>
     				</tr>
     				<tr>
@@ -26,7 +26,7 @@
 	    				<td>
 	    				<span> {{ field }}</span>
 	    				</td>
-	    				<td style="padding-left:5px">
+	    				<td style="padding-left:0px">
 	    				{% if field.label == 'School' and not request.user.get_profile.school and not request.user.get_profile.submitted_school %}
 	    				<span class="addpts">+2 Pts</span>
 	    				{% elif field.label = 'Grad year' and not request.user.get_profile.grad_year and not request.user.get_profile.submitted_grad_year %}

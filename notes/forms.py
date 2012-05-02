@@ -29,8 +29,9 @@ class ProfileForm(forms.Form):
         queryset=School.objects.all(),
         error_messages={'invalid_choice': 'Select a valid school.',
                         'required': 'Select a school.'},
+        widget=forms.Select(attrs={'class': 'span2'})
     )
-    grad_year = forms.ChoiceField(required=False)
+    grad_year = forms.ChoiceField(required=False, widget=forms.Select(attrs={'class': 'span2'}))
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
