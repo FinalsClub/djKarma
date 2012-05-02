@@ -24,8 +24,9 @@ from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
+from django.utils.encoding import iri_to_uri
 # External lib imports
-from gdocs import convertWithGDocs
+from gdocs import convertWithGDocs, convertWithGDocsv3
 # Local imports
 from models import School, Course, File, Instructor, SiteStats, Level
 from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
@@ -78,8 +79,10 @@ def upload(request):
             try:
                 # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
                 #pass
-                convertWithGDocs(newNote)
-            except:
+                #convertWithGDocs(newNote)
+                convertWithGDocsv3(newNote)
+            except Exception, e:
+                print "gDocs error: " + str(e)
                 # TODO: More granular exception handling
                 newNote.delete()
                 return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
@@ -330,7 +333,8 @@ def note(request, note_pk):
         profile.files.add(note)
         profile.save()
 
-    return render(request, 'note.html', {'note': note})
+    url = iri_to_uri(note.file.url)
+    return render(request, 'Googlenote.html', {'note': note, 'url': url})
 
 
 # Ajax: Return all schools and courses in JSON
