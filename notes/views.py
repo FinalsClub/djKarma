@@ -341,7 +341,7 @@ def searchBySchool(request):
     if request.is_ajax():
         schools = School.objects.all()
         for school in schools:
-            school_json = jsonifyModel(school, depth=1)
+            school_json = jsonifyModel(model=school, depth=1)
             response_json.append(school_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
@@ -357,13 +357,16 @@ def searchBySchool(request):
 # Ajax: Return all notes belonging to a school
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
+    print school_pk
     response_json = []
     if request.is_ajax():
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
-        print jsonifyModel(school, depth=2)
+        print "notes request for " + str(school.pk)
+        #print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(school, depth=2))
             #response_json.append(school_json)
+        print json.dumps(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
