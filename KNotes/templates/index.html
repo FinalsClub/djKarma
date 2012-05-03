@@ -278,12 +278,13 @@ $(document).ready(function() {
       $.getJSON('/notesOfSchool/' + schoolID, function(schoolArr) {
         // validate json
         //alert(schoolArr);
+        /*
         try{
           var theJson = $.parseJSON(schoolArr);
           alert('good json!');
         }catch(err){
           alert('malformed json!');
-        }
+        }*/
         // returns a one-element array: [ {
         //   id: xxx,
         //   name: "Harvard",

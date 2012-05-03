@@ -334,7 +334,7 @@ def note(request, note_pk):
         profile.save()
 
     url = iri_to_uri(note.file.url)
-    return render(request, 'GoogleNote.html', {'note': note, 'url': url})
+    return render(request, 'note.html', {'note': note, 'url': url})
 
 
 # Ajax: Return all schools and courses in JSON
