@@ -334,7 +334,7 @@ def note(request, note_pk):
         profile.save()
 
     url = iri_to_uri(note.file.url)
-    return render(request, 'Googlenote.html', {'note': note, 'url': url})
+    return render(request, 'GoogleNote.html', {'note': note, 'url': url})
 
 
 # Ajax: Return all schools and courses in JSON
@@ -347,6 +347,7 @@ def searchBySchool(request):
         for school in schools:
             school_json = jsonifyModel(model=school, depth=1)
             response_json.append(school_json)
+        print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
