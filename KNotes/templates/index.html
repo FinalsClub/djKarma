@@ -47,6 +47,8 @@
     text-shadow:2px 2px 2px #E8EBE9;
   }
   .addpts{
+    vertical-align:text-top;
+    padding-left:4px;
     font-weight: bold;
     text-shadow:2px 2px 2px #ADFFC7;
     color:#06C442;
@@ -222,11 +224,13 @@ $(document).ready(function() {
       // add a coursesOfSchool div immediately following;
       $('#' + school._id + '-Btn').after(
         $('<div/>', {class:'coursesOfSchool',
-                     id: school.name + '-Courses'})
+                     id: slugify(school.name) + '-Courses'})
       );
+      // school.name.replace... fixes issue with spaces in css id!
+      // Can't believe I missed that :)
       // add the courses inside coursesOfSchool;
       $.each(school.courses, function(idx, course) {
-        $('#' + school.name + '-Courses').append(
+        $('#' + slugify(school.name) + '-Courses').append(
           $('<div/>', {id: course._id,
                        class: 'courseBtn',
                        text: course.title})
@@ -272,6 +276,15 @@ $(document).ready(function() {
       $(this).addClass('hasNotes');
       var schoolID = this.id.slice(0, -4);
       $.getJSON('/notesOfSchool/' + schoolID, function(schoolArr) {
+        // validate json
+        //alert(schoolArr);
+        /*
+        try{
+          var theJson = $.parseJSON(schoolArr);
+          alert('good json!');
+        }catch(err){
+          alert('malformed json!');
+        }*/
         // returns a one-element array: [ {
         //   id: xxx,
         //   name: "Harvard",
@@ -282,6 +295,7 @@ $(document).ready(function() {
           $.each(course.notes, function(idx, note){
             listItems += "<div><a href=\"/file/"+note._id+"\">" + note.notedesc + "</a></div>";
           });
+          //alert(course._id);
           $('#' + course._id).after(
               $('<div class="notesOfCourse" style="display: none;">' +
                 listItems + '</div>')
@@ -313,6 +327,15 @@ $(document).ready(function() {
     var str = tmpNode.innerHTML;
     tmpNode = node = null; // prevent memory leaks in IE
     return str;
+  }
+
+  function slugify(Text)
+  {
+      return Text
+          .toLowerCase()
+          .replace(/[^\w ]+/g,'')
+          .replace(/ +/g,'-')
+          ;
   }
   /*
     For the time being we'll disable drag-n-drop uploads

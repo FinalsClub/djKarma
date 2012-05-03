@@ -15,20 +15,22 @@
 
 # Standard lib imports
 import json
-from utils import jsonifyModel, processCsvTags
+from utils import jsonifyModel, processCsvTags, uploadForm
 # Django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms, authenticate, login
+from django import forms as djangoforms
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
-from django import forms as djangoforms
+from django.template.response import TemplateResponse
+from django.utils.encoding import iri_to_uri
 # External lib imports
-from gdocs import convertWithGDocs
+from simple_autocomplete.widgets import AutoCompleteWidget
+from gdocs import convertWithGDocs, convertWithGDocsv3
 # Local imports
 from models import School, Course, File, Instructor, SiteStats, Level
-from simple_autocomplete.widgets import AutoCompleteWidget
 from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
@@ -44,6 +46,7 @@ def home(request):
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
+
 # Upload Page
 @login_required
 def upload(request):
@@ -52,44 +55,57 @@ def upload(request):
 
     # If a note has been uploaded (POST request), process it and report success.
     # Return user to upload screen
+
+    course_form = CourseForm()
+    school_form = SchoolForm()
+    instructor_form = InstructorForm()
+
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
+        file_form = UploadFileForm(request.POST, request.FILES)
+
+        if file_form.is_valid():
             newNote = File.objects.create(
-                                type=form.cleaned_data['type'],
-                                title=form.cleaned_data['title'],
-                                description=form.cleaned_data['description'],
-                                course=form.cleaned_data['course'],
-                                school=form.cleaned_data['school'],
+                                type=file_form.cleaned_data['type'],
+                                title=file_form.cleaned_data['title'],
+                                description=file_form.cleaned_data['description'],
+                                course=file_form.cleaned_data['course'],
+                                school=file_form.cleaned_data['school'],
                                 #instructor=form.cleaned_data['instructor'],
                                 file=request.FILES['note_file'])
 
             # Get or Create a Tag for each 'tag' given in the CharField (as csv)
-            processCsvTags(newNote, form.cleaned_data['tags'])
+            processCsvTags(newNote, file_form.cleaned_data['tags'])
 
             # The below line is used if Tags is data from a ModelMultipleChoiceField
             #newNote.tags = form.cleaned_data['tags']
             try:
                 # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
                 #pass
-                convertWithGDocs(newNote)
-            except:
+                #convertWithGDocs(newNote)
+                convertWithGDocsv3(newNote)
+            except Exception, e:
+                print "gDocs error: " + str(e)
                 # TODO: More granular exception handling
                 newNote.delete()
-                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'form': form})
+                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
 
             # After the document is accepted by convertWithGDocs, credit the user
             user_profile = request.user.get_profile()
             # Credit the user with this note. See models.UserProfile.addFile
             user_profile.addFile(newNote)
-            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'form': form})
+            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
         else:
-            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'form': form})
+            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
     #If a note has not been uploaded (GET request), show the upload form.
     else:
-        return upload_form(request)
+        # uploadForm() pre-populates the School field with the user
+        file_form = uploadForm(request.user)
+        return render(request, 'upload.html', {'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
+        ## use this method instead to pre-populate more of school form
+        #return upload_form(request)
 
 def upload_form(request):
+    # Wrote this and am not using in leu of David's school_form above
     #print request.user.username
     user_profile = request.user.get_profile()
     if user_profile.school:
@@ -175,8 +191,14 @@ def profile(request):
 
 # handles user creation (via HTML forms) of auxillary objects: 
 # School, Course, and Instructor. Called by /upload
+# UPDATED: Now also handles ajax requests from combined form page
+# i.e: If ajax, just return updated form, not entire html page
 def addCourseOrSchool(request):
     if request.method == 'POST':
+        if request.is_ajax():
+            print "ajax request"
+        else:
+            print "non-ajax request"
         type = request.POST['type']
         if type == "Course":
             form = CourseForm(request.POST)
@@ -194,9 +216,21 @@ def addCourseOrSchool(request):
             #print "type: " + str(type).lower() + " model: " + str(model)
             # Trying to format the model properly for display in modelchoicefield
             #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
-            return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
+
+            # If ajax request, return success message
+            if request.is_ajax():
+                return HttpResponse("success")
+            else:
+                return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
-            return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
+            # If ajax, return only the form with errors
+            if request.is_ajax():
+                #return HttpResponse(form.errors)
+                return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': type})
+                #return render(request, 'ajaxFormResponse.html', {'form': form})
+            # If not ajax, render entire form page
+            else:
+                return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
     else:
         type = request.GET.get('type')
         if type == "Course":
@@ -328,7 +362,8 @@ def note(request, note_pk):
         profile.files.add(note)
         profile.save()
 
-    return render(request, 'note.html', {'note': note})
+    url = iri_to_uri(note.file.url)
+    return render(request, 'note.html', {'note': note, 'url': url})
 
 
 # Ajax: Return all schools and courses in JSON
@@ -339,8 +374,9 @@ def searchBySchool(request):
     if request.is_ajax():
         schools = School.objects.all()
         for school in schools:
-            school_json = jsonifyModel(school, depth=1)
+            school_json = jsonifyModel(model=school, depth=1)
             response_json.append(school_json)
+        print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
@@ -355,13 +391,16 @@ def searchBySchool(request):
 # Ajax: Return all notes belonging to a school
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
+    print school_pk
     response_json = []
     if request.is_ajax():
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
-        print jsonifyModel(school, depth=2)
+        print "notes request for " + str(school.pk)
+        #print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(school, depth=2))
             #response_json.append(school_json)
+        print json.dumps(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404

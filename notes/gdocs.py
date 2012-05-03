@@ -16,15 +16,79 @@
 #Dependencies
 #gdata
 #pymongo
+import gdata.sample_util
+import gdata.docs.client
 import gdata.docs.service
 import gdata.docs.data
 import gdata.data
 import mimetypes
 from credentials import GOOGLE_USER, GOOGLE_PASS
-from KNotes.settings import MEDIA_ROOT
 
 
-# given a filePath, upload the file to Google Docs and retrieve html
+###################################
+#### Google Docs API V3 Helpers ###
+###################################
+
+class SampleConfig(object):
+    APP_NAME = 'Karma Notes'
+    DEBUG = False
+
+
+def CreateClient():
+    """Create a Documents List Client."""
+    client = gdata.docs.client.DocsClient(source=SampleConfig.APP_NAME)
+    client.http_client.debug = SampleConfig.DEBUG
+    client.client_login(GOOGLE_USER, GOOGLE_PASS, source=client.source, service=client.auth_service)
+    return client
+
+#######################################
+#### End Google Docs API V3 Helpers ###
+#######################################
+
+
+# Upload File and download html representation
+# using Google Documents API v3
+def convertWithGDocsv3(File):
+    # Create and Authorize OAuth client
+    client = CreateClient()
+
+    # Get file_type and encoding of uploaded file
+    # i.e: file_type = 'text/plain', encoding = None
+    (file_type, encoding) = mimetypes.guess_type(File.file.path)
+
+    # Raise Exception if file has no extension
+    if file_type == None:
+        raise Exception('File extension required.')
+
+    # Encapsulate File in Google's MediaSource Object
+    media = gdata.data.MediaSource()
+    media.SetFileHandle(File.file.path, file_type)
+
+    # Create a Resource to connect MediaSource to
+    doc = gdata.docs.data.Resource(type='document', title=File.title)
+
+    # Upload document and retrieve representation
+    doc = client.CreateResource(entry=doc, media=media)
+
+    # If file is of type that Google can convert to html, download it
+    if file_type == "plain/text" or file_type == "application/msword":
+        # Download html representation of document
+        client.download_resource(entry=doc, file_path=File.file.path + '.html')
+
+        f = open(str(File.file.path) + '.html')
+        File.html = f.read()
+        File.save()
+        f.close()
+    # If pdf, we can use Google Document iframe to view
+    elif file_type == "application/pdf":
+        File.html = "pdf"
+        File.save()
+
+
+
+# Upload File and download html representation
+# using Google Documents API v2
+# Works. Lacks pdf support
 def convertWithGDocs(File):
     #print Note.file.path
     # Create a client class which will make HTTP requests with Google Docs server.

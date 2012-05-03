@@ -29,8 +29,9 @@ class ProfileForm(forms.Form):
         queryset=School.objects.all(),
         error_messages={'invalid_choice': 'Select a valid school.',
                         'required': 'Select a school.'},
+        widget=forms.Select(attrs={'class': 'span2'})
     )
-    grad_year = forms.ChoiceField(required=False)
+    grad_year = forms.ChoiceField(required=False, widget=forms.Select(attrs={'class': 'span2'}))
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
@@ -54,6 +55,15 @@ class SchoolForm(forms.ModelForm):
 # Create course form
 class CourseForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+    instructor = forms.ModelChoiceField(
+        queryset=Instructor.objects.all(),
+        widget=AutoCompleteWidget(
+            url='/instructors',
+            initial_display=''
+        ),
+        error_messages={'invalid_choice': 'Enter a valid instructor. Begin typing an instructor name to see available choices.',
+                        'required': 'Enter an instructor.'},
+    )
 
     class Meta:
         model = Course
