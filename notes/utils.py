@@ -34,7 +34,7 @@ def jsonifyModel(model, depth=0):
         json_result["name"] = model.name
         json_result["courses"] = []
         if(depth > 0):
-            for course in model.course_set.all():
+            for course in model.course_set.all().order_by('title'):
                 course_json = jsonifyModel(course, depth - 1)
                 json_result["courses"].append(course_json)
     elif isinstance(model, Course):
@@ -42,7 +42,7 @@ def jsonifyModel(model, depth=0):
         json_result["title"] = model.title
         json_result["notes"] = []
         if(depth > 0):
-            for note in model.file_set.all():
+            for note in model.file_set.all().order_by('-timestamp'):
                 note_json = jsonifyModel(note)
                 json_result["notes"].append(note_json)
     elif isinstance(model, File):
