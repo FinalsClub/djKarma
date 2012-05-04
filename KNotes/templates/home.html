@@ -16,7 +16,6 @@
     {% if recent_files %}
       <h3>Recently Uploaded Files</h3>
       <div id="recent-files" style="padding:10px;width:80%;text-align:center;margin-left:auto;margin-right:auto;">
-    {% endif %}
 
     {% for file in recent_files %}
       <div style="display:inline-block; padding:8px;border:1px solid gray;">
@@ -36,6 +35,7 @@
         | {{file.school}}</div>
       </div>
     {% endfor %}
-    </div>
-  </div>
+    </div> <!-- #recent-files -->
+    {% endif %}
+</div> <!-- #home -->
 {% endblock %}
