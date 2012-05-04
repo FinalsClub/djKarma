@@ -1,0 +1,17 @@
+body {
+    background-color: #E5FCFF;
+    }
+
+.foot-nav {
+    margin: 0px auto;
+    width:  450px;
+}
+ul.center {
+    text-align: center;
+    list-style: none;
+    margin:     0px auto;
+    width: 500px
+}
+.license {
+    margin: 9px auto;
+}
