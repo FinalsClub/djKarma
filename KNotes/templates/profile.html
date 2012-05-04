@@ -115,12 +115,12 @@
 	    </div>
 	  </div>
 	  <div class="row-fluid">
-	  	<div class="span12" style="margin:left:auto;margin-right:auto;">
+	  	<div class="span12" style="margin-left:auto;margin-right:auto;">
 	  		<h2>My Files</h2>
 	  	</div>
-	  	<div class="span12" style="margin:20px;padding:10px;">
+	  	<div class="span12" style="margin-left:auto;margin-right:auto;padding:10px;">
 	      {% for file in request.user.get_profile.files.all %}
-			   <div style="display:inline-block; padding:8px;border:1px solid gray;">
+			   <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
 		        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
 		        <div>
 		        {% if file.type == "N" %}

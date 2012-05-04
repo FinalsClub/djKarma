@@ -10,7 +10,7 @@
     <br/><br/>
     <h2>{{stats.numStudyGuides}} Study Guides and {{stats.numNotes}} Notes</h2>
     <br/>
-    <a class="btn btn-primary" href="{% url 'upload' %}">Upload a Note</a>
+    <a style="font-size:20px; padding:10px" class="shadow btn btn-primary" href="{% url 'upload' %}">Upload a Note</a>
     <br/><br/>
 
     {% if recent_files %}
@@ -18,7 +18,7 @@
       <div id="recent-files" style="padding:10px;width:80%;text-align:center;margin-left:auto;margin-right:auto;">
 
     {% for file in recent_files %}
-      <div style="display:inline-block; padding:8px;border:1px solid gray;">
+      <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
         <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
         <div>
         {% if file.type == "N" %}
