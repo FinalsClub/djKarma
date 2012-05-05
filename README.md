@@ -7,8 +7,6 @@ What needs to be done:
 ### Proper Search ###
 + Currently notes.views.search returns a union of all tags entered
 
-### Form Polish ###
-+ The upload form state should be preserved when a user leaves to create a Course/School/Instructor.
 
 ### Initial Data in Autocomplete ###
 + Currently, the Autocomplete fields do not reflect initial-value populating. Until this is remedied the profile page form will not be autocomplete (because the most common case is the user all ready has their profile info entered)
@@ -49,6 +47,7 @@ Dependencies
 
  + Python2.7
  + django1.4
+ + Solr3.6.0
 
 
 To install python package dependencies run:
@@ -82,6 +81,11 @@ local   karmanotes      djkarma                                 md5
 sudo service postgresql restart
 ./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
 ```
+### Deploying Solr ###
+
+1) You can generate the schema from the django application (once Haystack is installed and setup) by running ./manage.py build_solr_schema. 
+2) Take the output from that command and place it in apache-solr-1.4.1/example/solr/conf/schema.xml. 
+3) Restart Solr.
 
 Note on Database migrations
 ---------------------------
