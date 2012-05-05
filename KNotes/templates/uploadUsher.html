@@ -43,7 +43,7 @@ $(document).ready(function(){
 }); // End document ready
 
 function initSearchForm(type){
-    state = type;
+
     // Clear search value 
     $('#id_title').val('');
       // Display School search
@@ -54,11 +54,14 @@ function initSearchForm(type){
         $('#search-header').html('What\'s your ' + type+' name?');
       
       $('#search-input-type').val(type);
+
+      // If searching Courses, provide school to restrict search
+      if(state == "Course"){
         $("#id_title").autocomplete({
         source: function(request, response){
             $.ajax({
                 url: "/"+type.toLowerCase()+"s",
-                data: {'q': request.term },
+                data: {'q': request.term, 'school': school},
                 success: function(data) {
                     if (data != 'CACHE_MISS')
                     {
@@ -77,6 +80,33 @@ function initSearchForm(type){
         select: function(event, ui) { $('#id_title').val(ui.item.real_value); },
         minLength: 3
         });
+      }
+      // If searching School, don't provide school to restrict search
+      else{
+        $("#id_title").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/"+type.toLowerCase()+"s",
+                data: {'q': request.term},
+                success: function(data) {
+                    if (data != 'CACHE_MISS')
+                    {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item[1],
+                                value: item[1],
+                                real_value: item[0]
+                            };
+                        }));
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        select: function(event, ui) { $('#id_title').val(ui.item.real_value); },
+        minLength: 3
+        });
+      }
       $('#search-div').fadeIn('fast');
 }
 
@@ -106,19 +136,40 @@ $("#add-instructor-btn").click(function() {
 // elements created in the future! (as opposed to .click)
 // The #container element exists in the inherited index.html template
 $("#container").on("click", ".back-btn", function() {
-  // If back btn clicked on Instructor form, return to course div
-  if($(this).parent()[0].id == "instructor-div"){
-    $("#instructor-div").fadeOut('fast',function(){
-      $("#course-div").fadeIn('fast');
-    });
+  // If back btn clicked, behavior depends only on state
+  if(state == "Course"){
+    // if on course search, show School Search and hide back-btn
+    // if on Course create, show course search
+    if($('#search-div').is(":visible")){
+      // show School search
+      state = "School";
+      $('#search-div').fadeOut('fast',function(){
+        initSearchForm(state);
+        $('#back-btn').fadeOut('fast');
+      });
+    }
+    else if($('#model-div').is(":visible")){
+      $('#model-div').fadeOut('fast', function(){
+        $('#search-div').fadeIn('fast');
+      });
+    }
   }
-  // If the back button is clicked on course/school form, return to file div
-  else{
-    //$(".form").fadeOut('slow',function(){
-    $($(this).parent()[0]).fadeOut('fast',function(){
-      $("#file-div").fadeIn('fast');
-    });
+  else if(state == "School"){
+    //if on school create, show school search
+    if($('#model-div').is(":visible")){
+      $('#model-div').fadeOut('fast', function(){
+        $('#search-div').fadeIn('fast');
+      });
+    }
   }
+  else if(state == "File"){
+    //show course search
+    state = "Course";
+      $('#file-div').fadeOut('fast',function(){
+        initSearchForm(state);
+      });
+  }
+  
 });
 
 // Override submit behavior for School/Course/Instructor Forms
@@ -153,7 +204,8 @@ $('#container').on("submit", "form", function(){
       var form_data = $(this).serializeArray();
       // Save school_title for display on course search form if appropriate
       if(state == "School"){
-        // Beware hardcode to form arrangement
+        // Beware hardcode to search form arrangement
+        // Also beware this could be a partial title if coming from search-form
         school_title = form_data[2].value;
       }
 
@@ -164,6 +216,7 @@ $('#container').on("submit", "form", function(){
             console.log(state);
             if(data.status == "success"){
                 if(state == "School"){
+                    console.log('BACK TO School Search');
                     // Save selected school pk
                     console.log('school saved: ' + data.model);
                     school = data.model;
@@ -173,6 +226,7 @@ $('#container').on("submit", "form", function(){
                     if($('#search-div').is(":visible")){
                         $('#search-div').fadeOut('fast', function(){
                             initSearchForm(state);
+                            $('#back-btn').fadeIn('fast');
                         });
                     }
                     // Fade out old Model Form (if visible) and show new Model form
@@ -184,6 +238,7 @@ $('#container').on("submit", "form", function(){
                     
                 }
                 else if(state == "Course"){
+                    console.log('BACK TO Course Search');
                     // Save selected course pk
                     console.log('course saved: ' + data.model);
                     course = data.model;
@@ -216,9 +271,16 @@ $('#container').on("submit", "form", function(){
             }
             // if data.status != 'success'
             else{
+                console.log('BACK TO ' + state + 'SEARCH ');
                 // If we're creating school or file
                 if(state != "File"){
                     $('#model-div').html(data);
+                    // If State == School, show back btn
+                    // this signifies we've entered (or are in) the
+                    // school create form
+                    if(state == "School"){
+                      $('#back-btn').fadeIn('fast');
+                    }
                     // If Course Model Form, populate hidden School field
                     if(state == "Course"){
                       $('#id_school').val(school);
@@ -300,6 +362,8 @@ $('#container').on("submit", "form", function(){
     </fieldset>
   </form>
   </div>
-
+  
+  <!-- Back Button -->
+  <a style="display:none;"class="btn btn-inverse back-btn" id="back-btn" >Back</a>
 </div>
 {% endblock %}
