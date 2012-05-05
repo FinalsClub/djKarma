@@ -70,8 +70,9 @@ def convertWithGDocsv3(File):
     # Upload document and retrieve representation
     doc = client.CreateResource(entry=doc, media=media)
 
+    print "file_type: " + str(file_type)
     # If file is of type that Google can convert to html, download it
-    if file_type == "plain/text" or file_type == "application/msword":
+    if file_type == "plain/text" or file_type == "application/msword" or file_type == "text/html":
         # Download html representation of document
         client.download_resource(entry=doc, file_path=File.file.path + '.html')
 

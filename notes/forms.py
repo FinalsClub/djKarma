@@ -21,7 +21,99 @@ from simplemathcaptcha.fields import MathCaptchaField
 from django.template.defaultfilters import slugify
 
 
-# User Profile form
+##########################
+### Upload Usher Forms ###
+##########################
+
+class CharInstructorField(forms.CharField):
+    # Convert text instructor name to Instructor model
+    # creating one if necessary
+    def clean(self, value):
+        if Instructor.objects.filter(name=value).exists():
+            instructor = Instructor.objects.get(name=value)
+        else:
+            instructor = Instructor.objects.create(name=value)
+        return instructor
+
+
+class CharSchoolField(forms.CharField):
+    # Convert text school name to School model
+    # creating one if necessary
+    def clean(self, value):
+        if School.objects.filter(pk=value).exists():
+            school = School.objects.get(pk=value)
+        else:
+            # This should never happen as this field is hidden
+            # and populated by javascript in uploadUsher.html
+            raise forms.ValidationError("Sorry, the seleted School does not exist.")
+        return school
+
+
+class CharCourseField(forms.CharField):
+    # Convert text school name to School model
+    # creating one if necessary
+    def clean(self, value):
+        if Course.objects.filter(pk=value).exists():
+            course = Course.objects.get(pk=value)
+        else:
+            # This should never happen as this field is hidden
+            # and populated by javascript in uploadUsher.html
+            raise forms.ValidationError("Sorry, the seleted Course does not exist.")
+        return course
+
+
+class ModelSearchForm(forms.Form):
+    title = forms.CharField(max_length=127)
+
+
+class UsherUploadFileForm(forms.Form):
+    type = forms.ChoiceField(choices=File.FILE_PTS)
+    title = forms.CharField(max_length=50, error_messages={'required': 'Enter a title.'})
+    description = forms.CharField(required=False, max_length=511, error_messages={'required': 'Enter a description.'})
+    school = CharSchoolField(max_length=255, widget=forms.HiddenInput(attrs={'id': 'usherUpload-school'}))
+    course = CharCourseField(max_length=255, widget=forms.HiddenInput(attrs={'id': 'usherUpload-course'}))
+    #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
+
+    tags = forms.CharField(required=False, max_length=511, label="Tags (separated with commas)", error_messages={'required': 'Help us organize. Add some tags.'})
+
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+    agree = forms.BooleanField(required=True, label='I Agree to the Terms of Use',
+                               error_messages={'required': 'We aren\'t evil, check out the Terms.'})
+    #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
+    note_file = forms.FileField(label='File', error_messages={'required': 'Attach a file'})
+
+    required_css_class = 'required'
+
+# Create course form with hidden school
+class UsherCourseForm(forms.ModelForm):
+    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+    instructor = CharInstructorField(required=False, max_length=127, error_messages={'required': 'Please Enter your Instructor\'s Name'})
+    # school is populated with the school Model pk with javascript.See uploadUsher.html
+    school = CharSchoolField(max_length=255, widget=forms.HiddenInput())
+
+    class Meta:
+        model = Course
+        #fields = ('title', 'school')
+
+    # Convert school and instructor CharFields to Models, then validate
+    # Instructor.school = school
+    def clean(self):
+        # TODO: Refactor model does not exist errors to field clean() methods
+        cleaned_data = super(UsherCourseForm, self).clean()
+
+        # Verify Instructor belongs to given school
+        if cleaned_data.get("instructor") != None and cleaned_data.get("instructor").school != None:
+            if cleaned_data.get("instructor").school != cleaned_data.get("school"):
+                raise forms.ValidationError("Selected Professor belongs to " + cleaned_data.get("instructor").school.name)
+
+        return cleaned_data
+
+##########################
+###  End Upload Usher  ###
+##########################
+
+# User Profile form for inline profile editing
+# Used in profile.html
 class ProfileForm(forms.Form):
 
     school = forms.ModelChoiceField(
@@ -29,9 +121,9 @@ class ProfileForm(forms.Form):
         queryset=School.objects.all(),
         error_messages={'invalid_choice': 'Select a valid school.',
                         'required': 'Select a school.'},
-        widget=forms.Select(attrs={'class': 'span2'})
+        widget=forms.Select(attrs={'class': 'profile-field-school'})
     )
-    grad_year = forms.ChoiceField(required=False, widget=forms.Select(attrs={'class': 'span2'}))
+    grad_year = forms.ChoiceField(required=False, widget=forms.Select(attrs={'class': 'profile-field-year'}))
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
@@ -53,6 +145,7 @@ class SchoolForm(forms.ModelForm):
 
 
 # Create course form
+# DEPRECATED. To be removed after UploadUsher is functional
 class CourseForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     instructor = forms.ModelChoiceField(

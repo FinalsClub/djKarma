@@ -4,9 +4,9 @@
 {% block content %}
 
 <div id="home">
-    <h1 style="font-size:3  00%">KarmaNotes.org</h1>
+    <h1 class="title" style="margin-top:40px;">KarmaNotes</h1>
     <br/><br/>
-    <img src="/static/img/ohm.png"/>
+    <img style="opacity:.8" src="/static/img/ohm.png"/>
     <br/><br/>
     <h2>{{stats.numStudyGuides}} Study Guides and {{stats.numNotes}} Notes</h2>
     <br/>
@@ -14,7 +14,7 @@
     <br/><br/>
 
     {% if recent_files %}
-      <h3>Recently Uploaded Files</h3>
+      <h3>Recently Uploaded</h3>
       <div id="recent-files" style="padding:10px;width:80%;text-align:center;margin-left:auto;margin-right:auto;">
 
     {% for file in recent_files %}

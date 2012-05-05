@@ -1,15 +1,20 @@
 {% load url from future %}
 <h1>Add {{type}}</h1>
-	<form enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
+<p>{{message}}</p>
+	<form class="form-horizontal model-form" id="{{type}}-form" enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
 		<input type='hidden' name='type' value='{{ type }}' />
-		{% for field in form %}
-    	<div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-		            {{ field.label_tag }} 
-		            {{ field }}
-		            {% if field.label == 'Instructor' %}
-		            	<a style="color:green" id="add-instructor-btn"><b>+</b></a>
-		            {% endif %}
+		{% for field in form.hidden_fields %}
+		  {{field}}
+		{% endfor %}
+		{% for field in form.visible_fields %}
+    	<div class="control-group">
+        <label style="font-size:15px"class="control-label">{{field.label}}</label>
+        <div class="controls">
+            {{ field }}
+            <span class="help-inline">{{field.errors}}</span>
+        </div>
+      </div>
     	{% endfor %}<br/>
-	  <input class="btn btn-primary" type="submit" value="Create {{ type }}!" />
+	  <input style="font-size:20px; padding:10px" class="btn btn-primary" type="submit" value="Create {{ type }}!" />
 	</form>
 	 <a class="btn btn-inverse back-btn" id="{{type|lower}}-back-btn" >Back</a>

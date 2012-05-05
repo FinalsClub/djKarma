@@ -1,11 +1,15 @@
+{% load url from future %}
+
 <!DOCTYPE HTML>
 <html>
 <head>
 <meta charset="utf-8">
 <!-- Bootstrap CSS Toolkit styles -->
 <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/css/bootstrap-responsive.css">
 <link rel="stylesheet" href="/static/css/local.css">
 <title>Karma Notes</title>
+<link href='http://fonts.googleapis.com/css?family=Macondo+Swash+Caps' rel='stylesheet' type='text/css'>
 <meta name="google-site-verification" content="uVEr4TwuWwovidBozQG-TRZblTLEsi0l4qxxi5rw71w" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
@@ -23,6 +27,12 @@
 <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
 <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 <style type="text/css">
+
+  /*  Karma Notes Header Style*/
+  .title{
+    font-family: 'Macondo Swash Caps', cursive;
+    font-size:100px;
+  }
   /* Due to CSS collisions between twitter bootstrap and jquery UI CSS, we have to explicitly include
   the necessary jquery UI CSS */
     /* Autocomplete
@@ -40,8 +50,16 @@
   .navbar {
         background-color: #ECF7F8;
         color: #ECF7F8;
+        font-size: 15px;
         }
 
+  /* Profile form fields */
+  .profile-field-school{
+    width:130px;
+  }
+  .profile-field-year{
+    width:60px;
+  }
   /* Points labels */
   .pts{
     font-weight: bold;
@@ -162,30 +180,33 @@
 
   <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
+        <div class="container-fluid">
+          
           <a style="vertical-align:middle"class="brand" href="/"><img style="vertical-align:middle" src="/static/img/ohm_icon.png"></a>
-          <div class="nav-collapse">
             <ul class="nav">
-              <li><a id="uploadNotesBtn" href="/upload">Upload</a></li>
-              <li><a id="searchForNotesBtn" href="/search">Search</a></li>
-              <li><a id="profileBtn" href="/profile">Profile</a></li>
-              <li><a id="aboutBtn" href="#">About</a></li>
-            </ul>
-            <div style="float:right;margin:7px;"><a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><span alt="Creative Commons Attribution 3.0 Unported License"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></span></a></div>
-            <p class="navbar-text pull-right">
-              {% if request.user.is_authenticated %}
-                {{request.user.username}} <a  href="{% url auth_logout %}">Log out</a>
-              {% else %}
-                <a  href="{% url django.contrib.auth.views.login %}">Log in</a>
-              {% endif %}
-            </p>
+              <li><a id="searchForNotesBtn" href="/search">search</a></li>
+              <li><a id="uploadNotesBtn" href="/upload">upload</a></li>
             
-          </div><!--/.nav-collapse -->
+              <li><a id="aboutBtn" href="#">about</a></li>
+            </ul>
+            <ul class="nav pull-right">
+            
+              {% if request.user.is_authenticated %}
+              <li>
+                <a href="{% url 'profile' %}">{{request.user.username}} ({{request.user.get_profile.karma}})</a>
+              </li>
+              <li class="divider-vertical"></li>
+              <li>
+              <a  href="{% url 'auth_logout' %}">sign out</a>
+              </li>
+              {% else %}
+              <li>
+                <a  href="{% url 'login' %}">sign in</a>
+              </li>
+              {% endif %}
+            
+            </ul>
+            
         </div><!--.container -->
       </div>
     </div>
@@ -199,7 +220,8 @@
 {% endblock %}
 {% block stuff %}
 {% endblock %}
-{% include "footer.html" %}
+<!-- footer removed because it doesn't adjust to avoid jquery generated content. Causes overlap in search view 
+-->
 </div> <!-- /container -->
 
 
@@ -390,5 +412,7 @@ $(document).ready(function() {
 }); // $(document).ready
 </script>
 {% endblock %}
+
+<script src="/static/js/bootstrap.min.js"></script>
 </body>
 </html>

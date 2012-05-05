@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     url(r'^$', 'notes.views.home'),
 
     # Upload page (Note Upload Form)
-    url(r'^upload$', 'notes.views.upload', name='upload'),
+    url(r'^upload$', 'notes.views.uploadUsher', name='upload'),
 
      # Browse by School / Search by Tag view
     url(r'^search$', 'notes.views.search'),
@@ -43,6 +43,9 @@ urlpatterns = patterns('',
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
     url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),
+
+    # Ajax requets from upload usher. Text input to model get / create
+    url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
 
     # Ajax requests from note upload form for autocomplete fields
     url(r'^courses$', 'notes.views.courses'),
@@ -58,7 +61,7 @@ urlpatterns = patterns('',
     # <a href="{% url auth_logout_next /some/location %}">Logout</a>
     #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^accounts/register/$', 'notes.views.register', name='register'),
     url(r'', include('social_auth.urls')),
 

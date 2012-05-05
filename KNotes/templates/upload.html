@@ -57,7 +57,7 @@ $('#container').on("submit", "form", function(){
       var form_data = $(this).serializeArray();
       $.post('/add', form_data,
           function(data){
-            if(data == "success"){
+            if(data.status == "success"){
                 alert('success');
             }
             else{

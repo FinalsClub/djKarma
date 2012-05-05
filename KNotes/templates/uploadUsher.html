@@ -1,0 +1,305 @@
+{% extends "index.html" %}
+{% load url from future %}
+
+{% block scripts %}
+<script>
+// Keep track of Usher state
+// state == School : School search / create forms
+// state == Course : Course search / create forms
+// state == File   : Upload File form
+var state = "";
+// Keep track of user's School, Course selection (pks) for 
+// inclusion in final File Upload Form
+var school = "";
+var course = "";
+
+// School and Course titles for instructions
+var school_title = "None";
+
+$(document).ready(function(){
+    // Determine initial page state
+    {% if type == "File" %}
+    // Show file form
+      state = "File";
+    // Populate hidden File Form fields
+      $('#usherUpload-school').val({{school}});
+      $('#usherUpload-course').val({{course}});
+
+      school = "{{school}}";
+      course = "{{course}}";
+
+      $('#file-div').fadeIn('fast');
+    {% elif user_school == None %}
+    // Show School Select Form
+      state = "School";
+      initSearchForm(state);
+    {% else %}
+    // Show Course Select Form
+      school_title = "{{user_school}}";
+      state = "Course";
+      initSearchForm(state);
+    {% endif %}
+    console.log('school title: ' + school_title);
+}); // End document ready
+
+function initSearchForm(type){
+    state = type;
+    // Clear search value 
+    $('#id_title').val('');
+      // Display School search
+      if(school_title != "None" && type=="Course"){
+        $('#search-header').html('What\'s the title of your ' + type + ' at '+ school_title+'?');
+      }
+      else
+        $('#search-header').html('What\'s your ' + type+' name?');
+      
+      $('#search-input-type').val(type);
+        $("#id_title").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/"+type.toLowerCase()+"s",
+                data: {'q': request.term },
+                success: function(data) {
+                    if (data != 'CACHE_MISS')
+                    {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item[1],
+                                value: item[1],
+                                real_value: item[0]
+                            };
+                        }));
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        select: function(event, ui) { $('#id_title').val(ui.item.real_value); },
+        minLength: 3
+        });
+      $('#search-div').fadeIn('fast');
+}
+
+// Add Course button
+$("#add-course-btn").click(function() {
+  $("#file-div").fadeOut('fast',function(){
+    $("#course-div").fadeIn('fast');
+  });
+});
+
+// Add School button
+$("#add-school-btn").click(function() {
+  $("#file-div").fadeOut('fast',function(){
+    $("#school-div").fadeIn('fast');
+  });
+});
+
+// Add Instructor button
+$("#add-instructor-btn").click(function() {
+  $("#course-div").fadeOut('fast',function(){
+    $("#instructor-div").fadeIn('fast');
+  });
+});
+
+// Back Button -- Return to file-form
+// jquery on() method allows live-binding to 
+// elements created in the future! (as opposed to .click)
+// The #container element exists in the inherited index.html template
+$("#container").on("click", ".back-btn", function() {
+  // If back btn clicked on Instructor form, return to course div
+  if($(this).parent()[0].id == "instructor-div"){
+    $("#instructor-div").fadeOut('fast',function(){
+      $("#course-div").fadeIn('fast');
+    });
+  }
+  // If the back button is clicked on course/school form, return to file div
+  else{
+    //$(".form").fadeOut('slow',function(){
+    $($(this).parent()[0]).fadeOut('fast',function(){
+      $("#file-div").fadeIn('fast');
+    });
+  }
+});
+
+// Override submit behavior for School/Course/Instructor Forms
+// If user doesn't have javascript, object will still be created
+// but 'success page' will not display correctly
+$('#container').on("submit", "form", function(){
+    // the url endpoint to submit the form to
+    var url = "";
+    // the containing div in which to inject
+    // response html
+    var containing_div_id = $(this).closest("div")[0].id;
+    //var nearest_back_btn_id = $(this).closest(".back-btn")[0].id;
+    if($(this).hasClass('search-form')){
+        // Smart Model Query endpoint
+        // checks if model with title/name matching Charfield exists
+        // else presents model create form
+        url = "/smartModelQuery";
+    }
+    else if($(this).hasClass('file-form')){
+        // For now, the file form remains a non-ajax POST 
+        //url = "/upload";
+        //Ensure hidden form values are populated before POST
+        $('#usherUpload-school').val(school);
+        $('#usherUpload-course').val(course);
+        return true;
+    }
+    else if($(this).hasClass('model-form')){
+        // Model Create Form endpoint
+        url = "/add";
+    }
+    
+      var form_data = $(this).serializeArray();
+      // Save school_title for display on course search form if appropriate
+      if(state == "School"){
+        // Beware hardcode to form arrangement
+        school_title = form_data[2].value;
+      }
+
+      console.log(form_data[2]);
+      $.post(url, form_data,
+          function(data){
+            console.log(data.status);
+            console.log(state);
+            if(data.status == "success"){
+                if(state == "School"){
+                    // Save selected school pk
+                    console.log('school saved: ' + data.model);
+                    school = data.model;
+                    // Go to Course Select
+                    state = "Course";
+                    // Fade out old Search Form (if visible) and show new Search form
+                    if($('#search-div').is(":visible")){
+                        $('#search-div').fadeOut('fast', function(){
+                            initSearchForm(state);
+                        });
+                    }
+                    // Fade out old Model Form (if visible) and show new Model form
+                    else if($('#model-div').is(":visible")){
+                        $('#model-div').fadeOut('fast', function(){
+                            initSearchForm(state);
+                        });
+                    }
+                    
+                }
+                else if(state == "Course"){
+                    // Save selected course pk
+                    console.log('course saved: ' + data.model);
+                    course = data.model;
+                    // Go to File Upload Form
+                    state = "File";
+
+                    // Populate hidden File Upload Form values for
+                    // School and Course
+                    $('#usherUpload-school').val(school);
+                    $('#usherUpload-course').val(course);
+                    console.log('school: ' + school);
+                    console.log('course: ' + course);
+
+                    // Fade out old Search Form (if visible) and show new File Form
+                    if($('#search-div').is(":visible")){
+                        $('#search-div').fadeOut('fast', function(){
+                            $('#file-div').fadeIn('fast');
+                        });
+                    }
+                    // Fade out old Model Form (if visible) and show new File form
+                    else if($('#model-div').is(":visible")){
+                        $('#model-div').fadeOut('fast', function(){
+                            $('#file-div').fadeIn('fast');
+                        });
+                    }
+
+                //alert('success');
+                // TODO: take appropriate next action
+                }
+            }
+            // if data.status != 'success'
+            else{
+                // If we're creating school or file
+                if(state != "File"){
+                    $('#model-div').html(data);
+                    // If Course Model Form, populate hidden School field
+                    if(state == "Course"){
+                      $('#id_school').val(school);
+                    }
+                    $('#search-div').fadeOut('fast', function(){
+                        $('#model-div').fadeIn('fast');
+                    });
+                }
+                else{
+                    $('#file-div').html(data);
+                }
+               //alert('fail');
+                //$('#'+containing_div_id).html(data);
+            }
+        
+      });
+      return false;
+});
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="width:400px; margin-left:auto;margin-right:auto">
+
+<!-- Model Search -->
+<div style="display:none;margin-left:auto;margin-right:auto" class="form model-form" id="search-div">
+    <h1 id="search-header"></h1>
+    <br/><br/>
+  <form class="form-horizontal search-form" enctype="multipart/form-data" action="/upload" method="post">
+    <fieldset>
+      <input id='search-input-type' type='hidden' name='type' value='' />
+      {% csrf_token %}
+      {% for field in search_form %}
+      <div class="control-group">
+        <label style="font-size:15px"class="control-label">{{field.label}}</label>
+        <div class="controls">
+            {{ field }}
+            <span class="help-inline">{{field.errors}}</span>
+        </div>
+      </div>
+    {% endfor %}<br/>
+    <input style="font-size:20px; padding:10px" class="btn btn-primary" type="submit" value="Next" />
+    </fieldset>
+  </form>
+</div>
+
+<!-- Model Create 
+     Populated with ajax response -->
+<div style="display:none;margin-left:auto;margin-right:auto" class="form model-form" id="model-div">
+</div>
+
+
+<!-- File Upload -->
+<div style="display:none" class="form" id="file-div" >
+  <div id="drop-instruction"><h1>Upload File</h1></div>
+  <p>{{ message }}</p>
+  <form id="file-form" class="form-horizontal file-form" enctype="multipart/form-data" action="/upload" method="post">
+    <fieldset>
+      {% csrf_token %}
+      {% for field in file_form.hidden_fields %}
+        {{field}}
+      {% endfor %}
+      {% for field in file_form.visible_fields %}
+      <div class="control-group">
+        <label style="font-size:15px"class="control-label">
+          {% if field.field.required %}
+            <b>{{field.label}}</b>
+          {% else %}
+            {{field.label}}
+          {% endif %}</label>
+        <div class="controls">
+            {{ field }}
+            <span class="help-inline">{{field.errors}}</span>
+        </div>
+      </div>
+    {% endfor %}<br/>
+    <input style="font-size:20px; padding:10px" class="btn btn-primary" type="submit" value="Upload!" />
+    </fieldset>
+  </form>
+  </div>
+
+</div>
+{% endblock %}

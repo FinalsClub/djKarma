@@ -31,7 +31,7 @@ from simple_autocomplete.widgets import AutoCompleteWidget
 from gdocs import convertWithGDocs, convertWithGDocsv3
 # Local imports
 from models import School, Course, File, Instructor, SiteStats, Level
-from forms import UploadFileForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
+from forms import UploadFileForm, UsherUploadFileForm, UsherCourseForm, ModelSearchForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
 
@@ -45,6 +45,126 @@ def home(request):
     recent_files = File.objects.order_by('-timestamp')[:7]
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+
+
+# Upload Usher
+# Guides user through process
+# Aims to minimize process
+@login_required
+def uploadUsher(request):
+    template_data = {}
+    #template_data['course_form'] = CourseForm()
+    #template_data['school_form'] = SchoolForm()
+    #template_data['instructor_form'] = InstructorForm()
+    template_data['user_school'] = request.user.get_profile().school
+    template_data['search_form'] = ModelSearchForm
+    template_data['file_form'] = UsherUploadFileForm()
+
+    # If File Upload form is submitted
+    if request.method == 'POST':
+        file_form = UsherUploadFileForm(request.POST, request.FILES)
+        # 'type' used to generate ajaxFormResponse.html
+        template_data['type'] = "File"
+        if file_form.is_valid():
+            newNote = File.objects.create(
+                                type=file_form.cleaned_data['type'],
+                                title=file_form.cleaned_data['title'],
+                                description=file_form.cleaned_data['description'],
+                                course=file_form.cleaned_data['course'],
+                                school=file_form.cleaned_data['school'],
+                                #instructor=form.cleaned_data['instructor'],
+                                file=request.FILES['note_file'])
+
+            # Get or Create a Tag for each 'tag' given in the CharField (as csv)
+            processCsvTags(newNote, file_form.cleaned_data['tags'])
+
+            # The below line is used if Tags is data from a ModelMultipleChoiceField
+            #newNote.tags = form.cleaned_data['tags']
+            try:
+                # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
+                #pass
+                #convertWithGDocs(newNote)
+                convertWithGDocsv3(newNote)
+            except Exception, e:
+                print "gDocs error: " + str(e)
+                # TODO: More granular exception handling
+                newNote.delete()
+               # A bound Form is immutable, so to provide the hidden field values
+                # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
+                # We'll pass them to the template directly and inject into form with javascript
+                template_data['school'] = request.POST['school']
+                template_data['course'] = request.POST['course']
+
+                template_data['form'] = file_form
+                template_data['message'] = "We're sorry, there was a problem processing your file. Can you convert it to a .doc or .rtf?"
+                return render(request, 'uploadUsher.html', template_data)
+
+            # After the document is accepted by convertWithGDocs, credit the user
+            user_profile = request.user.get_profile()
+            # Credit the user with this note. See models.UserProfile.addFile
+            user_profile.addFile(newNote)
+            # Success
+
+            # A bound Form is immutable, so to provide the hidden field values
+            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
+            # We'll pass them to the template directly and inject into form with javascript
+            template_data['school'] = request.POST['school']
+            template_data['course'] = request.POST['course']
+
+            template_data['form'] = file_form
+            template_data['message'] = "File successfully uploaded! Your Karma increases!"
+            return render(request, 'uploadUsher.html', template_data)
+        # Form invalid
+        else:
+            print file_form.errors
+            # A bound Form is immutable, so to provide the hidden field values
+            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
+            # We'll pass them to the template directly and inject into form with javascript
+            template_data['school'] = request.POST['school']
+            template_data['course'] = request.POST['course']
+
+            template_data['form'] = file_form
+            template_data['message'] = "Please check your form data."
+            return render(request, 'uploadUsher.html', template_data)
+    # If GET: Begin Upload Usher
+    else:
+        return render(request, 'uploadUsher.html', template_data)
+
+
+# Accessed by charfields corresponding to a model title/name
+# See if model with similiar title exists and return title
+# If not, return model create form with populated title/name
+def smartModelQuery(request):
+    if request.method == 'POST' and request.is_ajax():
+        search_form = ModelSearchForm(request.POST)
+        if search_form.is_valid():
+            if request.POST['type'] == "School":
+                # If no school matching text entry exists, present School Form
+                if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
+                    form = SchoolForm(initial={'name': search_form.cleaned_data['title']})
+                    message = "Tell us a little more about your school"
+                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message})
+                # A school matching entry exists
+                else:
+                    # Return a json object: {'status': 'success', 'model': 'model's pk}
+                    response = {}
+                    response['status'] = 'success'
+                    response['model'] = School.objects.get(name=search_form.cleaned_data['title']).pk
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+            if request.POST['type'] == "Course":
+                # If no course matching text entry exists, present Course Form
+                if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
+                    form = UsherCourseForm(initial={'title': search_form.cleaned_data['title']})
+                    message = "Tell us a little more about your course"
+                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message})
+                # A course matching entry exists
+                else:
+                    # Return a json object: {'status': 'success', 'model': 'model's pk}
+                    response = {}
+                    response['status'] = 'success'
+                    response['model'] = Course.objects.get(title=search_form.cleaned_data['title']).pk
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+    raise Http404
 
 
 # Upload Page
@@ -103,6 +223,7 @@ def upload(request):
         return render(request, 'upload.html', {'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
         ## use this method instead to pre-populate more of school form
         #return upload_form(request)
+
 
 def upload_form(request):
     # Wrote this and am not using in leu of David's school_form above
@@ -201,26 +322,30 @@ def addCourseOrSchool(request):
             print "non-ajax request"
         type = request.POST['type']
         if type == "Course":
-            form = CourseForm(request.POST)
+            form = UsherCourseForm(request.POST)
         elif type == "School":
             form = SchoolForm(request.POST)
         elif type == "Instructor":
             form = InstructorForm(request.POST)
         if form.is_valid():
             model = form.save()
-            # Return to /upload page after object added
-            # TODO: Have form reflect pre-populated value
-            # With below line uncommented, the value is set to the form
-            # But the autocomplete field does not reflect this in its display
-            form = UploadFileForm(initial={str(type).lower(): model})
             #print "type: " + str(type).lower() + " model: " + str(model)
             # Trying to format the model properly for display in modelchoicefield
             #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
 
             # If ajax request, return success message
             if request.is_ajax():
-                return HttpResponse("success")
+                # Return a json object: {'status': 'success', 'model': 'model's pk}
+                response = {}
+                response['status'] = 'success'
+                response['model'] = model.pk
+                return HttpResponse(json.dumps(response), mimetype="application/json")
             else:
+                # Return to /upload page after object added
+                # TODO: Have form reflect pre-populated value
+                # With below line uncommented, the value is set to the form
+                # But the autocomplete field does not reflect this in its display
+                form = UploadFileForm(initial={str(type).lower(): model})
                 return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             # If ajax, return only the form with errors
@@ -234,7 +359,7 @@ def addCourseOrSchool(request):
     else:
         type = request.GET.get('type')
         if type == "Course":
-            form = CourseForm()
+            form = UsherCourseForm()
         elif type == "School":
             form = SchoolForm()
         elif type == "Instructor":
