@@ -80,6 +80,12 @@ def uploadUsher(request):
 
             # The below line is used if Tags is data from a ModelMultipleChoiceField
             #newNote.tags = form.cleaned_data['tags']
+
+            # A bound Form is immutable, so to provide the hidden field values
+            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
+            # We'll pass them to the template directly and inject into form with javascript
+            template_data['school'] = request.POST['school']
+            template_data['course'] = request.POST['course']
             try:
                 # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
                 #pass
@@ -89,11 +95,6 @@ def uploadUsher(request):
                 print "gDocs error: " + str(e)
                 # TODO: More granular exception handling
                 newNote.delete()
-               # A bound Form is immutable, so to provide the hidden field values
-                # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
-                # We'll pass them to the template directly and inject into form with javascript
-                template_data['school'] = request.POST['school']
-                template_data['course'] = request.POST['course']
 
                 template_data['form'] = file_form
                 template_data['message'] = "We're sorry, there was a problem processing your file. Can you convert it to a .doc or .rtf?"
@@ -104,13 +105,6 @@ def uploadUsher(request):
             # Credit the user with this note. See models.UserProfile.addFile
             user_profile.addFile(newNote)
             # Success
-
-            # A bound Form is immutable, so to provide the hidden field values
-            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
-            # We'll pass them to the template directly and inject into form with javascript
-            template_data['school'] = request.POST['school']
-            template_data['course'] = request.POST['course']
-
             template_data['form'] = file_form
             template_data['message'] = "File successfully uploaded! Your Karma increases!"
             return render(request, 'uploadUsher.html', template_data)

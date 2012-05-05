@@ -35,7 +35,10 @@ $(document).ready(function(){
       initSearchForm(state);
     {% else %}
     // Show Course Select Form
+      // set school_title for instruction display
       school_title = "{{user_school}}";
+      // set school pk for course ajax lookup
+      school = "{{user_school.pk}}";
       state = "Course";
       initSearchForm(state);
     {% endif %}
