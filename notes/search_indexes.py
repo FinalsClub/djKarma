@@ -21,6 +21,7 @@ class SchoolIndex(SearchIndex):
         return Note.objects.filter(pub_date__lte=datetime.datetime.now())
     '''
 
+
 class CourseIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
     # Non document fields allow for search filtering
@@ -28,7 +29,6 @@ class CourseIndex(SearchIndex):
     school = CharField(model_attr='school')
     semester = IntegerField(model_attr='semester')
     academic_year = IntegerField(model_attr='academic_year')
-
 
 
 site.register(School, SchoolIndex)

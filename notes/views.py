@@ -406,7 +406,7 @@ def instructors(request):
 def schools(request):
     if request.is_ajax():
         query = request.GET.get('q')
-        schools = School.objects.filter(name__contains=query).distinct()
+        schools = School.objects.filter(name__icontains=query).distinct()
         response = []
         for school in schools:
             response.append((school.pk, school.name))
@@ -422,10 +422,10 @@ def courses(request):
         school_pk = request.GET.get('school', '0')
         # If no school provided, search all courses
         if school_pk == 0:
-            courses = Course.objects.filter(title__contains=query).distinct()
+            courses = Course.objects.filter(title__icontains=query).distinct()
         # IF school provided, restrict search
         else:
-            courses = Course.objects.filter(title__contains=query, school=School.objects.get(pk=school_pk)).distinct()
+            courses = Course.objects.filter(title__icontains=query, school=School.objects.get(pk=school_pk)).distinct()
         response = []
         for course in courses:
             response.append((course.pk, course.title))
