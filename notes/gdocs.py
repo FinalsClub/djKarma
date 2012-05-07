@@ -16,6 +16,7 @@
 #Dependencies
 #gdata
 #pymongo
+import os
 import gdata.sample_util
 import gdata.docs.client
 import gdata.docs.service
@@ -24,6 +25,8 @@ import gdata.data
 import mimetypes
 from credentials import GOOGLE_USER, GOOGLE_PASS
 
+# A dictionary containing known extensions missed by mimetypes.guess_type
+EXT_TO_MIME = {'.docx': 'application/msword'}
 
 ###################################
 #### Google Docs API V3 Helpers ###
@@ -56,9 +59,18 @@ def convertWithGDocsv3(File):
     # i.e: file_type = 'text/plain', encoding = None
     (file_type, encoding) = mimetypes.guess_type(File.file.path)
 
-    # Raise Exception if file has no extension
+    # If mimetype cannot be guessed
+    # Check against known issues, then
+    # finally, Raise Exception
     if file_type == None:
-        raise Exception('File extension required.')
+        # Extract file extension and compare it to EXT_TO_MIME dict
+        fileName, fileExtension = os.path.splitext(File.file.path)
+        if fileExtension.strip().lower() in EXT_TO_MIME:
+            file_type = EXT_TO_MIME[fileExtension.strip().lower()]
+        # If boy mimetypes.guess_type and EXT_TO_MIME fail to cover
+        # file, return error
+        else:
+            raise Exception('Unknown file type')
 
     # Encapsulate File in Google's MediaSource Object
     media = gdata.data.MediaSource()
@@ -72,19 +84,15 @@ def convertWithGDocsv3(File):
 
     print "file_type: " + str(file_type)
     # If file is of type that Google can convert to html, download it
-    if file_type == "plain/text" or file_type == "application/msword" or file_type == "text/html":
-        # Download html representation of document
-        client.download_resource(entry=doc, file_path=File.file.path + '.html')
+    #if file_type == "plain/text" or file_type == "application/msword" or file_type == "text/html":
 
-        f = open(str(File.file.path) + '.html')
-        File.html = f.read()
-        File.save()
-        f.close()
-    # If pdf, we can use Google Document iframe to view
-    elif file_type == "application/pdf":
-        File.html = "pdf"
-        File.save()
+    # Download html representation of document
+    client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params={'exportFormat': 'html'})
 
+    f = open(str(File.file.path) + '.html')
+    File.html = f.read()
+    File.save()
+    f.close()
 
 
 # Upload File and download html representation
