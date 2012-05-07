@@ -55,6 +55,9 @@ def convertWithGDocsv3(File):
     # Create and Authorize OAuth client
     client = CreateClient()
 
+    # Create a dictionary for extra Google query variables
+    query_args = {'exportFormat': 'html'}
+
     # Get file_type and encoding of uploaded file
     # i.e: file_type = 'text/plain', encoding = None
     (file_type, encoding) = mimetypes.guess_type(File.file.path)
@@ -79,15 +82,19 @@ def convertWithGDocsv3(File):
     # Create a Resource to connect MediaSource to
     doc = gdata.docs.data.Resource(type='document', title=File.title)
 
+    # if pdf, append OCR=true to uri
+    if file_type == 'application/pdf':
+        create_uri = gdata.docs.client.RESOURCE_UPLOAD_URI + '?ocr=true'
+    else:
+        create_uri = gdata.docs.client.RESOURCE_UPLOAD_URI
+
     # Upload document and retrieve representation
-    doc = client.CreateResource(entry=doc, media=media)
+    doc = client.CreateResource(entry=doc, create_uri=create_uri, media=media)
 
     print "file_type: " + str(file_type)
-    # If file is of type that Google can convert to html, download it
-    #if file_type == "plain/text" or file_type == "application/msword" or file_type == "text/html":
 
     # Download html representation of document
-    client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params={'exportFormat': 'html'})
+    client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params=query_args)
 
     f = open(str(File.file.path) + '.html')
     File.html = f.read()
