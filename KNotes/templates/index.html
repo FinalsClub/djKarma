@@ -37,7 +37,7 @@
   the necessary jquery UI CSS */
     /* Autocomplete
   ----------------------------------*/
-  .ui-autocomplete { position: absolute; cursor: default; }       
+  .ui-autocomplete { position: absolute; cursor: default; }
   /* .ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; } */
 
   /* workarounds */
@@ -71,6 +71,8 @@
     font-weight: bold;
     text-shadow:2px 2px 2px #ADFFC7;
     color:#06C442;
+    height: 30px;
+    display:block;
   }
   .shadow {
     -moz-box-shadow:    0px 0px 5px 5px #ccc;
@@ -180,47 +182,53 @@
 
   <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container-fluid">
-          
-          <a style="vertical-align:middle"class="brand" href="/"><img style="vertical-align:middle" src="/static/img/ohm_icon.png"></a>
-            <ul class="nav">
-              <li><a id="searchForNotesBtn" href="/search">search</a></li>
-              <li><a id="uploadNotesBtn" href="/upload">upload</a></li>
-            
-              <li><a id="aboutBtn" href="#">about</a></li>
-            </ul>
-            <ul class="nav pull-right">
-            
-              {% if request.user.is_authenticated %}
-              <li>
-                <a href="{% url 'profile' %}">{{request.user.username}} ({{request.user.get_profile.karma}})</a>
-              </li>
-              <li class="divider-vertical"></li>
-              <li>
-              <a  href="{% url 'auth_logout' %}">sign out</a>
-              </li>
-              {% else %}
-              <li>
-                <a  href="{% url 'login' %}">sign in</a>
-              </li>
-              {% endif %}
-            
-            </ul>
-            
+        <div class="container">
+
+          <div class="row show-grid">
+            <div id="nav" class="offset1 span10">
+              <a style="vertical-align:middle"class="brand" href="/">
+                <img style="vertical-align:middle" src="/static/img/ohm_icon.png">
+              </a>
+              <ul class="nav">
+                <li><a id="searchForNotesBtn" href="/search">search</a></li>
+                <li><a id="uploadNotesBtn" href="/upload">upload</a></li>
+
+                <li><a id="aboutBtn" href="/about">about</a></li>
+              </ul>
+              <ul class="nav pull-right">
+
+                {% if request.user.is_authenticated %}
+                <li>
+                  <a href="{% url 'profile' %}" title="You currently have {{ request.user.get_profile.karma }} KarmaPoints">{{request.user.username}} ({{request.user.get_profile.karma}})</a>
+                </li>
+                <li class="divider-vertical"></li>
+                <li>
+                <a  href="{% url 'auth_logout' %}">sign out</a>
+                </li>
+                {% else %}
+                <li>
+                  <a  href="{% url 'login' %}">sign in</a>
+                </li>
+                {% endif %}
+
+              </ul>
+            </div> <!-- #nav -->
+
+          </div> <!-- .row -->
         </div><!--.container -->
       </div>
     </div>
-<div id="container" class="container-fluid">
+<div id="container" class="container">
 
   {% block content %}
-  
+
 
   <table id="file-list" style="background:#ffffff;opacity:1;width:70%;cell-padding:5px;margin-left:auto;margin-right:auto;margin-top:-320px;z-index:1">
   </table>
 {% endblock %}
 {% block stuff %}
 {% endblock %}
-<!-- footer removed because it doesn't adjust to avoid jquery generated content. Causes overlap in search view 
+<!-- footer removed because it doesn't adjust to avoid jquery generated content. Causes overlap in search view
 -->
 </div> <!-- /container -->
 

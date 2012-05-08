@@ -3,142 +3,157 @@
 
 {% block content %}
 
-<div class="row-fluid" style="text-align:center;">
-	<h1>Hey {{request.user.username}}</h1>
+<div class="row">
+  <h1>Hey {{ request.user.username }}</h1>
     <br/><br/>
 </div>
-	  <div class="row-fluid">
-	    <div class="span3">
-	    	{{request.user.username}}
-	    		<form enctype="multipart/form-data" action="/profile" method="post">
-	    		{% csrf_token %}
-	    		<table>
-    			{% for field in profile_form %}
-    				<tr>
-    					<td colspan="3">
-    					<div style="font-weight:bold;margin-left:auto;margin-right:auto;">{{ field.errors }}</div>
-    					</td>
-    				</tr>
-    				<tr>
-    					<td style="text-align:right">
-	    				<span style="padding-right:5px">{{ field.label }} </span>
-	    				</td>
-	    				<td>
-	    				{{ field }}
-	    				</td>
-	    				<td style="padding-left:0px">
-	    				{% if field.label == 'School' and not request.user.get_profile.school and not request.user.get_profile.submitted_school %}
-	    				<span class="addpts">+2 Pts</span>
-	    				{% elif field.label = 'Grad year' and not request.user.get_profile.grad_year and not request.user.get_profile.submitted_grad_year %}
-	    				<span class="addpts">+2 Pts</span>
-	    				{% endif %}
-	    				</td>
-	    			</tr>
-	    		{% endfor %}
-	    	</table>
-      			<input class="btn btn-primary" type="submit" value="Save" />
-    			</form>
-	    </div>
-	    <div class="span6" style="">
-	    	{% if not request.user.get_profile.school %}
-	    	<h2> Select your school to view activity</h2>
-	    	{% else %}
-	    	<h2>New at {{request.user.get_profile.school}}</h2>
-	    	
-	    	<table class="table" style="margin-left:auto;margin-right:auto;">
-	    		<tr>
-					<td class="span3">
-						<h4>Title</h4>
-					</td>
-					<td class="span3">
-						<h4>Type</h4>
-					</td>
-					<td class="span3">
-						<h4>Course</h4>
-					</td>
-					<td class="span3">
-						<h4>Semester</h4>
-					</td>
-				</tr>
-	    	{% for file in recent_files %}
-	    		<tr>
-	    			<td class="span3">
-						<h4><a href="/file/{{file.pk}}">{{file.title}}</a></h4>
-					</td>
-					<td class="span3">
-						<h4>{% if file.type == "N" %}
-					        Note
-					        {% elif file.type == "S" %}
-					        Syllabus
-					        {% elif file.type == "E" %}
-					        Exam
-					        {% elif file.type == "G" %}
-					        Study Guide
-					        {% elif file.type == "A" %}
-					        Assignment
-					        {% endif %}
-					    </h4>
-					</td>
-					<td class="span3">
-						<h4>{{file.course.title}}</h4>
-					</td>
-					<td class="span3">
-						<h4>
-							{% if file.course.semester == 1 %}
-								Fall
-							{% elif file.course.semester == 2 %}
-								Winter
-							{% elif file.course.semester == 3 %}
-								Spring
-							{% elif file.course.semester == 4 %}
-								Summer
-							{% endif %}
-							{{file.course.academic_year}}
-						</h4>
-					</td>
-	    		</tr>
-	    	{% endfor %}
-	    	</table>
-	    	{% endif %}
-	    </div>
-	    <div class="span2" style="">
-	    	<div style="float:right;">
-	    		<div id="Karma"><h1 class="pts">{{request.user.get_profile.karma}}</h1> Karma Points</div>
-		    	<div class="progress" style="border-style:solid;border-width:2px;margin-right: -top:5px">
 
-	  				<div class="bar" style="width: {{ progress }}%;"></div>
-				</div>
-	      		{% if next_level %}
-	      		<div id="Karma"><h4>Next Level: {{next_level.title}} ({{next_level.karma}} Pts.)</h4></div>
-	      		{% endif %}
-	      	</div>
-	    </div>
-	  </div>
-	  <div class="row-fluid">
-	  	<div class="span12" style="margin-left:auto;margin-right:auto;">
-	  		<h2>My Files</h2>
-	  	</div>
-	  	<div class="span12" style="margin-left:auto;margin-right:auto;padding:10px;">
-	      {% for file in request.user.get_profile.files.all %}
-			   <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
-		        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
-		        <div>
-		        {% if file.type == "N" %}
-		        Note
-		        {% elif file.type == "S" %}
-		        Syllabus
-		        {% elif file.type == "E" %}
-		        Exam
-		        {% elif file.type == "G" %}
-		        Study Guide
-		        {% elif file.type == "A" %}
-		        Assignment
-		        {% endif %}
-		        | {{file.school}}</div>
-		      </div>
-	      {% endfor %}
-	    </div>
-	  </div>
+<div class="row">
+  <div class="offset1 span4 well">
+    {# request.user.username #}
+    <form enctype="multipart/form-data" action="/profile" method="post">
+      {% csrf_token %}
+      <div id="school-form" class="row show-grid">
+        {% for field in profile_form %}
+
+          <div class="span3" style="font-weight:bold;margin-left:auto;margin-right:auto;">{{ field.errors }}</div>
+
+          <div class="span1">
+            {{ field.label }}
+          </div> <!-- .span -->
+          <div class="span2">
+            {{ field }}
+          </div> <!-- .span -->
+          {% if field.label == 'School' and not request.user.get_profile.school and not request.user.get_profile.submitted_school %}
+          {# TODO: if user has submitted school, use this field to tell the user they can change their school, or turn this into a more static box #}
+          <div class="span1" style="height:40px;">
+            <span class="addpts">+2 Pts</span>
+          </div>
+          {% elif field.label = 'Grad year' and not request.user.get_profile.grad_year and not request.user.get_profile.submitted_grad_year %}
+          <div class="span1" style="height:40px;">
+            <span class="addpts">+2 Pts</span>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <div class="span4">
+          <input class="btn btn-primary" type="submit" value="Save" />
+        </div>
+
+      </div> <!-- #school-form .row -->
+    </form>
+
+    <div class="span4" style="margin-top: 30px; margin-left: 0px;">
+      <div>
+        <div id="Karma">
+          <h1 class="pts">{{request.user.get_profile.karma}}</h1> Karma Points
+        </div>
+        <div class="progress" style="border-style:solid;border-width:2px;margin-right: -top:5px">
+          <div class="bar" style="width: {{ progress }}%;"></div>
+        </div>
+        {% if next_level %}
+          <div id="Karma"><h4>Next Level: {{next_level.title}} ({{next_level.karma}} Pts.)</h4></div>
+        {% endif %}
+      </div>
+    </div>
+  </div> <!-- .offset1 .span3 -->
+
+  <div class="span6">
+  <div class="row">
+  {% if not request.user.get_profile.school %}
+    <div class="span6">
+      <h2> Select your school to view activity</h2>
+    </div>
+  {% else %}
+    <div class="span6">
+      <h2>New at {{request.user.get_profile.school}}</h2>
+    </div>
+
+    <table class="table table-striped span6">
+      <tr>
+      <td>
+        <h4>Title</h4>
+      </td>
+      <td>
+        <h4>Type</h4>
+      </td>
+      <td>
+        <h4>Course</h4>
+      </td>
+      <td>
+        <h4>Semester</h4>
+      </td>
+    </tr>
+    {% for file in recent_files %}
+      <tr>
+        <td>
+          <h4><a href="/file/{{file.pk}}">{{file.title}}</a></h4>
+        </td>
+        <td>
+          <h4>{% if file.type == "N" %}
+                Note
+                {% elif file.type == "S" %}
+                Syllabus
+                {% elif file.type == "E" %}
+                Exam
+                {% elif file.type == "G" %}
+                Study Guide
+                {% elif file.type == "A" %}
+                Assignment
+                {% endif %}
+            </h4>
+        </td>
+        <td>
+          <h4>{{file.course.title}}</h4>
+        </td>
+        <td>
+          <h4>
+            {% if file.course.semester == 1 %}
+              Fall
+            {% elif file.course.semester == 2 %}
+              Winter
+            {% elif file.course.semester == 3 %}
+              Spring
+            {% elif file.course.semester == 4 %}
+              Summer
+            {% endif %}
+            {{file.course.academic_year}}
+          </h4>
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+  </div> <!-- .row (rightmost column) -->
+
+</div> <!-- .row -->
+
+<div class="row-fluid">
+  {# TODO: if the user has files #}
+  <div class="span12" style="margin-left:auto;margin-right:auto;">
+    <h2>My Files</h2>
+  </div>
+  <div class="span12" style="margin-left:auto;margin-right:auto;padding:10px;">
+    {% for file in request.user.get_profile.files.all %}
+     <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
+        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
+        <div>
+        {% if file.type == "N" %}
+        Note
+        {% elif file.type == "S" %}
+        Syllabus
+        {% elif file.type == "E" %}
+        Exam
+        {% elif file.type == "G" %}
+        Study Guide
+        {% elif file.type == "A" %}
+        Assignment
+        {% endif %}
+        | {{file.school}}</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 
 
 {% endblock %}

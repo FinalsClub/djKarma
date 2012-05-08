@@ -545,3 +545,7 @@ def all_notes(request):
             response['schools'][school.name][course.title] = notes
     print response
     return render(request, 'notes.html', response)
+
+def about(request):
+    print "loading the about page"
+    return render(request, 'static/about.html')
