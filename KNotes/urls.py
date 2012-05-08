@@ -28,6 +28,9 @@ urlpatterns = patterns('',
     # Landing page.
     url(r'^$', 'notes.views.home'),
 
+    # About page
+    url(r'^about$', 'notes.views.about'),
+
     # Upload page (Note Upload Form)
     url(r'^upload$', 'notes.views.uploadUsher', name='upload'),
 
