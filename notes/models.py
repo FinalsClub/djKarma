@@ -291,6 +291,7 @@ class UserProfile(models.Model):
     reputationEvents = models.ManyToManyField(ReputationEvent, blank=True, null=True)
 
     # Optional fields:
+    # TODO: update this when User.save() is run, check if gravatar has an image for their email
     gravatar = models.URLField(blank=True)  # Profile glitter
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
