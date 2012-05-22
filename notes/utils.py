@@ -13,6 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.contrib.auth.models import User
 from models import School, Course, File, Tag
 from forms import UploadFileForm
 from django import forms as djangoforms
@@ -22,12 +23,13 @@ from django.template.defaultfilters import slugify
 # Returns a python dictionary representation of a model
 # The resulting model is ready for json.dumps()
 # model is a Django Model
-# depth is how many levels of foreignKey introspection should be performed
-# jsonifyModel(School, 1) returns school json at course detail
-# jsonifyModel(School, 2) returns school json at note detail
+# optional: depth is how many levels of foreignKey introspection should be performed
+# jsonifyModel(model=School, depth=1) returns school json at course detail
+# jsonifyModel(model=School, depth=2) returns school json at note detail
+# optional: user_pk for inclusion of moderation data in file response
+# i.e: has the user voted on this file?
 
-
-def jsonifyModel(model, depth=0):
+def jsonifyModel(model, depth=0, user_pk=-1):
     json_result = {}
     if isinstance(model, School):
         json_result["_id"] = model.pk
@@ -35,7 +37,7 @@ def jsonifyModel(model, depth=0):
         json_result["courses"] = []
         if(depth > 0):
             for course in model.course_set.all().order_by('title'):
-                course_json = jsonifyModel(course, depth - 1)
+                course_json = jsonifyModel(model=course, depth=depth - 1, user_pk=user_pk)
                 json_result["courses"].append(course_json)
     elif isinstance(model, Course):
         json_result["_id"] = model.pk
@@ -43,11 +45,46 @@ def jsonifyModel(model, depth=0):
         json_result["notes"] = []
         if(depth > 0):
             for note in model.file_set.all().order_by('-timestamp'):
-                note_json = jsonifyModel(note)
+                note_json = jsonifyModel(model=note, user_pk=user_pk)
                 json_result["notes"].append(note_json)
     elif isinstance(model, File):
         json_result["_id"] = model.pk
         json_result["notedesc"] = model.title
+        json_result["karma"] = model.numUpVotes - model.numDownVotes
+        json_result["views"] = model.viewCount
+
+        # If the file has an owner, provide it
+        if model.userprofile_set.exists():
+            #
+            json_result["user"] = model.userprofile_set.all()[0].getName()
+        else:
+            json_result["user"] = "KN Staff"
+
+        # If a valid user_pk is provided, and that user has voted on this file add vote data
+        # If a valid user_pk is provided, and that user matches the file owner, indicate that
+        if User.objects.filter(pk=user_pk).exists():
+            # If the valid user has voted on this file, bundle vote value:
+            if model.votes.filter(user=User.objects.get(pk=user_pk)).exists():
+                # user has all ready voted
+                json_result["canvote"] = False
+                user_file_vote = model.votes.get(user=User.objects.get(pk=user_pk)).up
+                if user_file_vote == True:
+                    json_result["vote"] = 1  # upvote
+                elif user_file_vote == False:
+                    json_result["vote"] = -1  # downvote
+            else:
+                # The valid user has not voted on this file
+                # If the valid user has viewed the file, allow them to vote
+                if model.userprofile_set.all()[0] == User.objects.get(pk=user_pk):
+                    json_result["canvote"] = True
+                else:
+                    json_result["canvote"] = False
+                json_result["vote"] = 0  # novote
+        else:
+            # A valid user_pk was not provided
+            json_result["canvote"] = False
+            json_result["vote"] = 0  # novote
+
     return json_result
 
 

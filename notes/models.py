@@ -147,6 +147,9 @@ class Vote(models.Model):
     user = models.ForeignKey(User)
     up = models.BooleanField(default=True)
 
+    def __unicode__(self):
+        return u"%s voted %s" % (self.user, str(self.up))
+
 
 class School(models.Model):
     name = models.CharField(max_length=255)
@@ -315,6 +318,26 @@ class UserProfile(models.Model):
 
     # TODO: store all reputation-related activity
     # To a separate file
+
+    def __unicode__(self):
+        #Note these must be unicode objects
+        return u"%s at %s" % (self.user.username, self.school)
+
+    # Get the "name" of this user for display
+    # If no first_name, user username
+    def getName(self):
+        if self.user.first_name:
+            if self.user.last_name:
+                # First name + Last name initial
+                return self.user.first_name + self.user.last_name[0].upper()
+            else:
+                # First name
+                return self.user.first_name
+        else:
+            # As last resort, use username
+            # Could be user entered username, fb username, or a 
+            # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
+            return self.user.username
 
     # Award user karma given a ReputationEventType slug title
     # and add a new ReputationEvent to UserProfile.reputationEvents

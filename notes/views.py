@@ -17,6 +17,7 @@
 import json
 from utils import jsonifyModel, processCsvTags, uploadForm
 # Django imports
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms, authenticate, login
 from django import forms as djangoforms
@@ -30,7 +31,7 @@ from django.utils.encoding import iri_to_uri
 from simple_autocomplete.widgets import AutoCompleteWidget
 from gdocs import convertWithGDocs, convertWithGDocsv3
 # Local imports
-from models import School, Course, File, Instructor, SiteStats, Level
+from models import School, Course, File, Instructor, SiteStats, Level, Vote
 from forms import UploadFileForm, UsherUploadFileForm, UsherCourseForm, ModelSearchForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
 
 #from django.core import serializers
@@ -516,9 +517,11 @@ def searchBySchool(request):
 # Ajax: Return all notes belonging to a school
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
-    print school_pk
-    response_json = []
+    # If user id is sent with search, send moderation data per note
+    # i.e: has a user voted on this note?
     if request.is_ajax():
+        user_pk = request.GET.get('user', '-1')
+        response_json = []
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
         print "notes request for " + str(school.pk)
@@ -546,6 +549,17 @@ def all_notes(request):
     print response
     return render(request, 'notes.html', response)
 
+
 def about(request):
     print "loading the about page"
     return render(request, 'static/about.html')
+
+
+def voteTest(request):
+    # Retrieve file pks that a user has voted on
+    #users =  File.objects.filter(pk=-1).exists()
+    #response = File.objects.get(pk=6).votes.get(user=User.objects.get(pk=2))
+    response = File.objects.get(pk=1).userprofile_set.all()[0]
+    # return all files a user has voted in
+    #user_voted_files = File.objects.filter(votes__in=Vote.objects.filter(user=request.user.pk)).values('pk')
+    return HttpResponse(response)
