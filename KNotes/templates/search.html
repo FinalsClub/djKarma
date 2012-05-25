@@ -193,7 +193,7 @@ $(document).ready(function() {
     // Only perform the request if the corresponding notesOfCourse div doesn't have the 'populated' class
     if(!$(this).next().hasClass('populated')){
     {% if request.user.is_authenticated %}
-      $.getJSON('/notesOfCourse/' + courseID+'?user={{request.user.pk}}', function(schoolArr) {
+      $.getJSON('/notesOfCourse/' + courseID+'?user={{request.user.pk}}', function(noteArray) {
       {% else %}
       $.getJSON('/notesOfCourse/' + courseID, function(noteArray) {
       {% endif %}
