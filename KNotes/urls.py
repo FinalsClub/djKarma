@@ -26,7 +26,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
 
     # Vote Testing
-    url(r'^vote$', 'notes.views.voteTest'),
+    url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
+
     # Landing page.
     url(r'^$', 'notes.views.home'),
 

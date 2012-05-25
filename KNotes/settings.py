@@ -193,8 +193,8 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.request", #Makes request accessible to templates
-    #"django.core.context_processors.static",
+    "django.core.context_processors.request", # Makes request accessible to templates
+    "django.core.context_processors.static", # Makes STATIC_URL available
 )
 
 INSTALLED_APPS = (

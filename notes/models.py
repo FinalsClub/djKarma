@@ -240,6 +240,9 @@ class File(models.Model):
     numDownVotes = models.IntegerField(default=0)
     type = models.CharField(max_length=1, choices=FILE_PTS)
 
+    # User who uploaded the document
+    owner = models.ForeignKey(User, blank=True, null=True)
+
     # has the html content been escaped?
     # This is to assure we don't double escape characters
     cleaned = models.BooleanField(default=False)
@@ -261,6 +264,40 @@ class File(models.Model):
             self.cleaned = True
 
         super(File, self).save(*args, **kwargs)
+
+    # Calls UserProfile.awardKarma
+    # with the appropriate ReputationEventType slug title("upvote", "downvote")
+    # and target user (if downvote)
+    # upvote - vote_value=1 , downvote - vote_value=-1
+    def Vote(self, voter, vote_value=0):
+        print "Creating Vote object. voter: "+str(voter)+" value: "+str(vote_value)
+        # Abort of note vote_value provided, or voter is not a User object
+        if int(vote_value) == 0 or not isinstance(voter, User):
+            print "invalid vote value or voter"
+            return
+        if int(vote_value) == 1:
+            this_vote = Vote.objects.create(user=voter, up=True)
+            print "upvote created: " + str(this_vote)
+            # Increment the file's upvote counter
+            self.numUpVotes += 1
+            # Award karma corresponding to "upvote" ReputationEventType to file owner
+            if self.owner != None:
+                self.owner.get_profile().awardKarma(event="upvote")
+            # Add this vote to the file's collection
+            self.votes.add(this_vote)
+        elif int(vote_value) == -1:
+            this_vote = Vote.objects.create(user=voter, up=False)
+            print "downvote created: " + str(this_vote)
+            # Increment the file's downvote counter
+            self.numDownVotes += 1
+            # "Award" negative karma coresponding to "downvote" ReputationEventType to file owner
+            # and negative karma corresponding to "downvote" target user to downvoter
+            if self.owner != None:
+                self.owner.get_profile().awardKarma(event="downvote", target_user=voter)
+            # Add this vote to the file's collection
+            self.votes.add(this_vote)
+        self.save()
+
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
@@ -366,7 +403,10 @@ class UserProfile(models.Model):
     # Generates the appropriate ReputationEvent, and modifies
     # the user's karma
     def addFile(self, File):
-        # Associate this file with the user
+        # Set File.owner to the user
+        File.owner = self
+        File.save()
+        # Add this file to the user's collection
         self.files.add(File)
         # Generate a reputation event
         title = ""

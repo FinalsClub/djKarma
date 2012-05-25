@@ -50,39 +50,49 @@ def jsonifyModel(model, depth=0, user_pk=-1):
     elif isinstance(model, File):
         json_result["_id"] = model.pk
         json_result["notedesc"] = model.title
-        json_result["karma"] = model.numUpVotes - model.numDownVotes
         json_result["views"] = model.viewCount
+        json_result["pts"] = model.numUpVotes - model.numDownVotes
 
         # If the file has an owner, provide it
-        if model.userprofile_set.exists():
-            #
-            json_result["user"] = model.userprofile_set.all()[0].getName()
+        if model.owner != None:
+            json_result["user"] = model.owner.get_profile().getName()
         else:
             json_result["user"] = "KN Staff"
 
         # If a valid user_pk is provided, and that user has voted on this file add vote data
         # If a valid user_pk is provided, and that user matches the file owner, indicate that
         if User.objects.filter(pk=user_pk).exists():
+            request_user = User.objects.get(pk=user_pk)
             # If the valid user has voted on this file, bundle vote value:
-            if model.votes.filter(user=User.objects.get(pk=user_pk)).exists():
+            if model.votes.filter(user=request_user).exists():
+                #print "*** user voted"
                 # user has all ready voted
-                json_result["canvote"] = False
-                user_file_vote = model.votes.get(user=User.objects.get(pk=user_pk)).up
+                json_result["canvote"] = 1
+                user_file_vote = model.votes.get(user=request_user).up
                 if user_file_vote == True:
                     json_result["vote"] = 1  # upvote
                 elif user_file_vote == False:
                     json_result["vote"] = -1  # downvote
             else:
                 # The valid user has not voted on this file
-                # If the valid user has viewed the file, allow them to vote
-                if model.userprofile_set.all()[0] == User.objects.get(pk=user_pk):
-                    json_result["canvote"] = True
-                else:
-                    json_result["canvote"] = False
                 json_result["vote"] = 0  # novote
+                # If the valid user owns the file, don't allow voting
+                if model.owner != None and model.owner == request_user:
+                    #print "*** user owns file"
+                    json_result["canvote"] = 0
+                    json_result["vote"] = 1
+                # Else If the valid user has viewd the file, allow voting
+                elif request_user.get_profile().files.filter(pk=model.pk).exists():
+                    #print "*** user has viewed file!"
+                    json_result["canvote"] = True
+                # Else the valid user does not own, and has not viewed, so don't allow voting
+                else:
+                    #print "*** no user connection"
+                    json_result["canvote"] = 0
         else:
+            #print "*** user dne"
             # A valid user_pk was not provided
-            json_result["canvote"] = False
+            json_result["canvote"] = 0
             json_result["vote"] = 0  # novote
 
     return json_result

@@ -502,7 +502,7 @@ def searchBySchool(request):
         for school in schools:
             school_json = jsonifyModel(model=school, depth=1)
             response_json.append(school_json)
-        print 'searchBySchool: ' + str(response_json)
+        #print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
@@ -524,9 +524,9 @@ def notesOfSchool(request, school_pk):
         response_json = []
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
-        print "notes request for " + str(school.pk)
+        print "notes request for " + str(school.pk) + " by user " + str(user_pk)
         #print jsonifyModel(school, depth=2)
-        response_json.append(jsonifyModel(school, depth=2))
+        response_json.append(jsonifyModel(school, depth=2, user_pk=user_pk))
             #response_json.append(school_json)
         print json.dumps(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
@@ -555,11 +555,29 @@ def about(request):
     return render(request, 'static/about.html')
 
 
-def voteTest(request):
-    # Retrieve file pks that a user has voted on
-    #users =  File.objects.filter(pk=-1).exists()
-    #response = File.objects.get(pk=6).votes.get(user=User.objects.get(pk=2))
-    response = File.objects.get(pk=1).userprofile_set.all()[0]
-    # return all files a user has voted in
-    #user_voted_files = File.objects.filter(votes__in=Vote.objects.filter(user=request.user.pk)).values('pk')
-    return HttpResponse(response)
+def vote(request, file_pk):
+    vote_value = request.GET.get('vote', 0)
+    user_pk = request.GET.get('user', -1)
+    print "note: " + str(file_pk) + " vote: " + vote_value + "user: " + user_pk
+
+    # Check that GET parameters are valid
+    if vote_value != 0 and File.objects.filter(pk=file_pk).exists() and User.objects.filter(pk=user_pk).exists():
+        voting_file = File.objects.get(pk=file_pk)
+        voting_user = User.objects.get(pk=user_pk)
+    else:
+        raise Http404
+
+    # If the valid user owns the file or has all ready voted, don't allow voting
+    if voting_file.owner == voting_user:
+        return HttpResponse("You cannot vote on a file you uploaded")
+    # If the valid user has all ready voted, don't allow another vote
+    elif voting_file.votes.filter(user=voting_user).exists():
+        return HttpResponse("You have all ready voted on this file")
+    # Else If the valid user has viewd the file, allow voting
+    elif voting_user.get_profile().files.filter(pk=voting_file.pk).exists():
+        print "casting vote"
+        voting_file.Vote(voter=voting_user, vote_value=vote_value)
+        return HttpResponse("success")
+    # If valid use does not own file, has not voted, but not viewed the file
+    else:
+        return HttpResponse("You cannot vote on a file you have not viewed")
