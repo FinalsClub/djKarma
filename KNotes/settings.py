@@ -6,20 +6,37 @@ import os
 
 # Is this running on the karmanotes.org box?
 DEPLOY = False
+# Is this deployed as the beta server?
+BETA = True
 
 if DEPLOY:
-    DEBUG = False
+    if not BETA:
+        DEBUG = False
 
-    DATABASES = {
+        DATABASES = {
+            'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'karmanotes',
+            'USER': 'djkarma',
+            'PASSWORD': DB_PASSWORD,
+            'HOST': 'localhost',
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+            }
+        }
+    else:
+        DEBUG = True
+
+        DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'karmanotes',
+        'NAME': 'karmanotes_beta',
         'USER': 'djkarma',
         'PASSWORD': DB_PASSWORD,
         'HOST': 'localhost',
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }
     }
+
 
 else:
     DEBUG = True
