@@ -61,7 +61,12 @@ def jsonifyModel(model, depth=0, user_pk=-1):
 
         # If a valid user_pk is provided, and that user has voted on this file add vote data
         # If a valid user_pk is provided, and that user matches the file owner, indicate that
-        if User.objects.filter(pk=user_pk).exists():
+        # For performance, validate user_pk before calling jsonifyModel
+        # now only check that user_pk != -1
+        # Before: 2.42 s
+        # After: 2.11 s
+        if int(user_pk) != -1:
+            print user_pk
             request_user = User.objects.get(pk=user_pk)
             # If the valid user has voted on this file, bundle vote value:
             if model.votes.filter(user=request_user).exists():
@@ -94,6 +99,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
             # A valid user_pk was not provided
             json_result["canvote"] = 0
             json_result["vote"] = 0  # novote
+
 
     return json_result
 

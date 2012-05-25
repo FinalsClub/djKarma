@@ -55,6 +55,9 @@ $(document).ready(function() {
                        class: 'courseBtn',
                        text: course.title})
         );
+        $('#' + slugify(school.name) + '-Courses').append(
+          $('<div/>', {class: 'notesOfCourse'})
+        );
       });
     });
   });
@@ -96,20 +99,26 @@ $(document).ready(function() {
       $(this).addClass('hasNotes');
       var schoolID = this.id.slice(0, -4);
       // Send user id, if logged in, to /notesOfSchool
+      var reqTime = new Date().getTime();
+      }/* remove this curly brace and comment to restore /notesOfSchool function
+      
       {% if request.user.is_authenticated %}
       $.getJSON('/notesOfSchool/' + schoolID+'?user={{request.user.pk}}', function(schoolArr) {
       {% else %}
       $.getJSON('/notesOfSchool/' + schoolID, function(schoolArr) {
       {% endif %}
+      console.log("/notesOfSchool/ in " + (new Date().getTime() - reqTime)/1000+"s");
+      reqTime = new Date().getTime();
         // validate json
         //alert(schoolArr);
-        /*
-        try{
-          var theJson = $.parseJSON(schoolArr);
-          alert('good json!');
-        }catch(err){
-          alert('malformed json!');
-        }*/
+      
+        //try{
+        //  var theJson = $.parseJSON(schoolArr);
+        //  alert('good json!');
+        //}catch(err){
+        //  alert('malformed json!');
+        //}
+
         // returns a one-element array: [ {
         //   id: xxx,
         //   name: "Harvard",
@@ -126,8 +135,9 @@ $(document).ready(function() {
             
             // The user cannot vote, and has not voted on this note
             // Display voting widgets faded
+            console.log(parseInt(note.canvote));
             if(parseInt(note.canvote) == 0){
-              note_opacity = .3;
+              vote_opacity = .3;
             }
             // If the user cannot vote, and has all ready voted, 
             // display voting arrows accordingly
@@ -156,27 +166,7 @@ $(document).ready(function() {
                             +"<div>Uploaded by " + note.user + "</div>"
                           +"</div>"
                           +"</div>";
-            /*
-            listItems += "<div class=\"note-row\">";
-            // If the user can vote on this file, show voting controls
-            
-            listItems+= "<div class=\"voting-box\">"
-                          +"<img src=\"{{STATIC_URL}}img/up.png\"/>"
-                          +"<div style>"+note.pts+"</div>"
-                          +"<img src=\"{{STATIC_URL}}img/down.png\"/>"
-                        +"</div>";
-                        
-            listItems += 
-              "<div class=\"file-stats-bar\">"
-                  +"<div class=\"\"><a href=\"/file/"+note._id+"\">" + note.notedesc + "</a></div>"
-                  +"<div><span class=\"file-moderation\">"+ note.views+" views</span>"
-                  +"<span class=\"file-moderation\" style=\"margin-left:10px\">Uploaded by " + note.user + "</span></div>"
-              +"</div>";
-                  //+"<div class=\"file-moderation\">Can Vote " + note.canvote + "</div>"
-                  //+"<div class=\"file-moderation\">Pts " + note.pts + "</div>"
-              
-            listItems+="</div>"
-                */
+
           });
           //alert(course._id);
           $('#' + course._id).after(
@@ -184,8 +174,9 @@ $(document).ready(function() {
                 listItems + '</div>')
           );
         });
+      console.log("/notesOfSchool/ html injection " + (new Date().getTime() - reqTime)/1000+"s");
       });
-    }
+    }*/
   });
 
   //=================================
@@ -194,13 +185,105 @@ $(document).ready(function() {
   $('#searchBySchool').on("click", ".courseBtn", function() {
     // open course accordion to display notes;
     var clickedWasNotOpen = !$(this).hasClass('open');
-    // target 'em all (tough for the CPU);
-    $('.notesOfCourse').slideUp('normal');
-    // again, do 'em all!
-    $('.courseBtn').removeClass('open');
-    if (clickedWasNotOpen) {
-      $(this).addClass('open').next().slideDown('normal');
+    // get course id from courseBtn
+    var courseID = this.id;
+    console.log("**** 1: courseBtn click id: "+ courseID + " populated: "+$(this).next().hasClass('populated'));
+    /****************** JSON notesOfCourse ************************/
+    var reqTime = new Date().getTime();
+    // Only perform the request if the corresponding notesOfCourse div doesn't have the 'populated' class
+    if(!$(this).next().hasClass('populated')){
+    {% if request.user.is_authenticated %}
+      $.getJSON('/notesOfCourse/' + courseID+'?user={{request.user.pk}}', function(schoolArr) {
+      {% else %}
+      $.getJSON('/notesOfCourse/' + courseID, function(noteArray) {
+      {% endif %}
+      //console.log("/notesOfCourse/ in " + (new Date().getTime() - reqTime)/1000+"s");
+      reqTime = new Date().getTime();
+        // validate json
+        //alert(schoolArr);
+      
+        //try{
+        //  var theJson = $.parseJSON(schoolArr);
+        //  alert('good json!');
+        //}catch(err){
+        //  alert('malformed json!');
+        //}
+
+        // returns a one-element array: [ {
+        //   id: xxx,
+        //   name: "Harvard",
+        //   courses: [ {...}, {...}, {....} ]
+        // } ]
+        // Holds the HTML representation of all the selected course's notes
+        var listItems = "";
+        $.each(noteArray[0].notes, function(idx, note) {
+            //console.log(note);
+
+            // Voting widget attributes to be modified based on vote state
+            // If user canvote, display voting widgets non-faded
+            var vote_opacity = 1;
+            var vote_up_img = "up.png";
+            var vote_down_img = "down.png";
+            
+            // The user cannot vote, and has not voted on this note
+            // Display voting widgets faded
+            //console.log(parseInt(note.canvote));
+            if(parseInt(note.canvote) == 0){
+              vote_opacity = .3;
+            }
+            // If the user cannot vote, and has all ready voted, 
+            // display voting arrows accordingly
+            else if(parseInt(note.vote) !== 0){
+              // upvote has been cast
+              if(parseInt(note.vote) == 1){
+                vote_up_img = "up-voted.png";
+              }
+              else if(parseInt(note.vote) == -1){
+                vote_down_img = "down-voted.png";
+              }
+            }
+            // Inject note data div
+            listItems += "<div>"
+                          +"<div style=\"display:inline-block;text-align:center\">"
+                            +"<img style=\"opacity:"+vote_opacity+"\" class=\"vote upvote "+note.canvote+"\" id=\""+note._id+"-upvote\" src=\"{{STATIC_URL}}img/"+vote_up_img+"\"/>"
+                            +"<div id=\""+note._id+"-pts\">"+note.pts+"</div>"
+                            +"<img style=\"opacity:"+vote_opacity+"\" class=\"vote downvote "+note.canvote+"\" id=\""+note._id+"-downvote\" src=\"{{STATIC_URL}}img/"+vote_down_img+"\"/>"
+                          +"</div>"
+                          +"<div style=\"display:inline-block;margin-left:5px\">"
+                            +"<div><a href=\"/file/"+note._id+"\">" + note.notedesc + "</a></div>"
+                            +"<div>"+ note.views+" views </div>"
+                            +"<div>Uploaded by " + note.user + "</div>"
+                          +"</div>"
+                          +"</div>";
+          //alert(course._id);
+          
+        });
+        /* Instead of creating notesOfCourse, fill it
+        $('#' + courseID).after(
+              $('<div class="notesOfCourse" style="display: none;">' +
+                listItems + '</div>')
+          );
+        */
+        $('#' + courseID).next().append(listItems);
+      //console.log("/notesOfCourse/ html injection " + (new Date().getTime() - reqTime)/1000+"s");
+        $('#' + courseID).next().addClass('populated');
+
+        
+      }); // end getJson
+    } // end if notesOfCourse loaded check
+    
+      // target 'em all (tough for the CPU);
+      console.log("2: Slide up all notesOfCourse");
+      $('.notesOfCourse').slideUp('normal');
+      // again, do 'em all!
+      $('.courseBtn').removeClass('open');
+      if (clickedWasNotOpen) {
+        console.log("3: Slide down this notesOfCourse: "+$(this).next());
+        $(this).addClass('open').next().slideDown('normal');
+        //console.log("slide down notesOfCourse w id: "+ $(this).next().attr("id"));
+      
     }
+    /****************** END JSON notesOfCourse ********************/
   });
 
   // Vote click-listener
@@ -256,6 +339,8 @@ $(document).ready(function() {
     else{
       alert('you may only vote on notes you have viewed');
     }*/
+    {% else %}
+      alert('You must sign in to vote');
     {% endif %}
   });
 

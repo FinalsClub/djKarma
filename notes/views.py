@@ -514,19 +514,47 @@ def searchBySchool(request):
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 
-# Ajax: Return all notes belonging to a school
+# Deprecated: This request is too expensive to perform on a school-wide basis
+# Ajax: Return all notes (and corresponding voting data) belonging to a school
 # Used by search page javascript
 def notesOfSchool(request, school_pk):
     # If user id is sent with search, send moderation data per note
     # i.e: has a user voted on this note?
     if request.is_ajax():
         user_pk = request.GET.get('user', '-1')
+        # Validate request parameters
+        if not School.objects.filter(pk=school_pk).exists():
+            raise Http404
+
         response_json = []
         #notes = Note.objects.get(school.pk=school_pk)
         school = School.objects.get(pk=school_pk)
-        print "notes request for " + str(school.pk) + " by user " + str(user_pk)
+        #print "notes request for school " + str(school.pk) + " by user " + str(user_pk)
         #print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(school, depth=2, user_pk=user_pk))
+            #response_json.append(school_json)
+        #print json.dumps(response_json)
+        return HttpResponse(json.dumps(response_json), mimetype="application/json")
+    else:
+        raise Http404
+
+
+# Ajax: Return all notes belonging to a course
+# Used by search page javascript
+def notesOfCourse(request, course_pk):
+    # If user id is sent with search, send moderation data per note
+    # i.e: has a user voted on this note?
+    if request.is_ajax():
+        user_pk = request.GET.get('user', '-1')
+        # Validate request parameters
+        if not Course.objects.filter(pk=course_pk).exists():
+            raise Http404
+        response_json = []
+        #notes = Note.objects.get(school.pk=school_pk)
+        course = Course.objects.get(pk=course_pk)
+        print "notes request for course " + str(course.pk) + " by user " + str(user_pk)
+        #print jsonifyModel(school, depth=2)
+        response_json.append(jsonifyModel(course, depth=1, user_pk=user_pk))
             #response_json.append(school_json)
         print json.dumps(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")

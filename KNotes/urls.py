@@ -25,9 +25,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    # Vote Testing
-    url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
-
     # Landing page.
     url(r'^$', 'notes.views.home'),
 
@@ -51,7 +48,11 @@ urlpatterns = patterns('',
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
-    url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),
+    url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),  # Deprecated
+    url(r'^notesOfCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
+
+    # Ajax Voting
+    url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
 
     # Ajax requets from upload usher. Text input to model get / create
     url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
