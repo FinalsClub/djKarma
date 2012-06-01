@@ -66,6 +66,9 @@ def uploadUsher(request):
         file_form = UsherUploadFileForm(request.POST, request.FILES)
         # 'type' used to generate ajaxFormResponse.html
         template_data['type'] = "File"
+        # It should be safe to use POST['school'] and POST['course']. Validated by addCourseOrSchool or SmartModelQuery
+        template_data['school_title'] = School.objects.get(pk=int(request.POST['school'])).name
+        template_data['course_title'] = Course.objects.get(pk=int(request.POST['course'])).title
         if file_form.is_valid():
             newNote = File.objects.create(
                                 type=file_form.cleaned_data['type'],
@@ -87,8 +90,6 @@ def uploadUsher(request):
             # We'll pass them to the template directly and inject into form with javascript
             template_data['school'] = request.POST['school']
             template_data['course'] = request.POST['course']
-            template_data['school_title'] = School.objects.get(pk=int(request.POST['school'])).name
-            template_data['course_title'] = Course.objects.get(pk=int(request.POST['course'])).title
             try:
                 # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
                 #pass
