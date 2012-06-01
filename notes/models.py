@@ -404,7 +404,7 @@ class UserProfile(models.Model):
     # the user's karma
     def addFile(self, File):
         # Set File.owner to the user
-        File.owner = self
+        File.owner = self.user
         File.save()
         # Add this file to the user's collection
         self.files.add(File)
@@ -430,7 +430,6 @@ class UserProfile(models.Model):
         # Assign user points as prescribed by ReputationEventType
         self.karma += repType.actor_karma
         self.save()
-
 
     # Check if school, grad_year fields have been set
     # Automatically called on UserProfile post_save

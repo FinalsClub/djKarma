@@ -87,13 +87,17 @@ def uploadUsher(request):
             # We'll pass them to the template directly and inject into form with javascript
             template_data['school'] = request.POST['school']
             template_data['course'] = request.POST['course']
+            template_data['school_title'] = School.objects.get(pk=int(request.POST['school'])).name
+            template_data['course_title'] = Course.objects.get(pk=int(request.POST['course'])).title
             try:
                 # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
                 #pass
+                # DEPRECATED: Google Docs API v2
                 #convertWithGDocs(newNote)
+
                 convertWithGDocsv3(newNote)
             except Exception, e:
-                print "gDocs error: " + str(e)
+                print "Google Documents API error: " + str(e)
                 # TODO: More granular exception handling
                 newNote.delete()
 
@@ -101,11 +105,13 @@ def uploadUsher(request):
                 template_data['message'] = "We're sorry, there was a problem processing your file. Can you convert it to a .doc or .rtf?"
                 return render(request, 'uploadUsher.html', template_data)
 
-            # After the document is accepted by convertWithGDocs, credit the user
+            # After the document is accepted by Google Documents, credit the user
+            # addFile adds the file to the user's collection, sets the file owner
+            # to the user, generates the appropriate ReputationEvent and handles corresponding karma transaction
             user_profile = request.user.get_profile()
-            # Credit the user with this note. See models.UserProfile.addFile
             user_profile.addFile(newNote)
-            # Success
+
+            # Return bound form and success message
             template_data['form'] = file_form
             template_data['message'] = "File successfully uploaded! Your Karma increases!"
             return render(request, 'uploadUsher.html', template_data)
@@ -138,10 +144,13 @@ def smartModelQuery(request):
                 if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
                     form = SchoolForm(initial={'name': search_form.cleaned_data['title']})
                     message = "Tell us a little more about your school"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message})
+                    # Return a list of all schools to present to user, ensuring duplicate entires aren't made
+                    # TODO: Try searching school name with input, return mathing results
+                    schools = School.objects.all().values('name', 'pk').order_by('name')
+                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
-                    # Return a json object: {'status': 'success', 'model': 'model's pk}
+                    # Return a json object: {'status': 'success', 'model': model's pk}
                     response = {}
                     response['status'] = 'success'
                     response['model'] = School.objects.get(name=search_form.cleaned_data['title']).pk
@@ -151,13 +160,19 @@ def smartModelQuery(request):
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
                     form = UsherCourseForm(initial={'title': search_form.cleaned_data['title']})
                     message = "Tell us a little more about your course"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message})
+                    courses = None
+                    if request.GET.get("school", -1) != -1:
+                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).values("title", "pk").order_by('title')
+                    #courses = Course
+                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
-                    # Return a json object: {'status': 'success', 'model': 'model's pk}
+                    # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
                     response = {}
                     response['status'] = 'success'
-                    response['model'] = Course.objects.get(title=search_form.cleaned_data['title']).pk
+                    response_course = Course.objects.get(title=search_form.cleaned_data['title'])
+                    response['model'] = response_course.pk
+                    response['model_title'] = response_course.title
                     return HttpResponse(json.dumps(response), mimetype="application/json")
     raise Http404
 
@@ -324,6 +339,7 @@ def addCourseOrSchool(request):
             form = InstructorForm(request.POST)
         if form.is_valid():
             model = form.save()
+
             #print "type: " + str(type).lower() + " model: " + str(model)
             # Trying to format the model properly for display in modelchoicefield
             #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
@@ -334,6 +350,12 @@ def addCourseOrSchool(request):
                 response = {}
                 response['status'] = 'success'
                 response['model'] = model.pk
+
+                if type == "Course":
+                    response['model_title'] = model.title
+                elif type == "School":
+                    response['model_name'] = model.name
+
                 return HttpResponse(json.dumps(response), mimetype="application/json")
             else:
                 # Return to /upload page after object added

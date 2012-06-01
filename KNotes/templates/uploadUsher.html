@@ -15,9 +15,17 @@ var course = "";
 
 // School and Course titles for instructions
 var school_title = "None";
+var course_title = "None";
+
+function printSelect(){
+  console.log("suggestion: " + $('#model-suggestions').val());
+}
 
 $(document).ready(function(){
+
     // Determine initial page state
+
+    // A file was just uploaded, or a file-form error occured
     {% if type == "File" %}
     // Show file form
       state = "File";
@@ -27,6 +35,12 @@ $(document).ready(function(){
 
       school = "{{school}}";
       course = "{{course}}";
+      school_title = "{{school_title}}";
+      course_title = "{{course_title}}";
+
+      // School and Course text titles for user feedback
+      $('#file-school-display').val(school_title);
+      $('#file-course-display').val(course_title);
 
       $('#file-div').fadeIn('fast');
     {% elif user_school == None %}
@@ -45,6 +59,8 @@ $(document).ready(function(){
     console.log('school title: ' + school_title);
 }); // End document ready
 
+// Populate the form prompt text as appropriate for the given type ("Course", "School")
+// Hooks up jQuery autocomplete to search field as appropriate
 function initSearchForm(type){
 
     // Clear search value 
@@ -113,6 +129,7 @@ function initSearchForm(type){
       $('#search-div').fadeIn('fast');
 }
 
+/* UNUSED
 // Add Course button
 $("#add-course-btn").click(function() {
   $("#file-div").fadeOut('fast',function(){
@@ -132,6 +149,54 @@ $("#add-instructor-btn").click(function() {
   $("#course-div").fadeOut('fast',function(){
     $("#instructor-div").fadeIn('fast');
   });
+});
+*/
+
+// Existing model <select> listener
+// This operates on the widget presenting existing models
+// Before allowing user to create a new one
+/*
+$("#container").on("change", "#model-suggestions", function() {
+  console.log("suggestion change val: " + $("#model-suggestions option:selected").val());
+  console.log("suggestion change: " + $("#model-suggestions option:selected").html());
+  course = $("#model-suggestions option:selected").val();
+  course_title = $("#model-suggestions option:selected").html();
+  //printSelect();
+});*/
+
+// Model Create div Listeners
+// Present user with existing models, then if none suffice, present create model form
+
+// User selects existing model. Set 
+$("#container").on("click", "#select-suggestion", function() {
+  // SET STATE TO FILE
+  console.log("model-suggestion: "+ $("#model-suggestions").val());
+  if(state == "Course"){
+    course = $("#model-suggestions option:selected").val();
+    course_title = $("#model-suggestions option:selected").html();
+    showFileForm();
+  }
+  else if(state == "School"){
+    school = $("#model-suggestions option:selected").val();
+    school_title = $("#model-suggestions option:selected").html();
+    showCourseForm();
+  }
+  
+  // Save selected course pk and title
+  //course_title = $("#model-suggestions").html();
+  //console.log("model-suggestion html: "+ $("#model-suggestions").html());
+  /*
+  $("#model-suggestions").fadeOut('fast', function(){
+    $("#file-div").fadeIn('fast');
+  });*/
+  
+});
+
+$("#container").on("click", "#create-model", function() {
+  $("#model-suggestions").fadeOut('fast', function(){
+    $("#create-model-form").fadeIn('fast');
+  });
+  
 });
 
 // Back Button -- Return to file-form
@@ -154,6 +219,11 @@ $("#container").on("click", ".back-btn", function() {
     else if($('#model-div').is(":visible")){
       $('#model-div').fadeOut('fast', function(){
         $('#search-div').fadeIn('fast');
+
+        {% if user_school %}
+        // If user has a school set, don't allow them to "back out" to school select
+          $('#back-btn').fadeOut('fast');
+        {% endif %}
       });
     }
   }
@@ -170,9 +240,22 @@ $("#container").on("click", ".back-btn", function() {
     state = "Course";
       $('#file-div').fadeOut('fast',function(){
         initSearchForm(state);
+        {% if user_school %}
+        // If user has a school set, don't allow them to edit school
+          $('#back-btn').fadeOut('fast');
+        {% endif %}
       });
   }
   
+});
+
+// Change Course click listener (on File form)
+$("#container").on("click", "#change-course", function() {
+  // Return to Course Search
+  state = "Course";
+  $('#file-div').fadeOut('fast',function(){
+    initSearchForm(state);
+  });
 });
 
 // Override submit behavior for School/Course/Instructor Forms
@@ -185,23 +268,43 @@ $('#container').on("submit", "form", function(){
     // response html
     var containing_div_id = $(this).closest("div")[0].id;
     //var nearest_back_btn_id = $(this).closest(".back-btn")[0].id;
+
+    // Determine request url endpoint
+    // Options: Model Search, Model Create, or File Upload
+
+    // Model search
     if($(this).hasClass('search-form')){
-        // Smart Model Query endpoint
-        // checks if model with title/name matching Charfield exists
-        // else presents model create form
-        url = "/smartModelQuery";
+      // Smart Model Query endpoint
+      // checks if model with title/name matching Charfield exists
+      // else presents model create form
+
+      // If search text field is empty, return
+      console.log($("#id_title").val());
+      if($("#id_title").val() == "")
+        return false;
+
+      url = "/smartModelQuery";
+
+      // If this is a course search, send school
+      // as GET parameter so server can return course suggestions
+      if(state == "Course"){
+        url += "?school="+school;
+      }
+
     }
-    else if($(this).hasClass('file-form')){
-        // For now, the file form remains a non-ajax POST 
-        //url = "/upload";
-        //Ensure hidden form values are populated before POST
-        $('#usherUpload-school').val(school);
-        $('#usherUpload-course').val(course);
-        return true;
-    }
+    // Model  create
     else if($(this).hasClass('model-form')){
         // Model Create Form endpoint
         url = "/add";
+    }
+    // File upload
+    else if($(this).hasClass('file-form')){
+      // For now, the file form remains a non-ajax POST 
+      //url = "/upload";
+      //Ensure hidden form values are populated before POST
+      $('#usherUpload-school').val(school);
+      $('#usherUpload-course').val(course);
+      return true;
     }
     
       var form_data = $(this).serializeArray();
@@ -215,6 +318,7 @@ $('#container').on("submit", "form", function(){
       console.log(form_data[2]);
       $.post(url, form_data,
           function(data){
+            console.log("return data: "+data);
             console.log(data.status);
             console.log(state);
             if(data.status == "success"){
@@ -223,58 +327,25 @@ $('#container').on("submit", "form", function(){
                     // Save selected school pk
                     console.log('school saved: ' + data.model);
                     school = data.model;
+                    school_name = data.model_name
                     // Go to Course Select
-                    state = "Course";
-                    // Fade out old Search Form (if visible) and show new Search form
-                    if($('#search-div').is(":visible")){
-                        $('#search-div').fadeOut('fast', function(){
-                            initSearchForm(state);
-                            $('#back-btn').fadeIn('fast');
-                        });
-                    }
-                    // Fade out old Model Form (if visible) and show new Model form
-                    else if($('#model-div').is(":visible")){
-                        $('#model-div').fadeOut('fast', function(){
-                            initSearchForm(state);
-                        });
-                    }
+                    showCourseForm();
                     
                 }
                 else if(state == "Course"){
                     console.log('BACK TO Course Search');
-                    // Save selected course pk
-                    console.log('course saved: ' + data.model);
+                    // Save selected course pk and title
+                    console.log('course saved: ' + data.model + ' title: '+ data.model_title);
                     course = data.model;
+                    course_title = data.model_title;
+
                     // Go to File Upload Form
-                    state = "File";
-
-                    // Populate hidden File Upload Form values for
-                    // School and Course
-                    $('#usherUpload-school').val(school);
-                    $('#usherUpload-course').val(course);
-                    console.log('school: ' + school);
-                    console.log('course: ' + course);
-
-                    // Fade out old Search Form (if visible) and show new File Form
-                    if($('#search-div').is(":visible")){
-                        $('#search-div').fadeOut('fast', function(){
-                            $('#file-div').fadeIn('fast');
-                        });
-                    }
-                    // Fade out old Model Form (if visible) and show new File form
-                    else if($('#model-div').is(":visible")){
-                        $('#model-div').fadeOut('fast', function(){
-                            $('#file-div').fadeIn('fast');
-                        });
-                    }
-
-                //alert('success');
-                // TODO: take appropriate next action
+                    showFileForm();
                 }
             }
             // if data.status != 'success'
             else{
-                console.log('BACK TO ' + state + 'SEARCH ');
+              console.log('BACK TO ' + state + 'SEARCH ');
                 // If we're creating school or file
                 if(state != "File"){
                     $('#model-div').html(data);
@@ -295,13 +366,67 @@ $('#container').on("submit", "form", function(){
                 else{
                     $('#file-div').html(data);
                 }
-               //alert('fail');
-                //$('#'+containing_div_id).html(data);
             }
         
       });
       return false;
 });
+
+function showFileForm(){
+  console.log('BACK TO Course Search');
+  // Go to File Upload Form
+  state = "File";
+
+  // Clear File Form message field
+  // i.e: It may still say "File successfully uploaded"
+  // this should be cleared if you click ->change course -> return to file upload form
+  $('#file-form-message').html("");
+
+  // Populate hidden File Upload Form values for
+  // School and Course pks for submission
+  $('#usherUpload-school').val(school);
+  $('#usherUpload-course').val(course);
+  // School and Course text titles for user feedback
+  $('#file-school-display').val(school_title);
+  $('#file-course-display').val(course_title);
+
+  // Fade out back-btn
+  $('#back-btn').fadeOut('fast');
+
+  console.log('school: ' + school);
+  console.log('course: ' + course);
+
+  // Fade out old Search Form (if visible) and show new File Form
+  if($('#search-div').is(":visible")){
+      $('#search-div').fadeOut('fast', function(){
+          $('#file-div').fadeIn('fast');
+      });
+  }
+  // Fade out old Model Form (if visible) and show new File form
+  else if($('#model-div').is(":visible")){
+      $('#model-div').fadeOut('fast', function(){
+          $('#file-div').fadeIn('fast');
+      });
+  }
+
+}
+
+function showCourseForm(){
+  state = "Course";
+  // Fade out old Search Form (if visible) and show new Search form
+  if($('#search-div').is(":visible")){
+      $('#search-div').fadeOut('fast', function(){
+          initSearchForm(state);
+          $('#back-btn').fadeIn('fast');
+      });
+  }
+  // Fade out old Model Form (if visible) and show new Model form
+  else if($('#model-div').is(":visible")){
+      $('#model-div').fadeOut('fast', function(){
+          initSearchForm(state);
+      });
+  }
+}
 
 </script>
 {% endblock %}
@@ -340,7 +465,23 @@ $('#container').on("submit", "form", function(){
 <!-- File Upload -->
 <div style="display:none" class="form" id="file-div" >
   <div id="drop-instruction"><h1>Upload File</h1></div>
-  <p>{{ message }}</p>
+  <h4 id="file-form-message">{{ message }}</h4><br/>
+  <form id="file-form-school-course-display" class="form-horizontal file-form" enctype="multipart/form-data" action="/" method="post">
+  
+  <div class="control-group">
+    <label style="font-size:15px" id="file-form-school-title" class="control-label">School</label>
+    <div class="controls">
+      <input disabled="disabled" id="file-school-display">
+    </div>
+  </div>
+  <div class="control-group">
+    <label style="font-size:15px" id="file-form-course-title" class="control-label">Course</label>
+    <div class="controls">
+      <input disabled="disabled" id="file-course-display">
+      <div id="change-course" class="help-inline btn" style="margin-top:5px">Change Course</div>
+    </div>
+  </div>
+  </form>
   <form id="file-form" class="form-horizontal file-form" enctype="multipart/form-data" action="/upload" method="post">
     <fieldset>
       {% csrf_token %}

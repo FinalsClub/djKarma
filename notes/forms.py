@@ -84,7 +84,9 @@ class UsherUploadFileForm(forms.Form):
 
     required_css_class = 'required'
 
-# Create course form with hidden school
+
+# Create course form with hidden school field
+# school is populated with javascript based on the previous School selection
 class UsherCourseForm(forms.ModelForm):
     captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
     instructor = CharInstructorField(required=False, max_length=127, error_messages={'required': 'Please Enter your Instructor\'s Name'})
@@ -111,6 +113,7 @@ class UsherCourseForm(forms.ModelForm):
 ##########################
 ###  End Upload Usher  ###
 ##########################
+
 
 # User Profile form for inline profile editing
 # Used in profile.html
