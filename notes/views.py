@@ -102,7 +102,7 @@ def uploadUsher(request):
                 # TODO: More granular exception handling
                 newNote.delete()
 
-                template_data['form'] = file_form
+                template_data['file_form'] = file_form
                 template_data['message'] = "We're sorry, there was a problem processing your file. Can you convert it to a .doc or .rtf?"
                 return render(request, 'uploadUsher.html', template_data)
 
@@ -113,7 +113,7 @@ def uploadUsher(request):
             user_profile.addFile(newNote)
 
             # Return bound form and success message
-            template_data['form'] = file_form
+            template_data['file_form'] = file_form
             template_data['message'] = "File successfully uploaded! Your Karma increases!"
             return render(request, 'uploadUsher.html', template_data)
         # Form invalid
@@ -125,7 +125,7 @@ def uploadUsher(request):
             template_data['school'] = request.POST['school']
             template_data['course'] = request.POST['course']
 
-            template_data['form'] = file_form
+            template_data['file_form'] = file_form
             template_data['message'] = "Please check your form data."
             return render(request, 'uploadUsher.html', template_data)
     # If GET: Begin Upload Usher
