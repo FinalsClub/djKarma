@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^upload$', 'notes.views.uploadUsher', name='upload'),
 
      # Browse by School / Search by Tag view
-    url(r'^search$', 'notes.views.search'),
+    url(r'^browse$', 'notes.views.browse'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),

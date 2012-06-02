@@ -459,7 +459,7 @@ def courses(request):
 
 
 # Browse and Search Notes
-def search(request):
+def browse(request):
     # If the SelectTagsForm form has been submitted, display search result
     if request.method == 'POST':
         # Use SelectTagsForm for a SelectMultiple Widget
