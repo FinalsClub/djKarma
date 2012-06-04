@@ -1,28 +1,20 @@
-#gdocs.py
+#!/usr/bin/python
+# -*- coding:utf8 -*-
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #Dependencies
 #gdata
 #pymongo
+
+import mimetypes
 import os
+
 import gdata.sample_util
 import gdata.docs.client
 import gdata.docs.service
 import gdata.docs.data
 import gdata.data
-import mimetypes
+
 from credentials import GOOGLE_USER, GOOGLE_PASS
 
 # A dictionary containing known extensions missed by mimetypes.guess_type
@@ -49,9 +41,10 @@ def CreateClient():
 #######################################
 
 
-# Upload File and download html representation
-# using Google Documents API v3
 def convertWithGDocsv3(File):
+    """ Upload File and download html representation
+        using Google Documents API v3
+    """
     # Create and Authorize OAuth client
     client = CreateClient()
 
@@ -102,10 +95,11 @@ def convertWithGDocsv3(File):
     f.close()
 
 
-# Upload File and download html representation
-# using Google Documents API v2
-# Works. Lacks pdf support
 def convertWithGDocs(File):
+    """ Upload File and download html representation
+        using Google Documents API v2
+        Works. Lacks pdf support
+    """
     #print Note.file.path
     # Create a client class which will make HTTP requests with Google Docs server.
     client = gdata.docs.service.DocsService()
@@ -141,7 +135,7 @@ def convertWithGDocs(File):
     #print document_query.ToUri()
     #documents_feed = client.GetDocumentListFeed()
     #for doc in documents_feed.entry:
-    #	print doc
+    #   print doc
 
 
 
