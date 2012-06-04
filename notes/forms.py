@@ -1,24 +1,17 @@
+#!/usr/bin/python
+# -*- coding:utf8 -*-
+"""
+"""
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+
 from django import forms
-from models import School, Course, File, Tag, Instructor
+from django.template.defaultfilters import slugify
 from simple_autocomplete.widgets import AutoCompleteWidget
 from simplemathcaptcha.fields import MathCaptchaField
-from django.template.defaultfilters import slugify
+
+from models import School, Course, File, Tag, Instructor
 
 
 ##########################
@@ -26,8 +19,9 @@ from django.template.defaultfilters import slugify
 ##########################
 
 class CharInstructorField(forms.CharField):
-    # Convert text instructor name to Instructor model
-    # creating one if necessary
+    """ Convert text instructor name to Instructor model
+        creating one if necessary
+    """
     def clean(self, value):
         if Instructor.objects.filter(name=value).exists():
             instructor = Instructor.objects.get(name=value)
@@ -37,8 +31,9 @@ class CharInstructorField(forms.CharField):
 
 
 class CharSchoolField(forms.CharField):
-    # Convert text school name to School model
-    # creating one if necessary
+    """ Convert text school name to School model
+        creating one if necessary
+    """
     def clean(self, value):
         if School.objects.filter(pk=value).exists():
             school = School.objects.get(pk=value)
@@ -50,8 +45,9 @@ class CharSchoolField(forms.CharField):
 
 
 class CharCourseField(forms.CharField):
-    # Convert text school name to School model
-    # creating one if necessary
+    """ Convert text school name to School model
+        creating one if necessary
+    """
     def clean(self, value):
         if Course.objects.filter(pk=value).exists():
             course = Course.objects.get(pk=value)
@@ -63,50 +59,66 @@ class CharCourseField(forms.CharField):
 
 
 class ModelSearchForm(forms.Form):
+    """ Provides the form of the Search field """
     title = forms.CharField(max_length=127)
 
 
 class UsherUploadFileForm(forms.Form):
-    type = forms.ChoiceField(choices=File.FILE_PTS)
-    title = forms.CharField(max_length=50, error_messages={'required': 'Enter a title.'})
-    description = forms.CharField(required=False, max_length=511, error_messages={'required': 'Enter a description.'})
-    school = CharSchoolField(max_length=255, widget=forms.HiddenInput(attrs={'id': 'usherUpload-school'}))
-    course = CharCourseField(max_length=255, widget=forms.HiddenInput(attrs={'id': 'usherUpload-course'}))
-    #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
-
-    tags = forms.CharField(required=False, max_length=511, label="Tags (separated with commas)", error_messages={'required': 'Help us organize. Add some tags.'})
-
-    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
-    agree = forms.BooleanField(required=True, label='I Agree to the Terms of Use',
-                               error_messages={'required': 'We aren\'t evil, check out the Terms.'})
-    #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
-    note_file = forms.FileField(label='File', error_messages={'required': 'Attach a file'})
+    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    title       = forms.CharField(max_length=50, \
+                    error_messages={'required': 'Enter a title.'})
+    description = forms.CharField(required=False, max_length=511, \
+                    error_messages={'required': 'Enter a description.'})
+    school      = CharSchoolField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'usherUpload-school'}))
+    course      = CharCourseField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'usherUpload-course'}))
+    tags        = forms.CharField(required=False, max_length=511, \
+                    label="Tags (separated with commas)", \
+                    error_messages={'required': 'Help us organize. Add some tags.'})
+    captcha     = MathCaptchaField(required=True, \
+                    error_messages={'required': 'Prove you\'re probably a human.'})
+    agree       = forms.BooleanField(required=True, \
+                    label='I Agree to the Terms of Use',
+                    error_messages={'required': 'We aren\'t evil, check out the Terms.'})
+    note_file   = forms.FileField(label='File', error_messages={'required': 'Attach a file'})
 
     required_css_class = 'required'
 
+    #school     = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
+    #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
 
-# Create course form with hidden school field
-# school is populated with javascript based on the previous School selection
+
+
 class UsherCourseForm(forms.ModelForm):
-    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
-    instructor = CharInstructorField(required=False, max_length=127, error_messages={'required': 'Please Enter your Instructor\'s Name'})
+    """ Create course form with hidden school field
+        school is populated with javascript based on the previous School selection
+    """
+    captcha     = MathCaptchaField(required=True, \
+                    error_messages={'required': 'Prove you\'re probably a human.'})
+    instructor  = CharInstructorField(required=False, \
+                    max_length=127, \
+                    error_messages={'required': 'Please Enter your Instructor\'s Name'})
     # school is populated with the school Model pk with javascript.See uploadUsher.html
-    school = CharSchoolField(max_length=255, widget=forms.HiddenInput())
+    school      = CharSchoolField(max_length=255, widget=forms.HiddenInput())
 
     class Meta:
         model = Course
         #fields = ('title', 'school')
 
-    # Convert school and instructor CharFields to Models, then validate
-    # Instructor.school = school
+
     def clean(self):
+        """ Convert school and instructor CharFields to Models, then validate
+            Instructor.school = school
+        """
         # TODO: Refactor model does not exist errors to field clean() methods
         cleaned_data = super(UsherCourseForm, self).clean()
 
         # Verify Instructor belongs to given school
         if cleaned_data.get("instructor") != None and cleaned_data.get("instructor").school != None:
             if cleaned_data.get("instructor").school != cleaned_data.get("school"):
-                raise forms.ValidationError("Selected Professor belongs to " + cleaned_data.get("instructor").school.name)
+                error_string = "Selected Professor belongs to %s" % (cleaned_data.get("instructor").school.name)
+                raise forms.ValidationError(error_string)
 
         return cleaned_data
 
@@ -115,33 +127,38 @@ class UsherCourseForm(forms.ModelForm):
 ##########################
 
 
-# User Profile form for inline profile editing
-# Used in profile.html
 class ProfileForm(forms.Form):
+    """ User Profile form for inline profile editing
+        Used in profile.html
+    """
 
-    school = forms.ModelChoiceField(
-        required=False,
-        queryset=School.objects.all(),
-        error_messages={'invalid_choice': 'Select a valid school.',
-                        'required': 'Select a school.'},
-        widget=forms.Select(attrs={'class': 'profile-field-school'})
-    )
-    grad_year = forms.ChoiceField(required=False, widget=forms.Select(attrs={'class': 'profile-field-year'}))
+    school      = forms.ModelChoiceField(
+                    required=False,
+                    queryset=School.objects.all(),
+                    error_messages={'invalid_choice': 'Select a valid school.',
+                                    'required': 'Select a school.'},
+                    widget=forms.Select(attrs={'class': 'profile-field-school'})
+                )
+    grad_year   = forms.ChoiceField(
+                    required=False,
+                    widget=forms.Select(attrs={'class': 'profile-field-year'})
+                )
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
         # Auto populate the graduation_year choiceField with
         # a 75 year range
         #birth_day = forms.ChoiceField(choices=((str(x), x) for x in range(1,32)))
-        years = range(datetime.datetime.now().year - 30, datetime.datetime.now().year + 5)
+        years = range(1980, 2016) # TODO: update this value once a year
         years.insert(0, '')
         year_tuples = ((str(x), x) for x in years)
         self.fields['grad_year'].choices = year_tuples
 
 
-# Create school form
 class SchoolForm(forms.ModelForm):
-    captcha = MathCaptchaField(required=True, error_messages={'required': 'Prove you\'re probably a human.'})
+    """ Create school form """
+    captcha = MathCaptchaField(required=True, \
+                error_messages={'required': 'Prove you\'re probably a human.'})
 
     class Meta:
         model = School
