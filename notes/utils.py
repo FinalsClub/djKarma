@@ -1,17 +1,4 @@
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import User
 from models import School, Course, File, Tag
@@ -20,16 +7,19 @@ from django import forms as djangoforms
 from simple_autocomplete.widgets import AutoCompleteWidget
 from django.template.defaultfilters import slugify
 
-# Returns a python dictionary representation of a model
-# The resulting model is ready for json.dumps()
-# model is a Django Model
-# optional: depth is how many levels of foreignKey introspection should be performed
-# jsonifyModel(model=School, depth=1) returns school json at course detail
-# jsonifyModel(model=School, depth=2) returns school json at note detail
-# optional: user_pk for inclusion of moderation data in file response
-# i.e: has the user voted on this file?
 
 def jsonifyModel(model, depth=0, user_pk=-1):
+    """ Returns a python dictionary representation of a model
+        The resulting model is ready for json.dumps()
+        model is a Django Model
+
+        optional: depth is how many levels of foreignKey introspection should be performed
+            jsonifyModel(model=School, depth=1) returns school json at course detail
+            jsonifyModel(model=School, depth=2) returns school json at note detail
+        optional: user_pk for inclusion of moderation data in file response
+
+        i.e: has the user voted on this file?
+    """
     json_result = {}
     if isinstance(model, School):
         json_result["_id"] = model.pk
@@ -100,15 +90,14 @@ def jsonifyModel(model, depth=0, user_pk=-1):
             json_result["canvote"] = 0
             json_result["vote"] = 0  # novote
 
-
     return json_result
 
-
-# file: a File object , csvString: a csv string of Tags
-# Retrieve or Create a tag corresponding to each string
-# and assign it to file
-
 def processCsvTags(file, csvString):
+    """ Retrieve or Create a tag corresponding to each string
+        and assign it to file
+            file: a File object
+            csvString: a csv string of Tags
+    """
     if not isinstance(file, File):
         return False
     tagStrs = csvString.split(',')
@@ -123,12 +112,10 @@ def processCsvTags(file, csvString):
         file.tags.add(tag)
     return True
 
-
-# Creates an UploadFileForm and pre-populates the school field
-# With the uer's school, if available
-
-
 def uploadForm(user):
+    """ Creates an UploadFileForm and pre-populates the school field
+        With the uer's school, if available
+    """
     #print request.user.username
     user_profile = user.get_profile()
     if user_profile.school:
