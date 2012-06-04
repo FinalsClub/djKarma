@@ -296,20 +296,36 @@ class File(models.Model):
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
 
+class ProfileTodo(models.Model):
+    """ Abstract class of tasks for a profile to be done.
+        Adding a field here, adds a TODO to all future new profiles
+
+        `message` is what we show in the modal box to the User
+        This not currently, but could eventually be a template
+    """
+    name    = models.CharField()
+    message    = models.TextField() # << might involve a template
+
+class UserProfileTodo(models.Model):
+    """ These entries are created on UserProfile creation
+        They are the accomplished/unaccomplished tasks
+
+        UserProfile.complete_profile becomes 1 when all entries \
+        Fkey'd to a UserProfile are done
+        Sum of entries for a given UserProfile acts as a counter
+            4/10 profile completeness
+        Delete entries if they are irrelevant to that particular Profile
+    """
+
+    user_profile    = models.ForeignKey('UserProfile')
+    profile_todo    = models.ForeignKey('ProfileTodo') # for getting name & text
+    done            = models.BooleanField(default=False) # default not done
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
 
-        username
-        first_name
-        last_name
-        email
-        password
-        is_staff
-        is_active
-        is_superuser
-        last_login
-        date_joined
+        username, first_name last_name email password
+        is_staff is_active is_superuser last_login date_joined
 
         user_profile extends the user to add our extra fields
     """
@@ -317,6 +333,10 @@ class UserProfile(models.Model):
     # This field is required
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
+
+    # Has a user finished setting up their profile?
+    complete_profile = models.BooleanField(default=False)
+    # change to 1 when all UserProfileTodos
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -460,3 +480,4 @@ def ensure_profile_exists(sender, **kwargs):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
+
