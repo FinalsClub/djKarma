@@ -48,7 +48,6 @@ urlpatterns = patterns('',
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
-    url(r'^notesOfSchool/(\d{1,99})$', 'notes.views.notesOfSchool'),  # Deprecated
     url(r'^notesOfCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting
