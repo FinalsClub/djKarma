@@ -1,29 +1,18 @@
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import datetime
+import re
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
-import datetime
-import re
 from django.template.defaultfilters import slugify
 
 
-# Define User Levels
-# Each slug title is related to a minimum karma level
 class Level(models.Model):
+    """ Define User Levels
+        Each slug title is related to a minimum karma level
+    """
     title = models.SlugField(max_length=255)
     karma = models.IntegerField(default=0)
 
@@ -31,12 +20,13 @@ class Level(models.Model):
         return u"%s %d" % (self.title, self.karma)
 
 
-# Used to incrementally tally site statistics
-# For display on landing page, etc.
-# This is more efficient then calculating totals on every request
-# Upon installing the app we should initialize ONE instance of SiteStats
-# The increment/decrement methods will act only on the first instance (pk=1)
 class SiteStats(models.Model):
+    """ Used to incrementally tally site statistics
+        For display on landing page, etc.
+        This is more efficient then calculating totals on every request
+        Upon installing the app we should initialize ONE instance of SiteStats
+        The increment/decrement methods will act only on the first instance (pk=1)
+    """
     numNotes = models.IntegerField(default=0)
     numStudyGuides = models.IntegerField(default=0)
     numSyllabi = models.IntegerField(default=0)
@@ -50,11 +40,12 @@ class SiteStats(models.Model):
         return u"%d Notes, %d Guides, %d Syllabi, %d Assignments, %d Exams for %d total Courses at %d Schools" % (self.numNotes, self.numStudyGuides, self.numSyllabi, self.numAssignments, self.numExams, self.numCourses, self.numSchools)
 
 
-# Decrease the appropriate stat given a Model
-# Called in Model save() and post_delete() (not delete() due to queryset behavior)
 def decrement(sender, **kwargs):
+    """ Decrease the appropriate stat given a Model
+        Called in Model save() and post_delete() (not delete() due to queryset behavior)
+    """
     stats = SiteStats.objects.get(pk=1)
-    print stats.numNotes
+    #print stats.numNotes
     if isinstance(sender, File):
         if sender.type == 'N':
             stats.numNotes -= 1
@@ -73,11 +64,12 @@ def decrement(sender, **kwargs):
     stats.save()
 
 
-# Increment the appropriate stat given a Model
-# Called in Model save() and post_delete() (not delete() due to queryset behavior)
 def increment(sender, **kwargs):
+    """ Increment the appropriate stat given a Model
+        Called in Model save() and post_delete() (not delete() due to queryset behavior)
+    """
     stats = SiteStats.objects.get(pk=1)
-    print stats.numNotes
+    #print stats.numNotes
     if isinstance(sender, File):
         print sender.type
         if sender.type == 'N':
@@ -97,9 +89,10 @@ def increment(sender, **kwargs):
     stats.save()
 
 
-# This class represents a meta-tag of a note
-# Used for searching
 class Tag(models.Model):
+    """ This class represents a meta-tag of a note
+        Used for searching
+    """
     #Ensure no tag by same name exist
     name = models.SlugField(max_length=160)
     description = models.CharField(max_length=255, blank=True, null=True)
@@ -114,11 +107,12 @@ class Tag(models.Model):
         super(Tag, self).save(*args, **kwargs)
 
 
-# This class will allow us to model different user actions and the
-# karma they should receive. This model will only be altered from the
-# admin interface. Every User will have a collection of Reputation Events
-# that can be used to re-calculate reputation as our metric changes
 class ReputationEventType(models.Model):
+    """ This class will allow us to model different user actions and the
+        karma they should receive. This model will only be altered from the
+        admin interface. Every User will have a collection of Reputation Events
+        that can be used to re-calculate reputation as our metric changes
+    """
     title = models.SlugField(max_length=160, unique=True)
     # Karma on person committing action. i.e: User who casts downvote
     actor_karma = models.IntegerField(default=0)
@@ -130,9 +124,10 @@ class ReputationEventType(models.Model):
         return u"%s Actor: %spts Target: %spts" % (self.title, self.actor_karma, self.target_karma)
 
 
-# User objects will have a collection of these events
-# Used to calculate reputation
 class ReputationEvent(models.Model):
+    """ User objects will have a collection of these events
+        Used to calculate reputation
+    """
     type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -140,10 +135,11 @@ class ReputationEvent(models.Model):
         return u"%s" % (self.type.title)
 
 
-# Represents a vote cast on a Note
-# if up is true, it is an upvote
-# else, a downvote
 class Vote(models.Model):
+    """ Represents a vote cast on a Note
+        if up is true, it is an upvote
+        else, a downvote
+    """
     user = models.ForeignKey(User)
     up = models.BooleanField(default=True)
 
@@ -179,21 +175,21 @@ class Instructor(models.Model):
 
 class Course(models.Model):
     SEMESTERS = (
-    (1, 'Fall'),
-    (2, 'Winter'),
-    (3, 'Spring'),
-    (4, 'Summer'),
+        (1, 'Fall'),
+        (2, 'Winter'),
+        (3, 'Spring'),
+        (4, 'Summer'),
     )
-    school = models.ForeignKey(School, blank=True, null=True)
-    title = models.CharField(max_length=255)
-    url = models.URLField(max_length=511, blank=True)
-    field = models.CharField(max_length=255, blank=True, null=True)
-    semester = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
-    academic_year = models.IntegerField(blank=True, null=True)
-    instructor = models.ForeignKey(Instructor, blank=True, null=True)
+    school          = models.ForeignKey(School, blank=True, null=True)
+    title           = models.CharField(max_length=255)
+    url             = models.URLField(max_length=511, blank=True)
+    field           = models.CharField(max_length=255, blank=True, null=True)
+    semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
+    academic_year   = models.IntegerField(blank=True, null=True)
+    instructor      = models.ForeignKey(Instructor, blank=True, null=True)
 
     def __unicode__(self):
-        #Note these must be unicode objects
+        # Note: these must be unicode objects
         return u"%s at %s" % (self.title, self.school)
 
     def save(self, *args, **kwargs):
@@ -209,46 +205,43 @@ post_delete.connect(decrement, sender=Course)
 class File(models.Model):
 
     FILE_TYPES = (
-    ('N', 'Note'),
-    ('S', 'Syllabus'),
-    ('E', 'Exam'),
-    ('G', 'Study Guide'),
-    ('A', 'Assignment'),
+        ('N', 'Note'),
+        ('S', 'Syllabus'),
+        ('E', 'Exam'),
+        ('G', 'Study Guide'),
+        ('A', 'Assignment'),
     )
 
     # Display point values in upload form
     # TODO: Tie this to ReputationEventType
     FILE_PTS = (
-    ('N', 'Note (+5 pts)'),
-    ('S', 'Syllabus (+10 pts)'),
-    ('E', 'Exam (+10 pts)'),
-    ('G', 'Study Guide (+25 pts)'),
-    ('A', 'Assignment (+5 pts)'),
+        ('N', 'Note (+5 pts)'),
+        ('S', 'Syllabus (+10 pts)'),
+        ('E', 'Exam (+10 pts)'),
+        ('G', 'Study Guide (+25 pts)'),
+        ('A', 'Assignment (+5 pts)'),
     )
 
-    title = models.CharField(max_length=255)
+    title       = models.CharField(max_length=255)
     description = models.TextField(max_length=511)
-    course = models.ForeignKey(Course, blank=True, null=True)
-    school = models.ForeignKey(School, blank=True, null=True)
-    file = models.FileField(upload_to="uploads/notes")
-    html = models.TextField(blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
-    timestamp = models.DateTimeField(default=datetime.datetime.now())
-    viewCount = models.IntegerField(default=0)
-    votes = models.ManyToManyField(Vote, blank=True, null=True)
-    numUpVotes = models.IntegerField(default=0)
+    course      = models.ForeignKey(Course, blank=True, null=True)
+    school      = models.ForeignKey(School, blank=True, null=True)
+    file        = models.FileField(upload_to="uploads/notes")
+    html        = models.TextField(blank=True, null=True)
+    tags        = models.ManyToManyField(Tag, blank=True, null=True)
+    timestamp   = models.DateTimeField(default=datetime.datetime.now())
+    viewCount   = models.IntegerField(default=0)
+    votes       = models.ManyToManyField(Vote, blank=True, null=True)
+    numUpVotes  = models.IntegerField(default=0)
     numDownVotes = models.IntegerField(default=0)
-    type = models.CharField(max_length=1, choices=FILE_PTS)
-
+    type        = models.CharField(max_length=1, choices=FILE_PTS)
     # User who uploaded the document
-    owner = models.ForeignKey(User, blank=True, null=True)
-
+    owner       = models.ForeignKey(User, blank=True, null=True)
     # has the html content been escaped?
     # This is to assure we don't double escape characters
-    cleaned = models.BooleanField(default=False)
+    cleaned     = models.BooleanField(default=False)
 
     def __unicode__(self):
-        #Note these must be unicode objects
         return u"%s at %s" % (self.title, self.course)
 
     def save(self, *args, **kwargs):
@@ -265,11 +258,12 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
-    # Calls UserProfile.awardKarma
-    # with the appropriate ReputationEventType slug title("upvote", "downvote")
-    # and target user (if downvote)
-    # upvote - vote_value=1 , downvote - vote_value=-1
     def Vote(self, voter, vote_value=0):
+        """ Calls UserProfile.awardKarma
+            with the appropriate ReputationEventType slug title("upvote", "downvote")
+            and target user (if downvote)
+            upvote - vote_value=1 , downvote - vote_value=-1
+        """
         print "Creating Vote object. voter: "+str(voter)+" value: "+str(vote_value)
         # Abort of note vote_value provided, or voter is not a User object
         if int(vote_value) == 0 or not isinstance(voter, User):
@@ -376,13 +370,14 @@ class UserProfile(models.Model):
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
-    # Award user karma given a ReputationEventType slug title
-    # and add a new ReputationEvent to UserProfile.reputationEvents
-    # event is the slug title corresponding to a ReputationEventType
-    # target_user is a User object corresponding to the target (if applicable)
-    # Does not call UserProfile.save() because it is used in 
-    # The UserProfile save() method
     def awardKarma(self, event, target_user=None):
+        """ Award user karma given a ReputationEventType slug title
+            and add a new ReputationEvent to UserProfile.reputationEvents
+            event is the slug title corresponding to a ReputationEventType
+            target_user is a User object corresponding to the target (if applicable)
+            Does not call UserProfile.save() because it is used in 
+            The UserProfile save() method
+        """
         try:
             ret = ReputationEventType.objects.get(title=event)
             self.karma += ret.actor_karma
@@ -399,10 +394,11 @@ class UserProfile(models.Model):
         except:
             return False
 
-    # Called by notes.views.upload after saving File
-    # Generates the appropriate ReputationEvent, and modifies
-    # the user's karma
     def addFile(self, File):
+        """ Called by notes.views.upload after saving File
+            Generates the appropriate ReputationEvent, and modifies
+            the user's karma
+        """
         # Set File.owner to the user
         File.owner = self.user
         File.save()
@@ -431,9 +427,10 @@ class UserProfile(models.Model):
         self.karma += repType.actor_karma
         self.save()
 
-    # Check if school, grad_year fields have been set
-    # Automatically called on UserProfile post_save
     def save(self, *args, **kwargs):
+        """ Check if school, grad_year fields have been set
+            Automatically called on UserProfile post_save
+        """
         # Grad year was set for the first time, award karma
         if self.grad_year != None and not self.submitted_grad_year:
             self.submitted_grad_year = True
