@@ -1,44 +1,45 @@
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Standard lib imports
 import json
-from utils import jsonifyModel, processCsvTags, uploadForm
-# Django imports
+
+from django import forms as djangoforms
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import forms, authenticate, login
-from django import forms as djangoforms
+from django.contrib.auth import forms
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
-# External lib imports
 from simple_autocomplete.widgets import AutoCompleteWidget
-from gdocs import convertWithGDocs, convertWithGDocsv3
-# Local imports
-from models import School, Course, File, Instructor, SiteStats, Level, Vote
-from forms import UploadFileForm, UsherUploadFileForm, UsherCourseForm, ModelSearchForm, TypeTagsForm, CourseForm, SchoolForm, InstructorForm, ProfileForm
+
+from forms import UploadFileForm
+from forms import UsherUploadFileForm
+from forms import UsherCourseForm
+from forms import ModelSearchForm
+from forms import TypeTagsForm
+from forms import CourseForm
+from forms import SchoolForm
+from forms import InstructorForm
+from forms import ProfileForm
+from gdocs import convertWithGDocsv3
+from models import School
+from models import Course
+from models import File
+from models import Instructor
+from models import SiteStats
+from models import Level
+from models import Vote
+from utils import jsonifyModel, processCsvTags, uploadForm
 
 #from django.core import serializers
 
-
-# Landing Page
+## :|: Static pages :|: &
 def home(request):
+    """ Landing Page [static] """
     # Get the 'singleton' SiteStats instance
     stats = SiteStats.objects.get(pk=1)
 
@@ -48,11 +49,17 @@ def home(request):
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
 
-# Upload Usher
-# Guides user through process
-# Aims to minimize process
+def about(request):
+    print "loading the about page"
+    return render(request, 'static/about.html')
+
+## :|: Uploading :|: &
 @login_required
 def uploadUsher(request):
+    """ Upload Usher
+        Guides user through upload process
+        Aims to minimize process
+    """
     template_data = {}
     #template_data['course_form'] = CourseForm()
     #template_data['school_form'] = SchoolForm()
@@ -133,10 +140,11 @@ def uploadUsher(request):
         return render(request, 'uploadUsher.html', template_data)
 
 
-# Accessed by charfields corresponding to a model title/name
-# See if model with similiar title exists and return title
-# If not, return model create form with populated title/name
 def smartModelQuery(request):
+    """ Accessed by charfields corresponding to a model title/name
+        See if model with similiar title exists and return title
+        If not, return model create form with populated title/name
+    """
     if request.method == 'POST' and request.is_ajax():
         search_form = ModelSearchForm(request.POST)
         if search_form.is_valid():
@@ -178,14 +186,15 @@ def smartModelQuery(request):
     raise Http404
 
 
-# Upload Page
 @login_required
 def upload(request):
-    # If user is authenticated, home view should be upload-notes page
-    # Else go to login page
+    """ Upload Page
+        If user is authenticated, home view should be upload-notes page
+        Else go to login page
 
-    # If a note has been uploaded (POST request), process it and report success.
-    # Return user to upload screen
+        If a note has been uploaded (POST request), process it and report success.
+        Return user to upload screen
+    """
 
     course_form = CourseForm()
     school_form = SchoolForm()
@@ -232,39 +241,11 @@ def upload(request):
         # uploadForm() pre-populates the School field with the user
         file_form = uploadForm(request.user)
         return render(request, 'upload.html', {'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
-        ## use this method instead to pre-populate more of school form
-        #return upload_form(request)
 
 
-def upload_form(request):
-    # Wrote this and am not using in leu of David's school_form above
-    #print request.user.username
-    user_profile = request.user.get_profile()
-    if user_profile.school:
-        print "The user has a school, so we will auto populate it"
-        # This isn't the ideal way to override the field system. I would rather extend or replicate the existing UploadFileForm, but I am slightly unsure how to do that
-        # Alternatively, I could figure out how to use the 'school' kv argument
-        form = UploadFileForm(initial={'course': -1, 'school': -1})
-        form.fields['school'] = djangoforms.ModelChoiceField(
-                queryset = School.objects.all(),
-                widget=AutoCompleteWidget(
-                    url='/schools',
-                    initial_display = user_profile.school.name
-                ),
-                error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
-                                'required': 'Enter a school.'},
-            )
-    else:
-        # Provide bogus default school and course data to ensure
-        # legitimate data is chosen
-        form = UploadFileForm(initial={'course': -1, 'school': -1})
-    courseForm = CourseForm()
-    return render(request, 'upload.html', {'form': form, 'cform': courseForm})
-
-
-# User Profile
 @login_required
 def profile(request):
+    """ User Profile """
     # If user profile data has been submitted:
     if request.method == 'POST':
             #This must go before profile data calc
@@ -321,11 +302,12 @@ def profile(request):
     return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
 
 
-# handles user creation (via HTML forms) of auxillary objects: 
-# School, Course, and Instructor. Called by /upload
-# UPDATED: Now also handles ajax requests from combined form page
-# i.e: If ajax, just return updated form, not entire html page
 def addCourseOrSchool(request):
+    """ handles user creation (via HTML forms) of auxillary objects:
+        School, Course, and Instructor. Called by /upload
+        UPDATED: Now also handles ajax requests from combined form page
+        i.e: If ajax, just return updated form, not entire html page
+    """
     if request.method == 'POST':
         if request.is_ajax():
             print "ajax request"
@@ -387,11 +369,12 @@ def addCourseOrSchool(request):
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
 
-# Display user login and signup screens
-# the registration/login.html template redirects login attempts
-# to django's built-in login view (django.contrib.auth.views.login).
-# new user registration is handled by this view (because there is no built-in)
 def register(request):
+    """ Display user login and signup screens
+        the registration/login.html template redirects login attempts
+        to django's built-in login view (django.contrib.auth.views.login).
+        new user registration is handled by this view (because there is no built-in)
+    """
     if request.method == 'POST':
         #Fill form with POSTed data
         form = forms.UserCreationForm(request.POST)
@@ -413,8 +396,8 @@ def register(request):
         return render(request, "registration/register.html", {'form': form})
 
 
-# Ajax: Instructor autcomplete form field
 def instructors(request):
+    """ Ajax: Instructor autcomplete form field """
     if request.is_ajax():
         query = request.GET.get('q')
         instructors = Instructor.objects.filter(name__contains=query).distinct()
@@ -426,8 +409,8 @@ def instructors(request):
     raise Http404
 
 
-# Ajax: School autcomplete form field
 def schools(request):
+    """ Ajax: School autcomplete form field """
     if request.is_ajax():
         query = request.GET.get('q')
         schools = School.objects.filter(name__icontains=query).distinct()
@@ -439,8 +422,8 @@ def schools(request):
     raise Http404
 
 
-# Ajax: Course autocomplete form field
 def courses(request):
+    """ Ajax: Course autocomplete form field """
     if request.is_ajax():
         query = request.GET.get('q')
         school_pk = request.GET.get('school', '0')
@@ -458,8 +441,8 @@ def courses(request):
     raise Http404
 
 
-# Browse and Search Notes
 def browse(request):
+    """ Browse and Search Notes """
     # If the SelectTagsForm form has been submitted, display search result
     if request.method == 'POST':
         # Use SelectTagsForm for a SelectMultiple Widget
@@ -481,9 +464,9 @@ def browse(request):
         return render(request, 'search.html', {'tag_form': tag_form})
 
 
-# View Note HTML
 @login_required
 def note(request, note_pk):
+    """ View Note HTML """
     # Check that user has permission to read
     profile = request.user.get_profile()
     # If the user does not have read permission, and the
@@ -515,9 +498,10 @@ def note(request, note_pk):
     return render(request, 'note.html', {'note': note, 'url': url})
 
 
-# Ajax: Return all schools and courses in JSON
-# Used by search page javascript
 def searchBySchool(request):
+    """ Ajax: Return all schools and courses in JSON
+        Used by search page javascript
+    """
     response_json = []
 
     if request.is_ajax():
@@ -537,34 +521,10 @@ def searchBySchool(request):
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 
-# Deprecated: This request is too expensive to perform on a school-wide basis
-# Ajax: Return all notes (and corresponding voting data) belonging to a school
-# Used by search page javascript
-def notesOfSchool(request, school_pk):
-    # If user id is sent with search, send moderation data per note
-    # i.e: has a user voted on this note?
-    if request.is_ajax():
-        user_pk = request.GET.get('user', '-1')
-        # Validate request parameters
-        if not School.objects.filter(pk=school_pk).exists():
-            raise Http404
-
-        response_json = []
-        #notes = Note.objects.get(school.pk=school_pk)
-        school = School.objects.get(pk=school_pk)
-        #print "notes request for school " + str(school.pk) + " by user " + str(user_pk)
-        #print jsonifyModel(school, depth=2)
-        response_json.append(jsonifyModel(school, depth=2, user_pk=user_pk))
-            #response_json.append(school_json)
-        #print json.dumps(response_json)
-        return HttpResponse(json.dumps(response_json), mimetype="application/json")
-    else:
-        raise Http404
-
-
-# Ajax: Return all notes belonging to a course
-# Used by search page javascript
 def notesOfCourse(request, course_pk):
+    """ Ajax: Return all notes belonging to a course
+        Used by search page javascript
+    """
     # If user id is sent with search, send moderation data per note
     # i.e: has a user voted on this note?
     if request.is_ajax():
@@ -585,8 +545,8 @@ def notesOfCourse(request, course_pk):
         raise Http404
 
 
-# Display all notes
 def all_notes(request):
+    """ Display all notes """
     print "using the all_notes view"
     response = {}
     response['schools'] = {}
@@ -600,10 +560,6 @@ def all_notes(request):
     print response
     return render(request, 'notes.html', response)
 
-
-def about(request):
-    print "loading the about page"
-    return render(request, 'static/about.html')
 
 
 def vote(request, file_pk):
