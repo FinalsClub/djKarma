@@ -1,3 +1,6 @@
+"""
+Index descriptions to make various models searchable.
+"""
 from haystack.indexes import *
 from haystack import site
 from models import School, Course
