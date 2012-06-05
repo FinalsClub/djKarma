@@ -296,16 +296,6 @@ class File(models.Model):
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
 
-class ProfileTodo(models.Model):
-    """ Abstract class of tasks for a profile to be done.
-        Adding a field here, adds a TODO to all future new profiles
-
-        `message` is what we show in the modal box to the User
-        This not currently, but could eventually be a template
-    """
-    name    = models.CharField()
-    message    = models.TextField() # << might involve a template
-
 class UserProfileTodo(models.Model):
     """ These entries are created on UserProfile creation
         They are the accomplished/unaccomplished tasks
