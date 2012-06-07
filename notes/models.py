@@ -296,20 +296,6 @@ class File(models.Model):
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
 
-class UserProfileTodo(models.Model):
-    """ These entries are created on UserProfile creation
-        They are the accomplished/unaccomplished tasks
-
-        UserProfile.complete_profile becomes 1 when all entries \
-        Fkey'd to a UserProfile are done
-        Sum of entries for a given UserProfile acts as a counter
-            4/10 profile completeness
-        Delete entries if they are irrelevant to that particular Profile
-    """
-
-    user_profile    = models.ForeignKey('UserProfile')
-    profile_todo    = models.ForeignKey('ProfileTodo') # for getting name & text
-    done            = models.BooleanField(default=False) # default not done
 
 class UserProfile(models.Model):
     """ User objects have the following fields:
