@@ -6,6 +6,7 @@ from forms import UploadFileForm
 from django import forms as djangoforms
 from simple_autocomplete.widgets import AutoCompleteWidget
 from django.template.defaultfilters import slugify
+from notes import profile_tasks
 
 
 def jsonifyModel(model, depth=0, user_pk=-1):
@@ -114,7 +115,7 @@ def processCsvTags(file, csvString):
 
 def uploadForm(user):
     """ Creates an UploadFileForm and pre-populates the school field
-        With the uer's school, if available
+        With the user's school, if available
     """
     #print request.user.username
     user_profile = user.get_profile()
@@ -137,3 +138,20 @@ def uploadForm(user):
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return form
+
+def complete_profile_prompt(user):
+    """ Creates a list of prompts for the user to do to complete their profile
+        Takes a User object
+        Returns a list of template strings
+    """
+    user_profile = user.user_profile
+    profile_todo = []
+    for task in profile_tasks.tasks:
+        if not task.check(task(), user_profile):
+            # for tasks that are not done, add them to todo list
+            profile_todo.append(task)
+    # return list of message prompts for the user to be told on the profile page
+    messages = [task.message for task in profile_todo]
+    return messages
+
+
