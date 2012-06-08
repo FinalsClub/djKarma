@@ -311,7 +311,8 @@ class UserProfile(models.Model):
     school = models.ForeignKey(School, blank=True, null=True)
 
     # Has a user finished setting up their profile?
-    complete_profile = models.BooleanField(default=False)
+    complete_profile    = models.BooleanField(default=False)
+    invited_friend      = models.BooleanField(default=False)
     # change to 1 when all UserProfileTodos
 
     # karma will be calculated based on ReputationEvents

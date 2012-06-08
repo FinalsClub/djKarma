@@ -139,12 +139,11 @@ def uploadForm(user):
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return form
 
-def complete_profile_prompt(user):
+def complete_profile_prompt(user_profile):
     """ Creates a list of prompts for the user to do to complete their profile
         Takes a User object
         Returns a list of template strings
     """
-    user_profile = user.user_profile
     profile_todo = []
     for task in profile_tasks.tasks:
         if not task.check(task(), user_profile):
