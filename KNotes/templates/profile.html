@@ -10,7 +10,9 @@
 
 <div class="row">
   {% for message in messages %}
-    <div class='alert alert-info'>{{ message }}<a class="close" data-dismiss="alert" href="#">×</a></div>
+    <div class='alert alert-info'>{{ message }}
+      <a class="close" data-dismiss="alert" href="#">×</a>
+    </div>
   {% endfor %}
   <div class="offset1 span4 well">
     {# request.user.username #}
