@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.template.defaultfilters import slugify
 
+from social_auth.backends.facebook import FacebookBackend
+from social_auth.signals import socialauth_registered
+
 
 class Level(models.Model):
     """ Define User Levels
@@ -458,3 +461,19 @@ def ensure_profile_exists(sender, **kwargs):
 
 post_save.connect(ensure_profile_exists, sender=User)
 
+def facebook_extra_data(sender, user, response, details, **kwargs):
+    """
+    This is triggered after a django_social_auth returns a user's data.
+    This should save data to the UserProfile object, including username and school
+    TODO: we may need to create schools based on what facebook returns
+
+    see: http://django-social-auth.readthedocs.org/en/latest/signals.html
+    """
+    user_profile = user.get_profile()
+    user.email = response.get('email')
+    user_profile.fb_id = response.get('fbid')
+
+    user_profile.save()
+    user.save()
+
+socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
