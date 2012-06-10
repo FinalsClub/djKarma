@@ -33,7 +33,10 @@ from models import Instructor
 from models import SiteStats
 from models import Level
 from models import Vote
-from utils import jsonifyModel, processCsvTags, uploadForm
+from utils import complete_profile_prompt
+from utils import jsonifyModel
+from utils import processCsvTags
+from utils import uploadForm
 
 #from django.core import serializers
 
@@ -299,7 +302,9 @@ def profile(request):
         # If GET, Populate Profileform with existing profile data
         profile_form = ProfileForm(initial=profile_data)
 
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+    user_profile = request.user.get_profile()
+    messages = complete_profile_prompt(user_profile)
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages})
 
 
 def addCourseOrSchool(request):
