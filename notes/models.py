@@ -154,6 +154,9 @@ class School(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, blank=True, null=True)
 
+    # Facebook keeps a unique identifier for all schools
+    facebook_id         = models.IntegerField(blank=True, null=True)
+
     def __unicode__(self):
         return self.name
 
@@ -455,6 +458,7 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
+
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
@@ -471,9 +475,14 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     """
     user_profile = user.get_profile()
     user.email = response.get('email')
-    user_profile.fb_id = response.get('fbid')
-
-    user_profile.save()
     user.save()
+
+    user_profile.fb_id = response.get('fbid')
+    # take the user's school, save it to the UserProfile if found
+    # create a new School if not
+    # note this only takes the most recent school from a user's education history
+    user_school = response.get('education')[0]
+    user_profile.school = School.objects.get_or_create(name = user_school['name'], facebook_id = user_school['id'])
+    user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
