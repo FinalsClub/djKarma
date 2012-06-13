@@ -48,6 +48,7 @@ Dependencies
  + Python2.7
  + django1.4
  + Solr3.6.0
+ + django-celery2.5.5
 
 
 To install python package dependencies run:

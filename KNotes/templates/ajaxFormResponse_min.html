@@ -1,0 +1,27 @@
+{% load url from future %}
+
+<h4 id="file-form-message">{{ message }}</h4><br/>
+  <form id="file-form" class="form-horizontal file-form {{ class }}" enctype="multipart/form-data" action="/upload" method="post">
+    <fieldset>
+      {% csrf_token %}
+      {% for field in form.hidden_fields %}
+        {{field}}
+      {% endfor %}
+      {% for field in form.visible_fields %}
+      <div class="control-group">
+        <label style="font-size:15px"class="control-label">
+          {% if field.field.required %}
+            <b>{{field.label}}</b>
+          {% else %}
+            {{field.label}}
+          {% endif %}</label>
+        <div class="controls">
+            {{ field }}
+            <span class="help-inline">{{field.errors}}</span>
+        </div>
+      </div>
+    {% endfor %}<br/>
+    <input style="font-size:20px; padding:10px" class="btn btn-primary" type="submit" value="Done!" />
+    </fieldset>
+  </form>
+	 

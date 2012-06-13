@@ -14,7 +14,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
-from simple_autocomplete.widgets import AutoCompleteWidget
+from ajaxuploader.views import AjaxFileUploader
 
 from forms import UploadFileForm
 from forms import UsherUploadFileForm
@@ -25,6 +25,7 @@ from forms import CourseForm
 from forms import SchoolForm
 from forms import InstructorForm
 from forms import ProfileForm
+from forms import FileMetaDataForm
 from gdocs import convertWithGDocsv3
 from models import School
 from models import Course
@@ -36,6 +37,7 @@ from models import Vote
 from utils import jsonifyModel, processCsvTags, uploadForm
 
 #from django.core import serializers
+
 
 ## :|: Static pages :|: &
 def home(request):
@@ -54,6 +56,44 @@ def about(request):
     return render(request, 'static/about.html')
 
 ## :|: Uploading :|: &
+
+# For Ajax Uploader
+import_uploader = AjaxFileUploader()
+
+
+# One-shot file uploader with async Google processing
+def modalUpload(request):
+    template_data = {}
+    template_data['search_form'] = ModelSearchForm
+    template_data['file_form'] = FileMetaDataForm
+    return render(request, 'modalUpload.html', template_data)
+
+
+# Handles file meta data submission separate from file upload
+def fileMeta(request):
+    if request.method == "POST" and request.is_ajax():
+        response = {}
+        form = FileMetaDataForm(request.POST)
+        if form.is_valid():
+            file = File.objects.get(pk=form.cleaned_data["file_pk"])
+            file.type = form.cleaned_data["type"]
+            file.title = form.cleaned_data["title"]
+            file.descriptioin = form.cleaned_data["description"]
+            # process Tags
+            processCsvTags(file, form.cleaned_data['tags'])
+            file.save()
+            response = {}
+            response["status"] = "success"
+            response["file_pk"] = file.pk
+        else:
+            response["form"] = form
+            response["message"] = "Please check your form data."
+            return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
+    else:
+        response["status"] = "invalid request"
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 @login_required
 def uploadUsher(request):
     """ Upload Usher
@@ -78,13 +118,13 @@ def uploadUsher(request):
         template_data['course_title'] = Course.objects.get(pk=int(request.POST['course'])).title
         if file_form.is_valid():
             newNote = File.objects.create(
-                                type=file_form.cleaned_data['type'],
-                                title=file_form.cleaned_data['title'],
-                                description=file_form.cleaned_data['description'],
-                                course=file_form.cleaned_data['course'],
-                                school=file_form.cleaned_data['school'],
-                                #instructor=form.cleaned_data['instructor'],
-                                file=request.FILES['note_file'])
+                        type=file_form.cleaned_data['type'],
+                        title=file_form.cleaned_data['title'],
+                        description=file_form.cleaned_data['description'],
+                        course=file_form.cleaned_data['course'],
+                        school=file_form.cleaned_data['school'],
+                        #instructor=form.cleaned_data['instructor'],
+                        file=request.FILES['note_file'])
 
             # Get or Create a Tag for each 'tag' given in the CharField (as csv)
             processCsvTags(newNote, file_form.cleaned_data['tags'])
@@ -156,13 +196,17 @@ def smartModelQuery(request):
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
                     # TODO: Try searching school name with input, return mathing results
                     schools = School.objects.all().values('name', 'pk').order_by('name')
+                    print "smartModelQuery: return create School ajaxFormResponse"
                     return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': model's pk}
                     response = {}
                     response['status'] = 'success'
-                    response['model'] = School.objects.get(name=search_form.cleaned_data['title']).pk
+                    response['type'] = 'school'
+                    response_school = School.objects.get(name=search_form.cleaned_data['title'])
+                    response['model_pk'] = response_school.pk
+                    response['model_name'] = response_school.name
                     return HttpResponse(json.dumps(response), mimetype="application/json")
             if request.POST['type'] == "Course":
                 # If no course matching text entry exists, present Course Form
@@ -172,16 +216,17 @@ def smartModelQuery(request):
                     courses = None
                     if request.GET.get("school", -1) != -1:
                         courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).values("title", "pk").order_by('title')
-                    #courses = Course
+                    print "smartModelQuery: return create Course ajaxFormResponse"
                     return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
                     response = {}
                     response['status'] = 'success'
+                    response['type'] = 'course'
                     response_course = Course.objects.get(title=search_form.cleaned_data['title'])
-                    response['model'] = response_course.pk
-                    response['model_title'] = response_course.title
+                    response['model_pk'] = response_course.pk
+                    response['model_name'] = response_course.title
                     return HttpResponse(json.dumps(response), mimetype="application/json")
     raise Http404
 
@@ -332,10 +377,10 @@ def addCourseOrSchool(request):
                 # Return a json object: {'status': 'success', 'model': 'model's pk}
                 response = {}
                 response['status'] = 'success'
-                response['model'] = model.pk
+                response['model_pk'] = model.pk
 
                 if type == "Course":
-                    response['model_title'] = model.title
+                    response['model_name'] = model.title
                 elif type == "School":
                     response['model_name'] = model.name
 

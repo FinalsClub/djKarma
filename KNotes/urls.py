@@ -34,6 +34,15 @@ urlpatterns = patterns('',
     # Upload page (Note Upload Form)
     url(r'^upload$', 'notes.views.uploadUsher', name='upload'),
 
+    # Ajax File Upload
+    url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
+
+    # Modal Upload page (New Note Upload Form)
+    url(r'^upload2$', 'notes.views.modalUpload', name='upload2'),
+
+    # File meta data submission
+    url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
+
      # Browse by School / Search by Tag view
     url(r'^browse$', 'notes.views.browse'),
 

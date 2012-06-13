@@ -1,8 +1,11 @@
 # settings.py is part of Karma Notes
 # Django settings for KNotes project.
 
-from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
+from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD, DEV_STATIC_ROOT, DEV_UPLOAD_ROOT
 import os
+import djcelery
+
+djcelery.setup_loader()
 
 # Is this running on the karmanotes.org box?
 DEPLOY = False
@@ -94,7 +97,10 @@ USE_TZ = True
 if DEPLOY:
     MEDIA_ROOT = '/var/www/djKarma/uploads/notes/'
 else:
-    MEDIA_ROOT = ''
+    MEDIA_ROOT = DEV_UPLOAD_ROOT
+
+# For Ajax Uploader
+UPLOAD_DIR = MEDIA_ROOT
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -105,7 +111,11 @@ MEDIA_URL = 'http://karmanotes.org/library/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/static/'
+if DEPLOY:
+    STATIC_ROOT = '/static/'
+else:
+    STATIC_ROOT = DEV_STATIC_ROOT
+
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -229,9 +239,25 @@ INSTALLED_APPS = (
     'south',
     'gunicorn',
     'simplemathcaptcha',
+    # Ajax fileUpload
+    'ajaxuploader',
+    # Django-Celery apps:
+    'djcelery',
+    'kombu.transport.django',
     # Not sure this is necessary, yet
     #'haystack',
 )
+
+# Django-Celery settings
+BROKER_URL = "django://"
+
+if DEPLOY:
+    CELERY_RESULT_DBURI = "postgresql://djKarma:" + DB_PASSWORD + "@localhost/karmanotes"
+    if BETA:
+        CELERY_RESULT_DBURI += "_beta"
+else:
+    CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
+
 '''
 ### HAYSTACK Configuration
 HAYSTACK_SITECONF = 'notes.search_sites'

@@ -4,8 +4,6 @@
 """
 # Copyright (C) 2012  FinalsClub Foundation
 
-import datetime
-
 from django import forms
 from django.template.defaultfilters import slugify
 from simple_autocomplete.widgets import AutoCompleteWidget
@@ -14,9 +12,37 @@ from simplemathcaptcha.fields import MathCaptchaField
 from models import School, Course, File, Tag, Instructor
 
 
+class FileMetaDataForm(forms.Form):
+    file_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-file_pk'}))
+    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    title       = forms.CharField(max_length=50, \
+                    error_messages={'required': 'Enter a title.'})
+    description = forms.CharField(required=False, max_length=511, \
+                    error_messages={'required': 'Enter a description.'})
+    tags        = forms.CharField(required=False, max_length=511, \
+                    label="Tags (separated with commas)", \
+                    error_messages={'required': 'Help us organize. Add some tags.'})
+    captcha     = MathCaptchaField(required=True, \
+                    error_messages={'required': 'Prove you\'re probably a human.'})
+    agree       = forms.BooleanField(required=True, \
+                    label='I Agree to the Terms of Use',
+                    error_messages={'required': 'We aren\'t evil, check out the Terms.'})
+
+    required_css_class = 'required'
+
+    #school     = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
+    #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
+
+class FileUploadForm(forms.Form):
+    file = forms.FileField(required=True, label='File', error_messages={'required': 'Attach a file'})
+
+    required_css_class = 'required'
+
 ##########################
 ### Upload Usher Forms ###
 ##########################
+
 
 class CharInstructorField(forms.CharField):
     """ Convert text instructor name to Instructor model
@@ -60,7 +86,7 @@ class CharCourseField(forms.CharField):
 
 class ModelSearchForm(forms.Form):
     """ Provides the form of the Search field """
-    title = forms.CharField(max_length=127)
+    title = forms.CharField(max_length=127, widget=forms.TextInput(attrs={'class':'text-input'}))
 
 
 class UsherUploadFileForm(forms.Form):
