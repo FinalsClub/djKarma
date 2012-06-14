@@ -1,0 +1,511 @@
+
+<!--
+
+Questions:
+- mobile compatibility, if file info shows up on hover??
+
+-->
+
+<!DOCTYPE html>  
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+	<link rel="stylesheet/less" type="text/css" href="css/styles.less">
+    <script src="js/less.js" type="text/javascript"></script>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+   
+     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600,800' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="css/font-awesome.less">
+    <script type="text/javascript">	
+    $('.carousel('pause').carousel()')
+	$(".collapse").collapse()
+    </script>
+
+
+  </head>
+  
+  
+  <body class="ms">
+
+   <!-- Static navbar -->
+      <div class="navbar">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">Karma Notes</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                
+                <li><a href="#contact">Username</a></li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div>
+        </div>
+      </div>
+   
+    <div class="profile-page container">
+
+      <div class="row">     
+        <div class="span3">
+          <ul class="nav nav-list">
+            <li class="active">
+              <a href="#">
+                <i class="icon-book"></i>
+                Browse notes
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="icon-book"></i>
+                Some link
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="icon-book"></i>
+                Some other link
+              </a>
+            </li>
+          </ul>
+          <h3>Profile</h3>
+          
+          <ul class="thumbnails">
+            <li class="span3">
+              <div class="thumbnail">
+              <img alt="" src="http://placehold.it/230x100">
+                <div class="caption">
+                  <p>Profile Name <a href="#">edit</a></p>
+                  <p>Karma Status: <div class="karma-status">Trainee</div></p>
+                  <p>School:
+                    <select id="school-select">
+                      <option>Select school</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                  </p>
+                  <p>Year of Graduation:
+                    <select id="school-select">
+                      <option>Select year</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                  </p>  
+              </div>
+              </div>
+            </li>
+          </ul>
+          
+          
+          
+        </div>
+        
+        <div class="span9">
+          
+          <h2>Welcome, Username!</h2>
+          <div class="alert alert-success">
+            <button class="close" data-dismiss="alert">x</button>
+            Success! <i class="icon-paper-clip"></i>You've uploaded
+            a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
+          </div>
+          
+          
+              <div id="myCarousel" class="carousel slide">
+    <!-- Carousel items -->
+              <div class="carousel-inner">
+                <div class="active item">
+                 
+                    <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
+                    <div class="reminder">
+                      <a href="#">Add current courses</a> to see when classmates add notes. <span class="karma-points">+10 points</span>
+                    </div>
+                    
+             
+                </div>
+                <div class="item">
+                 
+                    <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
+                    <div class="reminder">
+                      <a href="#">Make a cake</a> and get some points. <span class="karma-points">+10 points</span>
+                    </div>
+                    
+             
+                </div>
+                <div class="item">
+                  <p>Derp need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
+                  <div class="reminder">
+                    <a href="#">Eat a chicken</a> and get lots of protein. <span class="karma-points">+10 points</span>
+                  </div>
+                 
+                </div>
+              </div>
+              <!-- Carousel nav -->
+              <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+              <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+              </div>
+         
+          
+          
+          
+          <div class="course-listing">
+            <div class="course row">
+              <div class="folder icon span1"></div>
+              <div class="course-title span6">
+                <a href="#">Underwater Basket Weaving While Having an Existential Crisis</a>
+                <div class="course-info">
+                  Chris Hansen <i class="icon-paper-clip"></i><a href="#">21 notes</a>
+                  <a href="#">(1) Your notes</a>
+                </div>
+              </div>
+              
+              <div class="upload span2">
+                <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+              </div>
+            </div>
+            
+            <div class="course row">
+              <div class="folder icon span1"></div>
+              <div class="course-title span6">
+                <a href="#">Underwater Basket Weaving While Having an Existential Crisis</a>
+                <div class="course-info">
+                  Mike Brown <i class="icon-paper-clip"></i> <a href="#">21 notes</a>
+                 
+				  <a href="#">(1) Your notes</a>
+                </div>
+              </div>
+              
+              <div class="upload span2">
+                <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+              </div>
+            </div>
+          </div>
+
+
+<!-- begin file listing structure -->
+
+		<div class="course row" data-toggle="collapse" data-target="#course-unique-1">
+		  <div class="folder icon span1"></div>
+		  <div class="course-title span6">
+		    <a href="#">Shakespeare 101</a>
+		    <div class="course-info">
+		      Bill Spears <i class="icon-paper-clip"></i><a href="#">21 notes</a>
+		      <a href="#">(1) Your notes</a>
+		    </div>
+		  </div>
+ 
+		  <div class="upload span2">
+		    <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+		  </div>
+		</div>
+	
+          
+          <div class="file-listing collapse in" id="course-unique-1">
+            
+           	 <!-- begin file -->
+			<div class="file row">
+	              <div class="file icon span1 offset1"></div>
+	              <div class="file-title span7">
+	                <a href="#">Lecture 1-6 Notes</a>
+					<div class="file-info-action hide row">
+	               	 <div class="file-info span3">
+							<span class="download"><a href="#">View file</a></span>
+							<span class="karma-points">-10 points</span>
+							<span class="views">405 views</a>
+						</div>
+						<div class="file-actions span4">
+		                	<a href="#"><i class="icon-heart"></i>Like (5)</a>
+		 					<a href="#"><i class="icon-flag"></i>Flag</a>
+							<a href="#"><i class="icon-pencil"></i>Edit</a>
+							<a href="#"><i class="icon-remove-circle"></i>Delete</a>
+
+		                </div>
+					</div>
+	              </div>
+	            </div>
+		
+			<!-- end file -->
+			
+			<!-- begin file -->
+			<div class="file row">
+	              <div class="file icon span1 offset1"></div>
+	              <div class="file-title span7">
+	                <a href="#">Lecture 1-6 Notes</a>
+					<div class="file-info-action hide row">
+	               	 <div class="file-info span3">
+							<span class="download"><a href="#">View file</a></span>
+							<span class="karma-points">-10 points</span>
+							<span class="views">405 views</a>
+						</div>
+						<div class="file-actions span4">
+		                	<a href="#"><i class="icon-heart"></i>Like (5)</a>
+		 					<a href="#"><i class="icon-flag"></i>Flag</a>
+							<a href="#"><i class="icon-pencil"></i>Edit</a>
+							<a href="#"><i class="icon-remove-circle"></i>Delete</a>
+
+		                </div>
+					</div>
+	              </div>
+	        </div>
+		
+			<!-- end file -->
+			<!-- begin file -->
+			<div class="file row">
+	              <div class="file icon span1 offset1"></div>
+	              <div class="file-title span7">
+	                <a href="#">Lecture 1-6 Notes</a>
+					<div class="file-info-action hide row">
+	               	 <div class="file-info span3">
+							<span class="download"><a href="#">View file</a></span>
+							<span class="karma-points">-10 points</span>
+							<span class="views">405 views</a>
+						</div>
+						<div class="file-actions span4">
+		                	<a href="#"><i class="icon-heart"></i>Like (5)</a>
+		 					<a href="#"><i class="icon-flag"></i>Flag</a>
+							<a href="#"><i class="icon-pencil"></i>Edit</a>
+							<a href="#"><i class="icon-remove-circle"></i>Delete</a>
+
+		                </div>
+					</div>
+	              </div>
+	            </div>
+		
+			<!-- end file -->
+			
+			<!-- show other files, relevant if user clicks "your notes" and then wants to expand to all files -->
+			<div class="row showmore">
+				<div class="showmoretext span8 offset1">Show all files</div>
+			</div>
+			
+			<!-- begin other file -->
+				<div class="file row hide">
+		              <div class="file icon span1 offset1"></div>
+		              <div class="file-title span7">
+		                <a href="#">Lecture 1-6 Notes</a>
+						<div class="file-info-action hide row">
+		               	 <div class="file-info span3">
+								<span class="download"><a href="#">View file</a></span>
+								<span class="karma-points">-10 points</span>
+								<span class="views">405 views</a>
+							</div>
+							<div class="file-actions span4">
+			                	<a href="#"><i class="icon-heart"></i>Like (5)</a>
+			 					<a href="#"><i class="icon-flag"></i>Flag</a>
+								<a href="#"><i class="icon-pencil"></i>Edit</a>
+								<a href="#"><i class="icon-remove-circle"></i>Delete</a>
+
+			                </div>
+						</div>
+		              </div>
+		            </div>
+
+				<!-- end file -->
+				<!-- begin other file -->
+					<div class="file row hide">
+			              <div class="file icon span1 offset1"></div>
+			              <div class="file-title span7">
+			                <a href="#">Lecture 1-6 Notes</a>
+							<div class="file-info-action hide row">
+			               	 <div class="file-info span3">
+									<span class="download"><a href="#">View file</a></span>
+									<span class="karma-points">-10 points</span>
+									<span class="views">405 views</a>
+								</div>
+								<div class="file-actions span4">
+				                	<a href="#"><i class="icon-heart"></i>Like (5)</a>
+				 					<a href="#"><i class="icon-flag"></i>Flag</a>
+									<a href="#"><i class="icon-pencil"></i>Edit</a>
+									<a href="#"><i class="icon-remove-circle"></i>Delete</a>
+
+				                </div>
+							</div>
+			              </div>
+			            </div>
+
+					<!-- end file -->
+		
+          </div>
+      </div>
+      
+      
+      <br /><br /><br /><br />
+      
+      
+    </div> <!-- /container -->
+<div class="modal-backdrop fade in" style="display: none;" ></div>
+<div class="modal" id="upload" class="modal hide fade in" style="display:none;">
+              <div class="modal-header">
+                <button class="close" data-dismiss="modal">x</button>
+                <h3>Upload a file</h3>
+              </div>
+              <div class="modal-body">
+				
+				
+				<!-- Progress bar -->
+				<h3>Your file is uploading...</h3>
+                <div class="progress progress-striped
+			    active">
+			    <div class="bar"
+			    style="width: 40%;"></div>
+			    </div>
+			
+				<!-- Form -->
+				<form class="form-horizontal">
+					<div class="control-group">
+				    	<label class="control-label" for="input01">Upload File</label>
+				  	  <div class="controls">
+						   <input type="file" class="input-file" id="file-upload">
+					    	<p class="help-block">Upload a .doc, .docx, .rtf, or .txt file</p>
+					    </div>
+				    </div>
+			    	<fieldset>
+					   <legend>What's your university?</legend>
+						<div class="control-group">
+					    	<label class="control-label" for="input01">Your University</label>
+					  	  <div class="controls">
+							   <input type="text" class="input-xlarge" id="input01" placeholder="ex. Harvard University">
+						    </div>
+					    </div>
+						<legend>About your notes</legend>
+				    	<div class="control-group">
+					    	<label class="control-label" for="input01">Course Name</label>
+					  	  <div class="controls">
+							   <input type="text" class="input-xlarge" id="input01" placeholder="ex. Social Analysis 10">
+						    	
+						    </div>
+					    </div>
+						<div class="control-group file-type">
+					    	<label class="control-label" for="input01">File type</label>
+					  	  <div class="controls">
+							<label class="radio inline">
+								<input id="note" type="radio" value="note" name="optionsRadio" checked>
+								<i class="icon-paper-clip"></i>
+								<div class="type-label">Note</div>
+							   </label>
+							<label class="radio inline">
+								<input id="study-guide" type="radio" value="study-guide" name="optionsRadio">
+								<i class="icon-copy"></i>
+								<div class="type-label sg">Study&nbsp;Guide</div>
+							   </label>
+							<label class="radio inline">
+								<input id="syllabus" type="radio" value="syllabus" name="optionsRadio">
+								<i class="icon-file"></i>
+								<div class="type-label">Syllabus</div>
+							   </label>
+							<label class="radio inline">
+								<input id="exam" type="radio" value="exam" name="optionsRadio">
+								<i class="icon-book"></i>
+								<div class="type-label">Exam</div>
+							   </label>
+							<label class="radio inline">
+								<input id="assignment" type="radio" value="assignment" name="optionsRadio">
+								<i class="icon-pencil"></i>
+								<div class="type-label">Assignment</div>
+							   </label>
+						    	
+						    </div>
+					    </div>
+						<div class="control-group">
+					    	<label class="control-label" for="input01">Note Title</label>
+					  	  <div class="controls">
+							   <input type="text" class="input-xlarge" id="input01" placeholder="ex. Midterm study guide">
+						    
+						    </div>
+					    </div>
+						<div class="control-group">
+					    	<label class="control-label" for="input01">Description</label>
+					  	  <div class="controls">
+							   <textarea class="input-xlarge" id="input01" placeholder="ex. Includes lectures 1-7 and reading summaries for the first half of the semester."></textarea>
+						    
+						    </div>
+					    </div>
+						<div class="control-group">
+					    	<label class="control-label" for="input01">Captcha</label>
+					  	  <div class="controls">
+							   CAPTCHA THING HERE
+						    </div>
+					    </div>
+						<div class="control-group">
+					    	<label class="control-label" for="input01">&nbsp;</label>
+					  	  <div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="current-course" value"current-course"> Check if you're currently in this course.
+							</label>
+							<label class="checkbox">
+								<input type="checkbox" id="current-course" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
+							</label>
+						    </div>
+					    </div>
+					<div class="form-actions">
+						<a class="button" type="submit">FINISH UPLOAD</a>
+					</div>
+				    </fieldset>
+			    </form>
+
+
+              </div>
+            
+            </div>
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+
+    <script src="js/jquery.js"></script>
+
+    <script type="text/javascript">
+	
+	$(document).ready(function(){
+
+		$("div.file.row").hover(function () {
+		      $(this).children('.file-title').children('.file-info-action').toggleClass("hide");
+			});
+		
+		$("div.showmore").click(function () {
+			      $(this).nextAll('div.file').slideToggle('slow');
+			});
+		
+		$('input:radio').screwDefaultButtons({
+		             checked: "url(img/check.jpg)",
+		             unchecked: "",
+		             width: 40,
+		             height: 50
+		          });
+
+		         
+
+ 	});
+</script>
+	
+	<script src="js/jquery.screwdefaultbuttons.min.js"></script>
+    <script src="js/bootstrap-transition.js"></script>
+    <script src="js/bootstrap-alert.js"></script>
+    <script src="js/bootstrap-modal.js"></script>
+    <script src="js/bootstrap-dropdown.js"></script>
+    <script src="js/bootstrap-tab.js"></script>
+    <script src="js/bootstrap-tooltip.js"></script>
+    <script src="js/bootstrap-popover.js"></script>
+    <script src="js/bootstrap-button.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/bootstrap-carousel.js"></script>
+
+  </body>
+</html>
