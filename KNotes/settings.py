@@ -1,7 +1,26 @@
 # settings.py is part of Karma Notes
 # Django settings for KNotes project.
 
-from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD, DEV_STATIC_ROOT, DEV_UPLOAD_ROOT
+''' Secrets '''
+from notes.credentials import FACEBOOK_ID
+from notes.credentials import FACEBOOK_SECRET
+
+from notes.credentials import BETA_DB_NAME
+from notes.credentials import BETA_DB_USERNAME
+from notes.credentials import BETA_DB_PASSWORD
+
+from notes.credentials import PROD_DB_NAME
+from notes.credentials import PROD_DB_USERNAME
+from notes.credentials import PROD_DB_PASSWORD
+
+from notes.credentials import DEV_STATIC_ROOT
+from notes.credentials import BETA_STATIC_ROOT
+from notes.credentials import PROD_STATIC_ROOT
+
+from notes.credentials import DEV_UPLOAD_ROOT
+from notes.credentials import BETA_UPLOAD_ROOT
+from notes.credentials import PROD_UPLOAD_ROOT
+
 import os
 import djcelery
 
@@ -19,9 +38,9 @@ if DEPLOY:
         DATABASES = {
             'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'karmanotes',
-            'USER': 'djkarma',
-            'PASSWORD': DB_PASSWORD,
+            'NAME': PROD_DB_NAME,
+            'USER': PROD_DB_USERNAME,
+            'PASSWORD': PROD_DB_PASSWORD,
             'HOST': 'localhost',
             'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
             }
@@ -32,9 +51,9 @@ if DEPLOY:
         DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'karmanotes_beta',
-        'USER': 'djkarma',
-        'PASSWORD': DB_PASSWORD,
+        'NAME': BETA_DB_NAME,
+        'USER': BETA_DB_USERNAME,
+        'PASSWORD': BETA_DB_PASSWORD,
         'HOST': 'localhost',
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }
@@ -95,7 +114,10 @@ USE_TZ = True
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 if DEPLOY:
-    MEDIA_ROOT = '/var/www/djKarma/uploads/notes/'
+    if BETA:
+        MEDIA_ROOT = BETA_UPLOAD_ROOT
+    else:
+        MEDIA_ROOT = PROD_UPLOAD_ROOT
 else:
     MEDIA_ROOT = DEV_UPLOAD_ROOT
 
@@ -112,7 +134,10 @@ MEDIA_URL = 'http://karmanotes.org/library/'
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 if DEPLOY:
-    STATIC_ROOT = '/static/'
+    if BETA:
+        STATIC_ROOT = BETA_STATIC_ROOT
+    else:
+        STATIC_ROOT = PROD_STATIC_ROOT
 else:
     STATIC_ROOT = DEV_STATIC_ROOT
 
@@ -126,7 +151,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    './static',
+
 )
 
 # List of finder classes that know how to find static files in
@@ -252,9 +277,10 @@ INSTALLED_APPS = (
 BROKER_URL = "django://"
 
 if DEPLOY:
-    CELERY_RESULT_DBURI = "postgresql://djKarma:" + DB_PASSWORD + "@localhost/karmanotes"
     if BETA:
-        CELERY_RESULT_DBURI += "_beta"
+        CELERY_RESULT_DBURI = "postgresql://" + BETA_DB_USERNAME + ":" + BETA_DB_PASSWORD + "@localhost/" + BETA_DB_NAME
+    else:
+        CELERY_RESULT_DBURI = "postgresql://" + PROD_DB_USERNAME + ":" + PROD_DB_PASSWORD + "@localhost/" + PROD_DB_NAME
 else:
     CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
 
