@@ -15,7 +15,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls import patterns, include, url
-import notes.views
 
 from django.contrib import admin
 admin.autodiscover()
@@ -32,13 +31,10 @@ urlpatterns = patterns('',
     url(r'^about$', 'notes.views.about'),
 
     # Upload page (Note Upload Form)
-    url(r'^upload$', 'notes.views.uploadUsher', name='upload'),
+    url(r'^upload$', 'notes.views.modalUpload', name='upload'),
 
     # Ajax File Upload
     url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
-
-    # Modal Upload page (New Note Upload Form)
-    url(r'^upload2$', 'notes.views.modalUpload', name='upload2'),
 
     # File meta data submission
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),

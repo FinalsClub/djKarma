@@ -17,14 +17,18 @@ class FileMetaDataForm(forms.Form):
                     widget=forms.HiddenInput(attrs={'id': 'file-form-file_pk'}))
     type        = forms.ChoiceField(choices=File.FILE_PTS)
     title       = forms.CharField(max_length=50, \
-                    error_messages={'required': 'Enter a title.'})
+                    error_messages={'required': 'Enter a title.'}, \
+                    widget=forms.TextInput(attrs={'class': 'text-input'}))
     description = forms.CharField(required=False, max_length=511, \
-                    error_messages={'required': 'Enter a description.'})
+                    error_messages={'required': 'Enter a description.'}, \
+                    widget=forms.Textarea(attrs={'class': 'text-input'}))
     tags        = forms.CharField(required=False, max_length=511, \
-                    label="Tags (separated with commas)", \
-                    error_messages={'required': 'Help us organize. Add some tags.'})
+                    label="Tags", \
+                    error_messages={'required': 'Help us organize. Add some tags.'}, \
+                    widget=forms.TextInput(attrs={'placeholder':'ex: math, uncertainty, statistics', 'class': 'text-input'}))
     captcha     = MathCaptchaField(required=True, \
                     error_messages={'required': 'Prove you\'re probably a human.'})
+    in_course = forms.BooleanField(required=False, label='I\'m currently in this course')
     agree       = forms.BooleanField(required=True, \
                     label='I Agree to the Terms of Use',
                     error_messages={'required': 'We aren\'t evil, check out the Terms.'})
