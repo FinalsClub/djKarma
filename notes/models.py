@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.template.defaultfilters import slugify
 
+from social_auth.backends.facebook import FacebookBackend
+from social_auth.signals import socialauth_registered
+
 
 class Level(models.Model):
     """ Define User Levels
@@ -150,6 +153,9 @@ class Vote(models.Model):
 class School(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, blank=True, null=True)
+
+    # Facebook keeps a unique identifier for all schools
+    facebook_id         = models.IntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -452,9 +458,31 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
+
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
 
+def facebook_extra_data(sender, user, response, details, **kwargs):
+    """
+    This is triggered after a django_social_auth returns a user's data.
+    This should save data to the UserProfile object, including username and school
+    TODO: we may need to create schools based on what facebook returns
+
+    see: http://django-social-auth.readthedocs.org/en/latest/signals.html
+    """
+    user_profile = user.get_profile()
+    user.email = response.get('email')
+    user.save()
+
+    user_profile.fb_id = response.get('fbid')
+    # take the user's school, save it to the UserProfile if found
+    # create a new School if not
+    # note this only takes the most recent school from a user's education history
+    user_school = response.get('education')[0]
+    user_profile.school = School.objects.get_or_create(name = user_school['name'], facebook_id = user_school['id'])
+    user_profile.save()
+
+socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
