@@ -189,6 +189,9 @@ SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 FACEBOOK_APP_ID              = FACEBOOK_ID
 FACEBOOK_API_SECRET          = FACEBOOK_SECRET
 
+# define additional data to request from FB
+FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_education_history']
+
 ######################
 # End Auth Settings
 #######################
