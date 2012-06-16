@@ -182,6 +182,46 @@ hide {
 	border-top-color:@primary;
 }
 
+
+.nav-list {
+	li.active > a,
+	li.active > a:hover {
+		background:lighten(@primary,50%);
+		color:@text-color;
+	}
+	li a:hover {
+		background:lighten(@primary,50%);
+	}
+	margin-bottom:20px;
+}
+
+/***** progress bar *****/
+
+.progress-karma .bar {
+	#gradient > .vertical(lighten(@karma,10%), @karma);
+	margin: 3px;
+	height: 13px;
+	.border-radius(4px);
+}
+
+.karma-label {
+	font-size:10px;
+	text-transform: uppercase;
+	margin-top:-10px;
+	margin-bottom:10px;
+	.karma-label-left {
+		float:left;
+		color:@karma;
+	}
+
+	.karma-label-right {
+		float:right;
+		color:@karma;
+	}
+}
+
+/**** navbar ****/
+
 .navbar {
 	
 	.dropdown.open .dropdown-toggle {
@@ -438,9 +478,14 @@ a.carousel-control {
 
 .profile-page {
     
-    #school-select, #yog-select {
-        
-    }
+    .thumbnail {
+		display: block;
+		padding: 4px;
+		line-height: 1;
+		border: 1px solid darken(@box-color,5%);
+		background:@box-color;
+		.inset-box-shadow(0,0,8px,darken(@box-color,5%));
+	}
 }
 
 .file-listing {
@@ -514,20 +559,37 @@ a.carousel-control {
 }
 
 
+/********* FORM STYLING *******/
+
+
+.not-found {
+	margin-top:10px;
+	background:@box-color;
+	padding:10px;
+	
+	.button {
+		padding:0 8px;
+	}
+}
+
+.modal {
+	width:620px;
+}
+
 .file-type { 
 	input[checked] {
 		background:red;
 		
 	}
 	label.radio.inline {
-		width:30px;
+		width:61px;
 	
 		i {
 			clear:right;
 			position:relative;
 			display:inline-block;
 			margin-top:-17px;
-			margin-left:5px;
+			margin-left:12px;
 			font-size:40px;
 			padding-bottom:10px;
 			color:@primary;
@@ -536,10 +598,11 @@ a.carousel-control {
 		
 		.type-label {
 			clear:both;
+			text-align:center;
 		}
 		
 		.sg {
-			margin-left:-17px;
+			margin-left:-7px;
 		}
 	}
 }
@@ -550,5 +613,10 @@ a.carousel-control {
 	position:relative;
 	margin-bottom:-20px;
 	border-radius:5px;
+	margin-left:5px;
+}
+
+#upload .radio, .checkbox {
+	padding-left: 7px;
 }
 

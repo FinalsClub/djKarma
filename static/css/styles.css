@@ -158,6 +158,49 @@ hide {
 .navbar .nav .open.dropdown .caret {
   border-top-color: #1b98d0;
 }
+.nav-list {
+  margin-bottom: 20px;
+}
+.nav-list li.active > a,
+.nav-list li.active > a:hover {
+  background: #edf8fd;
+  color: #393939;
+}
+.nav-list li a:hover {
+  background: #edf8fd;
+}
+/***** progress bar *****/
+.progress-karma .bar {
+  background-color: #a7158a;
+  background-image: -moz-linear-gradient(top, #b91899, #8c1274);
+  background-image: -ms-linear-gradient(top, #b91899, #8c1274);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b91899), to(#8c1274));
+  background-image: -webkit-linear-gradient(top, #b91899, #8c1274);
+  background-image: -o-linear-gradient(top, #b91899, #8c1274);
+  background-image: linear-gradient(top, #b91899, #8c1274);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#b91899', endColorstr='#8c1274', GradientType=0);
+  margin: 3px;
+  height: 13px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.karma-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+.karma-label .karma-label-left {
+  float: left;
+  color: #8c1274;
+}
+.karma-label .karma-label-right {
+  float: right;
+  color: #8c1274;
+}
+/**** navbar ****/
 .navbar {
   /* for right hand user info */
 
@@ -367,6 +410,16 @@ a.carousel-control {
   -moz-box-shadow: inset 0 0 30px #dcdcdc;
   -webkit-box-shadow: inset 0 0 30px #dcdcdc;
 }
+.profile-page .thumbnail {
+  display: block;
+  padding: 4px;
+  line-height: 1;
+  border: 1px solid #eae8df;
+  background: #f4f3ee;
+  box-shadow: inset 0 0 8px #eae8df;
+  -moz-box-shadow: inset 0 0 8px #eae8df;
+  -webkit-box-shadow: inset 0 0 8px #eae8df;
+}
 .file-listing .file {
   border-bottom: 1px solid #f4f4f4;
   clear: both;
@@ -426,18 +479,30 @@ a.carousel-control {
   padding-bottom: 5px;
   background: #93d4f1;
 }
+/********* FORM STYLING *******/
+.not-found {
+  margin-top: 10px;
+  background: #f4f3ee;
+  padding: 10px;
+}
+.not-found .button {
+  padding: 0 8px;
+}
+.modal {
+  width: 620px;
+}
 .file-type input[checked] {
   background: red;
 }
 .file-type label.radio.inline {
-  width: 30px;
+  width: 61px;
 }
 .file-type label.radio.inline i {
   clear: right;
   position: relative;
   display: inline-block;
   margin-top: -17px;
-  margin-left: 5px;
+  margin-left: 12px;
   font-size: 40px;
   padding-bottom: 10px;
   color: #1b98d0;
@@ -445,9 +510,10 @@ a.carousel-control {
 }
 .file-type label.radio.inline .type-label {
   clear: both;
+  text-align: center;
 }
 .file-type label.radio.inline .sg {
-  margin-left: -17px;
+  margin-left: -7px;
 }
 .styledRadio {
   width: 70px;
@@ -455,4 +521,9 @@ a.carousel-control {
   position: relative;
   margin-bottom: -20px;
   border-radius: 5px;
+  margin-left: 5px;
+}
+#upload .radio,
+.checkbox {
+  padding-left: 7px;
 }
