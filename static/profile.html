@@ -30,7 +30,7 @@ Questions:
 <link rel="stylesheet" type="text/css" href="css/font-awesome.less">
     <script type="text/javascript">	
     $('.carousel('pause').carousel()')
-	$(".collapse").collapse()
+		$(".collapse").collapse()
     </script>
 
 
@@ -48,12 +48,25 @@ Questions:
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="#">Karma Notes</a>
+            <a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
             <div class="nav-collapse">
               <ul class="nav">
                 
-                <li><a href="#contact">Username</a></li>
+								<li class="dropdown" id="menu1">
+								    <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+								      Username & Pic
+								      <b class="caret"></b>
+								    </a>
+								    <ul class="dropdown-menu">
+								      <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+								      <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+								      <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+								      <li class="divider"></li>
+								      <li><a href="#">Sign out</a></li>
+								    </ul>
+								  </li>
               </ul>
+
             </div><!--/.nav-collapse -->
           </div>
         </div>
@@ -130,23 +143,24 @@ Questions:
           
            <!-- Carousel items -->
               <div id="myCarousel" class="carousel slide">
+							<span class="counter"><span class="karma">2/5</span> profile completion tasks left</span>
+							<p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
               	<div class="carousel-inner">
                 	<div class="active item">
-                    <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
+                    
                     <div class="reminder">
                       <a href="#">Add current courses</a> to see when classmates add notes. <span class="karma-points">+10 points</span>
                    </div>
                     
              
                 </div>
+
                 <div class="item">
-                  <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
                     <div class="reminder">
                       <a href="#">Make a cake</a> and get some points. <span class="karma-points">+10 points</span>
                     </div>
                 </div>
                 <div class="item">
-                  <p>Derp need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
                   <div class="reminder">
                     <a href="#">Eat a chicken</a> and get lots of protein. <span class="karma-points">+10 points</span>
                   </div>
@@ -161,42 +175,45 @@ Questions:
 
 <!-- BEGIN COURSE LISTINGS -->
           
-          
+          <!-- one course -->
           <div class="course-listing">
-            <div class="course row">
+            <div class="course">
               <div class="folder icon">
 						  	<img src="img/icon-folder.png">
 						  </div>
               <div class="course-title">
                 <a href="#">Underwater Basket Weaving While Having an Existential Crisis</a>
                 <div class="course-info">
-                  Chris Hansen <i class="icon-paper-clip"></i><a href="#">21 notes</a>
-                  <a href="#">(1) Your notes</a>
+                  <span class="instructor">Chris Hansen</span> <i class="icon-paper-clip"></i><a href="#">21 notes</a>
+                  <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
                 </div>
               </div>
               
               <div class="upload">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
+							<div style="clear:both"></div>
             </div>
-            
-            <div class="course row">
+            <!-- end course -->
+						<!-- one course -->
+            <div class="course">
               <div class="folder icon">
 						  	<img src="img/icon-folder.png">
 						  </div>
               <div class="course-title">
                 <a href="#">Underwater Basket Weaving While Having an Existential Crisis</a>
                 <div class="course-info">
-                  Mike Brown <i class="icon-paper-clip"></i> <a href="#">21 notes</a>
-                 
-				  <a href="#">(1) Your notes</a>
+                  <span class="instructor">Mike Brown</span> <i class="icon-paper-clip"></i> <a href="#">21 notes</a>
+                 	<span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
                 </div>
               </div>
               
               <div class="upload">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
+							<div style="clear:both"></div>
             </div>
+						
           </div>
 
 
@@ -204,21 +221,22 @@ Questions:
 *** INACTIVE courses have "inactive" class in the wrapper 
 and icon name is icon-folder-inactive.png -->
 
-		<div class="course row inactive" data-toggle="collapse" data-target="#course-unique-1">
+		<div class="course inactive" data-toggle="collapse" data-target="#course-unique-1">
 		  <div class="folder icon">
 		  	<img src="img/icon-folder-inactive.png">
 		  </div>
 		  <div class="course-title">
 		    <a href="#">Shakespeare 101</a>
 		    <div class="course-info">
-		      Bill Spears <i class="icon-paper-clip"></i><a href="#">21 notes</a>
-		      <a href="#">(1) Your notes</a>
+		      <span class="instructor">Bill Spears</span> <i class="icon-paper-clip"></i><a href="#">21 notes</a>
+		      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
 		    </div>
 		  </div>
  
 		  <div class="upload">
 		    <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
 		  </div>
+			<div style="clear:both"></div>
 		</div>
 	
           
@@ -397,7 +415,8 @@ and icon name is icon-folder-inactive.png -->
 				    	<label class="control-label" for="input01">Upload File</label>
 				  	  <div class="controls">
 						   <input type="file" class="input-file" id="file-upload">
-					    	<p class="help-block">Upload a .doc, .docx, .rtf, or .txt file</p>
+					    	<p class="help-block">2MB limit. Upload a .doc, .docx, .pdf, .rtf, or .txt file</p>
+								
 					    </div>
 				    </div>
 			    	<fieldset>
@@ -498,6 +517,7 @@ and icon name is icon-folder-inactive.png -->
     <script type="text/javascript">
 	
 	$(document).ready(function(){
+		$('.dropdown-toggle').dropdown();
 
 		$("div.file.row-fluid").hover(function () {
 		      $(this).children('.file-info-action').toggleClass("hide");

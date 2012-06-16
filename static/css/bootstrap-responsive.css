@@ -830,6 +830,15 @@
 		.file-info-action {
 			width:80%;
 		}
+		span.your-files {
+			display:inline-block;
+			clear:left;
+		}
+		.course .course-title .course-info a,
+		.course .course-title .course-info .instructor,
+		.course .course-title .course-info .your-files {
+			font-size:12px;
+		}
 }
 
 @media (min-width: 980px) {

@@ -70,10 +70,6 @@ h3 {
 }
 a:link {
   color: #1b98d0;
-  transition: color 1s;
-  -moz-transition: color 1s;
-  -webkit-transition: color 1s;
-  -o-transition: color 1s;
 }
 a:hover {
   color: #66c2eb;
@@ -158,6 +154,84 @@ hide {
   display: none;
 }
 /**** Layout ****/
+.navbar .nav .dropdown-toggle .caret,
+.navbar .nav .open.dropdown .caret {
+  border-top-color: #1b98d0;
+}
+.navbar {
+  /* for right hand user info */
+
+  /* styling navbar and logo */
+
+}
+.navbar .dropdown.open .dropdown-toggle {
+  color: #a1c436;
+}
+.navbar .dropdown-menu {
+  min-width: 138px;
+  left: -20px;
+}
+.navbar .dropdown-menu b.caret {
+  color: #1b98d0;
+}
+.navbar .dropdown-menu::after {
+  content: '';
+  display: inline-block;
+  border-left: 6px solid 
+		transparent;
+  border-right: 6px solid 
+		transparent;
+  border-bottom: 6px solid 
+		white;
+  position: absolute;
+  top: -6px;
+  left: 65px;
+}
+.navbar .dropdown-menu::before {
+  content: '';
+  display: inline-block;
+  border-left: 7px solid 
+		transparent;
+  border-right: 7px solid 
+		transparent;
+  border-bottom: 7px solid 
+		#CCC;
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: -7px;
+  left: 64px;
+}
+.navbar .nav {
+  float: right;
+}
+.navbar .nav li a,
+.navbar .nav li a:visited {
+  color: #1b98d0;
+}
+.navbar .nav li a:active {
+  color: #a1c436;
+}
+.navbar .nav li a:hover {
+  color: #39b0e5;
+  background: #edf8fd;
+}
+.navbar .navbar-inner {
+  background: #ffffff;
+  box-shadow: none;
+}
+.navbar .navbar-inner .logo-mark {
+  margin-bottom: -6px;
+  position: relative;
+  margin-right: 2px;
+}
+.navbar .navbar-inner a.brand span.logo-karma {
+  color: #8c1274;
+  font-family: 'MuseoSlab-500';
+}
+.navbar .navbar-inner a.brand span.logo-notes {
+  color: #393939;
+  font-weight: 400;
+}
 .block {
   display: block;
   clear: right;
@@ -203,6 +277,12 @@ hide {
   -moz-box-shadow: inset 0 0 5px #eae8df;
   -webkit-box-shadow: inset 0 0 5px #eae8df;
 }
+.carousel.slide .counter {
+  text-transform: uppercase;
+  color: #c2bca1;
+  display: inline-block;
+  margin-bottom: 5px;
+}
 .carousel.slide .carousel-inner {
   width: 90%;
   margin-left: 20px;
@@ -210,7 +290,7 @@ hide {
 }
 .carousel.slide .reminder {
   font-size: 18px;
-  margin-top: 20px;
+  margin-top: 5px;
   margin-bottom: 5px;
 }
 a.carousel-control {
@@ -222,7 +302,7 @@ a.carousel-control {
   left: 10px;
   width: 0px;
   height: 0px;
-  margin-top: -20px;
+  margin-top: -6px;
   font-size: 60px;
   font-weight: 100;
   line-height: 30px;
@@ -253,8 +333,8 @@ a.carousel-control {
   padding-bottom: 0px;
 }
 .course i {
-  margin-right: 5px;
   color: #1b98d0;
+  margin-top: 2px;
 }
 .course .folder.icon {
   height: 70px;
