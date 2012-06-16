@@ -13,6 +13,7 @@
 @highlight: #FFF;
 @bg-color: #FFF;
 @box-color:#f4f3ee;
+@gray: #f5f5f5;
 
 /*** Font Variables ***/
 
@@ -108,11 +109,12 @@ a:visited {
     -o-box-shadow: 0 0 5px @box;
 }
 
-.inset-box-shadow(@box:#000) {
-    box-shadow: inset 0 0 5px @box;
-    -moz-box-shadow: inset 0 0 5px @box;
-    -webkit-box-shadow: inset 0 0 5px @box;
-    -o-box-shadow:inset 0 0 5px @box;
+
+
+.inset-box-shadow (@x: 0, @y: 0, @blur: 1px, @color: #000) {
+  box-shadow: inset @arguments;
+  -moz-box-shadow: inset @arguments;
+  -webkit-box-shadow: inset @arguments;
 }
 
 .bordered {
@@ -229,7 +231,7 @@ hide {
 	padding:20px;
 	.rounded-corners;
 	border:1px solid darken(@box-color,5%);
-	.inset-box-shadow(darken(@box-color,5%));
+	.inset-box-shadow(0,0,5px,darken(@box-color,5%));
 	
 	.carousel-inner {
 		width:90%;
@@ -299,7 +301,7 @@ a.carousel-control {
     padding-top:10px;
     padding-bottom:0px;
 
-	i {
+	i { 
 		margin-right:5px;
 		color:@primary;
 	}
@@ -307,10 +309,14 @@ a.carousel-control {
     .folder.icon {
         height:70px;
 		width:60px;
-        background:url(../img/icon-folder.png) no-repeat;
+		margin-left:20px;
+        background:url(../2img/icon-folder.png) no-repeat;
+		float:left;
     }
     .course-title {
+		margin-left:20px;
         font-size:@h3-size;
+		float:left;
         .course-info {
             margin-top:5px;
             text-transform:uppercase;
@@ -319,17 +325,26 @@ a.carousel-control {
         }
     }
     .upload {
-        margin-top:10px;
-		width:150px;
-		height:30px;
+		margin-top:10px;
+        float:right;
+		width:120px;
+		height:60px;
         text-transform:uppercase;
     }
+}
+
+/*** inactive course styling ****/
+
+.course.inactive {
+	background: @gray;
+	.inset-box-shadow(0,0,30px,darken(@gray,10%));
+	
 }
 
 .profile-page {
     
     #school-select, #yog-select {
-        width:180px;
+        
     }
 }
 
@@ -343,32 +358,50 @@ a.carousel-control {
 	    
     
 	    .file.icon {
-	        height:50px;
+	    	height:60px;
 			background:url(../img/icon-note.png) no-repeat;
+			width:60px;
+			float:left;	
 	    }
 	    .file-title {
 	        font-size:@body-size;
-	        .file-info, .file-actions {
-	            margin-top:5px;
-	            text-transform:uppercase;
-	            font-size:@mini-size;
-            
-	        }
+			float:left;
+			width: 70%;
+			display: block;
+			clear: right;
+		}
+		
+		.file-description {
+			float:left;
+			display:block;
+		}
+		.file-info-action {
+			float:left;
+			margin-left:0;
 			
-			.file-actions {
-				text-align:left;
-				i {
-					color:@primary;
-				} 
-				a {
-					margin-right:10px;
-					color:@primary;
-				}
+		}
+	    .file-info, .file-actions { 
+	        margin-top:5px;
+	        text-transform:uppercase;
+	        font-size:@mini-size;
+			float:left;  
+	     }
+			
+		.file-actions {
+			text-align:left;
+			margin-left:10px;
+			i {
+				color:@primary;
+			} 
+			a {
+				margin-right:10px;
+				color:@primary;
 			}
-			.class-name {
-				font-size: @body-size;
-			}
-	    }
+		}
+		.class-name {
+			font-size: @body-size;
+		}
+
 	    .upload {
 	        margin-top:10px;
 	        text-transform:uppercase;
@@ -398,7 +431,7 @@ a.carousel-control {
 			clear:right;
 			position:relative;
 			display:inline-block;
-			margin-top:-60px;
+			margin-top:-17px;
 			margin-left:5px;
 			font-size:40px;
 			padding-bottom:10px;

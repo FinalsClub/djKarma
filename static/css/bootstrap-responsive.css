@@ -133,6 +133,11 @@
   .carousel-caption {
     position: static;
   }
+
+/* added for course rows to be both fluid and responsive */
+	.course-title {
+		width:40%;
+	}
 }
 
 @media (max-width: 767px) {
@@ -196,6 +201,11 @@
     display: inline-block;
     width: auto;
   }
+
+	/* added for course rows to be both fluid and responsive */
+		.course-title {
+			width:52%;
+		}
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -432,6 +442,10 @@
   .uneditable-input.span1 {
     width: 32px;
   }
+	/* added for course rows to be both fluid and responsive */
+		.course-title {
+			width:54%;
+		}
 }
 
 @media (min-width: 1200px) {
@@ -798,6 +812,24 @@
     padding-right: 10px;
     padding-left: 10px;
   }
+	/* added for course rows to be both fluid and responsive */
+		.course-title {
+			width:55%;
+		}
+		.course .course-title a {
+			font-size:15px;
+		}
+		
+		.file-info-action .file-info {
+			margin-left:0px;
+		}
+		.file-info-action .file-actions a {
+			margin-right:60px;
+		}
+		
+		.file-info-action {
+			width:80%;
+		}
 }
 
 @media (min-width: 980px) {
@@ -805,4 +837,8 @@
     height: auto !important;
     overflow: visible !important;
   }
+	/* added for course rows to be both fluid and responsive */
+		.course-title {
+			width:67%;
+		}
 }
