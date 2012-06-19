@@ -31,7 +31,7 @@ from models import Instructor
 from models import SiteStats
 from models import Level
 from utils import jsonifyModel, processCsvTags
-
+from gdocs import convertWithGDocsv3
 #from django.core import serializers
 
 
@@ -485,3 +485,4 @@ def vote(request, file_pk):
     # If valid use does not own file, has not voted, but not viewed the file
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
+
