@@ -58,9 +58,12 @@ def convertWithGDocsv3(File):
     # If mimetype cannot be guessed
     # Check against known issues, then
     # finally, Raise Exception
+    # Extract file extension and compare it to EXT_TO_MIME dict
+
+    fileName, fileExtension = os.path.splitext(File.file.path)
+
     if file_type == None:
-        # Extract file extension and compare it to EXT_TO_MIME dict
-        fileName, fileExtension = os.path.splitext(File.file.path)
+
         if fileExtension.strip().lower() in EXT_TO_MIME:
             file_type = EXT_TO_MIME[fileExtension.strip().lower()]
         # If boy mimetypes.guess_type and EXT_TO_MIME fail to cover
@@ -73,7 +76,14 @@ def convertWithGDocsv3(File):
     media.SetFileHandle(File.file.path, file_type)
     print "GDocsv3: MediaSource created"
     # Create a Resource to connect MediaSource to
-    doc = gdata.docs.data.Resource(type='document', title=File.title)
+    if File.title:
+        file_title = File.title
+    else:
+        # If the django File obj has no title
+        # Use the filename. This only affects the document
+        # name in Karma Note's Google Docs account
+        file_title = fileName.rsplit("/", 1)[1]
+    doc = gdata.docs.data.Resource(type='document', title=file_title)
     print "GDocsv3: resource created"
     # if pdf, append OCR=true to uri
     if file_type == 'application/pdf':
