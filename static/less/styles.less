@@ -57,11 +57,12 @@ body, p, div, tr, td, table, span, h2, h3, h1, h4, h5, a:link {
 
 h2 {
     font-size:@h2-size;
-    font-weight:400;
+    font-weight:600;
 }
 
 h3 {
     font-size:@h3-size;
+	font-weight:600;
 }
 
 a:link {
@@ -153,6 +154,17 @@ a.button:hover {
     margin-top:20px;
     display:inline-block;
     padding:20px;
+}
+
+.img-left-align {
+	padding-top:10px;
+	padding-right:20px;
+	padding-bottom:15px;
+}
+
+.img-right-align {
+	padding-left:20px;
+	padding-bottom:15px;
 }
 
 /**** Karma styling ***/
@@ -308,12 +320,6 @@ hide {
 }
 
 
-
-.block {
-    display:block;
-    clear:right;
-}
-
 .right {
     float:left;
     margin-left:20px;
@@ -321,10 +327,19 @@ hide {
 
 .hero-unit {
     background:none;
-    #vidholder {
+	padding:0;
+	margin-top:20px;
+	margin-bottom:20px;
+	
+	.call-to-action {
+		display:block;
+		float:left;
+	}
+	
+    .vidholder {
         width:350px;
-        height:500px;
-        float:left;
+		margin-right:20px;
+        float:left;	
     }
     
     h2 {
@@ -488,66 +503,66 @@ a.carousel-control {
 	}
 }
 
-.file-listing {
-	
-	.file {
-		.bordered;
-    
-	    clear:both; 
-	    padding-top:5px;
-	    
-    
-	    .file.icon {
-	    	height:60px;
-			background:url(../img/icon-note.png) no-repeat;
-			width:60px;
-			float:left;	
-	    }
-	    .file-title {
-	        font-size:@body-size;
-			float:left;
-			width: 70%;
-			display: block;
-			clear: right;
-		}
-		
-		.file-description {
-			float:left;
-			display:block;
-		}
-		.file-info-action {
-			float:left;
-			margin-left:0;
-			
-		}
-	    .file-info, .file-actions { 
-	        margin-top:5px;
-	        text-transform:uppercase;
-	        font-size:@mini-size;
-			float:left;  
-	     }
-			
-		.file-actions {
-			text-align:left;
-			margin-left:10px;
-			i {
-				color:@primary;
-			} 
-			a {
-				margin-right:10px;
-				color:@primary;
-			}
-		}
-		.class-name {
-			font-size: @body-size;
-		}
 
-	    .upload {
-	        margin-top:10px;
-	        text-transform:uppercase;
-	    }
+	
+.file {
+	.bordered;
+   
+    clear:both; 
+    padding-top:5px;
+    
+   
+    .file.icon {
+    	height:60px;
+		background:url(../img/icon-note.png) no-repeat;
+		width:60px;
+		float:left;	
+    }
+    .file-title {
+        font-size:@body-size;
+		float:left;
+		width: 70%;
+		display: block;
+		clear: right;
 	}
+	
+	.file-description {
+		float:left;
+		display:block;
+	}
+	.file-info-action {
+		float:left;
+		margin-left:0;
+		
+	}
+    .file-info, .file-actions { 
+        margin-top:5px;
+        text-transform:uppercase;
+        font-size:@mini-size;
+		float:left;  
+     }
+		
+	.file-actions {
+		text-align:left;
+		margin-left:10px;
+		i {
+			color:@primary;
+		} 
+		a {
+			margin-right:10px;
+			color:@primary;
+		}
+	}
+	.class-name {
+		font-size: @body-size;
+	}
+
+    .upload {
+        margin-top:10px;
+        text-transform:uppercase;
+    }
 }
+
 
 .showmoretext {
 	text-align:center;
@@ -644,16 +659,26 @@ a.carousel-control {
 	}
 	.points-and-views {
 		float:left;
+		margin-top:5px;
+		.karma-points {
+			margin-right:20px;
+		}
 	}
 	.file-actions {
 		float:right; 
+		a {
+			margin-right:10px;
+		}
 		
 	}
 }
 
 
 
+/*** footer ***/
 
-
-
+.footer {
+	text-align:center;
+	margin-top:20px;
+}
 

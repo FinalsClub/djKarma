@@ -839,6 +839,11 @@
 		.course .course-title .course-info .your-files {
 			font-size:12px;
 		}
+		
+		
+		.hero-unit .block {
+			clear:left;
+		}
 }
 
 @media (min-width: 980px) {
