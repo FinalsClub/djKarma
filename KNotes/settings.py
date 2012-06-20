@@ -1,8 +1,31 @@
 # settings.py is part of Karma Notes
 # Django settings for KNotes project.
 
-from notes.credentials import FACEBOOK_ID, FACEBOOK_SECRET, DB_PASSWORD
+''' Secrets '''
+from notes.credentials import FACEBOOK_ID
+from notes.credentials import FACEBOOK_SECRET
+
+from notes.credentials import BETA_DB_NAME
+from notes.credentials import BETA_DB_USERNAME
+from notes.credentials import BETA_DB_PASSWORD
+
+from notes.credentials import PROD_DB_NAME
+from notes.credentials import PROD_DB_USERNAME
+from notes.credentials import PROD_DB_PASSWORD
+
+from notes.credentials import DEV_STATIC_ROOT
+from notes.credentials import BETA_STATIC_ROOT
+from notes.credentials import PROD_STATIC_ROOT
+from notes.credentials import DEV_APP_STATIC_ROOT
+
+from notes.credentials import DEV_UPLOAD_ROOT
+from notes.credentials import BETA_UPLOAD_ROOT
+from notes.credentials import PROD_UPLOAD_ROOT
+
 import os
+import djcelery
+
+djcelery.setup_loader()
 
 # Is this running on the karmanotes.org box?
 DEPLOY = False
@@ -16,9 +39,9 @@ if DEPLOY:
         DATABASES = {
             'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'karmanotes',
-            'USER': 'djkarma',
-            'PASSWORD': DB_PASSWORD,
+            'NAME': PROD_DB_NAME,
+            'USER': PROD_DB_USERNAME,
+            'PASSWORD': PROD_DB_PASSWORD,
             'HOST': 'localhost',
             'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
             }
@@ -29,9 +52,9 @@ if DEPLOY:
         DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'karmanotes_beta',
-        'USER': 'djkarma',
-        'PASSWORD': DB_PASSWORD,
+        'NAME': BETA_DB_NAME,
+        'USER': BETA_DB_USERNAME,
+        'PASSWORD': BETA_DB_PASSWORD,
         'HOST': 'localhost',
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }
@@ -92,9 +115,15 @@ USE_TZ = True
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 if DEPLOY:
-    MEDIA_ROOT = '/var/www/djKarma/uploads/notes/'
+    if BETA:
+        MEDIA_ROOT = BETA_UPLOAD_ROOT
+    else:
+        MEDIA_ROOT = PROD_UPLOAD_ROOT
 else:
-    MEDIA_ROOT = ''
+    MEDIA_ROOT = DEV_UPLOAD_ROOT
+
+# For Ajax Uploader
+UPLOAD_DIR = MEDIA_ROOT
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -105,7 +134,14 @@ MEDIA_URL = 'http://karmanotes.org/library/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/static/'
+if DEPLOY:
+    if BETA:
+        STATIC_ROOT = BETA_STATIC_ROOT
+    else:
+        STATIC_ROOT = PROD_STATIC_ROOT
+else:
+    STATIC_ROOT = DEV_STATIC_ROOT
+
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -116,7 +152,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    './static',
+    DEV_APP_STATIC_ROOT,
+
 )
 
 # List of finder classes that know how to find static files in
@@ -232,9 +269,26 @@ INSTALLED_APPS = (
     'south',
     'gunicorn',
     'simplemathcaptcha',
+    # Ajax fileUpload
+    'ajaxuploader',
+    # Django-Celery apps:
+    'djcelery',
+    'kombu.transport.django',
     # Not sure this is necessary, yet
     #'haystack',
 )
+
+# Django-Celery settings
+BROKER_URL = "django://"
+
+if DEPLOY:
+    if BETA:
+        CELERY_RESULT_DBURI = "postgresql://" + BETA_DB_USERNAME + ":" + BETA_DB_PASSWORD + "@localhost/" + BETA_DB_NAME
+    else:
+        CELERY_RESULT_DBURI = "postgresql://" + PROD_DB_USERNAME + ":" + PROD_DB_PASSWORD + "@localhost/" + PROD_DB_NAME
+else:
+    CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
+
 '''
 ### HAYSTACK Configuration
 HAYSTACK_SITECONF = 'notes.search_sites'

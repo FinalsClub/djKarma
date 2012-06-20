@@ -13,3 +13,7 @@ django-simple-math-captcha==1.0.2
 gunicorn==0.14.2
 django-haystack==1.2.7
 pysolr==2.1.0-beta
+celery==2.5.3
+django-celery==2.5.5
+-e git+https://github.com/OnlyInAmerica/django-ajax-uploader@278df554404c232c6250d487c9096ef644b8986f#egg=ajaxuploader-dev
+
