@@ -16,6 +16,7 @@ from notes.credentials import PROD_DB_PASSWORD
 from notes.credentials import DEV_STATIC_ROOT
 from notes.credentials import BETA_STATIC_ROOT
 from notes.credentials import PROD_STATIC_ROOT
+from notes.credentials import DEV_APP_STATIC_ROOT
 
 from notes.credentials import DEV_UPLOAD_ROOT
 from notes.credentials import BETA_UPLOAD_ROOT
@@ -151,6 +152,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    DEV_APP_STATIC_ROOT,
 
 )
 
