@@ -609,7 +609,7 @@ a.carousel-control {
 
 .progress-karma.progress-striped .bar {
   #gradient > .striped(@karma);
-}
+} 
 
 .styledRadio {
     width:70px;
@@ -623,4 +623,37 @@ a.carousel-control {
 #upload .radio, .checkbox {
 	padding-left: 7px;
 }
+
+
+
+/***** note page styling ****/
+
+.file-info-wrapper {
+	background:@box-color;
+	padding:20px;
+	.rounded-corners;
+	border:1px solid darken(@box-color,5%);
+	.inset-box-shadow(0,0,5px,darken(@box-color,5%));
+	margin-bottom:20px;
+	margin-top:20px;
+	h4 {
+		text-transform:uppercase;
+		color:darken(@box-color,30%);
+		text-shadow:0px 0px 5px lighten(@box-color,70%);
+		margin-bottom:10px;
+	}
+	.points-and-views {
+		float:left;
+	}
+	.file-actions {
+		float:right; 
+		
+	}
+}
+
+
+
+
+
+
 
