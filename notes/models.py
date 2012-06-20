@@ -30,6 +30,7 @@ class SiteStats(models.Model):
         Upon installing the app we should initialize ONE instance of SiteStats
         The increment/decrement methods will act only on the first instance (pk=1)
     """
+    # TODO: make this class name singular
     numNotes = models.IntegerField(default=0)
     numStudyGuides = models.IntegerField(default=0)
     numSyllabi = models.IntegerField(default=0)
@@ -47,8 +48,8 @@ def decrement(sender, **kwargs):
     """ Decrease the appropriate stat given a Model
         Called in Model save() and post_delete() (not delete() due to queryset behavior)
     """
+    # TODO, impement this as a method on the SiteStat object, rather than in the global scope of models
     stats = SiteStats.objects.get(pk=1)
-    #print stats.numNotes
     if isinstance(sender, File):
         if sender.type == 'N':
             stats.numNotes -= 1
@@ -71,6 +72,7 @@ def increment(sender, **kwargs):
     """ Increment the appropriate stat given a Model
         Called in Model save() and post_delete() (not delete() due to queryset behavior)
     """
+    # TODO, modify decrement to increment or decrement based on a passed flag, rather than duplicating this if else logic
     stats = SiteStats.objects.get(pk=1)
     #print stats.numNotes
     if isinstance(sender, File):
@@ -131,6 +133,7 @@ class ReputationEvent(models.Model):
     """ User objects will have a collection of these events
         Used to calculate reputation
     """
+    # TODO: add a fkey to UserProfile and other logic
     type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -473,6 +476,7 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
 
     see: http://django-social-auth.readthedocs.org/en/latest/signals.html
     """
+    # TODO: This should live in util, on the UserProfile object or in a generic app
     user_profile = user.get_profile()
     user.email = response.get('email')
     user.save()
