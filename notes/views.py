@@ -30,10 +30,13 @@ from models import File
 from models import Instructor
 from models import SiteStats
 from models import Level
-from utils import jsonifyModel, processCsvTags
-from gdocs import convertWithGDocsv3
-#from django.core import serializers
+from models import Vote
+from utils import complete_profile_prompt
+from utils import jsonifyModel
+from utils import processCsvTags
+from utils import uploadForm
 
+#from django.core import serializers
 
 ## :|: Static pages :|: &
 def home(request):
@@ -192,12 +195,14 @@ def profile(request):
     if request.method == 'POST':
         if not profile_form.is_valid():
             # Return profile page with form + errors
-            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'profile_data': profile_data})
     else:
         # If GET, Populate Profileform with existing profile data
         profile_form = ProfileForm(initial=profile_data)
 
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+    user_profile = request.user.get_profile()
+    messages = complete_profile_prompt(user_profile)
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages, 'profile_data': profile_data})
 
 
 def addCourseOrSchool(request):

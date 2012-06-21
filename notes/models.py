@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.template.defaultfilters import slugify
 
+from social_auth.backends.facebook import FacebookBackend
+from social_auth.signals import socialauth_registered
+
 
 class Level(models.Model):
     """ Define User Levels
@@ -27,6 +30,7 @@ class SiteStats(models.Model):
         Upon installing the app we should initialize ONE instance of SiteStats
         The increment/decrement methods will act only on the first instance (pk=1)
     """
+    # TODO: make this class name singular
     numNotes = models.IntegerField(default=0)
     numStudyGuides = models.IntegerField(default=0)
     numSyllabi = models.IntegerField(default=0)
@@ -44,8 +48,8 @@ def decrement(sender, **kwargs):
     """ Decrease the appropriate stat given a Model
         Called in Model save() and post_delete() (not delete() due to queryset behavior)
     """
+    # TODO, impement this as a method on the SiteStat object, rather than in the global scope of models
     stats = SiteStats.objects.get(pk=1)
-    #print stats.numNotes
     if isinstance(sender, File):
         if sender.type == 'N':
             stats.numNotes -= 1
@@ -68,6 +72,7 @@ def increment(sender, **kwargs):
     """ Increment the appropriate stat given a Model
         Called in Model save() and post_delete() (not delete() due to queryset behavior)
     """
+    # TODO, modify decrement to increment or decrement based on a passed flag, rather than duplicating this if else logic
     stats = SiteStats.objects.get(pk=1)
     #print stats.numNotes
     if isinstance(sender, File):
@@ -128,6 +133,7 @@ class ReputationEvent(models.Model):
     """ User objects will have a collection of these events
         Used to calculate reputation
     """
+    # TODO: add a fkey to UserProfile and other logic
     type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -150,6 +156,9 @@ class Vote(models.Model):
 class School(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, blank=True, null=True)
+
+    # Facebook keeps a unique identifier for all schools
+    facebook_id         = models.IntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -224,7 +233,7 @@ class File(models.Model):
 
     title       = models.CharField(max_length=255)
     description = models.TextField(max_length=511)
-    course      = models.ForeignKey(Course, blank=True, null=True)
+    course      = models.ForeignKey(Course, blank=True, null=True, related_name="files")
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
     html        = models.TextField(blank=True, null=True)
@@ -300,23 +309,20 @@ post_delete.connect(decrement, sender=File)
 class UserProfile(models.Model):
     """ User objects have the following fields:
 
-        username
-        first_name
-        last_name
-        email
-        password
-        is_staff
-        is_active
-        is_superuser
-        last_login
-        date_joined
+        username, first_name last_name email password
+        is_staff is_active is_superuser last_login date_joined
 
         user_profile extends the user to add our extra fields
     """
+    # TODO: add a a many to many relation to courses for profile page
     ## 1-to-1 relation to user model
-    # This field is required
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
+
+    # Has a user finished setting up their profile?
+    complete_profile    = models.BooleanField(default=False)
+    invited_friend      = models.BooleanField(default=False)
+    # change to 1 when all UserProfileTodos
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -455,8 +461,32 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
+
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
+
+def facebook_extra_data(sender, user, response, details, **kwargs):
+    """
+    This is triggered after a django_social_auth returns a user's data.
+    This should save data to the UserProfile object, including username and school
+    TODO: we may need to create schools based on what facebook returns
+
+    see: http://django-social-auth.readthedocs.org/en/latest/signals.html
+    """
+    # TODO: This should live in util, on the UserProfile object or in a generic app
+    user_profile = user.get_profile()
+    user.email = response.get('email')
+    user.save()
+
+    user_profile.fb_id = response.get('fbid')
+    # take the user's school, save it to the UserProfile if found
+    # create a new School if not
+    # note this only takes the most recent school from a user's education history
+    user_school = response.get('education')[0]
+    user_profile.school = School.objects.get_or_create(name = user_school['name'], facebook_id = user_school['id'])
+    user_profile.save()
+
+socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
