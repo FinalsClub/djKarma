@@ -88,13 +88,6 @@ MANAGERS = ADMINS
 # For autocomplete
 SIMPLE_AUTOCOMPLETE_MODELS = ('notes.School', 'notes.Course')
 
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# On Unix systems, a value of None will cause Django to use the same
-# timezone as the operating system.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
 TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
@@ -103,7 +96,7 @@ LANGUAGE_CODE = 'en-us'
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
@@ -140,7 +133,8 @@ if DEPLOY:
     else:
         STATIC_ROOT = PROD_STATIC_ROOT
 else:
-    STATIC_ROOT = DEV_STATIC_ROOT
+    # This should work for any development machine's local path setting
+    STATIC_ROOT = os.path.join(os.path.dirname(__file__), '../django_static/')
 
 
 # URL prefix for static files.
@@ -152,8 +146,10 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    DEV_APP_STATIC_ROOT,
+    #DEV_APP_STATIC_ROOT,
 
+    # this should work genericly
+    os.path.join(os.path.dirname(__file__), '../static/'),
 )
 
 # List of finder classes that know how to find static files in
@@ -263,19 +259,21 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'notes',
+
+    # 3rd party packages
     'simple_autocomplete',
     'social_auth',
     'south',
     'gunicorn',
     'simplemathcaptcha',
-    # Ajax fileUpload
-    'ajaxuploader',
-    # Django-Celery apps:
-    'djcelery',
+    'ajaxuploader', # Ajax fileUpload
+    'djcelery',     # Django-Celery apps:
     'kombu.transport.django',
     # Not sure this is necessary, yet
     #'haystack',
+
+    # our app(s)
+    'notes',
 )
 
 # Django-Celery settings
@@ -283,9 +281,9 @@ BROKER_URL = "django://"
 
 if DEPLOY:
     if BETA:
-        CELERY_RESULT_DBURI = "postgresql://" + BETA_DB_USERNAME + ":" + BETA_DB_PASSWORD + "@localhost/" + BETA_DB_NAME
+        CELERY_RESULT_DBURI = "postgresql://{0}:{1}@localhost/{2}".format(BETA_DB_USERNAME, BETA_DB_PASSWORD, BETA_DB_NAME)
     else:
-        CELERY_RESULT_DBURI = "postgresql://" + PROD_DB_USERNAME + ":" + PROD_DB_PASSWORD + "@localhost/" + PROD_DB_NAME
+        CELERY_RESULT_DBURI = "postgresql://{0}:{1}@localhost/{2}".format(PROD_DB_USERNAME, PROD_DB_PASSWORD, PROD_DB_NAME)
 else:
     CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
 
