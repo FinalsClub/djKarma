@@ -14,18 +14,16 @@ from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
-from simple_autocomplete.widgets import AutoCompleteWidget
+from ajaxuploader.views import AjaxFileUploader
 
 from forms import UploadFileForm
-from forms import UsherUploadFileForm
 from forms import UsherCourseForm
 from forms import ModelSearchForm
 from forms import TypeTagsForm
-from forms import CourseForm
 from forms import SchoolForm
 from forms import InstructorForm
 from forms import ProfileForm
-from gdocs import convertWithGDocsv3
+from forms import FileMetaDataForm
 from models import School
 from models import Course
 from models import File
@@ -57,90 +55,42 @@ def about(request):
     return render(request, 'static/about.html')
 
 ## :|: Uploading :|: &
-@login_required
-def uploadUsher(request):
-    """ Upload Usher
-        Guides user through upload process
-        Aims to minimize process
-    """
+
+# For Ajax Uploader
+import_uploader = AjaxFileUploader()
+
+
+# One-shot file uploader with async Google processing
+def modalUpload(request):
     template_data = {}
-    #template_data['course_form'] = CourseForm()
-    #template_data['school_form'] = SchoolForm()
-    #template_data['instructor_form'] = InstructorForm()
-    template_data['user_school'] = request.user.get_profile().school
     template_data['search_form'] = ModelSearchForm
-    template_data['file_form'] = UsherUploadFileForm()
+    template_data['file_form'] = FileMetaDataForm
+    return render(request, 'modalUpload.html', template_data)
 
-    # If File Upload form is submitted
-    if request.method == 'POST':
-        file_form = UsherUploadFileForm(request.POST, request.FILES)
-        # 'type' used to generate ajaxFormResponse.html
-        template_data['type'] = "File"
-        # It should be safe to use POST['school'] and POST['course']. Validated by addCourseOrSchool or SmartModelQuery
-        template_data['school_title'] = School.objects.get(pk=int(request.POST['school'])).name
-        template_data['course_title'] = Course.objects.get(pk=int(request.POST['course'])).title
-        if file_form.is_valid():
-            newNote = File.objects.create(
-                                type=file_form.cleaned_data['type'],
-                                title=file_form.cleaned_data['title'],
-                                description=file_form.cleaned_data['description'],
-                                course=file_form.cleaned_data['course'],
-                                school=file_form.cleaned_data['school'],
-                                #instructor=form.cleaned_data['instructor'],
-                                file=request.FILES['note_file'])
 
-            # Get or Create a Tag for each 'tag' given in the CharField (as csv)
-            processCsvTags(newNote, file_form.cleaned_data['tags'])
-
-            # The below line is used if Tags is data from a ModelMultipleChoiceField
-            #newNote.tags = form.cleaned_data['tags']
-
-            # A bound Form is immutable, so to provide the hidden field values
-            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
-            # We'll pass them to the template directly and inject into form with javascript
-            template_data['school'] = request.POST['school']
-            template_data['course'] = request.POST['course']
-            try:
-                # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
-                #pass
-                # DEPRECATED: Google Docs API v2
-                #convertWithGDocs(newNote)
-
-                convertWithGDocsv3(newNote)
-            except Exception, e:
-                print "Google Documents API error: " + str(e)
-                # TODO: More granular exception handling
-                newNote.delete()
-
-                template_data['file_form'] = file_form
-                template_data['message'] = "We're sorry, there was a problem processing your file. Can you convert it to a .doc or .rtf?"
-                return render(request, 'uploadUsher.html', template_data)
-
-            # After the document is accepted by Google Documents, credit the user
-            # addFile adds the file to the user's collection, sets the file owner
-            # to the user, generates the appropriate ReputationEvent and handles corresponding karma transaction
-            user_profile = request.user.get_profile()
-            user_profile.addFile(newNote)
-
-            # Return bound form and success message
-            template_data['file_form'] = file_form
-            template_data['message'] = "File successfully uploaded! Your Karma increases!"
-            return render(request, 'uploadUsher.html', template_data)
-        # Form invalid
+# Handles file meta data submission separate from file upload
+def fileMeta(request):
+    if request.method == "POST" and request.is_ajax():
+        response = {}
+        form = FileMetaDataForm(request.POST)
+        if form.is_valid():
+            file = File.objects.get(pk=form.cleaned_data["file_pk"])
+            file.type = form.cleaned_data["type"]
+            file.title = form.cleaned_data["title"]
+            file.descriptioin = form.cleaned_data["description"]
+            # process Tags
+            processCsvTags(file, form.cleaned_data['tags'])
+            file.save()
+            response = {}
+            response["status"] = "success"
+            response["file_pk"] = file.pk
         else:
-            print file_form.errors
-            # A bound Form is immutable, so to provide the hidden field values
-            # Which aren't passed on (Because the hidden fields are Charfields converted to Models on clean())
-            # We'll pass them to the template directly and inject into form with javascript
-            template_data['school'] = request.POST['school']
-            template_data['course'] = request.POST['course']
-
-            template_data['file_form'] = file_form
-            template_data['message'] = "Please check your form data."
-            return render(request, 'uploadUsher.html', template_data)
-    # If GET: Begin Upload Usher
+            response["form"] = form
+            response["message"] = "Please check your form data."
+            return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
     else:
-        return render(request, 'uploadUsher.html', template_data)
+        response["status"] = "invalid request"
+    return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def smartModelQuery(request):
@@ -159,13 +109,17 @@ def smartModelQuery(request):
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
                     # TODO: Try searching school name with input, return mathing results
                     schools = School.objects.all().values('name', 'pk').order_by('name')
+                    print "smartModelQuery: return create School ajaxFormResponse"
                     return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': model's pk}
                     response = {}
                     response['status'] = 'success'
-                    response['model'] = School.objects.get(name=search_form.cleaned_data['title']).pk
+                    response['type'] = 'school'
+                    response_school = School.objects.get(name=search_form.cleaned_data['title'])
+                    response['model_pk'] = response_school.pk
+                    response['model_name'] = response_school.name
                     return HttpResponse(json.dumps(response), mimetype="application/json")
             if request.POST['type'] == "Course":
                 # If no course matching text entry exists, present Course Form
@@ -175,75 +129,19 @@ def smartModelQuery(request):
                     courses = None
                     if request.GET.get("school", -1) != -1:
                         courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).values("title", "pk").order_by('title')
-                    #courses = Course
+                    print "smartModelQuery: return create Course ajaxFormResponse"
                     return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
                     response = {}
                     response['status'] = 'success'
+                    response['type'] = 'course'
                     response_course = Course.objects.get(title=search_form.cleaned_data['title'])
-                    response['model'] = response_course.pk
-                    response['model_title'] = response_course.title
+                    response['model_pk'] = response_course.pk
+                    response['model_name'] = response_course.title
                     return HttpResponse(json.dumps(response), mimetype="application/json")
     raise Http404
-
-
-@login_required
-def upload(request):
-    """ Upload Page
-        If user is authenticated, home view should be upload-notes page
-        Else go to login page
-
-        If a note has been uploaded (POST request), process it and report success.
-        Return user to upload screen
-    """
-
-    course_form = CourseForm()
-    school_form = SchoolForm()
-    instructor_form = InstructorForm()
-
-    if request.method == 'POST':
-        file_form = UploadFileForm(request.POST, request.FILES)
-
-        if file_form.is_valid():
-            newNote = File.objects.create(
-                                type=file_form.cleaned_data['type'],
-                                title=file_form.cleaned_data['title'],
-                                description=file_form.cleaned_data['description'],
-                                course=file_form.cleaned_data['course'],
-                                school=file_form.cleaned_data['school'],
-                                #instructor=form.cleaned_data['instructor'],
-                                file=request.FILES['note_file'])
-
-            # Get or Create a Tag for each 'tag' given in the CharField (as csv)
-            processCsvTags(newNote, file_form.cleaned_data['tags'])
-
-            # The below line is used if Tags is data from a ModelMultipleChoiceField
-            #newNote.tags = form.cleaned_data['tags']
-            try:
-                # TESTING: Uncomment pass, comment convertWithGDocs(newNote) to disable Google Documents processing
-                #pass
-                #convertWithGDocs(newNote)
-                convertWithGDocsv3(newNote)
-            except Exception, e:
-                print "gDocs error: " + str(e)
-                # TODO: More granular exception handling
-                newNote.delete()
-                return render(request, 'upload.html', {'message': 'We\'re having trouble working with your file. Please ensure it has a file extension (i.e .doc, .rtf)', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
-
-            # After the document is accepted by convertWithGDocs, credit the user
-            user_profile = request.user.get_profile()
-            # Credit the user with this note. See models.UserProfile.addFile
-            user_profile.addFile(newNote)
-            return render(request, 'upload.html', {'message': 'File Successfully Uploaded! Add another!', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
-        else:
-            return render(request, 'upload.html', {'message': 'Please check your form entries.', 'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
-    #If a note has not been uploaded (GET request), show the upload form.
-    else:
-        # uploadForm() pre-populates the School field with the user
-        file_form = uploadForm(request.user)
-        return render(request, 'upload.html', {'file_form': file_form, 'course_form': course_form, 'school_form': school_form, 'instructor_form': instructor_form})
 
 
 @login_required
@@ -297,14 +195,14 @@ def profile(request):
     if request.method == 'POST':
         if not profile_form.is_valid():
             # Return profile page with form + errors
-            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'profile_data': profile_data})
     else:
         # If GET, Populate Profileform with existing profile data
         profile_form = ProfileForm(initial=profile_data)
 
     user_profile = request.user.get_profile()
     messages = complete_profile_prompt(user_profile)
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages})
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages, 'profile_data': profile_data})
 
 
 def addCourseOrSchool(request):
@@ -337,10 +235,10 @@ def addCourseOrSchool(request):
                 # Return a json object: {'status': 'success', 'model': 'model's pk}
                 response = {}
                 response['status'] = 'success'
-                response['model'] = model.pk
+                response['model_pk'] = model.pk
 
                 if type == "Course":
-                    response['model_title'] = model.title
+                    response['model_name'] = model.title
                 elif type == "School":
                     response['model_name'] = model.name
 
@@ -566,7 +464,6 @@ def all_notes(request):
     return render(request, 'notes.html', response)
 
 
-
 def vote(request, file_pk):
     vote_value = request.GET.get('vote', 0)
     user_pk = request.GET.get('user', -1)
@@ -593,3 +490,4 @@ def vote(request, file_pk):
     # If valid use does not own file, has not voted, but not viewed the file
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
+

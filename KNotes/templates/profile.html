@@ -1,164 +1,279 @@
-{% extends "index.html" %}
+{% extends "new_index.html" %}
 {% load url from future %}
+
+{% block title %}
+  Your Personal Profile Page {{ user.username }}
+{% endblock %}
+
+
+{% block header %}
+  <script type="text/javascript">
+    //$('.carousel('pause').carousel()')
+    //$(".collapse").collapse()
+  </script>
+
+  <script type="text/javascript">
+
+  $(document).ready(function(){
+    $('.dropdown-toggle').dropdown();
+
+    $("div.file.row-fluid").hover(function () {
+          $(this).children('.file-info-action').toggleClass("hide");
+      });
+
+    $("div.showmore").click(function () {
+            $(this).nextAll('div.file').slideToggle('slow');
+      });
+
+    $('input:radio').screwDefaultButtons({
+                 checked: "url(/static/img/check.jpg)",
+                 unchecked: "",
+                 width: 50,
+                 height: 50
+              });
+
+    });
+  </script>
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
+  <script src="/static/js/bootstrap-transition.js"/static/></script>
+  <script src="/static/js/bootstrap-alert.js"/static/></script>
+  <script src="/static/js/bootstrap-modal.js"/static/></script>
+  <script src="/static/js/bootstrap-dropdown.js"/static/></script>
+  <script src="/static/js/bootstrap-tab.js"/static/></script>
+  <script src="/static/js/bootstrap-tooltip.js"/static/></script>
+  <script src="/static/js/bootstrap-popover.js"/static/></script>
+  <script src="/static/js/bootstrap-button.js"/static/></script>
+  <script src="/static/js/bootstrap-collapse.js"/static/></script>
+  <script src="/static/js/bootstrap-carousel.js"/static/></script>
+
+{% endblock %}
+
 
 {% block content %}
 
-<div class="row">
-  <h1>Hey {{ request.user.username }}</h1>
-    <br/><br/>
-</div>
 
-<div class="row">
-  {% for message in messages %}
-    <div class='alert alert-info'>{{ message }}
-      <a class="close" data-dismiss="alert" href="#">×</a>
-    </div>
-  {% endfor %}
-  <div class="offset1 span4 well">
-    {# request.user.username #}
-    <form enctype="multipart/form-data" action="/profile" method="post">
-      {% csrf_token %}
-      <div id="school-form" class="row show-grid">
-        {% for field in profile_form %}
+<div class="profile-page container">
+  <div class="row">
+    <div class="span3">
+      <ul class="nav nav-list">
+        <li class="active">
+          <a href="#">
+            <i class="icon-book"></i>
+            Browse notes
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="icon-book"></i>
+            Some link
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="icon-book"></i>
+            Some other link
+          </a>
+        </li>
+      </ul>
 
-          <div class="span3" style="font-weight:bold;margin-left:auto;margin-right:auto;">{{ field.errors }}</div>
+      <h3>Profile</h3>
 
-          <div class="span1">
-            {{ field.label }}
-          </div> <!-- .span -->
-          <div class="span2">
-            {{ field }}
-          </div> <!-- .span -->
-          {% if field.label == 'School' and not request.user.get_profile.school and not request.user.get_profile.submitted_school %}
-          {# TODO: if user has submitted school, use this field to tell the user they can change their school, or turn this into a more static box #}
-          <div class="span1" style="height:40px;">
-            <span class="addpts">+2 Pts</span>
+      <ul class="thumbnails">
+        <li class="span3">
+          <div class="thumbnail">
+            <img alt="" src="http://placehold.it/230x100">
+            <div class="caption">
+              <p>{{ user.username }} <a href="#">edit</a></p>
+              <!-- progress bar -->
+              <p>Karma Points</p>
+              <div class="progress progress-karma">
+                <div class="bar"
+                     style="width: 60%;"></div>
+              </div>
+              <div class="karma-label">
+                <div class="karma-label-left">n00b {{ user.karma }}</div>
+                <div class="karma-label-right">l33t {{ user.karma|add:"10" }}</div>
+                <div style="clear:both"></div>
+              </div>
+
+              <p>Karma Status: <div class="karma-status">Trainee</div></p>
+
+              <p>School:</p>
+              {% if profile_data.school %}
+                {{ user.school }}
+              {% else %}
+              <select id="school-select" class="span2">
+                <option>Select school</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+              {% endif %}
+
+              <p>Year of Graduation:</p>
+              {# TODO: make this display inline if filled out #}
+              {% if profile_data.grad_year %}
+                {{ profile_data.grad_year }}
+              {% else %}
+              <select id="school-select" class="span2">
+                <option>Select year</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+              {% endif %}
+            </div>
           </div>
-          {% elif field.label = 'Grad year' and not request.user.get_profile.grad_year and not request.user.get_profile.submitted_grad_year %}
-          <div class="span1" style="height:40px;">
-            <span class="addpts">+2 Pts</span>
+        </li>
+      </ul>
+    </div> <!-- .span3 -->
+
+    <div class="span9">
+      <h2>Welcome, {{ user.username }}!</h2>
+
+      {# for message in messages #}
+      <div class="alert alert-success">
+        <button class="close" data-dismiss="alert">x</button>
+        Success! <i class="icon-paper-clip"></i>
+        You've uploaded a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
+      </div> <!-- .alert .alert-success -->
+      {# endfor #}
+
+      <!-- Carousel items -->
+      <div id="myCarousel" class="carousel slide">
+        <span class="counter">
+          <span class="karma">2/5</span> profile completion tasks left
+        </span>
+
+        <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
+
+        <div class="carousel-inner">
+
+          {% for message in messages %}
+          <div class="{% if forloop.first %}active {% endif %}item">
+            <div class="reminder">
+              <a href="#">link to do thing</a>
+              {{ message }}
+              <span class="karma-points">+10 points</span>
+            </div> <!-- .reminder -->
+          </div> <!-- .active .item -->
+          {% endfor %}
+
+          <!-- more sample items -->
+          <div class="item">
+            <div class="reminder">
+              <a href="#">Make a cake</a> and get some points.
+              <span class="karma-points">+10 points</span>
+            </div>
+          </div> <!-- .item -->
+
+          <div class="item">
+            <div class="reminder">
+              <a href="#">Eat a chicken</a> and get lots of protein. <span class="karma-points">+10 points</span>
+            </div>
+          </div> <!-- .item -->
+          <!-- end sample items -->
+
+        </div> <!-- carousel-inner -->
+        <!-- Carousel nav -->
+        <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+        <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+      </div> <!-- #myCarousel .carousel .slide -->
+
+      <!-- BEGIN COURSE LISTINGS -->
+      <!-- one course -->
+      <div class="course-listing">
+        {# this is an example string to loop over (length of your username #}
+        {% for course in user.username %}
+        <div class="course">
+          <div class="folder icon">
+            <img src="/static/img/icon-folder.png">
           </div>
-          {% endif %}
+          <div class="course-title">
+            <a href="#">{# course.title #}Underwater Basket Weaving While Having an Existential Crisis</a>
+            <div class="course-info">
+              <span class="instructor">{# course.instructor #}Chris Hansen</span> <i class="icon-paper-clip"></i><a href="#">{# course.files.count() provides this now #}21 notes</a>
+              <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+            </div> <!-- .course-info -->
+          </div> <!-- .course-title -->
+
+          <div class="upload">
+            <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+          </div>
+          <div style="clear:both"></div>
+        </div> <!-- .course -->
+        {% endfor %}
+      </div> <!-- .course-listing -->
+
+      <!-- begin file listing structure
+      *** INACTIVE courses have "inactive" class in the wrapper
+      and icon name is icon-folder-inactive.png -->
+      {# replace this with an IF in for course in courses loop #}
+
+      <div class="course inactive" data-toggle="collapse" data-target="#course-unique-1">
+        <div class="folder icon">
+          <img src="/static/img/icon-folder-inactive.png">
+        </div>
+        <div class="course-title">
+          <a href="#">Shakespeare 101</a>
+          <div class="course-info">
+            <span class="instructor">Bill Spears</span> <i class="icon-paper-clip"></i><a href="#">21 notes</a>
+            <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+          </div>
+        </div>
+        <div class="upload">
+          <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+      <!-- end INACTIVE courses -->
+
+      <div class="file-listing collapse in" id="course-unique-1">
+
+        {# makes a file for letter in your username #}
+        {% for file in user.username %}
+        <div class="file row-fluid">
+
+          <div class="file icon"></div>
+
+          <div class="file-title">
+            <a href="#">Lecture 1-6 Notes</a>
+          </div>
+
+          <div class="file-description">
+            This is a great file description, so much stuff, it will get cut off...
+          </div>
+
+          <div class="file-info-action hide row">
+            <div class="file-info">
+              <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>USERNAME</a></span>
+              <span class="download"><a href="#"><i class="icon-paper-clip"></i>View file</a></span>
+              <span class="karma-points">-10 points</span>
+              <span class="views">405 views</a>
+            </div>
+            <div class="file-actions">
+              <a href="#"><i class="icon-heart"></i>Like (5)</a>
+              <a href="#"><i class="icon-flag"></i>Flag</a>
+              <a href="#"><i class="icon-pencil"></i>Edit</a>
+              <a href="#"><i class="icon-remove-circle"></i>Delete</a>
+            </div>
+          </div> <!-- .file-info-action hide row -->
+        </div> <!-- .file .row-fluid -->
         {% endfor %}
 
-        <div class="span4">
-          <input class="btn btn-primary" type="submit" value="Save" />
-        </div>
+      </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 
-      </div> <!-- #school-form .row -->
-    </form>
 
-    <div class="span4" style="margin-top: 30px; margin-left: 0px;">
-      <div>
-        <div id="Karma">
-          <h1 class="pts">{{request.user.get_profile.karma}}</h1> Karma Points
-        </div>
-        <div class="progress" style="border-style:solid;border-width:2px;margin-right: -top:5px">
-          <div class="bar" style="width: {{ progress }}%;"></div>
-        </div>
-        {% if next_level %}
-          <div id="Karma"><h4>Next Level: {{next_level.title}} ({{next_level.karma}} Pts.)</h4></div>
-        {% endif %}
-      </div>
-    </div>
-  </div> <!-- .offset1 .span3 -->
 
-  <div class="span6">
-  <div class="row">
-  {% if not request.user.get_profile.school %}
-    <div class="span6">
-      <h2> Select your school to view activity</h2>
-    </div>
-  {% else %}
-    <div class="span6">
-      <h2>New at {{request.user.get_profile.school}}</h2>
-    </div>
 
-    <table class="table table-striped span6">
-      <tr>
-      <td>
-        <h4>Title</h4>
-      </td>
-      <td>
-        <h4>Type</h4>
-      </td>
-      <td>
-        <h4>Course</h4>
-      </td>
-      <td>
-        <h4>Semester</h4>
-      </td>
-    </tr>
-    {% for file in recent_files %}
-      <tr>
-        <td>
-          <h4><a href="/file/{{file.pk}}">{{file.title}}</a></h4>
-        </td>
-        <td>
-          <h4>{% if file.type == "N" %}
-                Note
-                {% elif file.type == "S" %}
-                Syllabus
-                {% elif file.type == "E" %}
-                Exam
-                {% elif file.type == "G" %}
-                Study Guide
-                {% elif file.type == "A" %}
-                Assignment
-                {% endif %}
-            </h4>
-        </td>
-        <td>
-          <h4>{{file.course.title}}</h4>
-        </td>
-        <td>
-          <h4>
-            {% if file.course.semester == 1 %}
-              Fall
-            {% elif file.course.semester == 2 %}
-              Winter
-            {% elif file.course.semester == 3 %}
-              Spring
-            {% elif file.course.semester == 4 %}
-              Summer
-            {% endif %}
-            {{file.course.academic_year}}
-          </h4>
-        </td>
-      </tr>
-    {% endfor %}
-    </table>
-  {% endif %}
-  </div> <!-- .row (rightmost column) -->
 
-</div> <!-- .row -->
+</div> <!-- .profile-page .container -->
 
-<div class="row-fluid">
-  {# TODO: if the user has files #}
-  <div class="span12" style="margin-left:auto;margin-right:auto;">
-    <h2>My Files</h2>
-  </div>
-  <div class="span12" style="margin-left:auto;margin-right:auto;padding:10px;">
-    {% for file in request.user.get_profile.files.all %}
-     <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
-        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
-        <div>
-        {% if file.type == "N" %}
-        Note
-        {% elif file.type == "S" %}
-        Syllabus
-        {% elif file.type == "E" %}
-        Exam
-        {% elif file.type == "G" %}
-        Study Guide
-        {% elif file.type == "A" %}
-        Assignment
-        {% endif %}
-        | {{file.school}}</div>
-      </div>
-    {% endfor %}
-  </div>
-</div>
 
+
+<!-- running line of old and new
+@#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ -->
 
 {% endblock %}

@@ -1,10 +1,12 @@
 {% load url from future %}
+{% if type %}
 <h1>Add {{type}}</h1>
+{% endif %}
 {% if suggestions %}
-<div id="model-suggestions" style="padding:10px">
+<div id="model-suggestions-div" style="padding:10px">
 <h3>Sure we don't all ready have your {{type}}?</h3>
 
-<select name="Existing {{type}}" id="model-suggestions">
+<select name="Existing {{type}}" id="model-suggestions" class="{{type|lower}}">
 
 {% for suggestion in suggestions %}
 <option value="{{suggestion.pk}}">{{suggestion.title}}{{suggestion.name}}</option>
@@ -22,7 +24,7 @@
 
 
 <p>{{message}}</p>
-	<form class="form-horizontal model-form" id="{{type}}-form" enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
+	<form class="form-horizontal model-form {{type|lower}}" id="{{type}}-form" enctype="multipart/form-data" action="{% url 'add' %}" method="post">{% csrf_token %}
 		<input type='hidden' name='type' value='{{ type }}' />
 		{% for field in form.hidden_fields %}
 		  {{field}}
