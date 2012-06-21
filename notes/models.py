@@ -233,7 +233,7 @@ class File(models.Model):
 
     title       = models.CharField(max_length=255)
     description = models.TextField(max_length=511)
-    course      = models.ForeignKey(Course, blank=True, null=True)
+    course      = models.ForeignKey(Course, blank=True, null=True, related_name="files")
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
     html        = models.TextField(blank=True, null=True)
