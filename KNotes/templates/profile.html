@@ -7,7 +7,7 @@
 
 
 {% block header %}
-  <script type="text/javascript">	
+  <script type="text/javascript">
     //$('.carousel('pause').carousel()')
     //$(".collapse").collapse()
   </script>
@@ -91,14 +91,17 @@
                      style="width: 60%;"></div>
               </div>
               <div class="karma-label">
-                <div class="karma-label-left">n00b</div> 
-                <div class="karma-label-right">l33t</div> 
+                <div class="karma-label-left">n00b {{ user.karma }}</div>
+                <div class="karma-label-right">l33t {{ user.karma|add:"10" }}</div>
                 <div style="clear:both"></div>
               </div>
 
               <p>Karma Status: <div class="karma-status">Trainee</div></p>
 
               <p>School:</p>
+              {% if profile_data.school %}
+                {{ user.school }}
+              {% else %}
               <select id="school-select" class="span2">
                 <option>Select school</option>
                 <option>2</option>
@@ -106,8 +109,13 @@
                 <option>4</option>
                 <option>5</option>
               </select>
+              {% endif %}
 
               <p>Year of Graduation:</p>
+              {# TODO: make this display inline if filled out #}
+              {% if profile_data.grad_year %}
+                {{ profile_data.grad_year }}
+              {% else %}
               <select id="school-select" class="span2">
                 <option>Select year</option>
                 <option>2</option>
@@ -115,6 +123,7 @@
                 <option>4</option>
                 <option>5</option>
               </select>
+              {% endif %}
             </div>
           </div>
         </li>
@@ -122,13 +131,15 @@
     </div> <!-- .span3 -->
 
     <div class="span9">
-      <h2>Welcome, Username!</h2>
+      <h2>Welcome, {{ user.username }}!</h2>
 
+      {# for message in messages #}
       <div class="alert alert-success">
         <button class="close" data-dismiss="alert">x</button>
         Success! <i class="icon-paper-clip"></i>
         You've uploaded a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
       </div> <!-- .alert .alert-success -->
+      {# endfor #}
 
       <!-- Carousel items -->
       <div id="myCarousel" class="carousel slide">
@@ -140,12 +151,17 @@
 
         <div class="carousel-inner">
 
-          <div class="active item">
+          {% for message in messages %}
+          <div class="{% if forloop.first %}active {% endif %}item">
             <div class="reminder">
-              <a href="#">Add current courses</a> to see when classmates add notes. <span class="karma-points">+10 points</span>
+              <a href="#">link to do thing</a>
+              {{ message }}
+              <span class="karma-points">+10 points</span>
             </div> <!-- .reminder -->
           </div> <!-- .active .item -->
+          {% endfor %}
 
+          <!-- more sample items -->
           <div class="item">
             <div class="reminder">
               <a href="#">Make a cake</a> and get some points.
@@ -158,6 +174,7 @@
               <a href="#">Eat a chicken</a> and get lots of protein. <span class="karma-points">+10 points</span>
             </div>
           </div> <!-- .item -->
+          <!-- end sample items -->
 
         </div> <!-- carousel-inner -->
         <!-- Carousel nav -->
@@ -190,8 +207,8 @@
         {% endfor %}
       </div> <!-- .course-listing -->
 
-      <!-- begin file listing structure 
-      *** INACTIVE courses have "inactive" class in the wrapper 
+      <!-- begin file listing structure
+      *** INACTIVE courses have "inactive" class in the wrapper
       and icon name is icon-folder-inactive.png -->
       {# replace this with an IF in for course in courses loop #}
 
@@ -256,7 +273,7 @@
 
 
 
-<!-- running line of old and new 
+<!-- running line of old and new
 @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ -->
 
 {% endblock %}

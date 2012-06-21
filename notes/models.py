@@ -314,8 +314,8 @@ class UserProfile(models.Model):
 
         user_profile extends the user to add our extra fields
     """
+    # TODO: add a a many to many relation to courses for profile page
     ## 1-to-1 relation to user model
-    # This field is required
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
 

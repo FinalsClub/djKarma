@@ -195,14 +195,14 @@ def profile(request):
     if request.method == 'POST':
         if not profile_form.is_valid():
             # Return profile page with form + errors
-            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files})
+            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'profile_data': profile_data})
     else:
         # If GET, Populate Profileform with existing profile data
         profile_form = ProfileForm(initial=profile_data)
 
     user_profile = request.user.get_profile()
     messages = complete_profile_prompt(user_profile)
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages})
+    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages, 'profile_data': profile_data})
 
 
 def addCourseOrSchool(request):
