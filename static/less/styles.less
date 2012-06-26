@@ -49,6 +49,9 @@ body, p, div, tr, td, table, span, h2, h3, h1, h4, h5, a:link {
     color: @text-color;
 }
 
+.container {
+	margin-top:30px;
+}
 
 .hero-unit h1 {
     font-size:@hero-size;
@@ -58,6 +61,7 @@ body, p, div, tr, td, table, span, h2, h3, h1, h4, h5, a:link {
 h2 {
     font-size:@h2-size;
     font-weight:600;
+	margin-bottom:10px;
 }
 
 h3 {
@@ -194,6 +198,24 @@ hide {
 	border-top-color:@primary;
 }
 
+.navbar {
+	margin:0;
+	.navbar-inner {
+		padding-right:0px;
+	}
+	
+	a.farthest-right {
+		padding: 10px 0px 11px;
+	}
+	.brand {
+		padding: 8px 0px 12px;
+	}
+}
+
+.left-sidebar {
+	margin-top:20px;
+}
+
 
 .nav-list {
 	li.active > a,
@@ -214,6 +236,15 @@ hide {
 
 /***** progress bar *****/
 
+
+.current-karma span{
+	margin-bottom:10px;
+	position: relative;
+	margin: 1em 0 3em;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
 .progress-karma .bar {
 	#gradient > .vertical(lighten(@karma,10%), @karma);
 	margin: 3px;
@@ -306,9 +337,10 @@ hide {
 		box-shadow:none;
 		
 		.logo-mark {
-			margin-bottom: -6px;
+			width:23px;
+			margin-bottom: -5px;
 			position: relative;
-			margin-right: 2px;
+			margin-right: 3px;
 		}
 		a.brand {
 			span.logo-karma {
@@ -499,11 +531,11 @@ a.carousel-control {
     
     .thumbnail {
 		display: block;
-		padding: 4px;
+		padding: 12px;
 		line-height: 1;
-		border: 1px solid darken(@box-color,5%);
-		background:@box-color;
-		.inset-box-shadow(0,0,8px,darken(@box-color,5%));
+		border: none;
+		background:none;
+		/*.inset-box-shadow(0,0,8px,darken(@box-color,5%));*/
 	}
 }
 
@@ -684,6 +716,9 @@ a.carousel-control {
 		color:@primary;
 	}
 	margin-bottom:20px;
+	background:@box-color;
+	padding:20px;
+	border: darken
 }
 
 /*** footer ***/
