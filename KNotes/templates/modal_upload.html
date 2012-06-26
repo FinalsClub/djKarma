@@ -1,0 +1,486 @@
+{% load url from future %}
+
+{% block scripts %}
+
+<!-- Django-Ajax-Uploader -->
+<script src="{{ STATIC_URL }}ajaxuploader/js/fileuploader.js" ></script>
+<link href="{{ STATIC_URL }}ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />
+{# TODO: Break this script into a js template file #}
+<script>
+  // Store file_pk received by ajaxUploader
+  var file_pk = -1;
+
+  // Keep track of Wizard state
+  // state == School : School search / create forms
+  // state == Course : Course search / create forms
+  // state == File   : Upload File form
+  var state = "";
+  // Keep track of user's School, Course selection (pks) for 
+  // inclusion in final File Upload Form
+  var school_pk = "";
+  var course_pk = "";
+
+  // School and Course titles for instructions
+  var school_name = "None";
+  var course_name = "None";
+
+  // After DOM loads
+  $(document).ready(function() {
+    // Configure AJAX file uploader
+    var uploader = new qq.FileUploader({
+        action: "{% url 'ajax_upload' %}",
+        element: $('#file-uploader')[0],
+        multiple: false,
+        onComplete: function(id, fileName, responseJSON) {
+            if(responseJSON.success) {
+                //alert("success! file_pk: " + responseJSON.file_pk);
+                file_pk = responseJSON.file_pk;
+            } else {
+                alert("upload failed!");
+            }
+        },
+        onAllComplete: function(uploads) {
+            // uploads is an array of maps
+            // the maps look like this: {file: FileObject, response: JSONServerResponse}
+            console.log("upload:");
+            console.log(uploads);
+            //alert("All complete!");
+            // Hide file uploader
+            
+            $('#file-uploader').fadeOut('fast', function(){
+              $('#file-uploader').html("<h2> File uploaded!</h2>");
+              $('#file-uploader').fadeIn('fast');
+            });
+        },
+        params: {
+            'csrf_token': '{{ csrf_token }}',
+            'csrf_name': 'csrfmiddlewaretoken',
+            'csrf_xname': 'X-CSRFToken',
+        },
+    });
+  });
+
+    // Form submit listener
+    $('#container').on("submit", "form", function(){
+
+      // Determine model this form relates to
+      if($(this).hasClass("school"))
+        var type = "school";
+      else if($(this).hasClass("course"))
+        var type = "course";
+
+      // School / Course Search Forms
+      if($(this).hasClass('search-form')){
+        //TODO abort query on blank input. Find nearest element with class 'text-input' (There is only one per search form)
+        var url = "/smartModelQuery";
+        if ($(this).hasClass("course")){
+          // attach the school to the request
+          url +="?school="+school_pk;
+        }
+          // Serialize form data for POSTing
+          var form_data = $(this).serializeArray();
+          $.post(url, form_data,function(data){
+            smartModelQueryResponseHandler(data, type);
+          });
+      }
+      // School / Course Create Forms
+      else if($(this).hasClass('model-form')){
+        // Model Create Form endpoint
+
+        if($(this).hasClass("course")){
+          // populate add Course hidden school field
+          console.log("populating CourseForm.school: " + school_pk);
+          $("#id_school").val(school_pk);
+          // Serialize form data for POSTing
+          var form_data = $(this).serializeArray();
+        }
+        else if($(this).hasClass("school")){
+          var form_data = $(this).serializeArray();
+        }
+        url = "/add";
+        $.post(url, form_data,
+          function(data){
+            // Request Complete callback
+            console.log("return data: "+data);
+            console.log(data.status);
+            addModelResponseHandler(data, type);
+        });
+      }
+    // File Meta Data Form
+    else if($(this).hasClass('file-form')){
+      if(file_pk == -1){
+        alert("You must upload a file before proceeding!");
+        return false;
+      }
+      url = "/filemeta";
+      $("#file-form-file_pk").val(file_pk);
+      // Re-Serialize form data for POSTing
+      var form_data = $(this).serializeArray();
+      $.post(url, form_data,
+          function(data){
+            // Request Complete callback
+            console.log("return data: "+data);
+            console.log(data.status);
+            handleFileDataResponse(data);
+        });
+
+    }
+      // do not pass submit event to DOM event handler
+      return false;
+
+    });
+
+    // Handles response from /fileMeta
+    function handleFileDataResponse(data){
+      if (data.status == "success"){
+        alert("Success!");
+      }
+      else{
+        $("#file-div").html(data);
+      }
+    }
+    // Handles response from /add
+    function addModelResponseHandler(data, type){
+      // The model was successfully created
+      // The response contains a JSON dic
+      // fields: model_name , model_pk 
+      if(data.status == "success"){
+        console.log("model created");
+        if(type == "school"){
+          school_pk = data.model_pk;
+          school_name = data.model_name;
+          $("#school-selection-input").val(school_name);
+          $("#school-create-div").fadeOut('fast', function(){
+            $("#school-search-div").fadeIn('fast');
+            // show school selection field
+            proceedToCourseSearch();
+          });
+        }
+        else if(type == "course"){
+          course_pk = data.model_pk;
+          course_name = data.model_name;
+          $("#course-selection-input").val(course_name);
+          $("#course-create-div").fadeOut('fast', function(){
+            // show course selection field
+            $("#course-search-div").fadeIn('fast');
+              // show file meta-data form
+            $("#file-div").fadeIn('fast');
+          });
+        }
+
+      }
+      // Else there were form errors, and the response contains
+      // the html representing the bound form with error text
+      else{
+        if(type == "school"){
+          $("#school-create-div").fadeOut('fast', function(){
+            $("#school-create-div").html(data);
+            $("#school-create-div").fadeIn('fast');
+          });
+        }
+        else if(type == "course"){
+          $("#course-create-div").fadeOut('fast', function(){
+            $("#course-create-div").html(data);
+            $("#course-create-div").fadeIn('fast');
+          });
+        }
+
+      }
+
+    }
+    // Handles response from /smartModelQuery
+    function smartModelQueryResponseHandler(data, type){
+      // A model matching query was found
+      if(data.status == "success"){
+        console.log("model found!");
+        if(type == "school"){
+          school_pk = data.model_pk;
+          school_name = data.model_name;
+          proceedToCourseSearch();
+          /*
+          $("#school-search-div").fadeOut('fast', function(){
+            // show school selection field
+            proceedToCourseSearch();
+          });
+          */
+        }
+        else if(type == "course"){
+          course_pk = data.model_pk;
+          course_name = data.model_name;
+          $("#course-selection-input").val(course_name);
+              // show file meta-data form
+          $("#file-div").fadeIn('fast');
+        }
+      }
+      // No model matching query found. Present create form
+      else{
+        console.log("no model found!");
+        if(type == "school"){
+          $("#school-create-div").html(data);
+          $("#school-search-div").fadeOut('fast', function(){
+            $("#school-create-div").fadeIn('fast');
+          });
+        }
+        else if(type == "course"){
+          $("#course-create-div").html(data);
+          $("#course-search-div").fadeOut('fast', function(){
+            $("#course-create-div").fadeIn('fast');
+          });
+        }
+      }
+    }
+
+    // Show School Selection and Course Search
+    // Fade out divs from last state before calling
+    function proceedToCourseSearch(){
+      //$("#school-selection-input").val(school_name);
+
+      // initiate course search
+      // connect jQuery autocomplete to #course-search-input
+      $("#course-search-input").autocomplete({
+      source: function(request, response){
+          $.ajax({
+              url: "/courses?school="+school_pk,
+              data: {'q': request.term },
+              success: function(data) {
+                  if (data != 'CACHE_MISS')
+                  {
+                      response($.map(data, function(item) {
+                          return {
+                              label: item[1],
+                              value: item[1],
+                              real_value: item[0]
+                          };
+                      }));
+                  }
+              },
+              dataType: "json"
+          });
+      },
+      select: function(event, ui) { 
+        // ensure suggestion is populated before submit
+        $("#course-search-input").val(ui.item.label);
+        // trigger submit
+        $("#course-search-input").submit();  
+      },
+      minLength: 3
+      });
+      $("#course-search-div").fadeIn('fast');
+
+    }
+
+// Model Check pre-Create btn-click listeners
+$("#container").on("click", "#select-suggestion", function() {
+console.log("model-suggestion: "+ $("#model-suggestions option:selected").val());
+  if($("#model-suggestions").hasClass("course")){
+    course_pk = $("#model-suggestions option:selected").val();
+    course_name = $("#model-suggestions option:selected").html();
+    console.log(course_name);
+    // Set course-select-input to suggestion and show it
+    $("#course-search-input").val(course_name);
+    $("#course-create-div").fadeOut('fast', function(){
+      $("#course-search-div").fadeIn('fast');
+        // show file meta-data form
+      $("#file-div").fadeIn('fast');
+    });
+  }
+  else if($("#model-suggestions").hasClass("school")){
+    console.log("school class");
+    school_pk = $("#model-suggestions option:selected").val();
+    school_name = $("#model-suggestions option:selected").html();
+    // Clear course selection on new School
+    $("#course-search-input").val("");
+    $("#school-search-input").val(school_name);
+    $("#school-create-div").fadeOut('fast', function(){
+      $("#school-search-div").fadeIn('fast');
+      proceedToCourseSearch();
+    });
+    
+  }
+});
+
+// User clicks "Create School" after confirming desired model does not exist
+$("#container").on("click", "#create-model", function() {
+  $("#model-suggestions-div").fadeOut('fast', function(){
+    $("#create-model-form").fadeIn('fast');
+  });
+  
+});
+
+    // Set jquery Autocomplete on School Search
+    $("#school-search-input").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/schools",
+                data: {'q': request.term },
+                success: function(data) {
+                    if (data != 'CACHE_MISS')
+                    {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item[1],
+                                value: item[1],
+                                real_value: item[0]
+                            };
+                        }));
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        select: function(event, ui) { 
+          // ensure suggestion is populated before submit
+          $("#school-search-input").val(ui.item.label)
+          // clear course-search-input in case it is populated
+          $("#course-search-input").val("");
+          // trigger submit event on auto-complete suggestion
+          $("#school-search-input").submit();  
+        },
+        minLength: 3
+    });
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="modal-backdrop fade in" style="display: none;"></div>
+<div id="upload" class="modal hide fade in" style="display:none;">
+  <div class="modal-header">
+    <button class="close" data-dismiss="modal">x</button>
+    <h3>Upload a file</h3>
+  </div> <!-- .modal-header -->
+
+  {# does this still work here? how do I integrate this? #}
+  <!-- File select / drag-n-drop -->
+  <div style="margin-left:200px;padding-bottom:50px;" id="file-uploader">
+    <noscript>
+      <p>Please enable JavaScript to use file uploader.</p>
+    </noscript>
+  </div> <!-- #file-uploader -->
+
+  <div class="modal-body">
+    <!-- Progress bar -->
+    <h3>Your file is uploading...</h3>
+    <div class="progress progress-striped active progress-karma">
+      <div class="bar" style="width: 40%;"></div>
+    </div>
+
+    <!-- Form -->
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="input01">Upload File</label>
+        <div class="controls">
+          <input type="file" class="input-file" id="file-upload">
+          <p class="help-block">2MB limit. Upload a .doc, .docx, .pdf, .rtf, or .txt file</p>
+        </div>
+      </div> <!-- #control-group -->
+
+      <fieldset>
+        <legend>What's your university?</legend>
+        <div class="control-group">
+          <label class="control-label" for="input01">Your University</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Harvard University">
+            <div class="not-found">
+              <p><strong>School not found.</strong> Is it one of these?:</p>
+              <ul>
+                <li><a href="#">Some school name</a></li>
+                <li><a href="#">Some school name</a></li>
+              </ul>
+              <p>Not there? <a class="button">Add school</a></p>
+            </div> <!-- .not-found -->
+
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <legend>About your notes</legend>
+        <div class="control-group">
+          <label class="control-label" for="input01">Course Name</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Social Analysis 10">
+            <div class="not-found">
+              <p><strong>We don't have that course listed yet.</strong> Could it be one of these?:</p>
+              <ul>
+                <li><a href="#">Some course name</a></li>
+                <li><a href="#">Some course name</a></li>
+                <li><a href="#">Some course name</a></li>
+              </ul>
+              <p>Not there? <a class="button">Add course</a></p>
+            </div> <!-- .not-found -->
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group file-type">
+          <label class="control-label" for="input01">File type</label>
+          <div class="controls">
+            <label class="radio inline">
+              <input id="note" type="radio" value="note" name="optionsRadio" checked>
+              <i class="icon-paper-clip"></i>
+              <div class="type-label">Note</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="study-guide" type="radio" value="study-guide" name="optionsRadio">
+              <i class="icon-copy"></i>
+              <div class="type-label sg">Study&nbsp;Guide</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="syllabus" type="radio" value="syllabus" name="optionsRadio">
+              <i class="icon-file"></i>
+              <div class="type-label">Syllabus</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="exam" type="radio" value="exam" name="optionsRadio">
+              <i class="icon-book"></i>
+              <div class="type-label">Exam</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="assignment" type="radio" value="assignment" name="optionsRadio">
+              <i class="icon-pencil"></i>
+              <div class="type-label">Assignment</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+
+          </div> <!-- .controls -->
+        </div> <!-- .control-group .file-type -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Note Title</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Midterm study guide">
+
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Description</label>
+          <div class="controls">
+            <textarea class="input-xlarge" id="input01" placeholder="ex. Includes lectures 1-7 and reading summaries for the first half of the semester."></textarea>
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Captcha</label>
+          <div class="controls">
+             CAPTCHA THING HERE
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">&nbsp;</label>
+          <div class="controls">
+            <label class="checkbox">
+              <input type="checkbox" id="current-course" value"current-course"> Check if you're currently in this course.
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="current-course" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
+            </label>
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="form-actions">
+          <a class="button" type="submit">FINISH UPLOAD</a>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+
+{% endblock %}
