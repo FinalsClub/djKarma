@@ -83,4 +83,13 @@ Note on Google Documents API
 Style compilation
 -----------------
 To recompile css from the less source files, install the latest Node js, which comes with the npm package manager and install 'less'
-TODO: Flesh our this after fixing issue #6
+
+# TODO automate this process, either with a make script or as a django ./manage.py command
+
+less source files live in `djKarma/static/less` To recompile `style.css`, you must install lessc
+
+    sudo npm install -g less
+
+You will now have the command lessc available to you. run this command from the root of the project repo
+
+    lessc ./static/less/styles.less ./static/css/styles.css
