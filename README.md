@@ -14,7 +14,6 @@ To install python package dependencies run:
 
     pip install -r requirements.txt
 
-TODO: add deployment dependcies
 
 Deployment
 ----------
@@ -22,8 +21,10 @@ Deployment
 1. checkout the git repository, we use `/var/www/djKarma` and will refer to this as the root of the repo
 2. install requirements with `sudo pip install -r requirements.txt`
 3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations. NOTE: You can't create a superuser BEFORE loading the fixtures.
-4. If a new deployment install the initial data (schools, courses, sample data, a SiteStat object, and ReputationEventTypes). `./manage.py loaddata ./fixtures/fixtures.json`. 
-5. Create superuser. `./manage.py createsuperuser
+4. Use south to migrate `djcelery` and `kombu.transport.django`:
+    ./manage.py migrate djcelery
+    ./manage.py migrate kombu.transport.django
+5. Create superuser. `./manage.py createsuperuser`
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
