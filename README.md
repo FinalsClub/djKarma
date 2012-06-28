@@ -24,6 +24,7 @@ Deployment
 3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations. NOTE: You can't create a superuser BEFORE loading the fixtures.
 4. If a new deployment install the initial data (schools, courses, sample data, a SiteStat object, and ReputationEventTypes). `./manage.py loaddata ./fixtures/fixtures.json`. 
 5. Create superuser. `./manage.py createsuperuser
+6. Start celery task server (see Note)
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
@@ -46,6 +47,30 @@ sudo service postgresql restart
 1) You can generate the schema from the django application (once Haystack is installed and setup) by running ./manage.py build_solr_schema. 
 2) Take the output from that command and place it in apache-solr-1.4.1/example/solr/conf/schema.xml. 
 3) Restart Solr.
+
+Celery Task Server
+---------------------------
+
+The celery task server asynchronously handles the Google Documents API processing so the main django server remains responsive. When a document is uploaded via /upload, the django app (specifically the custom django-ajax-uploader backend) will ask the celery server to upload the document (now on the local server) to Google and await their response. The code which the celery server executes is actually located in ./notes/tasks.py
+
+TODO: The new upload process works in two requests. One for the actual file, and a second for the file's meta data. If a file is processed but no meta data is submitted, the file needs to be marked specially. Currently, this behavior allows files without any meta data to appear wherever the site's files are displayed. Secondly, we need to create an avenue for a user to re-visit these incomplete uploads and enter meta data at their convenience. Only when this has happened should the files be displayed as normal.
+
+To install and run the celery task server:
+
+1) Ensure django-celery is installed per the requirements
+2) Place the celery init.d script (./packaging/celeryd) in /etc/init.d/
+3) Place the celery config file (./packaging/celeryconfig) in /etc/default
+4) Make an unprivileged, non-password-enabled user and group to run celery
+        useradd celery
+        
+5) make a spot for the logs and the pid files
+        mkdir /var/log/celery
+        mkdir /var/run/celery
+        chown celery:celery /var/log/celery
+        chown celery:celery /var/run/celery
+6) chmod +x /etc/init.d/celeryd
+7) run /etc/init.d/celeryd start
+
 
 Note on Database migrations
 ---------------------------

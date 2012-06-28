@@ -346,7 +346,7 @@ $("#container").on("click", "#create-model", function() {
 <div class="modal-backdrop fade in" style="display: none;"></div>
 <div id="upload" class="modal hide fade in" style="display:none;">
   <div class="modal-header">
-    <button class="close" data-dismiss="modal">x</button>:w
+    <button class="close" data-dismiss="modal">x</button>
     <h3>Upload a file</h3>
   </div> <!-- .modal-header -->
 
@@ -408,13 +408,79 @@ $("#container").on("click", "#create-model", function() {
             </div> <!-- .not-found -->
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
+        <div class="control-group file-type">
+          <label class="control-label" for="input01">File type</label>
+          <div class="controls">
+            <label class="radio inline">
+              <input id="note" type="radio" value="note" name="optionsRadio" checked>
+              <i class="icon-paper-clip"></i>
+              <div class="type-label">Note</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="study-guide" type="radio" value="study-guide" name="optionsRadio">
+              <i class="icon-copy"></i>
+              <div class="type-label sg">Study&nbsp;Guide</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="syllabus" type="radio" value="syllabus" name="optionsRadio">
+              <i class="icon-file"></i>
+              <div class="type-label">Syllabus</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="exam" type="radio" value="exam" name="optionsRadio">
+              <i class="icon-book"></i>
+              <div class="type-label">Exam</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+            <label class="radio inline">
+              <input id="assignment" type="radio" value="assignment" name="optionsRadio">
+              <i class="icon-pencil"></i>
+              <div class="type-label">Assignment</div>
+              <span class="karma-points">+5 points</span>
+            </label>
+
+          </div> <!-- .controls -->
+        </div> <!-- .control-group .file-type -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Note Title</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Midterm study guide">
+
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Description</label>
+          <div class="controls">
+            <textarea class="input-xlarge" id="input01" placeholder="ex. Includes lectures 1-7 and reading summaries for the first half of the semester."></textarea>
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">Captcha</label>
+          <div class="controls">
+             CAPTCHA THING HERE
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="control-group">
+          <label class="control-label" for="input01">&nbsp;</label>
+          <div class="controls">
+            <label class="checkbox">
+              <input type="checkbox" id="current-course" value"current-course"> Check if you're currently in this course.
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="current-course" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
+            </label>
+          </div> <!-- .controls -->
+        </div> <!-- .control-group -->
+        <div class="form-actions">
+          <a class="button" type="submit">FINISH UPLOAD</a>
+        </div>
       </fieldset>
     </form>
-
-
-          </div>
-
-        </div>
+  </div>
+</div>
 
 
 {% endblock %}
