@@ -27,8 +27,8 @@ Questions:
     <![endif]-->
 
      <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600,800' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/font-awesome.less">
-    <script type="text/javascript">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+    <script type="text/javascript">	
     $('.carousel('pause').carousel()')
 		$(".collapse").collapse()
     </script>
@@ -38,47 +38,13 @@ Questions:
 
 
   <body class="ms">
-
-   <!-- Static navbar -->
-      <div class="navbar">
-        <div class="navbar-inner">
-          <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
-            <div class="nav-collapse">
-              <ul class="nav">
-                <li class="dropdown" id="menu1">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-                    Username & Pic
-                    <b class="caret"></b>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#"><i class="icon-user"></i> Profile</a></li>
-                    <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-                    <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Sign out</a></li>
-                  </ul>
-                </li>
-              </ul>
-
-            </div><!--/.nav-collapse -->
-          </div>
-        </div>
-      </div>
-
-    <div class="profile-page container">
-
-      <div class="row">
-        <div class="span3">
+   <div class="profile-page container">
+      <div class="row">     
+        <div class="span3 left-sidebar">
           <ul class="nav nav-list">
             <li class="active">
               <a href="#">
-                <i class="icon-book"></i>
+                <i class="icon-paper-clip"></i>
                 Browse notes
               </a>
             </li>
@@ -90,42 +56,48 @@ Questions:
             </li>
             <li>
               <a href="#">
-                <i class="icon-book"></i>
+                <i class="icon-user"></i>
                 Some other link
               </a>
             </li>
+						<li class="karma">
+              <a href="#share" class="karma" data-toggle="modal">
+                <i class="icon-user"></i>
+                Share Karma Notes
+								<div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
+              </a>
+							
+            </li>
           </ul>
 
-					<div class="social-share">
-						<h3>Share Karma Notes</h3>
-						<p>Spread the love. Share your invite link, invite Facebook friends, and gain <span class="karma-points">+5 points</span> per signup!</p>
-							<strong>Your Link (Copy + Paste):</strong><input id="social-link" type="text" value="http://karmanotes.org/40201" name"social-link" class="span3">
-							<a id="fb-link" name="fb_share" type="icon_link"
-							   share_url="http://karmanotes.org/40201"><strong>Share on Facebook</strong></a> <br />
-							<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"
-							        type="text/javascript">
-							</script>
-
-					</div>
           <h3>Profile</h3>
 
           <ul class="thumbnails">
             <li class="span3">
               <div class="thumbnail">
-              <img alt="" src="http://placehold.it/230x100">
+              <img alt="" src="http://placehold.it/150x150">
                 <div class="caption">
                   <p>Profile Name <a href="#">edit</a></p>
-									<!-- progress bar -->
-									<p>Karma Points</p>
-									<div class="progress progress-karma" id="karma-info" rel="popover" data-content="Status1: 25 points<br />Status2: 50 points<br />Status3: 75 points<br />Status4: 100 points<br />" data-original-title="How Karma Status Works">
-									  <div class="bar"
-									       style="width: 60%;"></div>
-									</div>
-									<div class="karma-label">
-										<div class="karma-label-left">n00b</div> <div class="karma-label-right">l33t</div>
+                <!-- progress bar -->
+                <p>Karma Points</p>
+                
+                <!-- the left margin of the current karma point status is
+                the percentage of the progress bar minus 22%.
+                For example, if progress is 60%, margin for status is 38%-->
+                
+                    
+                <div class="progress progress-karma" id="karma-info" rel="popover" data-content="Status1: 25 points<br />Status2: 50 points<br />Status3: 75 points<br />Status4: 100 points<br />" data-original-title="How Karma Status Works">
+                  <div class="bar"
+                       style="width: 60%;"></div>
+                            <div class="current-karma" style="">
+                                <span class="karma-points">30 points</span>
+                            </div>
+                </div>
+                <div class="karma-label">
+										<div class="karma-label-left">Recruit (0)</div> <div class="karma-label-right">Apprentice (50)</div> 
 										<div style="clear:both"></div>
 									</div>
-                  <p>Karma Status: <div class="karma-status">Trainee</div></p>
+                  
                   <p>School:</p>
                     <select id="school-select" class="span2">
                       <option>Select school</option>
@@ -154,14 +126,56 @@ Questions:
         </div>
 
         <div class="span9">
+          
+				  <!-- Static navbar -->
+				      <div class="navbar">
+				        <div class="navbar-inner">
+				        
+				            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				              <span class="icon-bar"></span>
+				              <span class="icon-bar"></span>
+				              <span class="icon-bar"></span>
+				            </a>
+				            <a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
+				            <div class="nav-collapse">
+				              <ul class="nav">
+												<li class="" id="menu0">
+													<form class="navbar-search input-append form-search">
+													  <input type="text" class="input-medium search-query" placeholder="Search">
+														
+													  <a type="submit" class="btn button">Go</a>
+														
+													</form>
+												</li>
+				                <li class="dropdown" id="menu1">
+				                  <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
+				                    Username & Pic
+				                    <b class="caret"></b>
+				                  </a>
+													<ul class="dropdown-menu">
+											      <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+											      <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+											      <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+											      <li class="divider"></li>
+											      <li><a href="#">Sign out</a></li>
+											    </ul>
+				                   
+				                </li>
+				              </ul>
 
-          <h2>Welcome, Username!</h2>
+				            </div><!--/.nav-collapse -->
+	
+				        </div>
+							<div class="clear"></div>
+				      </div>
+
+          
           <div class="alert alert-success">
             <button class="close" data-dismiss="alert">x</button>
             Success! <i class="icon-paper-clip"></i>You've uploaded
             a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
           </div>
-
+        <h3>Welcome, Username!</h3>
            <!-- Carousel items -->
               <div id="myCarousel" class="carousel slide">
 							<span class="counter"><span class="karma">2/5</span> profile completion tasks left</span>
@@ -192,8 +206,6 @@ Questions:
               <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
               <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
               </div>
-
-
 <!-- BEGIN COURSE LISTINGS -->
 
           <!-- one course -->
@@ -209,27 +221,25 @@ Questions:
                   <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
                 </div>
               </div>
-
-              <div class="upload">
+              <div class="upload hidden-phone">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
-							<div style="clear:both"></div>
+              <div style="clear:both"></div>
             </div>
             <!-- end course -->
-						<!-- one course -->
+            <!-- one course -->
             <div class="course">
               <div class="folder icon">
-						  	<img src="img/icon-folder.png">
-						  </div>
+                <img src="img/icon-folder.png">
+              </div>
               <div class="course-title">
                 <a href="#">Underwater Basket Weaving While Having an Existential Crisis</a>
                 <div class="course-info">
                   <span class="instructor">Mike Brown</span> <i class="icon-paper-clip"></i> <a href="#">21 notes</a>
-                 	<span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+                  <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
                 </div>
               </div>
-
-              <div class="upload">
+              <div class="upload hidden-phone">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
 							<div style="clear:both"></div>
@@ -253,8 +263,8 @@ and icon name is icon-folder-inactive.png -->
 		      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
 		    </div>
 		  </div>
-
-		  <div class="upload">
+ 
+		  <div class="upload hidden-phone">
 		    <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
 		  </div>
 			<div style="clear:both"></div>
@@ -422,130 +432,60 @@ and icon name is icon-folder-inactive.png -->
   <div class="modal-body">
 
 
-            <!-- Progress bar -->
-            <h3>Your file is uploading...</h3>
-            <div class="progress progress-striped
-            active progress-karma">
-            <div class="bar"
-            style="width: 40%;"></div>
-            </div>
+  <!-- Progress bar -->
+  <h3>Your file is uploading...</h3>
+  <div class="progress progress-striped
+  active progress-karma">
+  <div class="bar"
+  style="width: 40%;"></div>
+  </div>
 
-        <!-- Form -->
-        <form class="form-horizontal">
-            <div class="control-group">
-                <label class="control-label" for="input01">Upload File</label>
-                  <div class="controls">
-                       <input type="file" class="input-file" id="file-upload">
-                        <p class="help-block">2MB limit. Upload a .doc, .docx, .pdf, .rtf, or .txt file</p>
 
-                    </div>
-                </div>
-                <fieldset>
-                   <legend>What's your university?</legend>
-                    <div class="control-group">
-                      <label class="control-label" for="input01">Your University</label>
-                      <div class="controls">
-                        <input type="text" class="input-xlarge" id="input01" placeholder="ex. Harvard University">
-                        <div class="not-found">
-                          <p><strong>School not found.</strong> Is it one of these?:</p>
-                                <ul>
-                                    <li><a href="#">Some school name</a></li>
-                                    <li><a href="#">Some school name</a></li>
-                                </ul>
-                                <p>Not there? <a class="button">Add school</a></p>
-                          </div>
+						<div class="modal-backdrop fade in" style="display: none;" ></div>
+						<div class="modal" id="share" class="modal hide fade in" style="display:none;">
+						              <div class="modal-header">
+						                <button class="close" data-dismiss="modal">x</button>
+						                <h3>Share Karma Notes</h3>
+						              </div>
+						              <div class="modal-body">
 
-                      </div>
-                    </div>
-                    <legend>About your notes</legend>
-                    <div class="control-group">
-                        <label class="control-label" for="input01">Course Name</label>
-                      <div class="controls">
-                           <input type="text" class="input-xlarge" id="input01" placeholder="ex. Social Analysis 10">
-                                <div class="not-found">
-                                <p><strong>We don't have that course listed yet.</strong> Could it be one of these?:</p>
-                                    <ul>
-                                        <li><a href="#">Some course name</a></li>
-                                        <li><a href="#">Some course name</a></li>
-                                        <li><a href="#">Some course name</a></li>
-                                    </ul>
-                                    <p>Not there? <a class="button">Add course</a></p>
-                            </div>
-                    </div>
-                    here here here
-                    <div class="control-group file-type">
-                      <label class="control-label" for="input01">File type</label>
-                      <div class="controls">
-                        <label class="radio inline">
-                          <input id="note" type="radio" value="note" name="optionsRadio" checked>
-                          <i class="icon-paper-clip"></i>
-                          <div class="type-label">Note</div>
-                          <span class="karma-points">+5 points</span>
-                        </label>
-                        <label class="radio inline">
-                          <input id="study-guide" type="radio" value="study-guide" name="optionsRadio">
-                          <i class="icon-copy"></i>
-                          <div class="type-label sg">Study&nbsp;Guide</div>
-                          <span class="karma-points">+5 points</span>
-                        </label>
-                        <label class="radio inline">
-                          <input id="syllabus" type="radio" value="syllabus" name="optionsRadio">
-                          <i class="icon-file"></i>
-                          <div class="type-label">Syllabus</div>
-                          <span class="karma-points">+5 points</span>
-                        </label>
-                        <label class="radio inline">
-                          <input id="exam" type="radio" value="exam" name="optionsRadio">
-                          <i class="icon-book"></i>
-                          <div class="type-label">Exam</div>
-                          <span class="karma-points">+5 points</span>
-                        </label>
-                        <label class="radio inline">
-                          <input id="assignment" type="radio" value="assignment" name="optionsRadio">
-                          <i class="icon-pencil"></i>
-                          <div class="type-label">Assignment</div>
-                          <span class="karma-points">+5 points</span>
-                        </label>
 
-                      </div> <!-- .controls -->
-                    </div> <!-- .control-group .file-type -->
-                    <div class="control-group">
-                      <label class="control-label" for="input01">Note Title</label>
-                      <div class="controls">
-                        <input type="text" class="input-xlarge" id="input01" placeholder="ex. Midterm study guide">
+									<p>Spread the love. Share your unique invite link for <span class="karma-points">+5 points</span> per signup.</p>
+									
+									<div class="social-share">
+										<!-- facebook share -->
+										<span class="inset-border">
+											<span class="social-icon">
+												<a id="fb-link" name="fb_share" type="icon_link" 
+												   share_url="http://karmanotes.org/40201">
+												<span class="fb-icon"><i class="icon-facebook"></i></span>
+												<strong>Share on Facebook</strong></a> 
+												<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" 
+												        type="text/javascript">
+												</script>
+											</span>
+										</span>
+											<!-- end facebook share -->
+									</div>
+									<div class="copy-paste-link">
+										<div class="title">
+											<h3>Or, copy & paste your unique link:</h3><br />
+										</div>
+										<div class="wrap">
+											<form class="input-prepend">
+												<span class="add-on"><i class="icon-cut"></i></span>
+												<input id="social-link" type="text" value="http://karmanotes.org/40201" name"social-link" class="span3">
+											</form>
+											<div style="clear:both"></div>
+										</div>
+									</div>
+										
+									
 
-                      </div> <!-- .controls -->
-                    </div> <!-- .control-group -->
-                    <div class="control-group">
-                      <label class="control-label" for="input01">Description</label>
-                      <div class="controls">
-                        <textarea class="input-xlarge" id="input01" placeholder="ex. Includes lectures 1-7 and reading summaries for the first half of the semester."></textarea>
-                      </div> <!-- .controls -->
-                    </div> <!-- .control-group -->
-                    <div class="control-group">
-                      <label class="control-label" for="input01">Captcha</label>
-                      <div class="controls">
-                         CAPTCHA THING HERE
-                      </div> <!-- .controls -->
-                    </div> <!-- .control-group -->
-                    <div class="control-group">
-                      <label class="control-label" for="input01">&nbsp;</label>
-                      <div class="controls">
-                        <label class="checkbox">
-                          <input type="checkbox" id="current-course" value"current-course"> Check if you're currently in this course.
-                        </label>
-                        <label class="checkbox">
-                          <input type="checkbox" id="current-course" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
-                        </label>
-                      </div> <!-- .controls -->
-                    </div> <!-- .control-group -->
-                    <div class="form-actions">
-                      <a class="button" type="submit">FINISH UPLOAD</a>
-                    </div>
-                </fieldset>
-            </form>
-          </div>
-        </div>
+
+						              </div>
+
+						            </div>
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -583,16 +523,8 @@ and icon name is icon-folder-inactive.png -->
 </script>
 
 	<script src="js/jquery.screwdefaultbuttons.min.js"></script>
-    <script src="js/bootstrap-transition.js"></script>
-    <script src="js/bootstrap-alert.js"></script>
-    <script src="js/bootstrap-modal.js"></script>
-    <script src="js/bootstrap-dropdown.js"></script>
-    <script src="js/bootstrap-tab.js"></script>
-    <script src="js/bootstrap-tooltip.js"></script>
-    <script src="js/bootstrap-popover.js"></script>
-    <script src="js/bootstrap-button.js"></script>
-    <script src="js/bootstrap-collapse.js"></script>
-    <script src="js/bootstrap-carousel.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
 
   </body>
 </html>
