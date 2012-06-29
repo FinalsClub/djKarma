@@ -32,43 +32,16 @@ class ModelTests(TestCase):
     def setUp(self):
         """ Creates a sample user to test with before each test.
         """
-        print "all userprofiles:"
-        print UserProfile.objects.all()
-
         l, b = Level.objects.get_or_create(title="Prospect", karma=10)
 
         print "\n Running ModelTests.setUp()"
-        print User.objects.all()
         User.objects.get_or_create(username="Philo")
-        print User.objects.all()
-        """j
-            print "user did not exist, so creating him"
-            user = User(username="Philo")
-            user.save()
-            user_profile = UserProfile()
-            user_profile.user = user
-            user_profile.save()
-            print user_profile
-        print "\t Philo created!"
-
-
-        user_profile = user.get_profile()
-        user_profile.user = user
-        user_profile.karma = 5
-        user_profile.save()
-        """
 
         # sample school
-        school = School()
-        school.name = u"College University"
-        school.location = u"1616 Mockingbird ln."
-        school.save()
+        school, b = School.objects.get_or_create(name=u"College University", location=u"1616 Mockingbird ln.")
 
         # sample course
         c, b = Course.objects.get_or_create(school=school, title=u"Underwater Basketweaving", semester=1)
-        print c, b
-
-        print "^^^^^^^^^^^^^^^\n"
 
     def tearDown(self):
         """ Deletes the example user, this always runs,
@@ -208,39 +181,22 @@ class UtilsTests(unittest.TestCase):
     """ Loads the notes fixtures into a temporary database.
         The database is destroyed when the tests are finished running.
     """
+    fixtures = ['initial_data']
 
     def setUp(self):
         """ Creates a sample user to test with before each test.
         """
-        # TODO sample courses to test recursive depth of jsonifyModel
-        user = User.objects.filter(username=u"Gooby").all()
-        if len(user) > 0:
-            print "we found " + user[0].__unicode__()
-            user = user[0]
-        else:
-            print "user did not exist, so creating him"
-            user = User(username=u"Gooby")
-            user.save()
-            user_profile = UserProfile()
-            user_profile.user = user
-            user_profile.save()
-        user_profile = user.get_profile()
-        user_profile.user = user
-        user_profile.karma = 5
-        user_profile.save()
+        l, b = Level.objects.get_or_create(title="Prospect", karma=10)
+
+        User.objects.get_or_create(username=u"Gooby")
 
         # sample school
-        school = School()
-        school.name = u"College University"
-        school.location = u"1616 Mockingbird ln."
-        school.save()
+        school, b = School.objects.get_or_create(name=u"College University", location=u"1616 Mockingbird ln.")
 
         # sample course
-        course = Course()
-        course.school = school
-        course.title = u"Underwater Basketweaving"
-        course.save()
+        c, b = Course.objects.get_or_create(school=school, title=u"Underwater Basketweaving", semester=1)
 
+        ss, b = SiteStats.objects.get_or_create(id=1)
 
     def tearDown(self):
         """ Deletes all sample data, this always runs,
