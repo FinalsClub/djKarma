@@ -871,6 +871,18 @@ a.carousel-control {
 
 /*** social share ***/
 
+
+a#fb-link .FBConnectButton_Simple, 
+a#fb-link .FBConnectButton_RTL_Simple {
+	background:none;
+}
+
+a#fb-link .FBConnectButton_Simple .FBConnectButton_Text_Simple {
+	margin:0;
+	&:hover {
+		text-decoration:none;
+	}
+}
 .share-karma {
 	background:@box-color;
 	padding: 3px 0 3px 23px;
@@ -893,8 +905,11 @@ a.carousel-control {
 		.rounded-corners;
 	}
 	.social-icon {
+		
 		strong, i {
 			color: @highlight;
+			
+			
 		}
 		.fb-icon {
 			border-right: 1px solid lighten(@primary,20%);
