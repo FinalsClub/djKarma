@@ -27,7 +27,7 @@ Questions:
     <![endif]-->
    
      <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600,800' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="css/font-awesome.less">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
     <script type="text/javascript">	
     $('.carousel('pause').carousel()')
 		$(".collapse").collapse()
@@ -38,16 +38,13 @@ Questions:
   
   
   <body class="ms">
-
- 
-    <div class="profile-page container">
-
+   <div class="profile-page container">
       <div class="row">     
         <div class="span3 left-sidebar">
           <ul class="nav nav-list">
             <li class="active">
               <a href="#">
-                <i class="icon-book"></i>
+                <i class="icon-paper-clip"></i>
                 Browse notes
               </a>
             </li>
@@ -59,23 +56,21 @@ Questions:
             </li>
             <li>
               <a href="#">
-                <i class="icon-book"></i>
+                <i class="icon-user"></i>
                 Some other link
               </a>
             </li>
+						<li class="karma">
+              <a href="#share" class="karma" data-toggle="modal">
+                <i class="icon-user"></i>
+                Share Karma Notes
+								<div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
+              </a>
+							
+            </li>
           </ul>
 
-					<div class="social-share">
-						<h3>Share Karma Notes</h3>
-						<p>Spread the love. Share your invite link, invite Facebook friends, and gain <span class="karma-points">+5 points</span> per signup!</p>
-							<strong>Your Link (Copy + Paste):</strong><input id="social-link" type="text" value="http://karmanotes.org/40201" name"social-link" class="span2">
-							<a id="fb-link" name="fb_share" type="icon_link" 
-							   share_url="http://karmanotes.org/40201"><strong>Share on Facebook</strong></a> <br /> 
-							<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" 
-							        type="text/javascript">
-							</script>
-							
-					</div>
+					
           <h3>Profile</h3>
           
           <ul class="thumbnails">
@@ -87,19 +82,23 @@ Questions:
 									<!-- progress bar -->
 									<p>Karma Points</p>
 									
-									<div class="current-karma" style="margin-left:55%;">
-										<span class="karma-points">30 points</span>
-									</div>
+									<!-- the left margin of the current karma point status is
+									the percentage of the progress bar minus 22%.
+									For example, if progress is 60%, margin for status is 38%-->
+									
 										
 									<div class="progress progress-karma" id="karma-info" rel="popover" data-content="Status1: 25 points<br />Status2: 50 points<br />Status3: 75 points<br />Status4: 100 points<br />" data-original-title="How Karma Status Works">
 									  <div class="bar"
 									       style="width: 60%;"></div>
+												<div class="current-karma" style="">
+													<span class="karma-points">30 points</span>
+												</div>
 									</div>
 									<div class="karma-label">
-										<div class="karma-label-left">n00b (0)</div> <div class="karma-label-right">l33t (50)</div> 
+										<div class="karma-label-left">Recruit (0)</div> <div class="karma-label-right">Apprentice (50)</div> 
 										<div style="clear:both"></div>
 									</div>
-                  <p>Karma Status: <div class="karma-status">Trainee</div></p>
+                  
                   <p>School:</p>
                     <select id="school-select" class="span2">
                       <option>Select school</option>
@@ -141,18 +140,27 @@ Questions:
 				            <a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
 				            <div class="nav-collapse">
 				              <ul class="nav">
+												<li class="" id="menu0">
+													<form class="navbar-search input-append form-search">
+													  <input type="text" class="input-medium search-query" placeholder="Search">
+														
+													  <a type="submit" class="btn button">Go</a>
+														
+													</form>
+												</li>
 				                <li class="dropdown" id="menu1">
 				                  <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
 				                    Username & Pic
 				                    <b class="caret"></b>
 				                  </a>
-				                  <ul class="dropdown-menu">
-				                    <li><a href="#"><i class="icon-user"></i> Profile</a></li>
-				                    <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-				                    <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-				                    <li class="divider"></li>
-				                    <li><a href="#">Sign out</a></li>
-				                  </ul>
+													<ul class="dropdown-menu">
+											      <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+											      <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+											      <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+											      <li class="divider"></li>
+											      <li><a href="#">Sign out</a></li>
+											    </ul>
+				                   
 				                </li>
 				              </ul>
 
@@ -162,13 +170,14 @@ Questions:
 							<div class="clear"></div>
 				      </div>
 
-          <h2>Welcome, Username!</h2>
+          
           <div class="alert alert-success">
             <button class="close" data-dismiss="alert">x</button>
             Success! <i class="icon-paper-clip"></i>You've uploaded
             a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
           </div>
           
+					<h3>Welcome, Username!</h3>
            <!-- Carousel items -->
               <div id="myCarousel" class="carousel slide">
 							<span class="counter"><span class="karma">2/5</span> profile completion tasks left</span>
@@ -200,7 +209,7 @@ Questions:
               <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
               </div>
          
-
+							
 <!-- BEGIN COURSE LISTINGS -->
           
           <!-- one course -->
@@ -217,7 +226,7 @@ Questions:
                 </div>
               </div>
               
-              <div class="upload">
+              <div class="upload hidden-phone">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
 							<div style="clear:both"></div>
@@ -236,7 +245,7 @@ Questions:
                 </div>
               </div>
               
-              <div class="upload">
+              <div class="upload hidden-phone">
                 <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
               </div>
 							<div style="clear:both"></div>
@@ -261,7 +270,7 @@ and icon name is icon-folder-inactive.png -->
 		    </div>
 		  </div>
  
-		  <div class="upload">
+		  <div class="upload hidden-phone">
 		    <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
 		  </div>
 			<div style="clear:both"></div>
@@ -556,6 +565,53 @@ and icon name is icon-folder-inactive.png -->
               </div>
             
             </div>
+
+
+						<div class="modal-backdrop fade in" style="display: none;" ></div>
+						<div class="modal" id="share" class="modal hide fade in" style="display:none;">
+						              <div class="modal-header">
+						                <button class="close" data-dismiss="modal">x</button>
+						                <h3>Share Karma Notes</h3>
+						              </div>
+						              <div class="modal-body">
+
+
+									<p>Spread the love. Share your unique invite link for <span class="karma-points">+5 points</span> per signup.</p>
+									
+									<div class="social-share">
+										<!-- facebook share -->
+										<span class="inset-border">
+											<span class="social-icon">
+												<a id="fb-link" name="fb_share" type="icon_link" 
+												   share_url="http://karmanotes.org/40201">
+												<span class="fb-icon"><i class="icon-facebook"></i></span>
+												<strong>Share on Facebook</strong></a> 
+												<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" 
+												        type="text/javascript">
+												</script>
+											</span>
+										</span>
+											<!-- end facebook share -->
+									</div>
+									<div class="copy-paste-link">
+										<div class="title">
+											<h3>Or, copy & paste your unique link:</h3><br />
+										</div>
+										<div class="wrap">
+											<form class="input-prepend">
+												<span class="add-on"><i class="icon-cut"></i></span>
+												<input id="social-link" type="text" value="http://karmanotes.org/40201" name"social-link" class="span3">
+											</form>
+											<div style="clear:both"></div>
+										</div>
+									</div>
+										
+									
+
+
+						              </div>
+
+						            </div>
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

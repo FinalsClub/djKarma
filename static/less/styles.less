@@ -125,7 +125,8 @@ a:visited {
 
 /*** UI elements ***/ 
 
-a.button {
+a.button,
+.navbar .form-search a.button {
     .button-font;
     .rounded-corners;
     .text-shadow(darken(@secondary,10%));
@@ -144,13 +145,51 @@ a.button {
     -webkit-transition: background 1s;
     -o-transition: background 1s;
 }
+
+
+
+
  
-a.button:hover {
+a.button:hover,
+.navbar .form-search a.button:hover {
+	color:@highlight;
     border: 1px solid @secondary;
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, @secondary), color-stop(1, lighten(@secondary, 10%)) );
     background:-moz-linear-gradient( center top, @secondary 5%, lighten(@secondary, 10%) 100% );
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='@secondary', endColorstr='lighten(@secondary, 10%)');
     .box-shadow(lighten(@secondary,30%));
+}
+
+/* search form button mods */
+
+.navbar .form-search a.button {
+	padding: 4px 8px;
+	margin-top:0px;
+	margin-left: -4px;
+	border-radius: 0px 12px 12px 0px;
+}
+
+li#menu0 {
+	form {
+		margin-top:0;
+	}
+	.input-append input {
+		float: none;
+		border-radius: 12px 0px 0px 12px;
+		border: 1px solid #CCC;
+		padding: 4px 9px;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 13px;
+		font-weight: normal;
+		line-height: 1;
+		color:@text-color;
+		margin-top:0;
+	}
+}
+	
+
+#menu0 {
+	margin-top:5px;
 }
 
 .hero-unit a.button {
@@ -200,16 +239,58 @@ hide {
 
 .navbar {
 	margin:0;
+	.nav {
+		margin:0;
+	}
 	.navbar-inner {
 		padding-right:0px;
 	}
 	
-	a.farthest-right {
-		padding: 10px 0px 11px;
+	.nav-collapse a.farthest-right {
+		padding: 11px 0px 10px 11px;
 	}
 	.brand {
 		padding: 8px 0px 12px;
+		margin-left:0;
 	}
+	
+	#login-menu {
+		.label {
+			width: 61px;
+			display: inline-block;
+			float: left;
+			text-align: right;
+			margin-right:10px;
+		}
+		input {
+			width:100px;
+			float:left;
+		
+		}
+		width:220px;
+		left:-80px;
+		form li {
+			padding:3px 15px;
+		}		
+	}
+}
+
+.navbar .btn-navbar {
+  float: right;
+  padding: 7px 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+  .buttonBackground(lighten(@secondary,15%), lighten(@secondary,5%));
+  .box-shadow("inset 0 1px 0 lighten(@secondary,40%), 0 1px 0 @secondary");
+}
+
+.navbar .btn-navbar .icon-bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: lighten(@secondary,80%);
+  .border-radius(1px);
+  .box-shadow(0 1px 0 @secondary);
 }
 
 .left-sidebar {
@@ -218,15 +299,37 @@ hide {
 
 
 .nav-list {
+	i {
+		margin-top:5px;
+	}
+
 	li.active > a,
 	li.active > a:hover {
-		background:lighten(@primary,50%);
+		background:transparent;
 		color:@text-color;
 	}
-	li a:hover {
-		background:lighten(@primary,50%);
+	li {
+		margin-bottom:20px;
+		margin-top:-15px;
+		a.karma {
+			margin-left: -20px;
+			padding-left: 5px;
+			.rounded-corners;
+			background:@box-color;
+			&:hover {
+				background:@box-color;
+			}
+		}
+		a {
+			font-family:'Open Sans';
+			font-size:@body-size;
+			padding:3px 0px;
+			&:hover {
+				background:@bg-color;
+				color: lighten(@primary,20%);
+			}	
+		}	
 	}
-	margin-bottom:20px;
 }
 
 .span3 h3 {
@@ -236,21 +339,48 @@ hide {
 
 /***** progress bar *****/
 
+.share-sidebar {
+	margin-bottom:20px;
+}
 
-.current-karma span{
-	margin-bottom:10px;
-	position: relative;
-	margin: 1em 0 3em;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
+.progress-karma {
+	margin-top:20px;
+	.current-karma {
+		width: 30px;
+		height: 18px;
+		float: left;
+		z-index: 99;
+		margin-top: -16px;
+		margin-left: -45px;
+		span {
+			.rounded-corners;
+			width: 57px;
+			position: absolute;
+			text-align: center;
+			padding: 3px 5px;
+		}
+	}
+	.current-karma::before {
+		content: '';
+		display: inline-block;
+		border-left: 7px solid transparent;
+		border-right: 7px solid transparent;
+		border-top: 7px solid @karma;
+		border-bottom-color: 
+		rgba(0, 0, 0, 0.2);
+		position: relative;
+		top: 9px;
+		left: 35px;
+	}
+	.bar {
+		#gradient > .vertical(lighten(@karma,10%), @karma);
+		margin: 3px;
+		height: 13px;
+		.border-radius(4px);
+		float:left;
+	}
 }
-.progress-karma .bar {
-	#gradient > .vertical(lighten(@karma,10%), @karma);
-	margin: 3px;
-	height: 13px;
-	.border-radius(4px);
-}
+
 
 .karma-label {
 	font-size:10px;
@@ -335,6 +465,7 @@ hide {
 	.navbar-inner {
 		background:@bg-color;
 		box-shadow:none;
+		padding-left:0;
 		
 		.logo-mark {
 			width:23px;
@@ -542,12 +673,14 @@ a.carousel-control {
 
 	
 .file {
-	.bordered;
+	
    
     clear:both; 
     padding-top:5px;
     
-   
+   &.row-fluid {
+		.bordered;
+	}
     .file.icon {
     	height: 60px;
 		background: url(../img/icon-note.png) no-repeat 20px 1px;
@@ -599,7 +732,34 @@ a.carousel-control {
     }
 }
 
+/** responsive navbar styling **/
+@media (max-width: 979px) {
+	.nav-collapse .navbar-form, .nav-collapse .navbar-search {
+		border:none;
+	}
+	li.dropdown{
+		border:1px solid #CCC;
+	}
+	li.dropdown.home {
+		border:none;
+	}
+}
+@media (max-width: 979px) and (min-width: 768px){
+	.file.row-fluid {
+		height:85px;
+	}
+}
 
+@media (max-width: 767px) {
+	.file.row-fluid {
+		height:85px;
+	}
+	.course-listing {
+		.course-title {
+			width:70%;
+		}
+	}
+}
 .showmoretext {
 	text-align:center;
 	color:@primary;
@@ -711,14 +871,144 @@ a.carousel-control {
 
 /*** social share ***/
 
-.social-share {
-	#fb-link span span strong {
-		color:@primary;
-	}
-	margin-bottom:20px;
+.share-karma {
 	background:@box-color;
-	padding:20px;
-	border: darken
+	padding: 3px 0 3px 23px;
+	font-size:12px;
+}
+
+.modal#share .modal-body {
+	text-align:center;
+	
+}
+.social-share {
+	text-align:center;
+	margin-bottom:40px;
+	margin-top:40px;
+	.inset-border {
+		padding:15px 5px;
+		box-shadow:inset 1px 2px 10px 2px lighten(@text-color,55%);
+		-moz-box-shadow: inset 1px 2px 10px 2px lighten(@text-color,55%);
+		-webkit-box-shadow: inset 1px 2px 10px 2px lighten(@text-color,55%);
+		.rounded-corners;
+	}
+	.social-icon {
+		strong, i {
+			color: @highlight;
+		}
+		.fb-icon {
+			border-right: 1px solid lighten(@primary,20%);
+			box-shadow:1px 0px 0px 0px @primary;
+			-moz-box-shadow:1px 0px 0px 0px @primary;
+			-webkit-box-shadow:1px 0px 0px 0px @primary; 
+			margin-top: 0px;
+			padding: 0px 11px 8px 5px;
+			margin-right: 7px;
+			display: inline-block;
+			font-size: 20px;
+			i {
+				margin-top:10px;
+			}
+		}
+		.button-font;
+	    .rounded-corners;
+	    .text-shadow(darken(@primary,10%));
+	    -moz-box-shadow:inset 0px 1px 0px 0px @highlight;
+	    -webkit-box-shadow:inset 0px 1px 0px 0px @highlight;
+	    box-shadow:inset 0px 1px 0px 0px @highlight, 0px 0px 1px 2px lighten(@text-color,60%);
+	    padding:8px;
+	    border: 1px solid @primary;
+	    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, lighten(@primary, 10%)), color-stop(1, @primary) );
+	    background:-moz-linear-gradient( center top, lighten(@primary, 10%) 5%, @primary 100% );
+	    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='lighten(@primary, 10%)', endColorstr='@primary');
+    
+	    transition: background 1s;
+	    -moz-transition: background 1s;
+	    -webkit-transition: background 1s;
+	    -o-transition: background 1s;
+	
+		
+	}
+	span.social-icon:hover {
+		background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, @primary), color-stop(1, lighten(@primary, 10%)) );
+		background:-moz-linear-gradient( center top, @primary 5%, lighten(@primary, 10%) 100% );
+		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='@primary', endColorstr='lighten(@primary, 10%)');
+		box-shadow:0px -1px 3px 0px lighten(@text-color,30%);
+		-moz-box-shadow:0px -1px 3px 0px lighten(@text-color,30%);
+		-webkit-box-shadow:0px -1px 3px 0px lighten(@text-color,30%);
+		position:relative;
+		left:1px;
+		top:1px;
+	
+	}
+	
+}
+
+.copy-paste-link {
+	text-align:center;
+	.title {
+		
+	}
+	.wrap {
+		display:inline-block;
+		clear:both;
+	}
+	input {
+		float:left;
+	}
+}
+
+
+/** popovers **/
+
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: @zindexPopover;
+  display: none;
+  padding: 5px;
+  &.top    { margin-top:  -5px; }
+  &.right  { margin-left:  5px; }
+  &.bottom { margin-top:   5px; }
+  &.left   { margin-left: -5px; }
+  &.top .arrow    { #popoverArrow > .top(); }
+  &.right .arrow  { #popoverArrow > .right(); }
+  &.bottom .arrow { #popoverArrow > .bottom(); }
+  &.left .arrow   { #popoverArrow > .left();  }
+  .arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+}
+.popover-inner {
+  padding: 1px;
+  width: 280px;
+  overflow: hidden;
+  background: darken(@box-color,10%); // has to be full background declaration for IE fallback
+  background: darken(@box-color,10%);
+  .border-radius(5px);
+  .box-shadow(0 3px 7px rgba(0,0,0,0.3));
+
+}
+.popover-title {
+  padding: 9px 15px;
+  line-height: 1;
+  background-color: @box-color;
+ 
+  .box-shadow(inset darken(@box-color,50%));
+  .border-radius(3px 3px 0 0);
+}
+.popover-content {
+	
+  padding: 14px;
+  background-color: @box-color;
+  .border-radius(0 0 3px 3px);
+  .background-clip(padding-box);
+  p, ul, ol {
+    margin-bottom: 0;
+  }
 }
 
 /*** footer ***/
@@ -727,4 +1017,5 @@ a.carousel-control {
 	text-align:center;
 	margin-top:20px;
 }
+
 
