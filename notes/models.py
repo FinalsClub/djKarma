@@ -243,7 +243,7 @@ class File(models.Model):
     votes       = models.ManyToManyField(Vote, blank=True, null=True)
     numUpVotes  = models.IntegerField(default=0)
     numDownVotes = models.IntegerField(default=0)
-    type        = models.CharField(blank=True, null=True, max_length=1, choices=FILE_PTS)
+    type        = models.CharField(blank=True, null=True, max_length=1, choices=FILE_PTS, default='N')
     # User who uploaded the document
     owner       = models.ForeignKey(User, blank=True, null=True)
     # has the html content been escaped?

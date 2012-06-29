@@ -116,6 +116,7 @@ def processCsvTags(file, csvString):
 def uploadForm(user):
     """ Creates an UploadFileForm and pre-populates the school field
         With the user's school, if available
+        is currently unused?
     """
     #print request.user.username
     user_profile = user.get_profile()
