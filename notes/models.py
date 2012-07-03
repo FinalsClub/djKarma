@@ -11,6 +11,8 @@ from django.template.defaultfilters import slugify
 from social_auth.backends.facebook import FacebookBackend
 from social_auth.signals import socialauth_registered
 
+from model_utils import fast_hash
+
 
 class Level(models.Model):
     """ Define User Levels
@@ -328,7 +330,8 @@ class UserProfile(models.Model):
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # change to 1 when all UserProfileTodos
+    # unique 6 char hex value for invites
+    hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -470,6 +473,11 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
+############################## ##############################
+#
+# Model extra utilities
+#
+############################## ##############################
 
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
@@ -499,3 +507,4 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
+
