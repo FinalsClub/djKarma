@@ -188,15 +188,16 @@
       <!-- one course -->
       <div class="course-listing">
         {# this is an example string to loop over (length of your username #}
-        {% for course in user.username %}
+        {% for course in user_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
             <img src="/static/img/icon-folder.png">
           </div>
           <div class="course-title">
-            <a href="#">{# course.title #}Underwater Basket Weaving While Having an Existential Crisis</a>
+            <a href="#">{{ course.title }}</a>
             <div class="course-info">
-              <span class="instructor">{# course.instructor #}Chris Hansen</span> <i class="icon-paper-clip"></i><a href="#">{# course.files.count() provides this now #}21 notes</a>
+              <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
+              {# TODO: not yet implemented downloaded files #}
               <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
             </div> <!-- .course-info -->
           </div> <!-- .course-title -->
