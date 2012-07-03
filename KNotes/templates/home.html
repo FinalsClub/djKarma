@@ -37,6 +37,7 @@ jQuery(document).ready(function() {
 
 </script>
 {% endblock %}
+
 {% block content %}
 <div class="container">
 
@@ -64,14 +65,15 @@ jQuery(document).ready(function() {
   <h2>Recently uploaded notes</h2>
 
   <ul id="mycarousel" class="jcarousel jcarousel-skin-tango">
+    {% for file in recent_files %}
     <li> <!-- begin one file -->
       <div class="file row-fluid">
         <div class="file icon"></div>
         <div class="file-title">
-          <a href="#">lecture 1 notes</a>
+          <a href="#">{{ file.title }}</a>
         </div>
         <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
+          {{ file.description }}
         </div>
         <div class="file-info-action hide row">
           <div class="file-info">
@@ -83,101 +85,7 @@ jQuery(document).ready(function() {
         </div> <!-- .file-info-action -->
       </div> <!-- .file .row-fluid -->
     </li> <!-- end one file -->
-    <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="#">lecture 1 notes</a>
-        </div>
-        <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
-    <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="#">lecture 1 notes</a>
-        </div>
-        <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
-    <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="#">lecture 1 notes</a>
-        </div>
-        <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
-    <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="#">lecture 1 notes</a>
-        </div>
-        <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
-    <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="#">lecture 1 notes</a>
-        </div>
-        <div class="file-description">
-          this is a great file description, so much stuff, it will get cut off...
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
+    {% endfor %}
   </ul>
 
     {% if recent_files %}
