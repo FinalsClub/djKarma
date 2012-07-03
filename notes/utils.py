@@ -93,6 +93,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
 
     return json_result
 
+
 def processCsvTags(file, csvString):
     """ Retrieve or Create a tag corresponding to each string
         and assign it to file
@@ -113,9 +114,11 @@ def processCsvTags(file, csvString):
         file.tags.add(tag)
     return True
 
+
 def uploadForm(user):
     """ Creates an UploadFileForm and pre-populates the school field
         With the user's school, if available
+        is currently unused?
     """
     #print request.user.username
     user_profile = user.get_profile()
@@ -138,6 +141,7 @@ def uploadForm(user):
         # legitimate data is chosen
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return form
+
 
 def complete_profile_prompt(user_profile):
     """ Creates a list of prompts for the user to do to complete their profile
