@@ -491,3 +491,22 @@ def vote(request, file_pk):
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
 
+
+''' 
+    Search testing
+'''
+from haystack.query import SearchQuerySet
+from haystack.forms import HighlightedModelSearchForm
+
+def search(request):
+    results = []
+    form = HighlightedModelSearchForm()
+    q = request.GET.get("q", "")
+    if q != "":
+        #Exact match result:
+        results = SearchQuerySet().filter(content=q)
+
+        # Partial string matching!
+        #results = SearchQuerySet().autocomplete(content_auto='old')
+        print results
+    return render(request, 'search2.html', {"results": results, "form": form})

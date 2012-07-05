@@ -19,6 +19,15 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+from haystack.views import SearchView, search_view_factory
+from haystack.forms import ModelSearchForm
+from haystack.query import SearchQuerySet
+
+from notes.models import School
+
+# Example SearchQuerySet fed to Haystack's SearchView
+sqs = SearchQuerySet().highlight()
+
 # Be mindful of overly broad url patterns
 # Remember the trailing $ to avoid partial match
 
@@ -48,8 +57,18 @@ urlpatterns = patterns('',
     # Note View
     url(r'^file/(\d{1,99})$', 'notes.views.note'),
 
-    # Haystack Search
-    url(r'^haysearch/', include('haystack.urls')),
+    # Built-in Haystack Search
+    url(r'^haysearch$', include('haystack.urls')),
+    # Custom Haystack Search Test
+    url(r'^customhaysearch/', 'notes.views.search'),
+
+    # Example using standard SearcView with parameters
+    #url(r'^customhaysearch$', search_view_factory(
+    #    view_class=SearchView,
+    #    template='search2.html',
+    #    searchqueryset=sqs,
+    #    form_class=ModelSearchForm
+    #), name='haystack_search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),
