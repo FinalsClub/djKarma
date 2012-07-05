@@ -62,11 +62,11 @@
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+              <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
               <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
               <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
               <li class="divider"></li>
-              <li><a href="#">Sign out</a></li>
+              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
             </ul>
           </li>
         </ul>
@@ -84,8 +84,13 @@
 {% block scripts %}
 {% endblock %}
 
+{% include 'footer.html' %}
+
 <!-- modal dialogs -->
 {% include 'modal_upload.html' %}
+{% if user %}
+  {% include 'modal_share_karma.html' %}
+{% endif %}
 
 </body>
 </html>

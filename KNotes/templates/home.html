@@ -1,41 +1,91 @@
-{% extends "index.html" %}
+{% extends "new_index.html" %}
 {% load url from future %}
 
+{% block header %}
+
+<script type="text/javascript" src="static/js/jquery.jcarousel.min.js"></script>
+<script type="text/javascript" src="static/js/jquery.screwdefaultbuttons.min.js"></script>
+
+<script type="text/javascript">
+function mycarousel_initCallback(carousel) {
+  // Disable autoscrolling if the user clicks the prev or next button.
+  carousel.buttonNext.bind('click', function() {
+    carousel.startAuto(0);
+  });
+
+  carousel.buttonPrev.bind('click', function() {
+    carousel.startAuto(0);
+  });
+
+  // Pause autoscrolling if the user moves with the cursor over the clip.
+  carousel.clip.hover(function() {
+    carousel.stopAuto();
+  }, function() {
+    carousel.startAuto();
+  });
+};
+
+jQuery(document).ready(function() {
+  jQuery('#mycarousel').jcarousel({
+    vertical: true,
+    auto: 2,
+    scroll: 1,
+    wrap:'circular',
+    initCallback: mycarousel_initCallback
+  });
+});
+
+</script>
+{% endblock %}
+
 {% block content %}
+<div class="container">
 
-<div id="home">
-    <h1 class="title" style="margin-top:40px;">KarmaNotes</h1>
-    <br/><br/>
-    <img style="opacity:.8" src="/static/img/ohm.png"/>
-    <br/><br/>
-    <h2>{{stats.numStudyGuides}} Study Guides and {{stats.numNotes}} Notes</h2>
-    <br/>
-    <a style="font-size:20px; padding:10px" class="shadow btn btn-primary" href="{% url 'upload' %}">Upload a Note</a>
-    <br/><br/>
-
-    {% if recent_files %}
-      <h3>Recently Uploaded</h3>
-      <div id="recent-files" style="padding:10px;width:80%;text-align:center;margin-left:auto;margin-right:auto;">
-
-    {% for file in recent_files %}
-      <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
-        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
-        <div>
-        {% if file.type == "N" %}
-        Note
-        {% elif file.type == "S" %}
-        Syllabus
-        {% elif file.type == "E" %}
-        Exam
-        {% elif file.type == "G" %}
-        Study Guide
-        {% elif file.type == "A" %}
-        Assignment
-        {% endif %}
-        | {{file.school}}</div>
+  <div class="hero-unit">
+    <div class="vidholder">
+      <img src="http://placehold.it/350x280" width="350" height="280">
+    </div>
+    <div class="block">
+      <h1>Share notes.</h1>
+      <h1>Ace your exams.</h1>
+      <h2>Upload your notes to get instant access to over 503,933 study materials. Free.</h2>
+      <div class="call-to-action">
+        <a href="#" class="button">UPLOAD FILE</a>
+        <div class="instant">for instant access</div>
+        <div class="clear"></div>
+        <div class="dragdrop">Or drag + drop anywhere on this page</div>
       </div>
+      <div class="clear"></div>
+    </div> <!-- .block -->
+  </div> <!-- .hero-unit -->
+
+
+
+  <!-- uploads carousel -->
+  <h2>Recently uploaded notes</h2>
+
+  <ul id="mycarousel" class="jcarousel jcarousel-skin-tango">
+    {% for file in recent_files %}
+    <li> <!-- begin one file -->
+      <div class="file row-fluid">
+        <div class="file icon"></div>
+        <div class="file-title">
+          <a href="/file/{{ file.id }}">{{ file.title }}</a>
+        </div>
+        <div class="file-description">
+          {{ file.description }}
+        </div>
+        <div class="file-info-action hide row">
+          <div class="file-info">
+            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.username }}</a></span>
+            <span class="download"><a href="/file/{{ file.id }}"><i class="icon-paper-clip"></i>view file</a></span>
+            <span class="karma-points">-10 points</span>
+            <span class="views">{{ file.viewCount }} views</a>
+          </div> <!-- .file-info -->
+        </div> <!-- .file-info-action -->
+      </div> <!-- .file .row-fluid -->
+    </li> <!-- end one file -->
     {% endfor %}
-    </div> <!-- #recent-files -->
-    {% endif %}
+  </ul>
 </div> <!-- #home -->
 {% endblock %}
