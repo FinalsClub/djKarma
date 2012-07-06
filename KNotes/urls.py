@@ -58,17 +58,9 @@ urlpatterns = patterns('',
     url(r'^file/(\d{1,99})$', 'notes.views.note'),
 
     # Built-in Haystack Search
-    url(r'^haysearch$', include('haystack.urls')),
+    #url(r'^haysearch$', include('haystack.urls')),
     # Custom Haystack Search Test
-    url(r'^customhaysearch/', 'notes.views.search'),
-
-    # Example using standard SearcView with parameters
-    #url(r'^customhaysearch$', search_view_factory(
-    #    view_class=SearchView,
-    #    template='search2.html',
-    #    searchqueryset=sqs,
-    #    form_class=ModelSearchForm
-    #), name='haystack_search'),
+    url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     url(r'^searchBySchool$', 'notes.views.searchBySchool'),

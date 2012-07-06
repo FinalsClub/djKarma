@@ -496,17 +496,17 @@ def vote(request, file_pk):
     Search testing
 '''
 from haystack.query import SearchQuerySet
-from haystack.forms import HighlightedModelSearchForm
+from haystack.forms import SearchForm
 
 def search(request):
     results = []
-    form = HighlightedModelSearchForm()
+    form = SearchForm()
     q = request.GET.get("q", "")
     if q != "":
         #Exact match result:
-        results = SearchQuerySet().filter(content=q)
-
-        # Partial string matching!
-        #results = SearchQuerySet().autocomplete(content_auto='old')
+        #results = SearchQuerySet().filter(content__contains=q)
+        results = SearchQuerySet().filter(content_auto__contains=q)
+        # Partial string matching. Not yet working
+        #results = SearchQuerySet().autocomplete(content_auto=q)
         print results
     return render(request, 'search2.html', {"results": results, "form": form})
