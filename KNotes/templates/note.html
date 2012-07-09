@@ -1,6 +1,6 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 
-{% block scripts %} 
+{% block scripts %}
 <script>
 $(document).ready(function() {
 	// inject the note's html into the page
@@ -33,12 +33,43 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block content %}
-<div style="text-align:center">
-	<h1> {{ note.title }} </h1>
-	<h2> {{ note.course.title }} </h2>
-	<h3> {{ note.school }} </h3>
-	<div class='hero-unit' style="padding:5px;text-align:left;">
-		<iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
-	</div>
-</div>
+<div class="row">
+  {% include "sidebar.html" %}
+
+  <div class="span9">
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>{{ note.title }}</h2>
+        <div class="file-info-wrapper">
+          <h4>About this Class</h4>
+            <h3><a href="#">{{ note.class.title }}</a></h3>
+            <strong>{{ note.class.instructor }} | {{ note.school }}</strong>
+
+
+            <div class="class-info">
+              This class has <a href="#">{{ note.class.files.count }}</a>.
+              <p><span class="your-files">You have <a href="#">1 upload </a> and <a href="#">2 downloads</a></span> from this class. </p>
+            </div>
+
+          <h4>About this file</h4>
+          <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>USERNAME</a></div>
+          <div class="points-and-views">
+            <strong>Study Guide:</strong> <span class="karma-points">10 points</span>
+            <span class="views">{{ note.viewCount }} views</a>
+          </div>
+          <div class="file-actions">
+            {# TODO, connect these #}
+            <a href="#"><i class="icon-heart"></i>Like (5)</a>
+            <a href="#"><i class="icon-flag"></i>Flag</a>
+            <a href="#"><i class="icon-pencil"></i>Edit</a>
+            <a href="#"><i class="icon-remove-circle"></i>Delete</a>
+          </div>
+          <div class="clear"></div>
+        </div>
+        <div class="note-text">
+          {{ note.html|safe }}
+        </div> <!-- .note-text -->
+  </div> <!-- .span9 -->
+</div> <!-- .row -->
+
 {% endblock %}
