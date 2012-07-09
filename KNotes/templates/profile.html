@@ -1,4 +1,4 @@
-{% extends "new_index.html" %}
+{% extends "base.html" %}
 {% load url from future %}
 
 {% block title %}
@@ -48,7 +48,7 @@
     <div class="span3">
       <ul class="nav nav-list">
         <li class="active">
-          <a href="#">
+          <a href="/browse">
             <i class="icon-book"></i>
             Browse notes
           </a>
@@ -115,10 +115,12 @@
               {% else %}
               <select id="school-select" class="span2">
                 <option>Select year</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
+                <option>2011</option>
+                <option>2012</option>
+                <option>2013</option>
+                <option>2014</option>
+                <option>2015</option>
+                <option>2016</option>
               </select>
               {% endif %}
             </div>
@@ -130,13 +132,19 @@
     <div class="span9">
       <h2>Welcome, {{ user.username }}!</h2>
 
-      {# for message in messages #}
+      {# ------ Messages ------ #}
+      {% for message in messages %}
+      <div class="alert alert-success">
+        <button class="close" data-dismiss="alert">x</button>
+        {{ message }}
+      </div> <!-- .alert .alert-success -->
+      {% endfor %}
       <div class="alert alert-success">
         <button class="close" data-dismiss="alert">x</button>
         Success! <i class="icon-paper-clip"></i>
-        You've uploaded a file and gained <span class="karma-points">+5 points</span>. Would you like to <a href="#">upload another</a>?
+        Sample message for a success, you earned <span class="karma-points">+5 points</span>. Would you like to <a href="%">upload another</a>?
       </div> <!-- .alert .alert-success -->
-      {# endfor #}
+      {# ------ End Messages ------ #}
 
       <!-- Carousel items -->
       <div id="myCarousel" class="carousel slide">
