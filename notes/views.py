@@ -2,12 +2,13 @@
 
 import json
 
-from django import forms as djangoforms
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -24,6 +25,7 @@ from forms import SchoolForm
 from forms import InstructorForm
 from forms import ProfileForm
 from forms import FileMetaDataForm
+from forms import SmartSchoolForm
 from models import School
 from models import Course
 from models import File
@@ -51,7 +53,6 @@ def home(request):
 
 
 def about(request):
-    print "loading the about page"
     return render(request, 'static/about.html')
 
 ## :|: Uploading :|: &
@@ -84,6 +85,11 @@ def fileMeta(request):
             response = {}
             response["status"] = "success"
             response["file_pk"] = file.pk
+            if request.user.is_authenticated():
+                # This should let us use django's messaging system to do the alert-notifications
+                # in our design on upload success at the top of the profile
+                # FIXME: fix this message with proper html
+                messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
         else:
             response["form"] = form
             response["message"] = "Please check your form data."
@@ -143,66 +149,84 @@ def smartModelQuery(request):
                     return HttpResponse(json.dumps(response), mimetype="application/json")
     raise Http404
 
-
 @login_required
 def profile(request):
     """ User Profile """
-    # If user profile data has been submitted:
-    if request.method == 'POST':
-            #This must go before profile data calc
-            profile_form = ProfileForm(request.POST)
-            if profile_form.is_valid():
-                # Update user profile with form data
-                # Karma points will be added as necessary
-                # By UserProfile model
-                profile = request.user.get_profile()
-                profile.school = profile_form.cleaned_data['school']
-                #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
-                if not profile_form.cleaned_data['grad_year'] == "":
-                    profile.grad_year = profile_form.cleaned_data['grad_year']
-                profile.save()
+    response = {}
 
     # Calculate User's progress towards next Karma level
     # Depends on models.Level objects
     user_karma = request.user.get_profile().karma
-    levels = Level.objects.all()
+    levels = Level.objects.all() # FIXME: this query could contain the logic of the loop below
 
-    next_level = None
     for level in levels:
         if user_karma < level.karma:
-            next_level = level
+            response['next_level'] = level
             break
 
     # The user has reached the top level
-    if not next_level:
-        progress = 100
+    if not response['next_level']:
+        response['progress'] = 100
     else:
-        progress = (user_karma / float(next_level.karma)) * 100
+        response['progress'] = (user_karma / float(response['next_level'].karma)) * 100
 
     #Pre-populate ProfileForm with user's data
-    profile_data = {}
-    recent_files = []
+    response['profile_data'] = {}
     if request.user.get_profile().school != None:
-        profile_data['school'] = request.user.get_profile().school
+        response['profile_data']['school'] = request.user.get_profile().school
 
         # If user has a school selected, fetch recent additions to School
         # For the user's news feed
-        recent_files = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
+        response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
     if request.user.get_profile().grad_year != None:
-        profile_data['grad_year'] = request.user.get_profile().grad_year
+        response['profile_data']['grad_year'] = request.user.get_profile().grad_year
 
-    # The profile form has been submitted with updated profile info
+    # If user profile data has been submitted:
     if request.method == 'POST':
-        if not profile_form.is_valid():
-            # Return profile page with form + errors
-            return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'profile_data': profile_data})
+        # TODO: merge the other return into this IF
+        #This must go before profile data calc
+        profile_form = ProfileForm(request.POST)
+        if profile_form.is_valid():
+            # Update user profile with form data
+            # Karma points will be added as necessary
+            # By UserProfile model
+            profile = request.user.get_profile()
+            profile.school = profile_form.cleaned_data['school']
+            #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
+            if not profile_form.cleaned_data['grad_year'] == "":
+                profile.grad_year = profile_form.cleaned_data['grad_year']
+            profile.save()
+            response['profile_form'] = profile_form
     else:
         # If GET, Populate Profileform with existing profile data
-        profile_form = ProfileForm(initial=profile_data)
+        response['profile_form'] = ProfileForm(initial=response['profile_data'])
 
     user_profile = request.user.get_profile()
-    messages = complete_profile_prompt(user_profile)
-    return render(request, 'profile.html', {'progress': int(progress), 'next_level': next_level, 'profile_form': profile_form, 'recent_files': recent_files, 'messages': messages, 'profile_data': profile_data})
+    response['messages'] = complete_profile_prompt(user_profile)
+    response['user_profile'] = user_profile
+
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.hash)
+
+    response = get_upload_form(response)
+
+    # home built auto-complete
+    response['available_schools'] = [str(school.name) for school in School.objects.all()]
+    response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
+    return render(request, 'profile.html', response)
+
+def get_upload_form(response):
+    """ Appends forms required for upload form to response
+        The way to make this smooth is:
+            user types option in autocomplete field >
+            after 3 characters, we search that via ajax
+            user is presented with options
+            when user clicks one of the options or hits enter, submits and saves school on field
+            the submit button also triggers the course field to appear like the school
+            when course is selected / created submits and saves course to file
+            course submit makes the metadata section appear
+    """
+    response['school_form'] = SmartSchoolForm
+    return response
 
 
 def addCourseOrSchool(request):
@@ -271,6 +295,35 @@ def addCourseOrSchool(request):
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
+def register_invited(request, invite):
+    """ This is a full-page version of the registration page that has an
+        optional urlargument for the invite code.
+        The invite code is a hash on the UserProfile object.
+    """
+    if request.method == 'POST':
+        # Fill form with POSTed data
+        form = forms.UserCreationForm(request.POST)
+        if form.is_valid():
+            print 'form valid'
+            new_user = form.save() # Save the new user from form data
+            # Authenticate the new user
+            new_user = authenticate(username=request.POST['username'],
+                                    password=request.POST['password1'])
+            # Login in the new user
+            login(request, new_user)
+
+            # Grant the inviter some points
+            # TODO grant some points
+            return HttpResponseRedirect("/profile")
+        else:
+            # TODO: replace this with a version of the front page with a register form
+            return render(request, "registration/register.html", {
+        'form': form})
+    else:
+        form = forms.UserCreationForm()
+        # TODO: replace this with a version of the front page with a register form
+        return render(request, "registration/register.html", {'form': form})
+
 
 def register(request):
     """ Display user login and signup screens
@@ -324,12 +377,22 @@ def schools(request):
 
     raise Http404
 
+def jqueryui_courses(request):
+    """ Ajax: Course autocomplete for jqueryui.autocomplete """
+    # TODO: add optional filter by school and the javascript to support it
+    query = request.GET.get('term')
+    print "query %s" % query
+    courses = Course.objects.filter(title__icontains=query).distinct()
+    print "courses %s %s" % (len(courses), courses)
+    response =  [(course.id, course.title) for course in courses]
+    print json.dumps(response)
+    return HttpResponse(json.dumps(response), mimetype="application/json")
 
 def courses(request):
     """ Ajax: Course autocomplete form field """
-    if request.is_ajax():
+    if True:
         query = request.GET.get('q')
-        school_pk = request.GET.get('school', '0')
+        school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
         if school_pk == 0:
             courses = Course.objects.filter(title__icontains=query).distinct()
@@ -339,6 +402,7 @@ def courses(request):
         response = []
         for course in courses:
             response.append((course.pk, course.title))
+        print response
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
     raise Http404
@@ -397,8 +461,10 @@ def note(request, note_pk):
         profile.files.add(note)
         profile.save()
 
+    # This is ugly, but is needed to be able to get the note type full name
+    note_type = [t[1] for t in note.FILE_TYPES if t[0] == note.type][0]
     url = iri_to_uri(note.file.url)
-    return render(request, 'note.html', {'note': note, 'url': url})
+    return render(request, 'note.html', {'note': note, 'note_type': note_type, 'url': url})
 
 
 def searchBySchool(request):
