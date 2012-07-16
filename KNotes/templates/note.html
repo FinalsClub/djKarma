@@ -3,31 +3,31 @@
 {% block scripts %}
 <script>
 $(document).ready(function() {
-	// inject the note's html into the page
-	// this method is used to preserve css data
-	// in the source document without overriding
-	// KarmaNotes's css
-	var doc = $('#noteframe')[0].contentWindow.document;
-	var $body = $('body',doc);
-	$body.html('{{note.html|safe}}');
-	autoResize('noteframe');
+  // inject the note's html into the page
+  // this method is used to preserve css data
+  // in the source document without overriding
+  // KarmaNotes's css
+  var doc = $('#noteframe')[0].contentWindow.document;
+  var $body = $('body',doc);
+  $body.html('{{note.html|safe}}');
+  autoResize('noteframe');
 
-	// Resize the iframe upon html injection
-	// Note: IE6 does not support contentWindow
-	// Test this case
-	function autoResize(id){
-	    var newheight;
-	    var newwidth;
+  // Resize the iframe upon html injection
+  // Note: IE6 does not support contentWindow
+  // Test this case
+  function autoResize(id){
+    var newheight;
+    var newwidth;
 
-	    if(document.getElementById){
-	        newheight=document.getElementById(id).contentWindow.document .body.scrollHeight;
-	        newwidth=document.getElementById(id).contentWindow.document .body.scrollWidth;
-	    }
+    if(document.getElementById){
+      newheight=document.getElementById(id).contentWindow.document .body.scrollHeight;
+      newwidth=document.getElementById(id).contentWindow.document .body.scrollWidth;
+    }
 
-	    document.getElementById(id).height= (newheight) + "px";
-	    //document.getElementById(id).width= (newwidth) + "px";
-	    //alert('height: ' + newheight);
-		}
+    document.getElementById(id).height= (newheight) + "px";
+    //document.getElementById(id).width= (newwidth) + "px";
+    //alert('height: ' + newheight);
+    }
 });
 </script>
 {% endblock %}
