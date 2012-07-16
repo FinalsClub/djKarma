@@ -19,6 +19,10 @@ class Command(BaseCommand):
                 course.school = School.objects.filter(pk=1)[0]
                 do_save = True
                 self.stdout.write('Populated school for  %s \n' % course.title)
+            if course.semester == None:
+                course.semester = 1
+                do_save = True
+                self.stdout.write('Populated semester for  %s \n' % course.title)
             if do_save:
                 count += 1
                 course.save()
