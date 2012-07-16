@@ -496,17 +496,24 @@ def vote(request, file_pk):
     Search testing
 '''
 from haystack.query import SearchQuerySet
-from haystack.forms import SearchForm
+
 
 def search(request):
     results = []
-    form = SearchForm()
-    q = request.GET.get("q", "")
-    if q != "":
-        #Exact match result:
-        #results = SearchQuerySet().filter(content__contains=q)
-        results = SearchQuerySet().filter(content_auto__contains=q)
-        # Partial string matching. Not yet working
-        #results = SearchQuerySet().autocomplete(content_auto=q)
-        print results
-    return render(request, 'search2.html', {"results": results, "form": form})
+    # Process query and return results
+    if request.is_ajax():
+        q = request.GET.get("q", "")
+        print "searching for: " + q
+        if q != "":
+            #Exact match result:
+            #results = SearchQuerySet().filter(content__contains=q)
+            results = SearchQuerySet().filter(content_auto__contains=q)
+            # Partial string matching. Not yet working
+            #results = SearchQuerySet().autocomplete(content_auto=q)
+            #print results
+            if len(results) == 0:
+                return HttpResponse("No Results")
+            else:
+                return TemplateResponse(request, 'search_results.html', {"results": results})
+        raise Http404
+    return render(request, 'search2.html')

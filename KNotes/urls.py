@@ -55,7 +55,7 @@ urlpatterns = patterns('',
     url(r'^profile$', 'notes.views.profile', name='profile'),
 
     # Note View
-    url(r'^file/(\d{1,99})$', 'notes.views.note'),
+    url(r'^file/(\d{1,99})$', 'notes.views.note', name='file'),
 
     # Built-in Haystack Search
     #url(r'^haysearch$', include('haystack.urls')),

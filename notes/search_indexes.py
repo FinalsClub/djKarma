@@ -4,7 +4,7 @@ Index descriptions to make various models searchable.
 from haystack.indexes import *
 from haystack.fields import EdgeNgramField
 from haystack import site
-from models import School, Course
+from models import School, Course, File
 
 
 class SchoolIndex(SearchIndex):
@@ -17,7 +17,7 @@ class SchoolIndex(SearchIndex):
     # See ./KNotes/templates/search/indexes/notes/school_text.txt
     text = CharField(document=True, use_template=True)
 
-    # An EdgeNgramField for autocomplete queries
+    # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='name')
 
     # Example custom queryset for objects to add to index
@@ -32,7 +32,7 @@ class SchoolIndex(SearchIndex):
 class CourseIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
 
-    # An EdgeNgramField for autocomplete queries
+    # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='title')
 
     # Non document fields allow for search filtering
@@ -42,5 +42,13 @@ class CourseIndex(SearchIndex):
     academic_year = IntegerField(model_attr='academic_year')
 
 
+class FileIndex(SearchIndex):
+    text = CharField(document=True, use_template=True)
+
+    # An EdgeNgramField for partial-match queries
+    content_auto = EdgeNgramField(model_attr='title')
+
+
+site.register(File, FileIndex)
 site.register(School, SchoolIndex)
 site.register(Course, CourseIndex)
