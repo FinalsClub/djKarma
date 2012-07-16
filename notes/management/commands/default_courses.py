@@ -13,12 +13,12 @@ class Command(BaseCommand):
             if course.academic_year == None:
                 course.academic_year = 2012
                 do_save = True
-                self.stdout.write('Populated academic year for  %s' % course.title)
+                self.stdout.write('Populated academic year for  %s \n' % course.title)
             if course.school == None:
                 # if null, set the school to Harvard
                 course.school = School.objects.filter(pk=1)[0]
                 do_save = True
-                self.stdout.write('Populated school for  %s' % course.title)
+                self.stdout.write('Populated school for  %s \n' % course.title)
             if do_save:
                 count += 1
                 course.save()
