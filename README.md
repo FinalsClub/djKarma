@@ -29,7 +29,7 @@ Deployment
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
-### Deployment database ###
+### Deployment database
 To initially deploy the postgres backup on a fresh debian based system:
 ```
 sudo apt-get install postgresql-9.1 python-psycopg2
@@ -43,7 +43,15 @@ local   karmanotes      djkarma                                 md5
 sudo service postgresql restart
 ./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
 ```
-### Search: Apache Solr ###
+### Search: Apache Solr 3.6.0
+
+#### Installation
+
+see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html).
+
+#### Maintaining the Search Index
+
+see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html). Also the [Django Haystack note](http://django-haystack.readthedocs.org/en/v1.2.7/tutorial.html#reindex) on maintaining the index.
 
 When changes are made to the search index schema (./notes/search_indexes.py), the index must be rebuilt (similiar to models.py and database migrations).
 
@@ -61,8 +69,7 @@ When changes are made to the search index schema (./notes/search_indexes.py), th
 
 2. Restart Solr.
 
-
-### Celery Task Server ###
+### Celery Task Server
 
 
 The celery task server asynchronously handles the Google Documents API processing so the main django server remains responsive. When a document is uploaded via /upload, the django app (specifically the custom django-ajax-uploader backend) will ask the celery server to upload the document (now on the local server) to Google and await their response. The code which the celery server executes is actually located in ./notes/tasks.py
@@ -114,26 +121,31 @@ Note on Creating a Development DB from Production DB
 
 If you'd like to copy the current production database and use it during your development:
 
-### ON PRODUCTION MACHINE: ###
+### On Production Machine:
 
 1. ssh into production project root
-2. Note the git state of the production project (with git log or likewise). NOTE: ignore merges performed by system users (Author will be a system user, not a GitHub user).
+2. Note the git state of the production project (with git log or likewise). NOTE: ignore merges performed by production system users (Commits where Author is a system username not a GitHub username).
 3. python manage.py dumpdata notes --exclude notes.userprofile > ~/dumps.json. Transfer dumps.json to development machine.
 
-### ON DEVELOPMENT MACHINE: ###
+### On Development Machine:
 
-4. checkout the commit corresponding to the production project state
-5. Make sure south is commented out in settings.INSTALLED_APPS
-5. manage.py syncdb (do NOT create superuser when prompted)
-6a. IF syncdb loads fixtures, manage.py createsuperuser
-6b. ELSE manage.py loaddata ./path/to/fixtures.json (or initial_data.json. The name's changed throughout the project history). Then manage.py createsuperuser
-7. manage.py loaddata ~/dumps.json 
+1. checkout the commit corresponding to the production project state
+2. Make sure south is commented out in settings.INSTALLED_APPS
+3. manage.py syncdb (do NOT create superuser when prompted)
+		
+	+ If syncdb loads fixtures: 
+	    a. manage.py createsuperuser
+	+ Else:
+		a. manage.py loaddata ./path/to/fixtures.json 
+		    + *Note:* fixtures.json was initial_data.json earlier in the project history. 
+		b. Then manage.py createsuperuser
+4. manage.py loaddata ~/dumps.json 
 
-8. Now un-comment south from settings.INSTALLED_APPS and manage.py syncdb
-9. manage.py convert_to_south notes
-10. git pull origin master
-11. manage.py schemamigration notes --auto
-11a. if schemamigration prompts you for a default value. i.e: 
+5. Now un-comment south from settings.INSTALLED_APPS and manage.py syncdb
+6. manage.py convert_to_south notes
+7. git pull origin master
+8. manage.py schemamigration notes --auto
+9. if schemamigration prompts you for a default value. i.e: 
 	
 		Added field owner on notes.File
 		? The field 'File.type' does not have a default specified, yet is NOT NULL.
@@ -146,7 +158,7 @@ If you'd like to copy the current production database and use it during your dev
  	
  	Simply enter 2 and enter a one-off value (In this case 'N' for Note) if you understand the data model. Else specify 3. In development, losing the ability to backwards migrate is not a big deal.
 
-12) manage.py migrate notes
+10. manage.py migrate notes
 
 
 Note on Google Documents API
@@ -163,7 +175,7 @@ Style compilation
 -----------------
 To recompile css from the less source files, install the latest Node js, which comes with the npm package manager and install 'less'
 
-# TODO automate this process, either with a make script or as a django ./manage.py command
+## TODO automate this process, either with a make script or as a django ./manage.py command
 
 less source files live in `djKarma/static/less` To recompile `style.css`, you must install lessc
 
