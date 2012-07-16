@@ -16,7 +16,7 @@ class Command(BaseCommand):
                 self.stdout.write('Populated academic year for  %s' % course.title)
             if course.school == None:
                 # if null, set the school to Harvard
-                course.school = School.objects.filter(pk=1)
+                course.school = School.objects.filter(pk=1)[0]
                 do_save = True
                 self.stdout.write('Populated school for  %s' % course.title)
             if do_save:
