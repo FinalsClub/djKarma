@@ -215,6 +215,8 @@ post_delete.connect(decrement, sender=Course)
 
 class File(models.Model):
 
+    # FIXME: list of tuples can't be addressed, dicts can
+    # FILE_TYPES['N']
     FILE_TYPES = (
         ('N', 'Note'),
         ('S', 'Syllabus'),
