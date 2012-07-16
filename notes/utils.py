@@ -1,11 +1,12 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
-from django.contrib.auth.models import User
-from models import School, Course, File, Tag
-from forms import UploadFileForm
 from django import forms as djangoforms
-from simple_autocomplete.widgets import AutoCompleteWidget
+from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from forms import UploadFileForm
+from simple_autocomplete.widgets import AutoCompleteWidget
+
+from models import School, Course, File, Tag
 from notes import profile_tasks
 
 
@@ -35,7 +36,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
         json_result["title"] = model.title
         json_result["notes"] = []
         if(depth > 0):
-            for note in model.file_set.all().order_by('-timestamp'):
+            for note in model.files.all().order_by('-timestamp'):
                 note_json = jsonifyModel(model=note, user_pk=user_pk)
                 json_result["notes"].append(note_json)
     elif isinstance(model, File):
@@ -142,7 +143,6 @@ def uploadForm(user):
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return form
 
-
 def complete_profile_prompt(user_profile):
     """ Creates a list of prompts for the user to do to complete their profile
         Takes a User object
@@ -156,5 +156,3 @@ def complete_profile_prompt(user_profile):
     # return list of message prompts for the user to be told on the profile page
     messages = [task.message for task in profile_todo]
     return messages
-
-

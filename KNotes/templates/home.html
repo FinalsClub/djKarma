@@ -70,33 +70,7 @@ jQuery(document).ready(function() {
       <div class="file row-fluid">
         <div class="file icon"></div>
         <div class="file-title">
-          <a href="#">{{ file.title }}</a>
-        </div>
-        <div class="file-description">
-          {{ file.description }}
-        </div>
-        <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>username</a></span>
-            <span class="download"><a href="#"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">405 views</a>
-          </div> <!-- .file-info -->
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
-    </li> <!-- end one file -->
-    {% endfor %}
-  </ul>
-
-    {% if recent_files %}
-      <h3>Recently Uploaded</h3>
-      <div id="recent-files" style="padding:10px;width:80%;text-align:center;margin-left:auto;margin-right:auto;">
-
-    {% for file in recent_files %}
-      <div class="file row-fluid">
-        <div class="file icon"></div> {# TODO: use file.type to denote icon type #}
-        <div class="file-title">
-          <a href="/file/{{ file.pk }}">{{ file.title }}</a>
+          <a href="/file/{{ file.id }}">{{ file.title }}</a>
         </div>
         <div class="file-description">
           {{ file.description }}
@@ -104,31 +78,14 @@ jQuery(document).ready(function() {
         <div class="file-info-action hide row">
           <div class="file-info">
             <span class="user">uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.username }}</a></span>
-            <span class="download"><a href="#/file/{{ file.pk }}"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">10 points</span>
-            <span class="views">405 views</a>
+            <span class="download"><a href="/file/{{ file.id }}"><i class="icon-paper-clip"></i>view file</a></span>
+            <span class="karma-points">-10 points</span>
+            <span class="views">{{ file.viewCount }} views</a>
           </div> <!-- .file-info -->
         </div> <!-- .file-info-action -->
       </div> <!-- .file .row-fluid -->
-
-      <div class="breadcrumb" style="display:inline-block; padding:8px;border:1px solid gray;">
-        <div><a href="/file/{{file.pk}}">{{file.title}}</a></div>
-        <div>
-        {% if file.type == "N" %}
-        Note
-        {% elif file.type == "S" %}
-        Syllabus
-        {% elif file.type == "E" %}
-        Exam
-        {% elif file.type == "G" %}
-        Study Guide
-        {% elif file.type == "A" %}
-        Assignment
-        {% endif %}
-        | {{file.school}}</div>
-      </div>
+    </li> <!-- end one file -->
     {% endfor %}
-    </div> <!-- #recent-files -->
-    {% endif %}
+  </ul>
 </div> <!-- #home -->
 {% endblock %}

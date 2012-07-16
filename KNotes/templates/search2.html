@@ -1,0 +1,45 @@
+{% extends "new_index.html" %}
+{% load url from future %}
+
+{% block content %}
+<div class="search-page container" id="container">
+  <div class="row">
+  	<form class="search-form" method="get" action="/search">
+          <input placeholder="Search Schools, Courses, and Files" style="margin-left:auto;margin-right:auto;font-size:18px;padding:10px; width:50%" type="text" name="q" id="id_q">
+    </form>
+  </div>
+  <div class="row results" id="results-container">
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+var callback = function(data){
+  console.log(data);
+  $('#results-container').fadeOut('fast', function(){
+    $('#results-container').html(data).fadeIn('fast');
+  });
+  
+};
+    $('#container').on("submit", "form", function(){
+      event.preventDefault(); // ensure no DOM handling
+        if($(this).hasClass("search-form")){
+          ajaxQuery($('#id_q').val(), callback);
+          return false; // do not pass event on to DOM handler
+        }
+    });
+
+
+function ajaxQuery(query, callback){
+  $.ajax({
+    url: "/search",
+    data: {'q': query },
+    success: callback
+  });
+}
+
+</script>
+{% endblock %}

@@ -43,11 +43,24 @@ local   karmanotes      djkarma                                 md5
 sudo service postgresql restart
 ./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
 ```
-### Deploying Solr ###
+### Search: Apache Solr ###
 
-1. You can generate the schema from the django application (once Haystack is installed and setup) by running ./manage.py build_solr_schema. 
-2. Take the output from that command and place it in apache-solr-1.4.1/example/solr/conf/schema.xml. 
-3. Restart Solr.
+When changes are made to the search index schema (./notes/search_indexes.py), the index must be rebuilt (similiar to models.py and database migrations).
+
+
+**Rebuilding the search index after modifying ./notes/search_indexes.py:**
+
+1. You can generate the schema from the django application (once Haystack is installed and setup) by running:
+
+		 ./manage.py build_solr_schema > /path/to/solr/conf/schema.xml
+		 
+	*Dev note*: With Solr installed using Homebrew on Mac OS X, the default path will be:
+        
+        /usr/local/Cellar/solr/3.6.0/libexec/example/solr/conf/schema.xml
+		 
+
+2. Restart Solr.
+
 
 ### Celery Task Server ###
 

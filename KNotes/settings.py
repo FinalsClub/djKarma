@@ -270,7 +270,7 @@ INSTALLED_APPS = (
     'djcelery',     # Django-Celery apps:
     'kombu.transport.django',
     # Not sure this is necessary, yet
-    #'haystack',
+    'haystack',
 
     # our app(s)
     'notes',
@@ -287,7 +287,7 @@ if DEPLOY:
 else:
     CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
 
-'''
+
 ### HAYSTACK Configuration
 HAYSTACK_SITECONF = 'notes.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'solr'
@@ -296,7 +296,7 @@ HAYSTACK_SEARCH_ENGINE = 'solr'
 HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
 # ...or for multicore...
 #HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/mysite'
-'''
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.

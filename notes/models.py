@@ -11,6 +11,8 @@ from django.template.defaultfilters import slugify
 from social_auth.backends.facebook import FacebookBackend
 from social_auth.signals import socialauth_registered
 
+from model_utils import fast_hash
+
 
 class Level(models.Model):
     """ Define User Levels
@@ -194,7 +196,7 @@ class Course(models.Model):
     url             = models.URLField(max_length=511, blank=True)
     field           = models.CharField(max_length=255, blank=True, null=True)
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
-    academic_year   = models.IntegerField(blank=True, null=True)
+    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
 
     def __unicode__(self):
@@ -245,7 +247,7 @@ class File(models.Model):
     numDownVotes = models.IntegerField(default=0)
     type        = models.CharField(blank=True, null=True, max_length=1, choices=FILE_PTS, default='N')
     # User who uploaded the document
-    owner       = models.ForeignKey(User, blank=True, null=True)
+    owner       = models.ForeignKey(User, blank=True, null=True, related_name='notes')
     # has the html content been escaped?
     # This is to assure we don't double escape characters
     cleaned     = models.BooleanField(default=False)
@@ -264,6 +266,12 @@ class File(models.Model):
             # TODO: Check this security
             self.html = re.escape(self.html)
             self.cleaned = True
+
+        if self.course and self.owner:
+            # if course and owner, add course to owner's courses
+            user_profile = self.owner.get_profile()
+            user_profile.courses.add(self.course)
+            user_profile.save()
 
         super(File, self).save(*args, **kwargs)
 
@@ -322,7 +330,8 @@ class UserProfile(models.Model):
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # change to 1 when all UserProfileTodos
+    # unique 6 char hex value for invites
+    hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -341,8 +350,11 @@ class UserProfile(models.Model):
     can_comment = models.BooleanField(default=False)
     can_moderate = models.BooleanField(default=False)
 
-    #user-submitted files and those the user has "paid for"
+    # user-submitted files and those the user has "paid for"
     files = models.ManyToManyField(File, blank=True, null=True)
+
+    # courses a user is currently, or has been enrolled
+    courses = models.ManyToManyField(Course, null=True)
 
     # Keep record of if user has added school / grad_year
     # Filling out these fields awards karma
@@ -461,6 +473,11 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
+############################## ##############################
+#
+# Model extra utilities
+#
+############################## ##############################
 
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
@@ -490,3 +507,4 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
+

@@ -65,21 +65,16 @@
             Some other link
           </a>
         </li>
+        <li>
+          <a href="#share" class="karma" data-toggle="modal">
+            <i class="icon-user"></i>
+            Share KarmaNotes
+            <div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
+          </a>
+        </li>
       </ul>
-      <div class="social-share">
-        <h3>Share Karma Notes</h3>
-        <p>Spread the love. Share your invite link, invite Facebook friends, and gain <span class="karma-points">+5 points</span> per signup!</p>
-        <strong>Your Link (Copy + Paste):</strong>
-        <input id="social-link" type="text" value="http://karmanotes.org/40201" name"social-link" class="span3">
-        <a id="fb-link" name="fb_share" type="icon_link" share_url="http://karmanotes.org/40201">
-          <strong>Share on Facebook</strong>
-        </a>
-        <br />
-
-      </div> <!-- .social-share -->
 
       <h3>Profile</h3>
-
       <ul class="thumbnails">
         <li class="span3">
           <div class="thumbnail">
@@ -188,15 +183,16 @@
       <!-- one course -->
       <div class="course-listing">
         {# this is an example string to loop over (length of your username #}
-        {% for course in user.username %}
+        {% for course in user_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
             <img src="/static/img/icon-folder.png">
           </div>
           <div class="course-title">
-            <a href="#">{# course.title #}Underwater Basket Weaving While Having an Existential Crisis</a>
+            <a href="#">{{ course.title }}</a>
             <div class="course-info">
-              <span class="instructor">{# course.instructor #}Chris Hansen</span> <i class="icon-paper-clip"></i><a href="#">{# course.files.count() provides this now #}21 notes</a>
+              <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
+              {# TODO: not yet implemented downloaded files #}
               <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
             </div> <!-- .course-info -->
           </div> <!-- .course-title -->
@@ -267,15 +263,6 @@
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 
-
-
-
-
 </div> <!-- .profile-page .container -->
-
-
-
-<!-- running line of old and new
-@#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ @#$%^ -->
 
 {% endblock %}
