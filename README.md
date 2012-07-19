@@ -26,6 +26,7 @@ Deployment
     ./manage.py migrate kombu.transport.django
 5. Create superuser. `./manage.py createsuperuser
 6. Start celery task server (see Note)
+7. Start Apache Solr search engine (see section)
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
@@ -48,6 +49,7 @@ sudo service postgresql restart
 #### Installation
 
 see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html).
+
 
 #### Maintaining the Search Index
 

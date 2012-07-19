@@ -507,7 +507,7 @@ def search(request):
         if q != "":
             #Exact match result:
             #results = SearchQuerySet().filter(content__contains=q)
-            results = SearchQuerySet().filter(content_auto__contains=q)
+            results = SearchQuerySet().filter(content_auto__contains=q).order_by('django_ct')
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=q)
             #print results

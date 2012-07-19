@@ -17,29 +17,54 @@
 {% block scripts %}
 <script type="text/javascript">
 
-var callback = function(data){
-  console.log(data);
-  $('#results-container').fadeOut('fast', function(){
-    $('#results-container').html(data).fadeIn('fast');
-  });
-  
-};
-    $('#container').on("submit", "form", function(){
-      event.preventDefault(); // ensure no DOM handling
-        if($(this).hasClass("search-form")){
-          ajaxQuery($('#id_q').val(), callback);
-          return false; // do not pass event on to DOM handler
-        }
+  $(document).ready(function(){
+
+    $('.dropdown-toggle').dropdown();
+
+    // replace above listener with below
+    $('#container').on("hover","div.file.row-fluid", function(){
+      $(this).children('.file-info-action').toggleClass("hide");
     });
 
+    $("div.showmore").click(function () {
+            $(this).nextAll('div.file').slideToggle('slow');
+      });
 
-function ajaxQuery(query, callback){
-  $.ajax({
-    url: "/search",
-    data: {'q': query },
-    success: callback
+    $('input:radio').screwDefaultButtons({
+                 checked: "url(/static/img/check.jpg)",
+                 unchecked: "",
+                 width: 50,
+                 height: 50
+              });
+
+    $('#container').on("submit", "form", function(){
+    event.preventDefault(); // ensure no DOM handling
+      if($(this).hasClass("search-form")){
+        ajaxQuery($('#id_q').val(), callback);
+        return false; // do not pass event on to DOM handler
+      }
+    });
+
   });
-}
 
-</script>
+  // handle search response
+  var callback = function(data){
+    console.log(data);
+    $('#results-container').fadeOut('fast', function(){
+      $('#results-container').html(data).fadeIn('fast');
+    });
+  
+  };
+
+  // perform ajax /search query
+  function ajaxQuery(query, callback){
+    $.ajax({
+      url: "/search",
+      data: {'q': query },
+      success: callback
+    });
+  }
+  </script>
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
+  <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"> </script>
 {% endblock %}
