@@ -21,7 +21,7 @@
 
     $('.dropdown-toggle').dropdown();
 
-    // replace above listener with below
+    // Show file action bar on hover
     $('#container').on("hover","div.file.row-fluid", function(){
       $(this).children('.file-info-action').toggleClass("hide");
     });
@@ -60,7 +60,7 @@
   function ajaxQuery(query, callback){
     $.ajax({
       url: "/search",
-      data: {'q': query },
+      data: {'q': query, 'user': {{request.user.pk}}},
       success: callback
     });
   }

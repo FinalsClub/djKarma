@@ -1,3 +1,4 @@
+{% load check_file_ownership %}
 {% for result in results %}
 <!-- if result is a File -->
 {% if result.object.viewCount %}
@@ -17,15 +18,22 @@
     <div class="file-info">
       <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{result.object.owner.get_profile.getName }}</a></span>
       <span class="download"><a href="/file/{{result.object.pk}}"><i class="icon-paper-clip"></i>View file</a></span>
+      {% if not result.object|ownedBy:user_pk %}
       <span class="karma-points">-10 points</span>
       <span class="views">{{result.object.viewCount}} Views
-    </span></div>
-    <div class="file-actions">
-      <a href="#"><i class="icon-heart"></i>Like ({{result.object.numUpVotes}})</a>
-      <a href="#"><i class="icon-flag"></i>Flag</a>
-      <a href="#"><i class="icon-pencil"></i>Edit</a>
-      <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-    </div>
+      </span></div>
+      {% else %}
+      <span class="karma-points">OWNED</span>
+      <span class="views">{{result.object.viewCount}} Views
+      </span></div>
+      <div class="file-actions">
+        <a href="#"><i class="icon-heart"></i>Like ({{result.object.numUpVotes}})</a>
+        <a href="#"><i class="icon-flag"></i>Flag</a>
+        <a href="#"><i class="icon-pencil"></i>Edit</a>
+        <a href="#"><i class="icon-remove-circle"></i>Delete</a>
+      </div>
+      {% endif %}
+
   </div> <!-- .file-info-action hide row -->
 </div>
 <!-- if result is a Course -->

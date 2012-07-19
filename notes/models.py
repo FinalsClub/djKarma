@@ -275,6 +275,14 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
+    def ownedBy(user_pk):
+        """ Returns true if the user owns or has "paid" for this file
+        """
+        # If the file is in the user's collection, or the user owns the file
+        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=self.pk).exists():
+            return True
+        return False
+
     def Vote(self, voter, vote_value=0):
         """ Calls UserProfile.awardKarma
             with the appropriate ReputationEventType slug title("upvote", "downvote")
