@@ -32,7 +32,6 @@ sqs = SearchQuerySet().highlight()
 # Remember the trailing $ to avoid partial match
 
 urlpatterns = patterns('',
-
     # Landing page.
     url(r'^$', 'notes.views.home'),
 

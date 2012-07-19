@@ -73,6 +73,11 @@
     });
 
   });
+
+<<<<<<< HEAD
+</script>
+{% endblock %}
+=======
   // handle search response
   var callback = function(data){
     console.log(data);
@@ -94,3 +99,4 @@
   <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
   <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"> </script>
 {% endblock %}
+>>>>>>> 7935f62fa73613caf28d6e0b2cd636c6c1779e68
