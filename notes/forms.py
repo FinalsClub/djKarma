@@ -29,6 +29,8 @@ class FileMetaDataForm(forms.Form):
     captcha     = MathCaptchaField(required=True, \
                     error_messages={'required': 'Prove you\'re probably a human.'})
     in_course = forms.BooleanField(required=False, label='I\'m currently in this course')
+    # only show this for new users, or the first time a user uploads. We should stores this on the userprofile
+    # That would require us to create a special user type, called the Zero User 
     agree       = forms.BooleanField(required=True, \
                     label='I Agree to the Terms of Use',
                     error_messages={'required': 'We aren\'t evil, check out the Terms.'})
@@ -220,6 +222,19 @@ class InstructorForm(forms.ModelForm):
     class Meta:
         model = Instructor
 
+class SmartSchoolForm(forms.Form):
+    """ Making a autocomplete field for just school as part of the upload process
+    """
+    # FIXME: terrible name
+    school = forms.ModelChoiceField(
+        queryset=School.objects.all(),
+        widget=AutoCompleteWidget(
+            url='/schools',
+            initial_display=''
+        ),
+        error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
+                        'required': 'Enter a school.'},
+    )
 
 # Upload file form
 class UploadFileForm(forms.Form):
