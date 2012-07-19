@@ -18,10 +18,10 @@
       <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{result.object.owner.get_profile.getName }}</a></span>
       <span class="download"><a href="/file/{{result.object.pk}}"><i class="icon-paper-clip"></i>View file</a></span>
       <span class="karma-points">-10 points</span>
-      <span class="views">{{result.object.viewCount}}
+      <span class="views">{{result.object.viewCount}} Views
     </span></div>
     <div class="file-actions">
-      <a href="#"><i class="icon-heart"></i>Like (5)</a>
+      <a href="#"><i class="icon-heart"></i>Like ({{result.object.numUpVotes}})</a>
       <a href="#"><i class="icon-flag"></i>Flag</a>
       <a href="#"><i class="icon-pencil"></i>Edit</a>
       <a href="#"><i class="icon-remove-circle"></i>Delete</a>
@@ -37,8 +37,9 @@
   <div class="course-title">
     <a href="#">{{result.object.title}}</a>
     <div class="course-info">
-      <span class="instructor">{{result.object.instructor.name}}</span> <i class="icon-paper-clip"></i><a href="#">{{ result.object__file_set.all|length}}</a>
-      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+      <span class="instructor">{{result.object.instructor.name}}</span> <i class="icon-paper-clip"></i><a href="#">{{ result.object.files.all|length}} notes</a>
+      <!-- TODO: Determine how to mash in user data
+      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
     </div>
   </div>
   <div class="upload">
@@ -57,7 +58,8 @@
     <a href="#">{{result.object.name}}</a>
     <div class="school-info">
       <span class="location">{{result.object.location}}</span> <i class="icon-paper-clip"></i><a href="#">{{ result.object__course_set.all|length}}</a>
-      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+      <!-- TODO: Determine how to mash in user data
+      <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>-->
     </div>
   </div>
   <div class="upload">
