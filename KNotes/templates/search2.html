@@ -64,7 +64,7 @@
       $.ajax({
         // /vote/note_pk?v=vote_value
         url: "/vote/"+file_pk,
-        data: {'vote': vote, 'user':{{request.user.pk}} },
+        data: {'vote': vote {% if request.user.is_authenticated%}, 'user':{{request.user.pk}} {% endif %} },
         success: function(data) {
           alert(data);
         },
