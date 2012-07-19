@@ -186,3 +186,12 @@ less source files live in `djKarma/static/less` To recompile `style.css`, you mu
 You will now have the command lessc available to you. run this command from the root of the project repo
 
     lessc ./static/less/styles.less ./static/css/styles.css
+   
+  
+Management Commands (manage.py \<command name>)
+-----------------------------------
++ **default_courses**: Assign default values to Course fields required by Solr indexing, but not enforced by models.py spec.
+   + Checks School, Academic Year, Semester fields of all Course objects.
++ **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
+   + Necessary when a backup of the notes app database is made separate of the User table 
+
