@@ -6,3 +6,4 @@
 /uploads
 /notes/migrations
 *local_settings.py
+/static

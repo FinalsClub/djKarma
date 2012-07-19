@@ -25,7 +25,7 @@ from forms import SchoolForm
 from forms import InstructorForm
 from forms import ProfileForm
 from forms import FileMetaDataForm
-from forms import SmartSchoolForm
+#from forms import SmartSchoolForm
 from models import School
 from models import Course
 from models import File
