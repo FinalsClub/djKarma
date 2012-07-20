@@ -190,7 +190,7 @@
       <!-- BEGIN COURSE LISTINGS -->
       <!-- one course -->
       <div class="course-listing">
-        {# this is an example string to loop over (length of your username #}
+        <h3>Your Courses</h3>
         {% for course in user_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
@@ -201,7 +201,8 @@
             <div class="course-info">
               <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
               {# TODO: not yet implemented downloaded files #}
-              <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
+              <!--
+              <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
             </div> <!-- .course-info -->
           </div> <!-- .course-title -->
 
@@ -215,7 +216,7 @@
 
       <!-- begin file listing structure
       *** INACTIVE courses have "inactive" class in the wrapper
-      and icon name is icon-folder-inactive.png -->
+      and icon name is icon-folder-inactive.png
       {# replace this with an IF in for course in courses loop #}
 
       <div class="course inactive" data-toggle="collapse" data-target="#course-unique-1">
@@ -234,10 +235,10 @@
         </div>
         <div style="clear:both"></div>
       </div>
-      <!-- end INACTIVE courses -->
+      end INACTIVE courses -->
 
       <div class="file-listing collapse in" id="course-unique-1">
-
+        <!--
         {# makes a file for letter in your username #}
         {% for file in user.username %}
         <div class="file row-fluid">
@@ -267,7 +268,7 @@
             </div>
           </div> <!-- .file-info-action hide row -->
         </div> <!-- .file .row-fluid -->
-        {% endfor %}
+        <!-- {% endfor %} -->
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 
