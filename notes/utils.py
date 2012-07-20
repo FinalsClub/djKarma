@@ -36,7 +36,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
         json_result["title"] = model.title
         json_result["notes"] = []
         if(depth > 0):
-            for note in model.file_set.all().order_by('-timestamp'):
+            for note in model.files.all().order_by('-timestamp'):
                 note_json = jsonifyModel(model=note, user_pk=user_pk)
                 json_result["notes"].append(note_json)
     elif isinstance(model, File):

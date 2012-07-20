@@ -1,0 +1,103 @@
+{% extends "new_index.html" %}
+{% load url from future %}
+
+{% block content %}
+<div class="search-page container" id="container">
+  <div class="row">
+  	<form class="search-form" method="get" action="/search">
+          <input placeholder="Search Schools, Courses, and Files" style="margin-left:auto;margin-right:auto;font-size:18px;padding:10px; width:50%" type="text" name="q" id="id_q">
+    </form>
+  </div>
+  <div class="row results" id="results-container">
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+    $('.dropdown-toggle').dropdown();
+
+    // Show file action bar on hover
+    $('#container').on("hover","div.file.row-fluid", function(){
+      $(this).children('.file-info-action').toggleClass("hide");
+    });
+
+    $("div.showmore").click(function () {
+            $(this).nextAll('div.file').slideToggle('slow');
+      });
+
+    $('input:radio').screwDefaultButtons({
+                 checked: "url(/static/img/check.jpg)",
+                 unchecked: "",
+                 width: 50,
+                 height: 50
+              });
+
+    // Handle search form submit
+    $('#container').on("submit", "form", function(){
+    event.preventDefault(); // ensure no DOM handling
+      if($(this).hasClass("search-form")){
+        ajaxQuery($('#id_q').val(), callback);
+        return false; // do not pass event on to DOM handler
+      }
+    });
+
+    // Handle file-action icon clicks
+    $('#container').on("click",".vote", function(){
+      // determine file corresponding to this row
+      {% if user.is_authenticated %}
+      file_pk = $(this).closest('.file-info-action').attr("id");
+      console.log($(this));
+      
+      vote = 0;
+      // like -- upvote
+      if($(this).hasClass("upvote")){
+        vote = 1;
+      }
+      // flag -- downvote
+      else if($(this).hasClass("downvote")){
+        vote = -1;
+      }
+      $.ajax({
+        // /vote/note_pk?v=vote_value
+        //flying fuck
+        url: "/vote/"+file_pk,
+        data: {'vote': vote, 'user':{{ user.pk}} },
+        success: function(data) {
+          alert(data);
+        },
+        dataType: "text"
+      });
+
+      {% else %}
+      alert("You must sign in to Like or Flag a File");
+      {% endif %}
+    });
+
+  });
+
+  // handle search response
+  var callback = function(data){
+    console.log(data);
+    $('#results-container').fadeOut('fast', function(){
+      $('#results-container').html(data).fadeIn('fast');
+    });
+  
+  };
+
+  // perform ajax /search query
+  function ajaxQuery(query, callback){
+    $.ajax({
+      url: "/search",
+      data: {'q': query {% if user.is_authenticated %}, 'user': {{request.user.pk}} {% endif %}},
+      success: callback
+    });
+  }
+  </script>
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
+  <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"> </script>
+{% endblock %}

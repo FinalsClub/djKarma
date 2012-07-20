@@ -557,3 +557,30 @@ def vote(request, file_pk):
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
 
+
+''' 
+    Search testing
+'''
+from haystack.query import SearchQuerySet
+
+
+def search(request):
+    results = []
+    # Process query and return results
+    if request.is_ajax():
+        q = request.GET.get("q", "")
+        user_pk = request.GET.get("user", "-1")
+        print "searching for: " + q + " . User: " + str(user_pk)
+        if q != "":
+            #Exact match result:
+            #results = SearchQuerySet().filter(content__contains=q)
+            results = SearchQuerySet().filter(content_auto__contains=q).order_by('django_ct')
+            # Partial string matching. Not yet working
+            #results = SearchQuerySet().autocomplete(content_auto=q)
+            #print results
+            if len(results) == 0:
+                return HttpResponse("No Results")
+            else:
+                return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
+        raise Http404
+    return render(request, 'search2.html')
