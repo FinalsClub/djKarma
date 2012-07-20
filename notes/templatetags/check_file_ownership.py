@@ -9,6 +9,8 @@ def ownedBy(file, user_pk):
     """ Returns True if the given file is owned by the user
         with pk=user_pk. False otherwise
     """
+    if user_pk == -1:
+        return False
     if file.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=file.pk).exists():
         return True
     return False

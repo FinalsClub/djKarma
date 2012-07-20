@@ -49,6 +49,7 @@
     // Handle file-action icon clicks
     $('#container').on("click",".vote", function(){
       // determine file corresponding to this row
+      {% if user.is_authenticated %}
       file_pk = $(this).closest('.file-info-action').attr("id");
       console.log($(this));
       
@@ -63,13 +64,18 @@
       }
       $.ajax({
         // /vote/note_pk?v=vote_value
+        //flying fuck
         url: "/vote/"+file_pk,
-        data: {'vote': vote {% if request.user.is_authenticated%}, 'user':{{request.user.pk}} {% endif %} },
+        data: {'vote': vote, 'user':{{ user.pk}} },
         success: function(data) {
           alert(data);
         },
         dataType: "text"
       });
+
+      {% else %}
+      alert("You must sign in to Like or Flag a File");
+      {% endif %}
     });
 
   });
@@ -87,7 +93,7 @@
   function ajaxQuery(query, callback){
     $.ajax({
       url: "/search",
-      data: {'q': query, 'user': {{request.user.pk}}},
+      data: {'q': query {% if user.is_authenticated %}, 'user': {{request.user.pk}} {% endif %}},
       success: callback
     });
   }
