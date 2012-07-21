@@ -14,6 +14,8 @@
 
   <script type="text/javascript">
 
+  var current_karma = {{ user.get_profile.karma }};
+
   $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
 
@@ -31,6 +33,77 @@
                  width: 50,
                  height: 50
               });
+
+    // Handle profile school submission
+    $(".select").on("change",function(){
+      request_data = { 'user': {{user.pk}} }
+      //console.log($(this).val());
+      //console.log($("#school-select option:selected").val());
+      if($(this).hasClass("school")){
+        val = $("#school-select option:selected").val();
+        if(val != "..."){
+          console.log("submit school");
+          request_data['school'] = val;
+          ajax(request_data, school_callback);
+        }
+      }else if($(this).hasClass("year")){
+        val = $("#year-select option:selected").val();
+        request_data['year'] = val;
+        ajax(request_data, year_callback);
+      }
+      
+    });
+
+    function ajax(request_data, callback){
+      $.ajax({
+              url: "/editProfile",
+              data: request_data,
+              success: callback,
+              dataType: "json"
+          });
+    }
+
+    function year_callback(data){
+      if(data.status === "success"){
+        $("#year-karma").fadeOut('slow', function(){
+          $("#year-select").slideUp('slow',function(){
+            $("#year-label").html(data.year).fadeIn('slow');
+            if(data.karma){
+              console.log(data.karma);
+              animate_karma(data.karma);
+            }
+          });
+        });
+      }
+    }
+
+    function school_callback(data){
+      if(data.status === "success"){
+        $("#school-karma").fadeOut('slow', function(){
+          $("#school-select").slideUp('slow',function(){
+            $("#school-label").html(data.school).fadeIn('slow');
+            if(data.karma){
+              console.log(data.karma);
+              animate_karma(data.karma);
+            }
+          });
+        });
+      }
+    }
+
+    function animate_karma(delta_karma){
+      current_karma += delta_karma
+      end_karma = {{ next_level.karma }};
+      new_progress = (current_karma + delta_karma) / (end_karma)*100;
+      console.log(String(new_progress+'%'));
+      $('#karma-progress').animate({
+        width: String(new_progress+'%'),
+      }, 5000);
+      $('#karma-label').fadeOut('fast', function(){
+        $('#karma-label').html(current_karma + delta_karma).fadeIn('fast');
+      });
+      
+    }
 
     });
   </script>
@@ -54,18 +127,6 @@
           </a>
         </li>
         <li>
-          <a href="#">
-            <i class="icon-book"></i>
-            Some link
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="icon-book"></i>
-            Some other link
-          </a>
-        </li>
-        <li>
           <a href="#share" class="karma" data-toggle="modal">
             <i class="icon-user"></i>
             Share KarmaNotes
@@ -84,44 +145,39 @@
               <!-- progress bar -->
               <p>Karma Points</p>
               <div class="progress progress-karma">
-                <div class="bar"
-                     style="width: 60%;"></div>
+                <div id="karma-progress" class="bar"
+                     style="width: {{progress}}%;"></div>
               </div>
               <div class="karma-label">
-                <div class="karma-label-left">n00b {{ user.karma }}</div>
-                <div class="karma-label-right">l33t {{ user.karma|add:"10" }}</div>
+                <div class="karma-label-left" id="karma-label">{{ user.get_profile.karma }}</div>
+                <div class="karma-label-right">{{ next_level.title}} {% if next_level %} ({{ next_level.karma }}) {% endif %}</div>
                 <div style="clear:both"></div>
               </div>
 
-              <p>Karma Status: <div class="karma-status">Trainee</div></p>
+              <p>Karma Status: <div class="karma-status">{{ current_level.title }}</div></p>
 
-              <p>School:</p>
-              {% if profile_data.school %}
-                {{ user.school }}
+              <p>School:</p><span style="display:none" id="school-label"></span>
+              {% if user_profile.school %}
+                {{ user_profile.school }}
               {% else %}
-              <select id="school-select" class="span2">
-                <option>Select school</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-              </select>
+              <select style="padding-top:5px" id="school-select" class="span2 select school">
+                <option>...</option>
+                {% for school in available_schools %}
+                <option value="{{school.1}}">{{school.0}}</option>
+                {% endfor %}
+              </select><span id="school-karma" class="karma-points">+5&nbsp;points</span>
               {% endif %}
-
-              <p>Year of Graduation:</p>
+              <p style="padding-top:5px">Year of Graduation:</p><span style="display:none" id="year-label"></span>
               {# TODO: make this display inline if filled out #}
-              {% if profile_data.grad_year %}
-                {{ profile_data.grad_year }}
+              {% if user_profile.grad_year %}
+                {{ user_profile.grad_year }}
               {% else %}
-              <select id="school-select" class="span2">
-                <option>Select year</option>
-                <option>2011</option>
-                <option>2012</option>
-                <option>2013</option>
-                <option>2014</option>
-                <option>2015</option>
-                <option>2016</option>
-              </select>
+              <select id="year-select" class="span2 select year">
+                <option>...</option>
+                {% for year in available_years %}
+                <option>{{year}}</option>
+                {% endfor %}
+              </select><span id="year-karma" class="karma-points">+5&nbsp;points</span>
               {% endif %}
             </div>
           </div>
@@ -191,7 +247,7 @@
       <!-- one course -->
       <div class="course-listing">
         <h3>Your Courses</h3>
-        {% for course in user_profile.courses.all %}
+        {% for course in user.get_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
             <img src="/static/img/icon-folder.png">

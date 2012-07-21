@@ -382,6 +382,26 @@ class UserProfile(models.Model):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
 
+    def getLevel(self):
+        """ Determine the current level of the user
+            based on their karma and the Levels.
+            Returns a dictionary of
+            [current_level] -> Level
+            [next_level] -> Next Level
+
+        """
+        response = {}
+        levels = Level.objects.all().order_by('karma')
+        for (counter, level) in enumerate(levels):
+            if self.karma < level.karma:
+                response['next_level'] = level
+                if counter > 0:
+                    response['current_level'] = levels[counter - 1]
+                break
+        if not 'next_level' in response:
+            response['current_level'] = levels[len(levels) - 1]
+        return response
+
     # Get the "name" of this user for display
     # If no first_name, user username
     def getName(self):
@@ -460,7 +480,9 @@ class UserProfile(models.Model):
             Automatically called on UserProfile post_save
         """
         # Grad year was set for the first time, award karma
-        if self.grad_year != None and not self.submitted_grad_year:
+        #print (self.grad_year == "")
+        if self.grad_year != "" and not self.submitted_grad_year:
+            print "grad year submitted"
             self.submitted_grad_year = True
             self.awardKarma('profile-grad-year')
 

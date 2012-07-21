@@ -52,6 +52,8 @@ urlpatterns = patterns('',
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
+    # User Profile Ajax submit
+    url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
 
     # Note View
     url(r'^file/(\d{1,99})$', 'notes.views.note', name='file'),
