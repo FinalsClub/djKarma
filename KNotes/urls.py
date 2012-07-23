@@ -34,9 +34,8 @@ sqs = SearchQuerySet().highlight()
 urlpatterns = patterns('',
     # Landing page.
     url(r'^$', 'notes.views.home'),
-
-    # About page
     url(r'^about$', 'notes.views.about'),
+    url(r'^terms$', 'notes.views.terms', name='terms'),
 
     # Upload page (Note Upload Form)
     url(r'^upload$', 'notes.views.modalUpload', name='upload'),
