@@ -54,7 +54,6 @@ def home(request):
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
-
 def about(request):
     return render(request, 'static/about.html')
 
@@ -325,37 +324,7 @@ def addCourseOrSchool(request):
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
-def register_invited(request, invite):
-    """ This is a full-page version of the registration page that has an
-        optional urlargument for the invite code.
-        The invite code is a hash on the UserProfile object.
-    """
-    if request.method == 'POST':
-        # Fill form with POSTed data
-        form = forms.UserCreationForm(request.POST)
-        if form.is_valid():
-            print 'form valid'
-            new_user = form.save() # Save the new user from form data
-            # Authenticate the new user
-            new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            # Login in the new user
-            login(request, new_user)
-
-            # Grant the inviter some points
-            # TODO grant some points
-            return HttpResponseRedirect("/profile")
-        else:
-            # TODO: replace this with a version of the front page with a register form
-            return render(request, "registration/register.html", {
-        'form': form})
-    else:
-        form = forms.UserCreationForm()
-        # TODO: replace this with a version of the front page with a register form
-        return render(request, "registration/register.html", {'form': form})
-
-
-def register(request):
+def register(request, invite_code):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
         to django's built-in login view (django.contrib.auth.views.login).

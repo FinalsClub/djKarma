@@ -88,7 +88,8 @@ urlpatterns = patterns('',
     #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^accounts/register/$', 'notes.views.register', name='register'),
+    # accepts the hex hash of the invite code
+    url(r'^accounts/register/(?P<invite_code>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
 
 

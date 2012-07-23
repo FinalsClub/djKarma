@@ -1,33 +1,33 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% load url from future %}
 
 {% block content %}
-	
 <div class="hero-unit" style="text-align:center;">
-	<h1>Sign up!</h1>
-	<br/><br/>
-	<a href="{% url "socialauth_begin" "facebook" %}"><img src="/static/img/fb_connect.png"/></a>
-	<br/><br/><br/>
-	or
-	<br/><br/><br/>
-	<p>Create a non-social KarmaNotes account:</a></p>
+  <h2>Sign up!</h2>
+  <br/><br/>
+  <a href="{% url "socialauth_begin" "facebook" %}"><img src="/static/img/fb_connect.png"/></a>
+  <br/><br/><br/>
+  or
+  <br/><br/><br/>
+  <p>Create a non-social KarmaNotes account:</a></p>
 
-	      {% if form.errors %}
-				<p><b>Check your username and password.</b></p>
-			{% endif %}
+  {% if form.errors %}
+    <p><b>Check your username and password.</b></p>
+  {% endif %}
 
-			<form method="post" action="{% url 'register' %}">
-			{% csrf_token %}
-			 {% for field in form %}
-		            <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-		            {{ field.label_tag }} 
-		            {{ field }}
-		    {% endfor %}
+  <form method="post" action="{% url 'register_account' invite_code=None %}">
+    {% csrf_token %}
+    {% for field in form %}
+      <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+      {{ field.label_tag }}
+      {{ field }}
+    {% endfor %}
 
-			<br/>
-			<input class="btn btn-primary" type="submit" value="Login" />
-			<input type="hidden" name="next" value="{{ next }}" />
-			</form>
+    <br/>
+    <input class="btn btn-primary" type="submit" value="Register" />
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+  <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
 </div>
 
 {% endblock %}
