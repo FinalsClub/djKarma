@@ -181,24 +181,6 @@ def profile(request):
         # For the user's news feed
         #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
-    # If user profile data has been submitted:
-    """
-    if request.method == 'POST':
-        # TODO: merge the other return into this IF
-        #This must go before profile data calc
-        profile_form = ProfileForm(request.POST)
-        if profile_form.is_valid():
-            # Update user profile with form data
-            # Karma points will be added as necessary
-            # By UserProfile model
-            profile = request.user.get_profile()
-            profile.school = profile_form.cleaned_data['school']
-            #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
-            if not profile_form.cleaned_data['grad_year'] == "":
-                profile.grad_year = profile_form.cleaned_data['grad_year']
-            profile.save()
-            response['profile_form'] = profile_form
-    """
     response['messages'] = complete_profile_prompt(user_profile)
     response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.hash)
     response['user_profile'] = user_profile
@@ -211,6 +193,7 @@ def profile(request):
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
     return render(request, 'profile.html', response)
+
 
 def editProfile(request):
     if(request.is_ajax()):
@@ -235,9 +218,14 @@ def editProfile(request):
             if not user_profile.submitted_grad_year:
                 response['karma'] = ReputationEventType.objects.get(title="profile-grad-year").actor_karma
 
+        if 'alias' in request.GET:
+            do_save = True
+            print "PRE: " + str(user_profile.alias)
+            user_profile.alias = request.GET['alias']
+            print "POST: " + str(user_profile.alias)
+            response['alias'] = user_profile.alias
 
         if do_save:
-            print "KARMA" + str(response['karma'])
             user_profile.save()
             response['status'] = 'success'
             return HttpResponse(json.dumps(response), mimetype="application/json")

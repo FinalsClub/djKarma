@@ -17,6 +17,9 @@ Profile Tasks.
 """
 class AddedUsername():
     message = "What should we call you? Add a username on the left"
+    div_id = "add-username-alert"
+    # Tag the div corresponding to this alert so it can be hidden
+    # without page reload
 
     def check(self, user_profile):
         if user_profile.user.username != None:
@@ -26,6 +29,7 @@ class AddedUsername():
 
 class InvitedFriend():
     message = "Last step, invite a friend to complete your profile"
+    div_id = "invite-friend-alert"
 
     def check(self, user_profile):
         # where invited_friend is a boolean
@@ -33,7 +37,7 @@ class InvitedFriend():
 
 class AddedSchool():
     message = "To get the most out of KarmaNotes, you need to add your school."
-
+    div_id = "add-school-alert"
     def check(self, user_profile):
         if user_profile.school != None:
             return True

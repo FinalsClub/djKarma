@@ -337,6 +337,8 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
 
+    alias = models.CharField(max_length=16, blank=True, null=True)
+
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
@@ -405,6 +407,13 @@ class UserProfile(models.Model):
     # Get the "name" of this user for display
     # If no first_name, user username
     def getName(self):
+        """ Generate the front-facing username for this user.
+            Prefer user-supplied alias first,
+            Second, username given on standard account signup
+            Lastly, first name last initial (from social login) 
+        """
+        if self.alias and self.alias != "":
+            return self.alias
         if self.user.first_name:
             if self.user.last_name:
                 # First name + Last name initial
