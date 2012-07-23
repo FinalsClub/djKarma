@@ -221,7 +221,7 @@
     </div> <!-- .span3 -->
 
     <div class="span9">
-      <h2><span>Welcome, </span><span id="username-header">{{ user.username }}</span><span>!</span></h2>
+      <h2><span>Welcome, </span><span id="username-header">{{ user.get_profile.getName }}</span><span>!</span></h2>
 
       {# ------ Messages ------ #}
       {% for message in messages %}
