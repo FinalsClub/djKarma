@@ -230,5 +230,10 @@
      "model":"notes.level",
      "fields":
         {"karma":15000,
-         "title":"Karma-Guru"}}
+         "title":"Karma-Guru"}},
+    {"pk":12,
+     "model":"notes.level",
+     "fields":
+        {"karma":0,
+         "title":"Baby"}}
 ]

@@ -33,10 +33,13 @@ from models import Instructor
 from models import SiteStats
 from models import Level
 from models import Vote
+from models import ReputationEventType
 from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import processCsvTags
 from utils import uploadForm
+
+import datetime
 
 #from django.core import serializers
 
@@ -51,9 +54,11 @@ def home(request):
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
-
 def about(request):
     return render(request, 'static/about.html')
+
+def terms(request):
+    return render(request, 'static/ToS.html')
 
 ## :|: Uploading :|: &
 
@@ -156,32 +161,28 @@ def profile(request):
 
     # Calculate User's progress towards next Karma level
     # Depends on models.Level objects
-    user_karma = request.user.get_profile().karma
-    levels = Level.objects.all() # FIXME: this query could contain the logic of the loop below
+    user_profile = request.user.get_profile()
 
-    for level in levels:
-        if user_karma < level.karma:
-            response['next_level'] = level
-            break
+    user_level = request.user.get_profile().getLevel()
+    response['current_level'] = user_level['current_level']
 
     # The user has reached the top level
-    if not response['next_level']:
+    if not 'next_level' in user_level:
+        #print user_level['current_level'].title + " Top Level"
         response['progress'] = 100
     else:
-        response['progress'] = (user_karma / float(response['next_level'].karma)) * 100
+        #print user_level['current_level'].title + " " + user_level['next_level'].title
+        response['next_level'] = user_level['next_level']
+        response['progress'] = (user_profile.karma / float(response['next_level'].karma)) * 100
 
     #Pre-populate ProfileForm with user's data
-    response['profile_data'] = {}
-    if request.user.get_profile().school != None:
-        response['profile_data']['school'] = request.user.get_profile().school
 
         # If user has a school selected, fetch recent additions to School
         # For the user's news feed
-        response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
-    if request.user.get_profile().grad_year != None:
-        response['profile_data']['grad_year'] = request.user.get_profile().grad_year
+        #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
     # If user profile data has been submitted:
+    """
     if request.method == 'POST':
         # TODO: merge the other return into this IF
         #This must go before profile data calc
@@ -197,22 +198,53 @@ def profile(request):
                 profile.grad_year = profile_form.cleaned_data['grad_year']
             profile.save()
             response['profile_form'] = profile_form
-    else:
-        # If GET, Populate Profileform with existing profile data
-        response['profile_form'] = ProfileForm(initial=response['profile_data'])
-
-    user_profile = request.user.get_profile()
+    """
     response['messages'] = complete_profile_prompt(user_profile)
-    response['user_profile'] = user_profile
-
     response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.hash)
-
+    response['user_profile'] = user_profile
     response = get_upload_form(response)
 
     # home built auto-complete
-    response['available_schools'] = [str(school.name) for school in School.objects.all()]
+    if not user_profile.school:
+        response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    if not user_profile.grad_year:
+        response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
     return render(request, 'profile.html', response)
+
+def editProfile(request):
+    if(request.is_ajax()):
+        response = {}
+        do_save = False
+        user_pk = int(request.GET.get('user', -1))
+        print user_pk
+        if user_pk == -1:
+            raise Http404
+        user_profile = User.objects.get(pk=user_pk).get_profile()
+        if 'school' in request.GET:
+            do_save = True
+            user_profile.school = School.objects.get(pk=int(request.GET['school']))
+            response['school'] = user_profile.school.name
+            # When the user_profile is saved, submitted_school / year are adjusted
+            if not user_profile.submitted_school:
+                response['karma'] = ReputationEventType.objects.get(title="profile-school").actor_karma
+        if 'year' in request.GET:
+            do_save = True
+            user_profile.grad_year = request.GET['year']
+            response['year'] = user_profile.grad_year
+            if not user_profile.submitted_grad_year:
+                response['karma'] = ReputationEventType.objects.get(title="profile-grad-year").actor_karma
+
+
+        if do_save:
+            print "KARMA" + str(response['karma'])
+            user_profile.save()
+            response['status'] = 'success'
+            return HttpResponse(json.dumps(response), mimetype="application/json")
+        else:
+            return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
+    else:
+        raise Http404
 
 def get_upload_form(response):
     """ Appends forms required for upload form to response
@@ -295,37 +327,7 @@ def addCourseOrSchool(request):
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
-def register_invited(request, invite):
-    """ This is a full-page version of the registration page that has an
-        optional urlargument for the invite code.
-        The invite code is a hash on the UserProfile object.
-    """
-    if request.method == 'POST':
-        # Fill form with POSTed data
-        form = forms.UserCreationForm(request.POST)
-        if form.is_valid():
-            print 'form valid'
-            new_user = form.save() # Save the new user from form data
-            # Authenticate the new user
-            new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            # Login in the new user
-            login(request, new_user)
-
-            # Grant the inviter some points
-            # TODO grant some points
-            return HttpResponseRedirect("/profile")
-        else:
-            # TODO: replace this with a version of the front page with a register form
-            return render(request, "registration/register.html", {
-        'form': form})
-    else:
-        form = forms.UserCreationForm()
-        # TODO: replace this with a version of the front page with a register form
-        return render(request, "registration/register.html", {'form': form})
-
-
-def register(request):
+def register(request, invite_code):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
         to django's built-in login view (django.contrib.auth.views.login).

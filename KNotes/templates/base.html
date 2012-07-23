@@ -36,54 +36,53 @@
   {% endblock %}
 </head>
 
-<body>
+<body class="ms">
 
-<!-- Navbar begin -->
-<div class="navbar">
-  <div class="navbar-inner">
-    <div class="container">
-      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
-      <a class="brand" href="#">
-        <img src="/static/img/karma-logo.png" class="logo-mark">
-        <span class="logo-karma">Karma</span>
-        <span class="logo-notes">Notes</span>
-      </a>
-      <div class="nav-collapse">
-        <ul class="nav">
-          {% if user.is_authenticated %}
-          <li class="dropdown" id="menu1">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-              {{ user.username }} & Pic
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
-            </ul>
-          </li>
-          {% else %}
-          <li id="menu1">
-            <a href="{% url 'login' %}">login</a>
-          </li>
-          {% endif %}
-        </ul>
-      </div><!--/.nav-collapse -->
+<div class="container">
+    <!-- Navbar begin -->
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="#">
+          <img src="/static/img/karma-logo.png" class="logo-mark">
+          <span class="logo-karma">Karma</span>
+          <span class="logo-notes">Notes</span>
+        </a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            {% if user.is_authenticated %}
+            <li class="dropdown" id="menu1">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+                {{ user.username }} & Pic
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
+                <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+                <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+                <li class="divider"></li>
+                <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
+              </ul>
+            </li>
+            {% else %}
+            {% include 'modal_login.html' %}
+            {% endif %}
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
     </div>
-  </div>
-</div>
 
 <!-- Navbar end -->
 
 
 {% block content %}
 {% endblock %}
+
+</div> <!-- .container -->
 
 {% block scripts %}
 {% endblock %}
