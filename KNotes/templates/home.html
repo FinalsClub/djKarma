@@ -31,6 +31,7 @@ jQuery(document).ready(function() {
     auto: 2,
     scroll: 1,
     wrap:'circular',
+    itemFallbackDimension: 300,
     initCallback: mycarousel_initCallback
   });
 });
@@ -82,7 +83,7 @@ jQuery(document).ready(function() {
             <span class="user">uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.username }}</a></span>
             <span class="download"><a href="/file/{{ file.id }}"><i class="icon-paper-clip"></i>view file</a></span>
             <span class="karma-points">-10 points</span>
-            <span class="views">{{ file.viewCount }} views</a>
+            <span class="views">{{ file.viewCount }} views</span>
           </div> <!-- .file-info -->
         </div> <!-- .file-info-action -->
       </div> <!-- .file .row-fluid -->

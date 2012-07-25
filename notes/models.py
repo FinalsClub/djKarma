@@ -396,9 +396,13 @@ class UserProfile(models.Model):
         levels = Level.objects.all().order_by('karma')
         for (counter, level) in enumerate(levels):
             if self.karma < level.karma:
-                response['next_level'] = level
                 if counter > 0:
+                    response['next_level'] = level
                     response['current_level'] = levels[counter - 1]
+                else:
+                    # If the user has not surpassed the first level
+                    response['current_level'] = level
+                    response['next_level'] = levels[counter + 1]
                 break
         if not 'next_level' in response:
             response['current_level'] = levels[len(levels) - 1]
