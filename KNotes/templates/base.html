@@ -25,6 +25,45 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
 
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    // Handle file-action icon clicks
+    $('#container').on("click",".vote", function(e){
+      // determine file corresponding to this row
+      {% if user.is_authenticated %}
+      file_pk = $(this).closest('.file-actions').attr("id").split("-")[1];
+      console.log($(this));
+      
+      vote = 0;
+      // like -- upvote
+      if($(this).hasClass("upvote")){
+        e.preventDefault();
+        vote = 1;
+      }
+      // flag -- downvote
+      else if($(this).hasClass("downvote")){
+        e.preventDefault();
+        vote = -1;
+      }
+      $.ajax({
+        // /vote/note_pk?v=vote_value
+        url: "/vote/"+file_pk,
+        data: {'vote': vote, 'user':{{ user.pk}} },
+        success: function(data) {
+          alert(data);
+        },
+        dataType: "text"
+      });
+
+      {% else %}
+      alert("You must sign in to Like or Flag a File");
+      {% endif %}
+    });
+
+  });
+  </script>
+
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -38,7 +77,7 @@
 
 <body class="ms">
 
-<div class="container">
+<div class="container" id="container">
     <!-- Navbar begin -->
     <div class="navbar">
       <div class="navbar-inner">

@@ -60,13 +60,7 @@ $(document).ready(function() {
               <strong>{{ note_type }}:</strong> <span class="karma-points">10 points</span>
               <span class="views">{{ note.viewCount }} views</a>
             </div>
-            <div class="file-actions">
-              {# TODO, connect these #}
-              <a href="#"><i class="icon-heart"></i>Like ({{note.numUpVotes}})</a>
-              <a href="#"><i class="icon-flag"></i>Flag</a>
-              <a href="#"><i class="icon-pencil"></i>Edit</a>
-              <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-            </div>
+            {% include "file-actions.html" with file=note %}
             <div class="clear"></div>
           </div>
           <div class="note-text">
