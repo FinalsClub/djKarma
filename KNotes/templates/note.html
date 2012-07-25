@@ -55,7 +55,7 @@ $(document).ready(function() {
               </div>
 
             <h4>About this file</h4>
-            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ note.owner.username }}</a></div>
+            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ note.owner.get_profile.getName }}</a></div>
             <div class="points-and-views">
               <strong>{{ note_type }}:</strong> <span class="karma-points">10 points</span>
               <span class="views">{{ note.viewCount }} views</a>

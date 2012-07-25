@@ -2,7 +2,7 @@
 {% load url from future %}
 
 {% block title %}
-  Your Personal Profile Page {{ user.username }}
+  Your Personal Profile Page {{ user.get_profile.getName }}
 {% endblock %}
 
 
@@ -346,18 +346,8 @@
           </div>
 
           <div class="file-info-action hide row">
-            <div class="file-info">
-              <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>USERNAME</a></span>
-              <span class="download"><a href="#"><i class="icon-paper-clip"></i>View file</a></span>
-              <span class="karma-points">-10 points</span>
-              <span class="views">405 views</a>
-            </div>
-            <div class="file-actions">
-              <a href="#"><i class="icon-heart"></i>Like (5)</a>
-              <a href="#"><i class="icon-flag"></i>Flag</a>
-              <a href="#"><i class="icon-pencil"></i>Edit</a>
-              <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-            </div>
+            {% include "file-info.html" with file=file user=user%}
+            {% include "file-actions.html" with file=file %}
           </div> <!-- .file-info-action hide row -->
         </div> <!-- .file .row-fluid -->
         <!-- {% endfor %} -->

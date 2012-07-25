@@ -37,7 +37,7 @@ from models import ReputationEventType
 from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import processCsvTags
-from utils import uploadForm
+from utils import userCanView
 
 import datetime
 
@@ -51,6 +51,7 @@ def home(request):
 
     #Get recently uploaded files
     recent_files = File.objects.order_by('-timestamp')[:7]
+    print recent_files
 
     return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
@@ -428,7 +429,7 @@ def note(request, note_pk):
     profile = request.user.get_profile()
     # If the user does not have read permission, and the
     # Requested files is not theirs
-    if not profile.can_read and not profile.files.filter(pk=note_pk).exists():
+    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
         user_karma = request.user.get_profile().karma
         level = Level.objects.get(title='Prospect')
         print level.karma
@@ -443,7 +444,7 @@ def note(request, note_pk):
     note.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not profile.files.filter(pk=note.pk).exists()):
+    if(not userCanView(request.user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')

@@ -46,38 +46,6 @@
       }
     });
 
-    // Handle file-action icon clicks
-    $('#container').on("click",".vote", function(){
-      // determine file corresponding to this row
-      {% if user.is_authenticated %}
-      file_pk = $(this).closest('.file-info-action').attr("id");
-      console.log($(this));
-      
-      vote = 0;
-      // like -- upvote
-      if($(this).hasClass("upvote")){
-        vote = 1;
-      }
-      // flag -- downvote
-      else if($(this).hasClass("downvote")){
-        vote = -1;
-      }
-      $.ajax({
-        // /vote/note_pk?v=vote_value
-        //flying fuck
-        url: "/vote/"+file_pk,
-        data: {'vote': vote, 'user':{{ user.pk}} },
-        success: function(data) {
-          alert(data);
-        },
-        dataType: "text"
-      });
-
-      {% else %}
-      alert("You must sign in to Like or Flag a File");
-      {% endif %}
-    });
-
   });
 
   // handle search response
