@@ -209,6 +209,11 @@ class Course(models.Model):
             increment(self)
         super(Course, self).save(*args, **kwargs)
 
+    class Meta:
+        # sort by "the date" in descending order unless
+        # overridden in the query with order_by()
+        ordering = ['title']
+
 # On Course delete, decrement numCourses
 post_delete.connect(decrement, sender=Course)
 

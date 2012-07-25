@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
@@ -412,14 +413,27 @@ def browse(request):
             files = File.objects.filter(tags__in=tags).distinct()
             return render(request, 'notes2.html', {'files': files})
         else:
-            return render(request, 'search.html', {'tag_form': tag_form})
+            return render(request, 'browse.html', {'tag_form': tag_form})
 
     # If this is a GET request, display the SelectTagsForm
     else:
         # Use SelectTagsForm for a SelectMultiple Widget
         #tag_form = SelectTagsForm()
         tag_form = TypeTagsForm()
-        return render(request, 'search.html', {'tag_form': tag_form})
+        return render(request, 'browse.html' )
+
+
+def browse2(request):
+    """ Browse and Search Notes
+        Instead of jsonifying model,
+        work as standard django template
+    """
+    if request.user.get_profile().school != None:
+        schools = request.user.get_profile.school
+    else:
+        schools = School.objects.all()
+
+    return render(request, 'browse2.html', {"schools": schools})
 
 
 @login_required
@@ -458,17 +472,21 @@ def note(request, note_pk):
     return render(request, 'note.html', {'note': note, 'note_type': note_type, 'url': url})
 
 
-def searchBySchool(request):
+def searchBySchool(request, school_pk=-1):
     """ Ajax: Return all schools and courses in JSON
         Used by search page javascript
     """
     response_json = []
 
     if request.is_ajax():
-        schools = School.objects.all()
-        for school in schools:
-            school_json = jsonifyModel(model=school, depth=1)
-            response_json.append(school_json)
+        if school_pk == -1:
+            schools = School.objects.all()
+            for school in schools:
+                school_json = jsonifyModel(model=school, depth=1)
+                response_json.append(school_json)
+        else:
+            school = get_object_or_404(School, pk=school_pk)
+            response_json.append(jsonifyModel(model=school, depth=1))
         #print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
