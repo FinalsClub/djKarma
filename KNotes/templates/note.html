@@ -62,7 +62,7 @@ $(document).ready(function() {
             </div>
             <div class="file-actions">
               {# TODO, connect these #}
-              <a href="#"><i class="icon-heart"></i>Like (5)</a>
+              <a href="#"><i class="icon-heart"></i>Like ({{note.numUpVotes}})</a>
               <a href="#"><i class="icon-flag"></i>Flag</a>
               <a href="#"><i class="icon-pencil"></i>Edit</a>
               <a href="#"><i class="icon-remove-circle"></i>Delete</a>
@@ -70,7 +70,7 @@ $(document).ready(function() {
             <div class="clear"></div>
           </div>
           <div class="note-text">
-            {{ note.html|safe }}
+            <iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
           </div> <!-- .note-text -->
         </div> <!-- .span12 -->
       </div> <!-- .row-fluid -->
