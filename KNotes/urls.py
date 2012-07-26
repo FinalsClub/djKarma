@@ -48,6 +48,7 @@ urlpatterns = patterns('',
 
      # Browse by School / Search by Tag view
     url(r'^browse$', 'notes.views.browse'),
+    url(r'^browse2$', 'notes.views.browse2'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
@@ -63,7 +64,8 @@ urlpatterns = patterns('',
     url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    url(r'^searchBySchool$', 'notes.views.searchBySchool'),
+    url(r'^searchBySchool/$', 'notes.views.searchBySchool'),
+    url(r'^searchBySchool/(\d{1,99})$', 'notes.views.searchBySchool'),
     url(r'^notesOfCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting

@@ -2,7 +2,7 @@
 {% load url from future %}
 
 {% block title %}
-  Your Personal Profile Page {{ user.username }}
+  Your Personal Profile Page {{ user.get_profile.getName }}
 {% endblock %}
 
 
@@ -34,9 +34,30 @@
                  height: 50
               });
 
+    // Handle username edit in place
+    $("#edit-username").on("click", function(e){
+      e.preventDefault();
+      $("#edit-username-label").hide();
+      $("#username-label").hide();
+      username = $("#username-label").text();
+      console.log("edit username: " + username);
+      $("#username-input").val(username);
+      $("#username-form").show();
+    });
+
+    // Handle username edit in place form submit
+    $("#username-form").on("submit", function(e){
+      request_data = { 'user': {{user.pk}} };
+      e.preventDefault();
+      console.log("form submit");
+      request_data['alias'] = $("#username-input").val();
+      console.log("alias: " + request_data['alias']);
+      editProfile(request_data, alias_callback);
+    });
+
     // Handle profile school submission
     $(".select").on("change",function(){
-      request_data = { 'user': {{user.pk}} }
+      request_data = { 'user': {{user.pk}} };
       //console.log($(this).val());
       //console.log($("#school-select option:selected").val());
       if($(this).hasClass("school")){
@@ -44,17 +65,17 @@
         if(val != "..."){
           console.log("submit school");
           request_data['school'] = val;
-          ajax(request_data, school_callback);
+          editProfile(request_data, school_callback);
         }
       }else if($(this).hasClass("year")){
         val = $("#year-select option:selected").val();
         request_data['year'] = val;
-        ajax(request_data, year_callback);
+        editProfile(request_data, year_callback);
       }
       
     });
 
-    function ajax(request_data, callback){
+    function editProfile(request_data, callback){
       $.ajax({
               url: "/editProfile",
               data: request_data,
@@ -85,9 +106,22 @@
             if(data.karma){
               console.log(data.karma);
               animate_karma(data.karma);
+              $('#add-school-alert').slideUp('slow');
             }
           });
         });
+      }
+    }
+
+    function alias_callback(data){
+      if(data.status === "success"){
+        $("#username-form").hide();
+        $("#edit-username-label").show();
+        console.log("Alias callback!");
+        console.log(data.alias);
+        $("#username-header").text(data.alias);
+        $("#username-label").text(data.alias);
+        $("#username-label").show();
       }
     }
 
@@ -141,7 +175,12 @@
           <div class="thumbnail">
             <img alt="" src="http://placehold.it/230x100">
             <div class="caption">
-              <p>{{ user.username }} <a href="#">edit</a></p>
+              <span id="username-label">{{ user.get_profile.getName }} </span><span id="edit-username-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
+              <form class="span2" id="username-form" action="#" style="display:none">
+              <input class="span2" name="username" id="username-input"></input>
+              </form>
+              <br><br>
+
               <!-- progress bar -->
               <p>Karma Points</p>
               <div class="progress progress-karma">
@@ -156,10 +195,8 @@
 
               <p>Karma Status: <div class="karma-status">{{ current_level.title }}</div></p>
 
-              <p>School:</p><span style="display:none" id="school-label"></span>
-              {% if user_profile.school %}
-                {{ user_profile.school }}
-              {% else %}
+              <p><span>School:</span><span style="margin-left:5px" id="school-label">{{ user_profile.school }}</span></p>
+              {% if not user_profile.school %}
               <select style="padding-top:5px" id="school-select" class="span2 select school">
                 <option>...</option>
                 {% for school in available_schools %}
@@ -167,11 +204,9 @@
                 {% endfor %}
               </select><span id="school-karma" class="karma-points">+5&nbsp;points</span>
               {% endif %}
-              <p style="padding-top:5px">Year of Graduation:</p><span style="display:none" id="year-label"></span>
+              <p style="padding-top:5px"><span>Year of Graduation:</span><span style="margin-left:5px" id="year-label">{{ user_profile.grad_year }}</span></p>
               {# TODO: make this display inline if filled out #}
-              {% if user_profile.grad_year %}
-                {{ user_profile.grad_year }}
-              {% else %}
+              {% if not user_profile.grad_year %}
               <select id="year-select" class="span2 select year">
                 <option>...</option>
                 {% for year in available_years %}
@@ -186,15 +221,16 @@
     </div> <!-- .span3 -->
 
     <div class="span9">
-      <h2>Welcome, {{ user.username }}!</h2>
+      <h2><span>Welcome, </span><span id="username-header">{{ user.get_profile.getName }}</span><span>!</span></h2>
 
       {# ------ Messages ------ #}
       {% for message in messages %}
-      <div class="alert alert-success">
+      <div class="alert alert-success" id="{{message.div_id}}">
         <button class="close" data-dismiss="alert">x</button>
-        {{ message }}
+        {{ message.body}}
       </div> <!-- .alert .alert-success -->
       {% endfor %}
+      <!--
       <div class="alert alert-success">
         <button class="close" data-dismiss="alert">x</button>
         Success! <i class="icon-paper-clip"></i>
@@ -216,7 +252,7 @@
           <div class="{% if forloop.first %}active {% endif %}item">
             <div class="reminder">
               <a href="#">link to do thing</a>
-              {{ message }}
+              {{ message.body }}
               <span class="karma-points">+10 points</span>
             </div> <!-- .reminder -->
           </div> <!-- .active .item -->
@@ -310,18 +346,8 @@
           </div>
 
           <div class="file-info-action hide row">
-            <div class="file-info">
-              <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>USERNAME</a></span>
-              <span class="download"><a href="#"><i class="icon-paper-clip"></i>View file</a></span>
-              <span class="karma-points">-10 points</span>
-              <span class="views">405 views</a>
-            </div>
-            <div class="file-actions">
-              <a href="#"><i class="icon-heart"></i>Like (5)</a>
-              <a href="#"><i class="icon-flag"></i>Flag</a>
-              <a href="#"><i class="icon-pencil"></i>Edit</a>
-              <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-            </div>
+            {% include "file-info.html" with file=file user=user%}
+            {% include "file-actions.html" with file=file %}
           </div> <!-- .file-info-action hide row -->
         </div> <!-- .file .row-fluid -->
         <!-- {% endfor %} -->

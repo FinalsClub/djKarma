@@ -1,4 +1,3 @@
-{% load check_file_ownership %}
 {% for result in results %}
 <!-- if result is a File -->
 {% if result.object.viewCount %}
@@ -14,7 +13,7 @@
     {{ result.object.description }}
   </div>
 
-  <div class="file-info-action row hide" id="{{result.object.pk}}">
+  <div class="file-info-action row hide">
     <div class="file-info">
       <span class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{result.object.owner.get_profile.getName }}</a></span>
       <span class="download"><a href="/file/{{result.object.pk}}"><i class="icon-paper-clip"></i>View file</a></span>
@@ -26,12 +25,7 @@
       <span class="karma-points">OWNED</span>
       <span class="views">{{result.object.viewCount}} Views
       </span></div>
-      <div class="file-actions">
-        <a href="#" class="vote upvote"><i class="icon-heart"></i>Like ({{result.object.numUpVotes}})</a>
-        <a href="#" class="vote downvote"><i class="icon-flag"></i>Flag</a>
-        <a href="#"><i class="icon-pencil"></i>Edit</a>
-        <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-      </div>
+      {% include file-actions.html with file={{result.object}} %}
       {% endif %}
 
   </div> <!-- .file-info-action hide row -->

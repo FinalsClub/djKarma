@@ -14,3 +14,4 @@ static/css/styles.css
 static/css/utilities.css
 static/css/variables.css
 static/css/bootstrap.css
+static/less/bootstrap *.css

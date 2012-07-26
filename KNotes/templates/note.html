@@ -55,22 +55,16 @@ $(document).ready(function() {
               </div>
 
             <h4>About this file</h4>
-            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ note.owner.username }}</a></div>
+            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ note.owner.get_profile.getName }}</a></div>
             <div class="points-and-views">
               <strong>{{ note_type }}:</strong> <span class="karma-points">10 points</span>
               <span class="views">{{ note.viewCount }} views</a>
             </div>
-            <div class="file-actions">
-              {# TODO, connect these #}
-              <a href="#"><i class="icon-heart"></i>Like (5)</a>
-              <a href="#"><i class="icon-flag"></i>Flag</a>
-              <a href="#"><i class="icon-pencil"></i>Edit</a>
-              <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-            </div>
+            {% include "file-actions.html" with file=note %}
             <div class="clear"></div>
           </div>
           <div class="note-text">
-            {{ note.html|safe }}
+            <iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
           </div> <!-- .note-text -->
         </div> <!-- .span12 -->
       </div> <!-- .row-fluid -->

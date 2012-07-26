@@ -1,24 +1,15 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
 <div id="browseForNotes">
-    <h1>Browse by School and Course</h1>
+  {% if user.get_profile.school %}
+    <h1>Browse {{ user.get_profile.school }}</h1>
+  {% else %}
+    <h1>Browse All Schools</h1>
+  {% endif %}
     <div id="searchBySchool"></div>
     <div id="searchByTags" style="clear:both;">
-    <br/>
-    <h2> - or - </h2>
-    <br/>
-    <h1>Search By Tag</h1>
-      <form enctype="multipart/form-data" action="/search" method="post">{% csrf_token %}
-      {{ message }}
-      {% for field in tag_form %}
-        <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-        {{ field.label_tag }} 
-        {{ field }}
-      {% endfor %}<br/>
-      <input class="btn btn-primary" type="submit" value="Search!" />
-    </form>
     </div>
   </div>
 {% endblock %}
@@ -33,7 +24,7 @@ $(document).ready(function() {
   //   <div id="4e5bb37258200ed9aabc5d66" class="courseBtn">Computer Science 50</div>
   //   <div id="4e5bb37258200ed9aabc5d67" class="courseBtn">Economics 10</div>
   // </div><!-- Brown-Courses -->
-  $.getJSON('/searchBySchool', function(schoolsArr) {
+  $.getJSON('/searchBySchool/{{user.get_profile.school.pk}}', function(schoolsArr) {
     $.each(schoolsArr, function(idx, school) {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
@@ -60,6 +51,7 @@ $(document).ready(function() {
         );
       });
     });
+  $('.coursesOfSchool').hide();
   });
 
   // =========================================================================
@@ -168,7 +160,8 @@ $(document).ready(function() {
               }
             }
             // Inject note data div
-            listItems += "<div>"
+            
+            listItems += "<div class=\"note\">"
                           +"<div style=\"display:inline-block;text-align:center\">"
                             +"<img style=\"opacity:"+vote_opacity+"\" class=\"vote upvote "+note.canvote+"\" id=\""+note._id+"-upvote\" src=\"{{STATIC_URL}}img/"+vote_up_img+"\"/>"
                             +"<div id=\""+note._id+"-pts\">"+note.pts+"</div>"
@@ -180,7 +173,7 @@ $(document).ready(function() {
                             +"<div>Uploaded by " + note.user + "</div>"
                           +"</div>"
                           +"</div>";
-          //alert(course._id);
+                                    //alert(course._id);
           
         });
         /* Instead of creating notesOfCourse, fill it

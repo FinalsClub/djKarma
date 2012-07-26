@@ -154,5 +154,10 @@ def complete_profile_prompt(user_profile):
             # for tasks that are not done, add them to todo list
             profile_todo.append(task)
     # return list of message prompts for the user to be told on the profile page
-    messages = [task.message for task in profile_todo]
+    messages = [{"body": task.message, "div_id": task.div_id} for task in profile_todo]
     return messages
+
+def userCanView(user, file):
+    if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
+        return True
+    return False
