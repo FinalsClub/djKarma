@@ -429,7 +429,7 @@ def browse2(request):
         work as standard django template
     """
     if request.user.get_profile().school != None:
-        schools = request.user.get_profile.school
+        schools = [request.user.get_profile().school]
     else:
         schools = School.objects.all()
 
