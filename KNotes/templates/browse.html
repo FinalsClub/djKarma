@@ -160,7 +160,35 @@ $(document).ready(function() {
               }
             }
             // Inject note data div
-            
+            listItems += "<div class=\"file row-fluid\">"
+          +"<div class=\"file icon\"></div>"
+          +"<div class=\"file-title\">"
+            +"<a href=\"#\">"+note.notedesc+"</a>"
+          +"</div>";
+
+
+            listItems += "<div class=\"note\">"
+              +"<div class=\"file-info-action hide row\">"
+              +"<div class=\"file-info\"> "
+              +"<span class=\"user\">Uploaded by <a href=\"#\"><i class=\"icon-user\"></i>"+note.user+"</a></span>"
+              +"<span class=\"download\"><a href=\"/file/"+note._id+"\"><i class=\"icon-paper-clip\"></i>View file</a></span>";
+
+            if (note.owns === 1){
+              listItems += "<span class=\"karma-points\">OWNED</span>";
+            }
+            else{
+              listItems += "<span class=\"karma-points\">-10 points</span>";
+            }
+            listItems += "<span class=\"views\">"+note.views+" Views </span>"
+              +"</div>";
+
+            listItems += "<div class=\"file-actions\" id=\"file-"+note._id+"\">"
+                +"<a href=\"#\" class=\"vote upvote\"><i class=\"icon-heart\"></i>Like ("+note.upvotes+")</a>"
+                +"<a href=\"#\" class=\"vote downvote\"><i class=\"icon-flag\"></i>Flag</a>"
+                +"<a href=\"#\"><i class=\"icon-pencil\"></i>Edit</a>"
+                +"<a href=\"#\"><i class=\"icon-remove-circle\"></i>Delete</a>"
+              +"</div></div></div></div>";
+            /*
             listItems += "<div class=\"note\">"
                           +"<div style=\"display:inline-block;text-align:center\">"
                             +"<img style=\"opacity:"+vote_opacity+"\" class=\"vote upvote "+note.canvote+"\" id=\""+note._id+"-upvote\" src=\"{{STATIC_URL}}img/"+vote_up_img+"\"/>"
@@ -174,6 +202,7 @@ $(document).ready(function() {
                           +"</div>"
                           +"</div>";
                                     //alert(course._id);
+                                    */
           
         });
         /* Instead of creating notesOfCourse, fill it

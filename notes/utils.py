@@ -44,6 +44,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
         json_result["notedesc"] = model.title
         json_result["views"] = model.viewCount
         json_result["pts"] = model.numUpVotes - model.numDownVotes
+        json_result["upvotes"] = model.numUpVotes
 
         # If the file has an owner, provide it
         if model.owner != None:
@@ -75,17 +76,20 @@ def jsonifyModel(model, depth=0, user_pk=-1):
                 json_result["vote"] = 0  # novote
                 # If the valid user owns the file, don't allow voting
                 if model.owner != None and model.owner == request_user:
+                    json_result["owns"] = 1
                     #print "*** user owns file"
                     json_result["canvote"] = 0
                     json_result["vote"] = 1
                 # Else If the valid user has viewd the file, allow voting
                 elif request_user.get_profile().files.filter(pk=model.pk).exists():
                     #print "*** user has viewed file!"
-                    json_result["canvote"] = True
+                    json_result["canvote"] = 1
+                    json_result["owns"] = 0
                 # Else the valid user does not own, and has not viewed, so don't allow voting
                 else:
                     #print "*** no user connection"
                     json_result["canvote"] = 0
+                    json_result["owns"] = 0
         else:
             #print "*** user dne"
             # A valid user_pk was not provided
