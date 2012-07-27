@@ -29,22 +29,41 @@ $(document).ready(function() {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
         $('<div/>', {class:'schoolBtn',
-                     id:   school._id + "-Btn",
-                     text: school.name})
+                     id:   school._id + "-Btn", text: school.name})
+
       );
       // add a coursesOfSchool div immediately following;
       $('#' + school._id + '-Btn').after(
         $('<div/>', {class:'coursesOfSchool',
-                     id: slugify(school.name) + '-Courses'})
+                     id: slugify(school.name) + '-Courses'}) 
       );
       // school.name.replace... fixes issue with spaces in css id!
       // Can't believe I missed that :)
       // add the courses inside coursesOfSchool;
       $.each(school.courses, function(idx, course) {
         $('#' + slugify(school.name) + '-Courses').append(
+          /*
           $('<div/>', {id: course._id,
                        class: 'courseBtn',
                        text: course.title})
+          */
+
+          "<div class=\"course courseBtn\" id=\""+course._id+"\">"
+          +"<div class=\"folder icon\">"
+            +"<img src=\"/static/img/icon-folder.png\">"
+          +"</div>"
+          +"<div class=\"course-title\">"
+            +"<a href=\"#\">"+course.title+"</a>"
+            +"<div class=\"course-info\">"
+              +"<span class=\"instructor\">"+ course.instructor+"</span> <i class=\"icon-paper-clip\"></i><a href=\"#\">{{ course.files.count }} notes</a>"
+            +"</div> <!-- .course-info -->"
+          +"</div> <!-- .course-title -->"
+          +"<div class=\"upload\">"
+            +"<a class=\"button\" data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
+          +"</div>"
+          +"<div style=\"clear:both\"></div>"
+        +"</div>" <!-- .course -->
+
         );
         $('#' + slugify(school.name) + '-Courses').append(
           $('<div/>', {class: 'notesOfCourse'})
