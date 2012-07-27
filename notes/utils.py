@@ -34,6 +34,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
     elif isinstance(model, Course):
         json_result["_id"] = model.pk
         json_result["title"] = model.title
+        json_result["instructor"] = model.instructor.name
         json_result["notes"] = []
         if(depth > 0):
             for note in model.files.all().order_by('-timestamp'):
