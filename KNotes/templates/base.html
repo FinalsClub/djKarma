@@ -80,7 +80,68 @@
   {% endblock %}
 </head>
 
-<!-- Seths new version of the header, sans linbo's changes
+<body>
+
+<div class="container" id="container">
+
+<!-- Navbar begin -->
+<div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          {% if user.is_authenticated %}
+          <li class="dropdown" id="menu1">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+              {{ user.get_profile.getName }} & Pic
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
+              <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+              <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
+            </ul>
+          </li>
+          {% else %}
+          <li id="menu1">
+            <a href="{% url 'login' %}">login</a>
+            {% include 'modal_login.html' %}
+          </li>
+          {% endif %}
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+
+<!-- Navbar end -->
+
+
+{% block content %}
+{% endblock %}
+
+</div> <!-- .container -->
+
+{% block scripts %}
+{% endblock %}
+
+{% include 'footer.html' %}
+
+<!-- modal dialogs -->
+{% include 'modal_upload.html' %}
+{% if user %}
+  {% include 'modal_share_karma.html' %}
+{% endif %}
+
+</body>
+</html>
+
+
 <body class="ms">
 
 <div class="container" id="container">
@@ -119,61 +180,3 @@
           </ul>
         </div><!--/.nav-collapse -->
       </div>
--->
-<body>
-
-<!-- Navbar begin -->
-<div class="navbar">
-  <div class="navbar-inner">
-    <div class="container">
-      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
-      <div class="nav-collapse">
-        <ul class="nav">
-          {% if user.is_authenticated %}
-          <li class="dropdown" id="menu1">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-              {{ user.username }} & Pic
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
-            </ul>
-          </li>
-          {% else %}
-          <li id="menu1">
-            <a href="{% url 'login' %}">login</a>
-          </li>
-          {% endif %}
-        </ul>
-      </div><!--/.nav-collapse -->
-    </div>
-
-<!-- Navbar end -->
-
-
-{% block content %}
-{% endblock %}
-
-</div> <!-- .container -->
-
-{% block scripts %}
-{% endblock %}
-
-{% include 'footer.html' %}
-
-<!-- modal dialogs -->
-{% include 'modal_upload.html' %}
-{% if user %}
-  {% include 'modal_share_karma.html' %}
-{% endif %}
-
-</body>
-</html>
