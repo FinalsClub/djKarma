@@ -307,6 +307,8 @@
       <!-- one course -->
       <div class="course-listing">
         <h3>Your Courses</h3>
+        {% if user.get_profile.courses.all > 0 %}
+        {{ user.get_profile.courses.all }}
         {% for course in user.get_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
@@ -328,6 +330,9 @@
           <div style="clear:both"></div>
         </div> <!-- .course -->
         {% endfor %}
+        {% else %}
+        Inner else tag
+        {% endif %}
       </div> <!-- .course-listing -->
 
       <!-- begin file listing structure
