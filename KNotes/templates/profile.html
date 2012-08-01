@@ -221,7 +221,30 @@
     </div> <!-- .span3 -->
 
     <div class="span9">
-      <h2><span>Welcome, </span><span id="username-header">{{ user.get_profile.getName }}</span><span>!</span></h2>
+      <!-- Static navbar -->
+      <div class="navbar">
+        <div class="navbar-inner">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#"><img src="./static/img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li class="" id="menu0">
+                  <form class="navbar-search input-append form-search">
+                    <input type="text" class="input-medium search-query" placeholder="Search">
+                    <a type="submit" class="btn button">Go</a> 
+                  </form>
+                </li>
+              </ul>
+            </div><!--/.nav-collapse -->
+
+        </div>
+      <div class="clear"></div>
+      </div>
+      <h2>Welcome, {{ user.username }}!</h2>
 
       {# ------ Messages ------ #}
       {% for message in messages %}
@@ -236,6 +259,7 @@
         Success! <i class="icon-paper-clip"></i>
         Sample message for a success, you earned <span class="karma-points">+5 points</span>. Would you like to <a href="%">upload another</a>?
       </div> <!-- .alert .alert-success -->
+      -->
       {# ------ End Messages ------ #}
 
       <!-- Carousel items -->
@@ -283,6 +307,8 @@
       <!-- one course -->
       <div class="course-listing">
         <h3>Your Courses</h3>
+        {% if user.get_profile.courses.all > 0 %}
+        {{ user.get_profile.courses.all }}
         {% for course in user.get_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
@@ -304,6 +330,9 @@
           <div style="clear:both"></div>
         </div> <!-- .course -->
         {% endfor %}
+        {% else %}
+        Inner else tag
+        {% endif %}
       </div> <!-- .course-listing -->
 
       <!-- begin file listing structure
