@@ -259,7 +259,6 @@
         Success! <i class="icon-paper-clip"></i>
         Sample message for a success, you earned <span class="karma-points">+5 points</span>. Would you like to <a href="%">upload another</a>?
       </div> <!-- .alert .alert-success -->
-      -->
       {# ------ End Messages ------ #}
 
       <!-- Carousel items -->
@@ -306,9 +305,8 @@
       <!-- BEGIN COURSE LISTINGS -->
       <!-- one course -->
       <div class="course-listing">
-        <h3>Your Courses</h3>
         {% if user.get_profile.courses.all > 0 %}
-        {{ user.get_profile.courses.all }}
+        <h3>Your Courses</h3>
         {% for course in user.get_profile.courses.all %}
         <div class="course">
           <div class="folder icon">
@@ -330,8 +328,6 @@
           <div style="clear:both"></div>
         </div> <!-- .course -->
         {% endfor %}
-        {% else %}
-        Inner else tag
         {% endif %}
       </div> <!-- .course-listing -->
 
