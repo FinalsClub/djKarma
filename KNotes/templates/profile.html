@@ -244,7 +244,7 @@
         </div>
       <div class="clear"></div>
       </div>
-      <h2>Welcome, {{ user.username }}!</h2>
+      <h2>Welcome, {{ user.get_profile.getName }}!</h2>
 
       {# ------ Messages ------ #}
       {% for message in messages %}
