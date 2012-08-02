@@ -198,7 +198,7 @@ def profile(request):
     if not user_profile.grad_year:
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
-    return render(request, 'profile.html', response)
+    return render(request, 'navigation.html', response)
 
 
 def editProfile(request):
@@ -405,32 +405,17 @@ def courses(request):
 
 
 def browse(request):
-    """ Browse and Search Notes """
-    # If the SelectTagsForm form has been submitted, display search result
-    if request.method == 'POST':
-        # Use SelectTagsForm for a SelectMultiple Widget
-        #tag_form = SelectTagsForm(request.POST)
-        tag_form = TypeTagsForm(request.POST)
-        if tag_form.is_valid():
-            tags = tag_form.cleaned_data['tags']
-            print "tags! " + str(tags)
-            files = File.objects.filter(tags__in=tags).distinct()
-            return render(request, 'notes2.html', {'files': files})
-        else:
-            return render(request, 'browse.html', {'tag_form': tag_form})
-
-    # If this is a GET request, display the SelectTagsForm
-    else:
-        # Use SelectTagsForm for a SelectMultiple Widget
-        #tag_form = SelectTagsForm()
-        tag_form = TypeTagsForm()
-        return render(request, 'browse.html' )
+    """ Browse Notes """
+    return render(request, 'browse.html')
 
 
 def browse2(request):
     """ Browse and Search Notes
         Instead of jsonifying model,
         work as standard django template
+        NOTE: This is significantly slower than
+        rendering the html from JSON in the client
+        I don't intend to develop this method further
     """
     if request.user.get_profile().school != None:
         schools = [request.user.get_profile().school]
@@ -444,15 +429,21 @@ def browse2(request):
 def note(request, note_pk):
     """ View Note HTML """
     # Check that user has permission to read
-    profile = request.user.get_profile()
+    #profile = request.user.get_profile()
+    user = request.GET.get("user_pk", "")
+    try:
+        user = User.objects.get(pk=user)
+        profile = user.get_profile()
+    except:
+        raise Http404
     # If the user does not have read permission, and the
     # Requested files is not theirs
     if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        user_karma = request.user.get_profile().karma
+        user_karma = profile.karma
         level = Level.objects.get(title='Prospect')
         print level.karma
         progress = (user_karma / float(level.karma)) * 100
-        return render(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
+        return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
         note = File.objects.get(pk=note_pk)
     except:
@@ -462,7 +453,7 @@ def note(request, note_pk):
     note.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not userCanView(request.user, File.objects.get(pk=note_pk))):
+    if(not userCanView(user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')
@@ -473,7 +464,7 @@ def note(request, note_pk):
     # This is ugly, but is needed to be able to get the note type full name
     note_type = [t[1] for t in note.FILE_TYPES if t[0] == note.type][0]
     url = iri_to_uri(note.file.url)
-    return render(request, 'note.html', {'note': note, 'note_type': note_type, 'url': url})
+    return TemplateResponse(request, 'note_ajax.html', {'note': note, 'note_type': note_type, 'url': url})
 
 
 def searchBySchool(request, school_pk=-1):
@@ -580,7 +571,7 @@ from haystack.query import SearchQuerySet
 def search(request):
     results = []
     # Process query and return results
-    if request.is_ajax():
+    if request.GET.get("q", "") != "":
         q = request.GET.get("q", "")
         user_pk = request.GET.get("user", "-1")
         print "searching for: " + q + " . User: " + str(user_pk)

@@ -28,7 +28,7 @@
   <script type="text/javascript">
   $(document).ready(function(){
     // Show file info on hover
-    $("#container").on("hover","div.file.row-fluid", function(){
+    $(".container").on("hover","div.file.row-fluid", function(){
       console.log("file hover");
       $(this).find('.file-info-action').toggleClass("hide");
     });
