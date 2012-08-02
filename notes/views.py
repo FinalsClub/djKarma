@@ -47,14 +47,18 @@ import datetime
 ## :|: Static pages :|: &
 def home(request):
     """ Landing Page [static] """
-    # Get the 'singleton' SiteStats instance
-    stats = SiteStats.objects.get(pk=1)
 
-    #Get recently uploaded files
-    recent_files = File.objects.order_by('-timestamp')[:7]
-    print recent_files
+    if request.user.is_authenticated():
+        return profile(request)
+    else:
+        # Get the 'singleton' SiteStats instance
+        stats = SiteStats.objects.get(pk=1)
 
-    return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+        #Get recently uploaded files
+        recent_files = File.objects.order_by('-timestamp')[:7]
+        #print recent_files
+
+        return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
 def about(request):
     return render(request, 'static/about.html')
