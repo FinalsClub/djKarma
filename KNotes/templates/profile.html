@@ -34,14 +34,19 @@
                  height: 50
               });
 
-    // Handle username edit in place
+    // Handle username edit in place click
     $("#edit-username").on("click", function(e){
       e.preventDefault();
-      $("#edit-username-label").hide();
-      $("#username-label").hide();
-      username = $("#username-label").text();
-      console.log("edit username: " + username);
-      $("#username-input").val(username);
+      $("#alias-label-profile").hide();
+      $("#edit-alias-label").hide();
+      // If the user has no alias set, 
+      // show username as alias input initial value
+      if($("#alias-label-profile").text() == "")
+        alias = $("#username-label-profile").text();
+      else
+        alias = $("#alias-label-profile").text();
+      console.log("edit username: " + alias);
+      $("#username-input").val(alias);
       $("#username-form").show();
     });
 
@@ -115,13 +120,13 @@
 
     function alias_callback(data){
       if(data.status === "success"){
-        $("#username-form").hide();
-        $("#edit-username-label").show();
         console.log("Alias callback!");
         console.log(data.alias);
-        $("#username-header").text(data.alias);
-        $("#username-label").text(data.alias);
-        $("#username-label").show();
+        $("#username-form").hide();
+        // show username-alias-label?
+        $("#edit-alias-label").show();
+        $(".alias-label").text(data.alias);
+        $("#alias-label-profile").show();
       }
     }
 
@@ -175,10 +180,19 @@
           <div class="thumbnail">
             <img alt="" src="http://placehold.it/230x100">
             <div class="caption">
-              <span id="username-label">{{ user.get_profile.getName }} </span><span id="edit-username-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
-              <form class="span2" id="username-form" action="#" style="display:none">
-              <input class="span2" name="username" id="username-input"></input>
-              </form>
+              <div>
+                <span class="username-label" id="username-label-profile">{{ user.username }}</span>
+              </div>
+              <div>
+                <span class="alias-label-description">Alias:</span>
+                <span class="alias-label" id="alias-label-profile"> {% if user.username != user.get_profile.getName %}{{user.get_profile.getName}} {% endif %} </span>
+                <span id="edit-alias-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
+                <form class="span2" id="username-form" action="#" style="display:none">
+                  <input class="span2" name="username" id="username-input"></input>
+                  This is your public alias, you'll still login with your original username ({{request.user.username}})
+                </form>
+              </div>
+              
               <br><br>
 
               <!-- progress bar -->
@@ -244,7 +258,7 @@
         </div>
       <div class="clear"></div>
       </div>
-      <h2>Welcome, {{ user.get_profile.getName }}!</h2>
+      <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
 
       {# ------ Messages ------ #}
       {% for message in messages %}
