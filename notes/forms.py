@@ -15,6 +15,10 @@ from models import School, Course, File, Tag, Instructor
 class FileMetaDataForm(forms.Form):
     file_pk      = forms.CharField(max_length=255, \
                     widget=forms.HiddenInput(attrs={'id': 'file-form-file_pk'}))
+    school_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-school_pk'}))
+    course_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-course_pk'}))
     type        = forms.ChoiceField(choices=File.FILE_PTS)
     title       = forms.CharField(max_length=50, \
                     error_messages={'required': 'Enter a title.'}, \

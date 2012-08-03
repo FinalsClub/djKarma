@@ -120,6 +120,8 @@
       }
       url = "/filemeta";
       $("#file-form-file_pk").val(file_pk);
+      $("#file-form-course_pk").val(course_pk);
+      $("#file-form-school_pk").val(school_pk);
       // Re-Serialize form data for POSTing
       var form_data = $(this).serializeArray();
       $.post(url, form_data,

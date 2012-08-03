@@ -90,18 +90,25 @@ def fileMeta(request):
             file.type = form.cleaned_data["type"]
             file.title = form.cleaned_data["title"]
             file.descriptioin = form.cleaned_data["description"]
+            try:
+                file.school = School.objects.get(pk=int(form.cleaned_data["school_pk"]))
+                file.course = Course.objects.get(pk=int(form.cleaned_data["course_pk"]))
+            except Exception, e:
+                print "school/course fuckup: " + str(e)
             # process Tags
             processCsvTags(file, form.cleaned_data['tags'])
             file.save()
             response = {}
             response["status"] = "success"
             response["file_pk"] = file.pk
+            print "fileMeta form valid! " + str(file.pk)
             if request.user.is_authenticated():
                 # This should let us use django's messaging system to do the alert-notifications
                 # in our design on upload success at the top of the profile
                 # FIXME: fix this message with proper html
                 messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
         else:
+            print "fileMeta form NOT valid!"
             response["form"] = form
             response["message"] = "Please check your form data."
             return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
