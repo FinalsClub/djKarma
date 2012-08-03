@@ -482,7 +482,7 @@ def searchBySchool(request, school_pk=-1):
         else:
             school = get_object_or_404(School, pk=school_pk)
             response_json.append(jsonifyModel(model=school, depth=1))
-        print 'searchBySchool: ' + str(response_json)
+        #print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
@@ -512,7 +512,7 @@ def notesOfCourse(request, course_pk):
         #print jsonifyModel(school, depth=2)
         response_json.append(jsonifyModel(course, depth=1, user_pk=user_pk))
             #response_json.append(school_json)
-        print json.dumps(response_json)
+        #print json.dumps(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
