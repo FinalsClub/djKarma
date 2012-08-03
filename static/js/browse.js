@@ -163,7 +163,7 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
               +"<span class=\"user\">Uploaded by <a href=\"#\"><i class=\"icon-user\"></i>"+note.user+"</a></span>"
               +"<span class=\"download\"><a class=\"view-file\" id=\""+note._id+"\" href=\"#\"><i class=\"icon-paper-clip\"></i>View file</a></span>";
 
-            if (note.canvote === 1){
+            if (parseInt(note.canvote) === 1){
               listItems += "<span class=\"karma-points\">OWNED</span>";
             }
             else{
