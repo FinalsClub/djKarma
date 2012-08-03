@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
@@ -33,27 +34,37 @@ from models import Instructor
 from models import SiteStats
 from models import Level
 from models import Vote
+from models import ReputationEventType
 from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import processCsvTags
-from utils import uploadForm
+from utils import userCanView
+
+import datetime
 
 #from django.core import serializers
 
 ## :|: Static pages :|: &
 def home(request):
     """ Landing Page [static] """
-    # Get the 'singleton' SiteStats instance
-    stats = SiteStats.objects.get(pk=1)
 
-    #Get recently uploaded files
-    recent_files = File.objects.order_by('-timestamp')[:7]
+    if request.user.is_authenticated():
+        return profile(request)
+    else:
+        # Get the 'singleton' SiteStats instance
+        stats = SiteStats.objects.get(pk=1)
 
-    return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+        #Get recently uploaded files
+        recent_files = File.objects.order_by('-timestamp')[:7]
+        #print recent_files
 
+        return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
 
 def about(request):
     return render(request, 'static/about.html')
+
+def terms(request):
+    return render(request, 'static/ToS.html')
 
 ## :|: Uploading :|: &
 
@@ -156,63 +167,78 @@ def profile(request):
 
     # Calculate User's progress towards next Karma level
     # Depends on models.Level objects
-    user_karma = request.user.get_profile().karma
-    levels = Level.objects.all() # FIXME: this query could contain the logic of the loop below
+    user_profile = request.user.get_profile()
 
-    for level in levels:
-        if user_karma < level.karma:
-            response['next_level'] = level
-            break
+    user_level = request.user.get_profile().getLevel()
+    response['current_level'] = user_level['current_level']
 
     # The user has reached the top level
-    if not response['next_level']:
+    if not 'next_level' in user_level:
+        #print user_level['current_level'].title + " Top Level"
         response['progress'] = 100
     else:
-        response['progress'] = (user_karma / float(response['next_level'].karma)) * 100
+        #print user_level['current_level'].title + " " + user_level['next_level'].title
+        response['next_level'] = user_level['next_level']
+        response['progress'] = (user_profile.karma / float(response['next_level'].karma)) * 100
 
     #Pre-populate ProfileForm with user's data
-    response['profile_data'] = {}
-    if request.user.get_profile().school != None:
-        response['profile_data']['school'] = request.user.get_profile().school
 
         # If user has a school selected, fetch recent additions to School
         # For the user's news feed
-        response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
-    if request.user.get_profile().grad_year != None:
-        response['profile_data']['grad_year'] = request.user.get_profile().grad_year
+        #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
-    # If user profile data has been submitted:
-    if request.method == 'POST':
-        # TODO: merge the other return into this IF
-        #This must go before profile data calc
-        profile_form = ProfileForm(request.POST)
-        if profile_form.is_valid():
-            # Update user profile with form data
-            # Karma points will be added as necessary
-            # By UserProfile model
-            profile = request.user.get_profile()
-            profile.school = profile_form.cleaned_data['school']
-            #print "grad_year " + str(profile_form.cleaned_data['grad_year'])
-            if not profile_form.cleaned_data['grad_year'] == "":
-                profile.grad_year = profile_form.cleaned_data['grad_year']
-            profile.save()
-            response['profile_form'] = profile_form
-    else:
-        # If GET, Populate Profileform with existing profile data
-        response['profile_form'] = ProfileForm(initial=response['profile_data'])
-
-    user_profile = request.user.get_profile()
     response['messages'] = complete_profile_prompt(user_profile)
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.invite_hash)
     response['user_profile'] = user_profile
-
-    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.hash)
-
     response = get_upload_form(response)
 
     # home built auto-complete
-    response['available_schools'] = [str(school.name) for school in School.objects.all()]
+    if not user_profile.school:
+        response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    if not user_profile.grad_year:
+        response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
-    return render(request, 'profile.html', response)
+    return render(request, 'navigation.html', response)
+
+
+def editProfile(request):
+    if(request.is_ajax()):
+        response = {}
+        do_save = False
+        user_pk = int(request.GET.get('user', -1))
+        print user_pk
+        if user_pk == -1:
+            raise Http404
+        user_profile = User.objects.get(pk=user_pk).get_profile()
+        if 'school' in request.GET:
+            do_save = True
+            user_profile.school = School.objects.get(pk=int(request.GET['school']))
+            response['school'] = user_profile.school.name
+            # When the user_profile is saved, submitted_school / year are adjusted
+            if not user_profile.submitted_school:
+                response['karma'] = ReputationEventType.objects.get(title="profile-school").actor_karma
+        if 'year' in request.GET:
+            do_save = True
+            user_profile.grad_year = request.GET['year']
+            response['year'] = user_profile.grad_year
+            if not user_profile.submitted_grad_year:
+                response['karma'] = ReputationEventType.objects.get(title="profile-grad-year").actor_karma
+
+        if 'alias' in request.GET:
+            do_save = True
+            print "PRE: " + str(user_profile.alias)
+            user_profile.alias = request.GET['alias']
+            print "POST: " + str(user_profile.alias)
+            response['alias'] = user_profile.alias
+
+        if do_save:
+            user_profile.save()
+            response['status'] = 'success'
+            return HttpResponse(json.dumps(response), mimetype="application/json")
+        else:
+            return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
+    else:
+        raise Http404
 
 def get_upload_form(response):
     """ Appends forms required for upload form to response
@@ -295,37 +321,7 @@ def addCourseOrSchool(request):
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
-def register_invited(request, invite):
-    """ This is a full-page version of the registration page that has an
-        optional urlargument for the invite code.
-        The invite code is a hash on the UserProfile object.
-    """
-    if request.method == 'POST':
-        # Fill form with POSTed data
-        form = forms.UserCreationForm(request.POST)
-        if form.is_valid():
-            print 'form valid'
-            new_user = form.save() # Save the new user from form data
-            # Authenticate the new user
-            new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            # Login in the new user
-            login(request, new_user)
-
-            # Grant the inviter some points
-            # TODO grant some points
-            return HttpResponseRedirect("/profile")
-        else:
-            # TODO: replace this with a version of the front page with a register form
-            return render(request, "registration/register.html", {
-        'form': form})
-    else:
-        form = forms.UserCreationForm()
-        # TODO: replace this with a version of the front page with a register form
-        return render(request, "registration/register.html", {'form': form})
-
-
-def register(request):
+def register(request, invite_code):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
         to django's built-in login view (django.contrib.auth.views.login).
@@ -409,41 +405,45 @@ def courses(request):
 
 
 def browse(request):
-    """ Browse and Search Notes """
-    # If the SelectTagsForm form has been submitted, display search result
-    if request.method == 'POST':
-        # Use SelectTagsForm for a SelectMultiple Widget
-        #tag_form = SelectTagsForm(request.POST)
-        tag_form = TypeTagsForm(request.POST)
-        if tag_form.is_valid():
-            tags = tag_form.cleaned_data['tags']
-            print "tags! " + str(tags)
-            files = File.objects.filter(tags__in=tags).distinct()
-            return render(request, 'notes2.html', {'files': files})
-        else:
-            return render(request, 'search.html', {'tag_form': tag_form})
+    """ Browse Notes """
+    return render(request, 'browse.html')
 
-    # If this is a GET request, display the SelectTagsForm
+
+def browse2(request):
+    """ Browse and Search Notes
+        Instead of jsonifying model,
+        work as standard django template
+        NOTE: This is significantly slower than
+        rendering the html from JSON in the client
+        I don't intend to develop this method further
+    """
+    if request.user.get_profile().school != None:
+        schools = [request.user.get_profile().school]
     else:
-        # Use SelectTagsForm for a SelectMultiple Widget
-        #tag_form = SelectTagsForm()
-        tag_form = TypeTagsForm()
-        return render(request, 'search.html', {'tag_form': tag_form})
+        schools = School.objects.all()
+
+    return render(request, 'browse2.html', {"schools": schools})
 
 
 @login_required
 def note(request, note_pk):
     """ View Note HTML """
     # Check that user has permission to read
-    profile = request.user.get_profile()
+    #profile = request.user.get_profile()
+    user = request.GET.get("user_pk", "")
+    try:
+        user = User.objects.get(pk=user)
+        profile = user.get_profile()
+    except:
+        raise Http404
     # If the user does not have read permission, and the
     # Requested files is not theirs
-    if not profile.can_read and not profile.files.filter(pk=note_pk).exists():
-        user_karma = request.user.get_profile().karma
+    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
+        user_karma = profile.karma
         level = Level.objects.get(title='Prospect')
         print level.karma
         progress = (user_karma / float(level.karma)) * 100
-        return render(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
+        return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
         note = File.objects.get(pk=note_pk)
     except:
@@ -453,7 +453,7 @@ def note(request, note_pk):
     note.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not profile.files.filter(pk=note.pk).exists()):
+    if(not userCanView(user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')
@@ -464,21 +464,25 @@ def note(request, note_pk):
     # This is ugly, but is needed to be able to get the note type full name
     note_type = [t[1] for t in note.FILE_TYPES if t[0] == note.type][0]
     url = iri_to_uri(note.file.url)
-    return render(request, 'note.html', {'note': note, 'note_type': note_type, 'url': url})
+    return TemplateResponse(request, 'note_ajax.html', {'note': note, 'note_type': note_type, 'url': url})
 
 
-def searchBySchool(request):
+def searchBySchool(request, school_pk=-1):
     """ Ajax: Return all schools and courses in JSON
         Used by search page javascript
     """
     response_json = []
 
     if request.is_ajax():
-        schools = School.objects.all()
-        for school in schools:
-            school_json = jsonifyModel(model=school, depth=1)
-            response_json.append(school_json)
-        #print 'searchBySchool: ' + str(response_json)
+        if school_pk == -1:
+            schools = School.objects.all()
+            for school in schools:
+                school_json = jsonifyModel(model=school, depth=1)
+                response_json.append(school_json)
+        else:
+            school = get_object_or_404(School, pk=school_pk)
+            response_json.append(jsonifyModel(model=school, depth=1))
+        print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
         raise Http404
@@ -558,7 +562,7 @@ def vote(request, file_pk):
         return HttpResponse("You cannot vote on a file you have not viewed")
 
 
-''' 
+'''
     Search testing
 '''
 from haystack.query import SearchQuerySet
@@ -567,19 +571,20 @@ from haystack.query import SearchQuerySet
 def search(request):
     results = []
     # Process query and return results
-    if request.is_ajax():
+    if request.GET.get("q", "") != "":
         q = request.GET.get("q", "")
-        print "searching for: " + q
+        user_pk = request.GET.get("user", "-1")
+        print "searching for: " + q + " . User: " + str(user_pk)
         if q != "":
             #Exact match result:
             #results = SearchQuerySet().filter(content__contains=q)
-            results = SearchQuerySet().filter(content_auto__contains=q)
+            results = SearchQuerySet().filter(content_auto__contains=q).order_by('django_ct')
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=q)
             #print results
             if len(results) == 0:
                 return HttpResponse("No Results")
             else:
-                return TemplateResponse(request, 'search_results.html', {"results": results})
+                return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
         raise Http404
     return render(request, 'search2.html')

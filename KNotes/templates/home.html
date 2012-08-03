@@ -3,7 +3,7 @@
 
 {% block header %}
 
-<script type="text/javascript" src="static/js/jquery.jcarousel.min.js"></script>
+{#<script type="text/javascript" src="static/js/jquery.jcarousel.min.js"></script>#}
 <script type="text/javascript" src="static/js/jquery.screwdefaultbuttons.min.js"></script>
 
 <script type="text/javascript">
@@ -31,6 +31,7 @@ jQuery(document).ready(function() {
     auto: 2,
     scroll: 1,
     wrap:'circular',
+    itemFallbackDimension: 300,
     initCallback: mycarousel_initCallback
   });
 });
@@ -42,18 +43,24 @@ jQuery(document).ready(function() {
 <div class="container">
 
   <div class="hero-unit">
+    <a class="brand" href="#">
+          <img src="/static/img/karma-logo.png" class="logo-mark">
+          <span class="logo-karma">Karma</span>
+          <span class="logo-notes">Notes</span>
+        </a>
+
+
     <div class="vidholder">
       <img src="http://placehold.it/350x280" width="350" height="280">
     </div>
     <div class="block">
-      <h1>Share notes.</h1>
-      <h1>Ace your exams.</h1>
+      <h1>Share notes. Ace your exams.</h1>
       <h2>Upload your notes to get instant access to over 503,933 study materials. Free.</h2>
       <div class="call-to-action">
         <a href="#" class="button">UPLOAD FILE</a>
-        <div class="instant">for instant access</div>
         <div class="clear"></div>
-        <div class="dragdrop">Or drag + drop anywhere on this page</div>
+        <div class="instant">for instant access</div>
+        {# <div class="dragdrop">Or drag + drop anywhere on this page</div> #}
       </div>
       <div class="clear"></div>
     </div> <!-- .block -->
@@ -76,12 +83,7 @@ jQuery(document).ready(function() {
           {{ file.description }}
         </div>
         <div class="file-info-action hide row">
-          <div class="file-info">
-            <span class="user">uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.username }}</a></span>
-            <span class="download"><a href="/file/{{ file.id }}"><i class="icon-paper-clip"></i>view file</a></span>
-            <span class="karma-points">-10 points</span>
-            <span class="views">{{ file.viewCount }} views</a>
-          </div> <!-- .file-info -->
+          {% include "file-info.html" with file=file %}
         </div> <!-- .file-info-action -->
       </div> <!-- .file .row-fluid -->
     </li> <!-- end one file -->

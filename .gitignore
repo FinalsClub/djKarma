@@ -6,3 +6,11 @@
 /uploads
 /notes/migrations
 *local_settings.py
+static/css/mixins.css
+static/css/responsive-utilities.css
+static/css/responsive.css
+static/css/styles.css
+static/css/utilities.css
+static/css/variables.css
+static/css/bootstrap.css
+static/less/bootstrap *.css

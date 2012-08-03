@@ -1,65 +1,51 @@
-{% extends "index.html" %}
-
-{% block content %}
-
-<div id="browseForNotes">
-    <h1>Browse by School and Course</h1>
-    <div id="searchBySchool"></div>
-    <div id="searchByTags" style="clear:both;">
-    <br/>
-    <h2> - or - </h2>
-    <br/>
-    <h1>Search By Tag</h1>
-      <form enctype="multipart/form-data" action="/search" method="post">{% csrf_token %}
-      {{ message }}
-      {% for field in tag_form %}
-        <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-        {{ field.label_tag }} 
-        {{ field }}
-      {% endfor %}<br/>
-      <input class="btn btn-primary" type="submit" value="Search!" />
-    </form>
-    </div>
-  </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-$(document).ready(function() {
-  // get school and course info: (example)
-  // <div id="4e5bb37258200ed9aabc6d65-Btn" class="schoolBtn">Brown</div>
-  // <div id="Brown-Courses" class="coursesOfSchool">
-  //   <div id="4e5bb37258200ed9aabc5d65" class="courseBtn">Accounting 101</div>
-  //   <div id="4e5bb37258200ed9aabc5d66" class="courseBtn">Computer Science 50</div>
-  //   <div id="4e5bb37258200ed9aabc5d67" class="courseBtn">Economics 10</div>
-  // </div><!-- Brown-Courses -->
-  $.getJSON('/searchBySchool', function(schoolsArr) {
+function initializeBrowseView(){
+$.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
     $.each(schoolsArr, function(idx, school) {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
         $('<div/>', {class:'schoolBtn',
-                     id:   school._id + "-Btn",
-                     text: school.name})
+                     id:   school._id + "-Btn", text: school.name})
+
       );
       // add a coursesOfSchool div immediately following;
       $('#' + school._id + '-Btn').after(
         $('<div/>', {class:'coursesOfSchool',
-                     id: slugify(school.name) + '-Courses'})
+                     id: slugify(school.name) + '-Courses'}) 
       );
       // school.name.replace... fixes issue with spaces in css id!
       // Can't believe I missed that :)
       // add the courses inside coursesOfSchool;
       $.each(school.courses, function(idx, course) {
         $('#' + slugify(school.name) + '-Courses').append(
+          /*
           $('<div/>', {id: course._id,
                        class: 'courseBtn',
                        text: course.title})
+          */
+
+          "<div class=\"course courseBtn\" id=\""+course._id+"\">"
+          +"<div class=\"folder icon\">"
+            +"<img src=\"/static/img/icon-folder.png\">"
+          +"</div>"
+          +"<div class=\"course-title\">"
+            +"<a href=\"#\">"+course.title+"</a>"
+            +"<div class=\"course-info\">"
+              +"<span class=\"instructor\">"+ course.instructor+"</span> <i class=\"icon-paper-clip\"></i><a href=\"#\">"+ course.num_notes +" notes</a>"
+            +"</div> <!-- .course-info -->"
+          +"</div> <!-- .course-title -->"
+          +"<div class=\"upload\">"
+            +"<a class=\"button\" data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
+          +"</div>"
+          +"<div style=\"clear:both\"></div>"
+        +"</div>" <!-- .course -->
+
         );
         $('#' + slugify(school.name) + '-Courses').append(
           $('<div/>', {class: 'notesOfCourse'})
         );
       });
     });
+  $('.coursesOfSchool').hide();
   });
 
   // =========================================================================
@@ -116,11 +102,7 @@ $(document).ready(function() {
     var reqTime = new Date().getTime();
     // Only perform the request if the corresponding notesOfCourse div doesn't have the 'populated' class
     if(!$(this).next().hasClass('populated')){
-    {% if request.user.is_authenticated %}
-      $.getJSON('/notesOfCourse/' + courseID+'?user={{request.user.pk}}', function(noteArray) {
-      {% else %}
-      $.getJSON('/notesOfCourse/' + courseID, function(noteArray) {
-      {% endif %}
+      $.getJSON('/notesOfCourse/' + courseID+'?user='+user_pk, function(noteArray) {
       //console.log("/notesOfCourse/ in " + (new Date().getTime() - reqTime)/1000+"s");
       reqTime = new Date().getTime();
         // validate json
@@ -168,7 +150,36 @@ $(document).ready(function() {
               }
             }
             // Inject note data div
-            listItems += "<div>"
+            listItems += "<div class=\"file row-fluid\">"
+          +"<div class=\"file icon\"></div>"
+          +"<div class=\"file-title\">"
+            +"<a href=\"#\">"+note.notedesc+"</a>"
+          +"</div>";
+
+
+            listItems += "<div class=\"note\">"
+              +"<div class=\"file-info-action hide row\">"
+              +"<div class=\"file-info\"> "
+              +"<span class=\"user\">Uploaded by <a href=\"#\"><i class=\"icon-user\"></i>"+note.user+"</a></span>"
+              +"<span class=\"download\"><a class=\"view-file\" id=\""+note._id+"\" href=\"#\"><i class=\"icon-paper-clip\"></i>View file</a></span>";
+
+            if (note.owns === 1){
+              listItems += "<span class=\"karma-points\">OWNED</span>";
+            }
+            else{
+              listItems += "<span class=\"karma-points\">-10 points</span>";
+            }
+            listItems += "<span class=\"views\">"+note.views+" Views </span>"
+              +"</div>";
+
+            listItems += "<div class=\"file-actions\" id=\"file-"+note._id+"\">"
+                +"<a href=\"#\" class=\"vote upvote\"><i class=\"icon-heart\"></i>Like ("+note.upvotes+")</a>"
+                +"<a href=\"#\" class=\"vote downvote\"><i class=\"icon-flag\"></i>Flag</a>"
+                +"<a href=\"#\"><i class=\"icon-pencil\"></i>Edit</a>"
+                +"<a href=\"#\"><i class=\"icon-remove-circle\"></i>Delete</a>"
+              +"</div></div></div></div>";
+            /*
+            listItems += "<div class=\"note\">"
                           +"<div style=\"display:inline-block;text-align:center\">"
                             +"<img style=\"opacity:"+vote_opacity+"\" class=\"vote upvote "+note.canvote+"\" id=\""+note._id+"-upvote\" src=\"{{STATIC_URL}}img/"+vote_up_img+"\"/>"
                             +"<div id=\""+note._id+"-pts\">"+note.pts+"</div>"
@@ -180,7 +191,8 @@ $(document).ready(function() {
                             +"<div>Uploaded by " + note.user + "</div>"
                           +"</div>"
                           +"</div>";
-          //alert(course._id);
+                                    //alert(course._id);
+                                    */
           
         });
         /* Instead of creating notesOfCourse, fill it
@@ -213,8 +225,6 @@ $(document).ready(function() {
 
   // Vote click-listener
   $('#searchBySchool').on("click", ".vote", function() {
-    // Only allow voting if user is signed in
-    {% if request.user.is_authenticated %}
     // check if user canvote on this note
     //if($(this).hasClass('true')){
       // note_id = [note_pk]-[upvote/downvote]
@@ -232,8 +242,9 @@ $(document).ready(function() {
       
       $.ajax({
                 // /vote/note_pk?v=vote_value
+                // NOTE: user_pk value is provided by page embedding this script
                 url: "/vote/"+note_id.split("-")[0],
-                data: {'vote': vote, 'user':{{request.user.pk}} },
+                data: {'vote': vote, 'user':user_pk },
                 success: function(data) {
                   //alert(data);
                     if (data === "success"){
@@ -263,11 +274,9 @@ $(document).ready(function() {
                 },
                 dataType: "text"
             });
-
-    {% else %}
-      alert('You must sign in to vote');
-    {% endif %}
   });
+
+}// end initializeBrowseView()
 
   var fileListHeaderDrawn = false;
   function nodeToString ( node ) {
@@ -286,7 +295,3 @@ $(document).ready(function() {
           .replace(/ +/g,'-')
           ;
   }
-
-}); // end $(document).ready
-</script>
-{% endblock %}

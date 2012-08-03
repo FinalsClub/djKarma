@@ -209,6 +209,11 @@ class Course(models.Model):
             increment(self)
         super(Course, self).save(*args, **kwargs)
 
+    class Meta:
+        # sort by "the date" in descending order unless
+        # overridden in the query with order_by()
+        ordering = ['title']
+
 # On Course delete, decrement numCourses
 post_delete.connect(decrement, sender=Course)
 
@@ -277,6 +282,14 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
+    def ownedBy(user_pk):
+        """ Returns true if the user owns or has "paid" for this file
+        """
+        # If the file is in the user's collection, or the user owns the file
+        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=self.pk).exists():
+            return True
+        return False
+
     def Vote(self, voter, vote_value=0):
         """ Calls UserProfile.awardKarma
             with the appropriate ReputationEventType slug title("upvote", "downvote")
@@ -329,11 +342,13 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
 
+    alias = models.CharField(max_length=16, blank=True, null=True)
+
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
     # unique 6 char hex value for invites
-    hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
+    invite_hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -374,9 +389,40 @@ class UserProfile(models.Model):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
 
+    def getLevel(self):
+        """ Determine the current level of the user
+            based on their karma and the Levels.
+            Returns a dictionary of
+            [current_level] -> Level
+            [next_level] -> Next Level
+
+        """
+        response = {}
+        levels = Level.objects.all().order_by('karma')
+        for (counter, level) in enumerate(levels):
+            if self.karma < level.karma:
+                if counter > 0:
+                    response['next_level'] = level
+                    response['current_level'] = levels[counter - 1]
+                else:
+                    # If the user has not surpassed the first level
+                    response['current_level'] = level
+                    response['next_level'] = levels[counter + 1]
+                break
+        if not 'next_level' in response:
+            response['current_level'] = levels[len(levels) - 1]
+        return response
+
     # Get the "name" of this user for display
     # If no first_name, user username
     def getName(self):
+        """ Generate the front-facing username for this user.
+            Prefer user-supplied alias first,
+            Second, username given on standard account signup
+            Lastly, first name last initial (from social login) 
+        """
+        if self.alias and self.alias != "":
+            return self.alias
         if self.user.first_name:
             if self.user.last_name:
                 # First name + Last name initial
@@ -452,7 +498,9 @@ class UserProfile(models.Model):
             Automatically called on UserProfile post_save
         """
         # Grad year was set for the first time, award karma
-        if self.grad_year != None and not self.submitted_grad_year:
+        #print (self.grad_year == "")
+        if self.grad_year != "" and not self.submitted_grad_year:
+            print "grad year submitted"
             self.submitted_grad_year = True
             self.awardKarma('profile-grad-year')
 

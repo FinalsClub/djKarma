@@ -7,14 +7,11 @@
 
 
 {% block header %}
-  <script type="text/javascript">
-    //$('.carousel('pause').carousel()')
-    //$(".collapse").collapse()
-  </script>
 
   <script type="text/javascript">
 
   var current_karma = {{ user.get_profile.karma }};
+  var user_pk = {{user.pk}};
 
   $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
@@ -34,16 +31,49 @@
                  height: 50
               });
 
-    // Handle nav-bar-search form submit
-    $('.nav-collapse').on("submit", "form", function(){
-      event.preventDefault(); // ensure no DOM handling
-      console.log("SEARCH INTERCEPT");
-      if($(this).hasClass("navbar-search")){
-        // redirect to search result page
-        window.location="http://www.someplace.com/ns.html";
-        //ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
-        return false; // do not pass event on to DOM handler
+    // Handle browse notes view
+    var browse_view_initialized = false;
+    $('.container').on("click", "#browse-notes", function(){
+      console.log("BROWSE INTERCEPT");
+      if(!browse_view_initialized){
+        initializeBrowseView();
+        browse_view_initialized = true;
       }
+      $('#profile-container').hide();
+      $('#file-view').hide();
+      $('#searchBySchool').show();
+      
+    });
+
+    // Handle KarmaNotes logo click
+     $('.container').on("click", ".brand", function(){
+      console.log("LOGO INTERCEPT");
+      $('#profile-container').show();
+      $('#file-view').hide();
+      $('#searchBySchool').hide();
+      $('#search-results').hide();
+
+    });
+
+     // Handle view file click
+     $('.container').on("click", ".view-file", function(){
+      console.log("FILE VIEW INTERCEPT");
+      file_pk = $(this).attr("id");
+
+      $.ajax({
+        url: "/file/"+file_pk,
+        data: {'user_pk': user_pk},
+        success: function(data){
+          $('#file-view').hide();
+          $('#profile-container').hide();
+          $('#searchBySchool').hide();
+          $('#search-results').hide();
+          $('#file-view').html(data);
+          $('#file-view').show();
+        }
+      });
+
+
     });
 
     // Handle username edit in place click
@@ -91,6 +121,34 @@
       }
       
     });
+
+    // Handle search request from navbar search
+    $('.nav-collapse').on("submit", ".navbar-search", function(event){
+      event.preventDefault(); // ensure no DOM handling
+      console.log("SEARCH INTERCEPT");
+      ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
+      return false; // do not pass event on to DOM handler
+    });
+
+  // handle search response
+  var search_callback = function(data){
+    console.log(data);
+    $('#profile-container').hide();
+    $('#searchBySchool').hide();
+    $('#search-results').fadeOut('fast', function(){
+      $('#search-results').html(data).fadeIn('fast');
+    });
+  
+  };
+
+  // perform ajax /search query
+  function ajaxSearchQuery(query, callback){
+    $.ajax({
+      url: "/search",
+      data: {'q': query , 'user': user_pk},
+      success: callback
+    });
+  }
 
 }); // end on document ready
 
@@ -159,11 +217,13 @@
       
     }
   </script>
-  <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
+
+  <!--<script SRC="/static/js/search.js"></script>-->
+  <script SRC="/static/js/browse.js"></script>
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"></script>
   <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"> </script>
 
 {% endblock %}
-
 
 {% block content %}
 
@@ -173,7 +233,7 @@
     <div class="span3">
       <ul class="nav nav-list">
         <li class="active">
-          <a href="/browse">
+          <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
           </a>
@@ -271,6 +331,16 @@
         </div>
       <div class="clear"></div>
       </div>
+      <!-- File view goes here -->
+      <div id="file-view" style="display:none">
+      </div>
+      <!-- Search results go here -->
+      <div id="search-results" style="display:none">
+      </div>
+      <!-- Note browsing goes her -->
+      <div id="searchBySchool" style="display:none">
+      </div>
+      <div id="profile-container">
       <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
 
       {# ------ Messages ------ #}
@@ -329,9 +399,6 @@
         <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
       </div> <!-- #myCarousel .carousel .slide -->
 
-      
-      <div class="search-results">
-      </div>
       <!-- BEGIN COURSE LISTINGS -->
       <!-- one course -->
       <div class="course-listing">
@@ -408,7 +475,7 @@
         <!-- {% endfor %} -->
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
-
+</div><!-- content container -->
 </div> <!-- .profile-page .container -->
 
 {% endblock %}

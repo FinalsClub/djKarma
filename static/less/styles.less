@@ -20,8 +20,8 @@
 @font: 'Open Sans';
 @mini-size:12px;
 @body-size: 14px;
-@hero-size: 50px;
-@h2-size: 25px;
+@hero-size: 30px;
+@h2-size: 20px;
 @h3-size: 18px;
 
 /* button fonts */
@@ -50,7 +50,7 @@ body, p, div, tr, td, table, span, h2, h3, h1, h4, h5, a:link {
 }
 
 .container {
-	margin-top:30px;
+	margin-top:0px;
 }
 
 .hero-unit h1 {
@@ -194,7 +194,6 @@ li#menu0 {
 
 .hero-unit a.button {
     .button-hero-font;
-    margin-top:20px;
     display:inline-block;
     padding:20px;
 }
@@ -217,8 +216,8 @@ li#menu0 {
     background:@karma;
     .inset-box-shadow(darken(@karma,10%));
     .rounded-corners;
-    display:inline;
-    padding:1px 5px;
+    display:inline-block;
+    padding:2px 5px;
     text-transform:uppercase;
     font-size:10px;
 }
@@ -468,7 +467,7 @@ hide {
 		padding-left:0;
 		
 		.logo-mark {
-			width:23px;
+			width:26px;
 			margin-bottom: -5px;
 			position: relative;
 			margin-right: 3px;
@@ -477,14 +476,20 @@ hide {
 			span.logo-karma {
 				color:@karma;
 				font-family:'MuseoSlab-500';
+				font-size:24px;
 			}
 			span.logo-notes {
 				color:@text-color;
-				font-weight:400;
+				font-size:24px;
+				font-weight:600;
 			}
 		}
 	}
 	
+}
+
+.nav-list {
+    margin-top:15px;
 }
 
 
@@ -495,41 +500,61 @@ hide {
 
 .hero-unit {
     background:none;
-	padding:0;
-	margin-top:20px;
-	margin-bottom:20px;
-	
-	.call-to-action {
-		display:block;
-		float:left;
-	}
+    padding:0;
+    margin-top:20px;
+    margin-bottom:20px;
+    text-align:center;
+    
+    .call-to-action {
+	    display:block;
+    }
 	
     .vidholder {
-        width:350px;
-		margin-right:20px;
-        float:left;	
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
     }
     
+    h1 {
+	font-weight:600;
+	margin-top:20px;
+    }
     h2 {
         margin-top:10px;
-        
-    }
-    .button {
-        float:left;
-        margin-right:20px;
+	font-weight:400;
+	font-size:20px;
     }
     .instant {
         font-size:@h3-size;
-        float:left;
+	clear:both;
         display:inline-block;
         height:50px;
-        margin-top:40px;
+        margin-top:10px;
     }
     
     .dragdrop {
         clear:both;
-        display:inline-block;
+        display:block;
     }
+    a.brand {
+	display: inline-block;
+	margin-bottom:20px;
+    }
+    .logo-mark {
+	    width:37px;
+	    margin-bottom:-5px;
+	    display:inline-block;
+    }
+    span.logo-karma {
+	    color:@karma;
+	    font-size:40px;
+	    font-family:'MuseoSlab-500';
+	}
+	span.logo-notes {
+	    color:@text-color;
+	    font-size:40px;
+	    font-weight:600;
+	}
 
 }
 
@@ -1005,7 +1030,7 @@ a#fb-link .FBConnectButton_Simple .FBConnectButton_Text_Simple {
   background: darken(@box-color,10%);
   .border-radius(5px);
   .box-shadow(0 3px 7px rgba(0,0,0,0.3));
-
+ 
 }
 .popover-title {
   padding: 9px 15px;

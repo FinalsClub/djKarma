@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
 {% block content %}
 
-<h1>Hey {{request.user.username}}!</h1>
+<h1>Hey {{user.get_profile.getName}}!</h1>
 <br/>
 <h2>You need a bit more Karma to {{permission}}!</h2>
 <br/>
