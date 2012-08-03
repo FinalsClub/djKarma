@@ -402,29 +402,35 @@
       <!-- BEGIN COURSE LISTINGS -->
       <!-- one course -->
       <div class="course-listing">
-        {% if user.get_profile.courses.all > 0 %}
-        <h3>Your Courses</h3>
-        {% for course in user.get_profile.courses.all %}
-        <div class="course">
-          <div class="folder icon">
-            <img src="/static/img/icon-folder.png">
-          </div>
-          <div class="course-title">
-            <a href="#">{{ course.title }}</a>
-            <div class="course-info">
-              <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
-              {# TODO: not yet implemented downloaded files #}
-              <!--
-              <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
-            </div> <!-- .course-info -->
-          </div> <!-- .course-title -->
+        {% if user.get_profile.courses.all %}
+          <h3>Your Courses</h3>
+          {% for course in user.get_profile.courses.all %}
+          <div class="course">
+            <div class="folder icon">
+              <img src="/static/img/icon-folder.png">
+            </div>
+            <div class="course-title">
+              <a href="#">{{ course.title }}</a>
+              <div class="course-info">
+                <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
+                {# TODO: not yet implemented downloaded files #}
+                <!--
+                <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
+              </div> <!-- .course-info -->
+            </div> <!-- .course-title -->
 
+            <div class="upload">
+              <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+            </div>
+            <div style="clear:both"></div>
+          </div> <!-- .course -->
+          {% endfor %}
+        {% else %}
+          <h3>You haven't added any courses yet</h3>
+          <p>Would you like to </p>
           <div class="upload">
             <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
           </div>
-          <div style="clear:both"></div>
-        </div> <!-- .course -->
-        {% endfor %}
         {% endif %}
       </div> <!-- .course-listing -->
 
