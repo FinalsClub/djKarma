@@ -28,7 +28,7 @@
   <script type="text/javascript">
   $(document).ready(function(){
     // Show file info on hover
-    $("#container").on("hover","div.file.row-fluid", function(){
+    $(".container").on("hover","div.file.row-fluid", function(){
       console.log("file hover");
       $(this).find('.file-info-action').toggleClass("hide");
     });
@@ -96,7 +96,7 @@
           {% if user.is_authenticated %}
           <li class="dropdown" id="menu1">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-              {{ user.get_profile.getName }} Profile {# TODO: Add user icon from facebook/gravatar #}
+              <span class="alias-label">{{ user.get_profile.getName }} navigation</span>
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
