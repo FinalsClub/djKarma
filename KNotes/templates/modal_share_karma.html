@@ -10,7 +10,7 @@
       <!-- facebook share -->
       <span class="inset-border">
         <span class="social-icon">
-          <a id="fb-link" name="fb_share" type="icon_link" share_url="/signup/{{ user_profile.hash }}">
+          <a id="fb-link" name="fb_share" type="icon_link" share_url="/signup/{{ user_profile.invite_hash }}">
           <span class="fb-icon"><i class="icon-facebook"></i></span>
           <strong>Share on Facebook</strong></a> 
           <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" 
@@ -28,7 +28,7 @@
       <form class="input-prepend">
         <span class="add-on"><i class="icon-cut"></i></span>
         {# TODO: implement domain name in settings for url generation #}
-        <input id="social-link" type="text" value="http://karmanotes.org/signup/{{ user_profile.hash }}" name"social-link" class="span3">
+        <input id="social-link" type="text" value="http://karmanotes.org/signup/{{ user_profile.invite_hash }}" name"social-link" class="span3">
       </form>
       <div style="clear:both"></div>
     </div> <!-- .wrap -->
