@@ -39,6 +39,7 @@
         initializeBrowseView();
         browse_view_initialized = true;
       }
+      $('#search-results').hide();
       $('#profile-container').hide();
       $('#file-view').hide();
       $('#searchBySchool').show();
@@ -133,6 +134,7 @@
   // handle search response
   var search_callback = function(data){
     console.log(data);
+    $('#file-view').hide();
     $('#profile-container').hide();
     $('#searchBySchool').hide();
     $('#search-results').fadeOut('fast', function(){
