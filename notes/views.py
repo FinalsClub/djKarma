@@ -184,7 +184,7 @@ def profile(request):
         #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
     response['messages'] = complete_profile_prompt(user_profile)
-    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.hash)
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.invite_hash)
     response['user_profile'] = user_profile
     response = get_upload_form(response)
 
@@ -567,7 +567,7 @@ def vote(request, file_pk):
         return HttpResponse("You cannot vote on a file you have not viewed")
 
 
-''' 
+'''
     Search testing
 '''
 from haystack.query import SearchQuerySet

@@ -348,7 +348,7 @@ class UserProfile(models.Model):
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
     # unique 6 char hex value for invites
-    hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
+    invite_hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
