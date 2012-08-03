@@ -55,7 +55,7 @@ def home(request):
         stats = SiteStats.objects.get(pk=1)
 
         #Get recently uploaded files
-        recent_files = File.objects.order_by('-timestamp')[:7]
+        recent_files = File.objects.exclude(title__exact='').order_by('-timestamp')[:7]
         #print recent_files
 
         return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
