@@ -29,6 +29,10 @@ Deployment
 7. Start Apache Solr search engine (see section)
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
+### Future
+
+8. copy $(djKarma_src)/bin/knotes -> /etc/init.d/knotes . This is the init script for running karmanotes at startup. Please
+note that the stop / kill options do not work because of pid issues.  A fix is being worked on.
 
 ### Deployment database
 To initially deploy the postgres backup on a fresh debian based system:
