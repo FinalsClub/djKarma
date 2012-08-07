@@ -4,61 +4,14 @@
 
 <!-- Django-Ajax-Uploader -->
 <script src="{{ STATIC_URL }}ajaxuploader/js/fileuploader.js" ></script>
+<script src="{{ STATIC_URL }}/js/modal-upload.js" ></script>
 <link href="{{ STATIC_URL }}ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />
 {# TODO: Break this script into a js template file #}
 <script>
+  var ajax_upload_url = "{% url 'ajax_upload' %}";
+  var csrf_token = "{{csrf_token}}";
   // Store file_pk received by ajaxUploader
-  var file_pk = -1;
-
-  // Keep track of Wizard state
-  // state == School : School search / create forms
-  // state == Course : Course search / create forms
-  // state == File   : Upload File form
-  var state = "";
-  // Keep track of user's School, Course selection (pks) for 
-  // inclusion in final File Upload Form
-  var school_pk = "";
-  var course_pk = "";
-
-  // School and Course titles for instructions
-  var school_name = "None";
-  var course_name = "None";
-
-  // After DOM loads
-  $(document).ready(function() {
-    // Configure AJAX file uploader
-    var uploader = new qq.FileUploader({
-        action: "{% url 'ajax_upload' %}",
-        element: $('#file-uploader')[0],
-        multiple: false,
-        onComplete: function(id, fileName, responseJSON) {
-            if(responseJSON.success) {
-                //alert("success! file_pk: " + responseJSON.file_pk);
-                file_pk = responseJSON.file_pk;
-            } else {
-                alert("upload failed!");
-            }
-        },
-        onAllComplete: function(uploads) {
-            // uploads is an array of maps
-            // the maps look like this: {file: FileObject, response: JSONServerResponse}
-            console.log("upload:");
-            console.log(uploads);
-            //alert("All complete!");
-            // Hide file uploader
-            
-            $('#file-uploader').fadeOut('fast', function(){
-              $('#file-uploader').html("<h2> File uploaded!</h2>");
-              $('#file-uploader').fadeIn('fast');
-            });
-        },
-        params: {
-            'csrf_token': '{{ csrf_token }}',
-            'csrf_name': 'csrfmiddlewaretoken',
-            'csrf_xname': 'X-CSRFToken',
-        },
-    });
-  });
+  
 
     // Upload form submit listener
     $('#upload').on("submit", "form", function(){
@@ -347,27 +300,28 @@ $("#container").on("click", "#create-model", function() {
 <div id="upload" class="modal hide fade in" style="display:none;">
   <div class="modal-header">
     <button class="close" data-dismiss="modal">x</button>
-    <h3>Upload a file</h3>
+    <span><h3>Upload a file</h3></span><span>2MB limit. Supports .doc, .docx, .pdf, .rtf, and .txt file</span>
   </div> <!-- .modal-header -->
-
-  {# does this still work here? how do I integrate this? #}
   <!-- File select / drag-n-drop -->
   <div style="margin-left:200px;padding-bottom:50px;" id="file-uploader">
     <noscript>
       <p>Please enable JavaScript to use file uploader.</p>
     </noscript>
   </div> <!-- #file-uploader -->
+  <p class="help-block"></p>
 
   <div class="modal-body">
-    <!-- Progress bar -->
-    <h3>Your file is uploading...</h3>
-    <div class="progress progress-striped active progress-karma">
-      <div class="bar" style="width: 40%;"></div>
+    <div id="modal-body-progress" style="display:none">
+      <!-- Progress bar -->
+      <h3>Your file is uploading...</h3>
+      <div class="progress progress-striped active progress-karma">
+        <div class="bar" id="progress-bar" style="width: 0%;"></div>
+      </div>
     </div>
 
     <!-- Form -->
-    <form class="form-horizontal">
-      <div class="control-group">
+    <form class="form-horizontal" id="modal-metadata-form" style="display:none">
+      <div class="control-group" style="display:none">
         <label class="control-label" for="input01">Upload File</label>
         <div class="controls">
           <input type="file" class="input-file" id="file-upload">
@@ -378,10 +332,10 @@ $("#container").on("click", "#create-model", function() {
       <fieldset>
         <legend>What's your university?</legend>
         <div class="control-group">
-          <label class="control-label" for="input01">Your University</label>
+          <label class="control-label" for="modal-school-input">Your University</label>
           <div class="controls">
-            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Harvard University">
-            <div class="not-found">
+            <input type="text" class="input-xlarge" id="modal-school-input" placeholder="ex. Harvard University">
+            <div class="school not-found" id="school-suggestions" style="display:none">
               <p><strong>School not found.</strong> Is it one of these?:</p>
               <ul>
                 <li><a href="#">Some school name</a></li>
@@ -394,10 +348,10 @@ $("#container").on("click", "#create-model", function() {
         </div> <!-- .control-group -->
         <legend>About your notes</legend>
         <div class="control-group">
-          <label class="control-label" for="input01">Course Name</label>
+          <label class="control-label" for="modal-course-input">Course Name</label>
           <div class="controls">
-            <input type="text" class="input-xlarge" id="input01" placeholder="ex. Social Analysis 10">
-            <div class="not-found">
+            <input type="text" class="input-xlarge" id="modal-course-input" placeholder="ex. Social Analysis 10">
+            <div class="course not-found" id="course-suggestions" style="display:none">
               <p><strong>We don't have that course listed yet.</strong> Could it be one of these?:</p>
               <ul>
                 <li><a href="#">Some course name</a></li>
@@ -445,14 +399,14 @@ $("#container").on("click", "#create-model", function() {
           </div> <!-- .controls -->
         </div> <!-- .control-group .file-type -->
         <div class="control-group">
-          <label class="control-label" for="input01">Note Title</label>
+          <label class="control-label" for="modal-title-input">Note Title</label>
           <div class="controls">
             <input type="text" class="input-xlarge" id="input01" placeholder="ex. Midterm study guide">
 
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
         <div class="control-group">
-          <label class="control-label" for="input01">Description</label>
+          <label class="control-label" for="modal-description-input">Description</label>
           <div class="controls">
             <textarea class="input-xlarge" id="input01" placeholder="ex. Includes lectures 1-7 and reading summaries for the first half of the semester."></textarea>
           </div> <!-- .controls -->
@@ -467,15 +421,15 @@ $("#container").on("click", "#create-model", function() {
           <label class="control-label" for="input01">&nbsp;</label>
           <div class="controls">
             <label class="checkbox">
-              <input type="checkbox" id="current-course" value"current-course"> Check if you're currently in this course.
+              <input type="checkbox" id="modal-current-course" value"current-course"> Check if you're currently in this course.
             </label>
             <label class="checkbox">
-              <input type="checkbox" id="current-course" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
+              <input type="checkbox" id="modal-tos-agree" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
             </label>
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
         <div class="form-actions">
-          <a class="button" type="submit">FINISH UPLOAD</a>
+          <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
         </div>
       </fieldset>
     </form>
