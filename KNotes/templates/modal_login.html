@@ -6,7 +6,7 @@
   <ul class="dropdown-menu">
     <form method="post" action="{% url login %}">
       {% csrf_token %}
-      <li><a href="#"><i class="icon-facebook-sign"></i>Login/Signup with Facebook</a></li>
+      <li><a href="{% url "socialauth_begin" "facebook" %}"><i class="icon-facebook-sign"></i>Login/Signup with Facebook</a></li>
       <li class="divider"></li>
       <li>
         <span class="label">
