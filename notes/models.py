@@ -359,7 +359,7 @@ class UserProfile(models.Model):
 
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
-    gravatar = models.CharField(blank=True)  # gravatar hash make urls in function
+    gravatar = models.CharField(max_length=100, blank=True)  # gravatar hash make urls in function
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField(default=True)
@@ -428,7 +428,7 @@ class UserProfile(models.Model):
         large_default = u'http://placehold.it/180x180'
         if self.fb_id:
             url = u"https://graph.facebook.com/{0}/picture".format(self.username)
-            if size = 'small':
+            if size == 'small':
                 return url
             else:
                 return url + u'?type=large'
@@ -438,10 +438,10 @@ class UserProfile(models.Model):
             else:
                 gravatar_hash = self.gravatar
             url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
-            if size = 'small':
-                return url += u'?s=50&d={0}'.format(small_default)
+            if size == 'small':
+                return u'{0}?s=50&d={1}'.format(url, small_default)
             else:
-                return url + u'?s=180d={0}'.format(large_default)
+                return u'{0}?s=180d={1}'.format(url, large_default)
 
     # Get the "name" of this user for display
     # If no first_name, user username
