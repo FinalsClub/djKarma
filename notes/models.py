@@ -528,7 +528,7 @@ class UserProfile(models.Model):
         # If there is not a gravatar hash, and the user registered by email
         # make a gravatar hash
         if not self.gravatar and not self.fb_id:
-            self.gravatar = hashlib.md5(self.user.email.lower).hexdigest()
+            self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
 
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
