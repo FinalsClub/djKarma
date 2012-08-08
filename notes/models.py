@@ -348,8 +348,6 @@ class UserProfile(models.Model):
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # unique 6 char hex value for invites
-    invite_hash         = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -530,7 +528,7 @@ class UserProfile(models.Model):
         # If there is not a gravatar hash, and the user registered by email
         # make a gravatar hash
         if not self.gravatar and not self.fb_id:
-            self.gravatar = hashlib.md5(self.user.email.lower).hexdigest()
+            self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
 
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
@@ -591,8 +589,8 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     # note this only takes the most recent school from a user's education history
     # FIXME: add a selector for which ofschool from their education history to use
     user_school = response.get('education')[0]
-    fb_school_name = user_school[0]['school']['name']
-    fb_school_id = user_school[0]['school']['id']
+    fb_school_name = user_school['school']['name']
+    fb_school_id = user_school['school']['id']
     user_profile.school = School.objects.get_or_create(\
             name=fb_school_name,
             facebook_id=fb_school_id)
