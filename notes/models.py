@@ -348,7 +348,7 @@ class UserProfile(models.Model):
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # unique 6 char hex value for invites   
+    # unique 6 char hex value for invites
     invite_hash         = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
@@ -415,7 +415,7 @@ class UserProfile(models.Model):
         return response
 
     def get_picture(self, size='small'):
-        """ get the url of an appropriately size image for a user 
+        """ get the url of an appropriately size image for a user
             :size:  if size is set to anything but small, it will return a 180px image
                     if size = default of 'small' then it will return a 50px image
             returns a facebook url if the user has a fb_id
@@ -423,7 +423,7 @@ class UserProfile(models.Model):
             returns a placeholder url if the user has neither
         """
         # TODO: get and use default user icon if none, use gravatar's 404 function
-        # 
+        #
         small_default = u'http://placehold.it/50x50'
         large_default = u'http://placehold.it/180x180'
         if self.fb_id:
@@ -449,7 +449,7 @@ class UserProfile(models.Model):
         """ Generate the front-facing username for this user.
             Prefer user-supplied alias first,
             Second, username given on standard account signup
-            Lastly, first name last initial (from social login) 
+            Lastly, first name last initial (from social login)
         """
         if self.alias and self.alias != "":
             return self.alias
@@ -462,7 +462,7 @@ class UserProfile(models.Model):
                 return self.user.first_name
         else:
             # As last resort, use username
-            # Could be user entered username, fb username, or a 
+            # Could be user entered username, fb username, or a
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
@@ -471,7 +471,7 @@ class UserProfile(models.Model):
             and add a new ReputationEvent to UserProfile.reputationEvents
             event is the slug title corresponding to a ReputationEventType
             target_user is a User object corresponding to the target (if applicable)
-            Does not call UserProfile.save() because it is used in 
+            Does not call UserProfile.save() because it is used in
             The UserProfile save() method
         """
         try:
