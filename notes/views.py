@@ -72,18 +72,19 @@ def terms(request):
 import_uploader = AjaxFileUploader()
 
 
-# One-shot file uploader with async Google processing
 def modalUpload(request):
+    """ One-shot file uploader with async Google processing """
     template_data = {}
     template_data['search_form'] = ModelSearchForm
     template_data['file_form'] = FileMetaDataForm
     return render(request, 'modalUpload.html', template_data)
 
 
-# Handles file meta data submission separate from file upload
 def fileMeta(request):
+    """ Takes async uploaded metadata using the FileMetaDataForm """
+    response = {}
+
     if request.method == "POST" and request.is_ajax():
-        response = {}
         form = FileMetaDataForm(request.POST)
         if form.is_valid():
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
@@ -108,12 +109,17 @@ def fileMeta(request):
                 # FIXME: fix this message with proper html
                 messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
         else:
+            # Form is invalid
             print "fileMeta form NOT valid!"
             response["form"] = form
             response["message"] = "Please check your form data."
             return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
+
     else:
+        # if not POST or not ajax
         response["status"] = "invalid request"
+
+
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -195,7 +201,7 @@ def profile(request):
         #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
     response['messages'] = complete_profile_prompt(user_profile)
-    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.invite_hash)
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.getName())
     response['user_profile'] = user_profile
     response = get_upload_form(response)
 
@@ -328,12 +334,13 @@ def addCourseOrSchool(request):
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
-def register(request, invite_code):
+def register(request, invite_user):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
         to django's built-in login view (django.contrib.auth.views.login).
         new user registration is handled by this view (because there is no built-in)
     """
+    # TODO: use give the invite_user some karma for referring someone
     if request.method == 'POST':
         #Fill form with POSTed data
         form = forms.UserCreationForm(request.POST)
@@ -380,17 +387,6 @@ def schools(request):
 
     raise Http404
 
-def jqueryui_courses(request):
-    """ Ajax: Course autocomplete for jqueryui.autocomplete """
-    # TODO: add optional filter by school and the javascript to support it
-    query = request.GET.get('term')
-    print "query %s" % query
-    courses = Course.objects.filter(title__icontains=query).distinct()
-    print "courses %s %s" % (len(courses), courses)
-    response =  [(course.id, course.title) for course in courses]
-    print json.dumps(response)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
-
 def courses(request):
     """ Ajax: Course autocomplete form field """
     if True:
@@ -409,6 +405,18 @@ def courses(request):
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
     raise Http404
+
+def jqueryui_courses(request):
+    """ Ajax: Course autocomplete for jqueryui.autocomplete """
+    # TODO: add optional filter by school and the javascript to support it
+    query = request.GET.get('term')
+    print "query %s" % query
+    courses = Course.objects.filter(title__icontains=query).distinct()
+    print "courses %s %s" % (len(courses), courses)
+    response =  [(course.id, course.title) for course in courses]
+    print json.dumps(response)
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 
 def browse(request):
