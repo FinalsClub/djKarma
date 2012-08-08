@@ -589,8 +589,8 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     # note this only takes the most recent school from a user's education history
     # FIXME: add a selector for which ofschool from their education history to use
     user_school = response.get('education')[0]
-    fb_school_name = user_school[0]['school']['name']
-    fb_school_id = user_school[0]['school']['id']
+    fb_school_name = user_school['school']['name']
+    fb_school_id = user_school['school']['id']
     user_profile.school = School.objects.get_or_create(\
             name=fb_school_name,
             facebook_id=fb_school_id)
