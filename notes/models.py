@@ -1,6 +1,7 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
 import datetime
+import hashlib
 import re
 
 from django.db import models
@@ -160,7 +161,7 @@ class School(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
 
     # Facebook keeps a unique identifier for all schools
-    facebook_id         = models.IntegerField(blank=True, null=True)
+    facebook_id = models.BigIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -347,8 +348,8 @@ class UserProfile(models.Model):
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # unique 6 char hex value for invites
-    invite_hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
+    # unique 6 char hex value for invites   
+    invite_hash         = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -358,7 +359,7 @@ class UserProfile(models.Model):
 
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
-    gravatar = models.URLField(blank=True)  # Profile glitter
+    gravatar = models.CharField(blank=True)  # gravatar hash make urls in function
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField(default=True)
@@ -412,6 +413,35 @@ class UserProfile(models.Model):
         if not 'next_level' in response:
             response['current_level'] = levels[len(levels) - 1]
         return response
+
+    def get_picture(self, size='small'):
+        """ get the url of an appropriately size image for a user 
+            :size:  if size is set to anything but small, it will return a 180px image
+                    if size = default of 'small' then it will return a 50px image
+            returns a facebook url if the user has a fb_id
+            returns a gravatar url if the user has an image there
+            returns a placeholder url if the user has neither
+        """
+        # TODO: get and use default user icon if none, use gravatar's 404 function
+        # 
+        small_default = u'http://placehold.it/50x50'
+        large_default = u'http://placehold.it/180x180'
+        if self.fb_id:
+            url = u"https://graph.facebook.com/{0}/picture".format(self.username)
+            if size = 'small':
+                return url
+            else:
+                return url + u'?type=large'
+        else:
+            if not self.gravatar:
+                gravatar_hash = update_gravatar(self)
+            else:
+                gravatar_hash = self.gravatar
+            url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
+            if size = 'small':
+                return url += u'?s=50&d={0}'.format(small_default)
+            else:
+                return url + u'?s=180d={0}'.format(large_default)
 
     # Get the "name" of this user for display
     # If no first_name, user username
@@ -497,6 +527,11 @@ class UserProfile(models.Model):
         """ Check if school, grad_year fields have been set
             Automatically called on UserProfile post_save
         """
+        # If there is not a gravatar hash, and the user registered by email
+        # make a gravatar hash
+        if not self.gravatar and not self.fb_id:
+            self.gravatar = hashlib.md5(self.email.lower).hexdigest()
+
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
         if self.grad_year != "" and not self.submitted_grad_year:
@@ -548,13 +583,19 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user.email = response.get('email')
     user.save()
 
-    user_profile.fb_id = response.get('fbid')
+    user_profile.fb_id = response.get('id')
+    #user_profile.gravatar = hashlib.md5(user.email.lower()).hashdigest()
+
     # take the user's school, save it to the UserProfile if found
     # create a new School if not
     # note this only takes the most recent school from a user's education history
+    # FIXME: add a selector for which ofschool from their education history to use
     user_school = response.get('education')[0]
-    user_profile.school = School.objects.get_or_create(name = user_school['name'], facebook_id = user_school['id'])
+    fb_school_name = user_school[0]['school']['name']
+    fb_school_id = user_school[0]['school']['id']
+    user_profile.school = School.objects.get_or_create(\
+            name=fb_school_name,
+            facebook_id=fb_school_id)
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
-
