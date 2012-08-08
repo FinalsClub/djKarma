@@ -16,7 +16,6 @@ from notes.credentials import PROD_DB_PASSWORD
 from notes.credentials import DEV_STATIC_ROOT
 from notes.credentials import BETA_STATIC_ROOT
 from notes.credentials import PROD_STATIC_ROOT
-from notes.credentials import DEV_APP_STATIC_ROOT
 
 from notes.credentials import DEV_UPLOAD_ROOT
 from notes.credentials import BETA_UPLOAD_ROOT
@@ -134,7 +133,7 @@ if DEPLOY:
         STATIC_ROOT = PROD_STATIC_ROOT
 else:
     # This should work for any development machine's local path setting
-    STATIC_ROOT = os.path.join(os.path.dirname(__file__), '../django_static/')
+    STATIC_ROOT = DEV_STATIC_ROOT
 
 
 # URL prefix for static files.

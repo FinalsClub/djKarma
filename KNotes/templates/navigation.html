@@ -127,8 +127,10 @@
     $('.nav-collapse').on("submit", ".navbar-search", function(event){
       event.preventDefault(); // ensure no DOM handling
       console.log("SEARCH INTERCEPT");
-      ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
-      return false; // do not pass event on to DOM handler
+      if($('#navbar-search-input').val() !== ""){
+        ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
+        return false; // do not pass event on to DOM handler
+      }
     });
 
   // handle search response
