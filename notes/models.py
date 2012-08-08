@@ -591,7 +591,7 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_school = response.get('education')[0]
     fb_school_name = user_school['school']['name']
     fb_school_id = user_school['school']['id']
-    user_profile.school = School.objects.get_or_create(\
+    user_profile.school, created = School.objects.get_or_create(\
             name=fb_school_name,
             facebook_id=fb_school_id)
     user_profile.save()
