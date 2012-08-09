@@ -81,7 +81,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
 
     # Add Course, School forms
-    url(r'^add', 'notes.views.addCourseOrSchool', name='add'),
+    url(r'^add', 'notes.views.simpleAddCourseOrSchool', name='add'),
 
     # Auth
     # This logout allows us to pass a redirect:

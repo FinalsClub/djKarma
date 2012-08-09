@@ -9,6 +9,7 @@ from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
+from django.core import serializers
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -129,18 +130,26 @@ def smartModelQuery(request):
         If not, return model create form with populated title/name
     """
     if request.method == 'POST' and request.is_ajax():
+        print "title: " + str(request.POST['title']) + ' type: ' + str(request.POST['type'])
         search_form = ModelSearchForm(request.POST)
         if search_form.is_valid():
-            if request.POST['type'] == "School":
+            if request.POST['type'] == "school":
                 # If no school matching text entry exists, present School Form
                 if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
-                    form = SchoolForm(initial={'name': search_form.cleaned_data['title']})
-                    message = "Tell us a little more about your school"
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
                     # TODO: Try searching school name with input, return mathing results
-                    schools = School.objects.all().values('name', 'pk').order_by('name')
+                    schools = School.objects.all().order_by('name').values('name', 'pk')
                     print "smartModelQuery: return create School ajaxFormResponse"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
+                    response = {}
+                    response['status'] = 'suggestion'
+                    response['type'] = 'school'
+                    # Django QuerySets are serializable, but when they're empty, error raised
+                    if schools != None:
+                        response['suggestions'] = list(schools)
+                    else:
+                        response['suggestions'] = []
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': model's pk}
@@ -151,16 +160,23 @@ def smartModelQuery(request):
                     response['model_pk'] = response_school.pk
                     response['model_name'] = response_school.name
                     return HttpResponse(json.dumps(response), mimetype="application/json")
-            if request.POST['type'] == "Course":
+            if request.POST['type'] == "course":
                 # If no course matching text entry exists, present Course Form
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
-                    form = UsherCourseForm(initial={'title': search_form.cleaned_data['title']})
-                    message = "Tell us a little more about your course"
                     courses = None
                     if request.GET.get("school", -1) != -1:
-                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).values("title", "pk").order_by('title')
-                    print "smartModelQuery: return create Course ajaxFormResponse"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
+                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).order_by('title')
+                    response = {}
+                    response['status'] = 'success'
+                    response['type'] = 'course'
+                     # Django QuerySets are serializable, but when they're empty, error raised
+                    if courses != None:
+                        response['suggestions'] = list(courses)
+                    else:
+                        response['suggestions'] = []
+                    print "smartModelQuery: return create Course sugesstions"
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
@@ -171,6 +187,8 @@ def smartModelQuery(request):
                     response['model_pk'] = response_course.pk
                     response['model_name'] = response_course.title
                     return HttpResponse(json.dumps(response), mimetype="application/json")
+        else:
+            print search_form.errors
     raise Http404
 
 @login_required
@@ -267,6 +285,23 @@ def get_upload_form(response):
     response['school_form'] = SmartSchoolForm
     return response
 
+
+def simpleAddCourseOrSchool(request):
+    ''' This replaces addCourseOrSchool in the new
+        modal-upload process
+    '''
+    if request.is_ajax() and request.method == 'POST':
+        if 'type' in request.POST:
+            type = request.POST['type']
+            form = ModelSearchForm(request.POST)
+            if form.is_valid():
+                if type == "course":
+                    new_model = Course.objects.create(title=form.cleaned_data['title'])
+                elif type == "school":
+                    new_model = School.objects.create(name=form.cleaned_data['title'])
+
+                return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
+    raise Http404
 
 def addCourseOrSchool(request):
     """ handles user creation (via HTML forms) of auxillary objects:
