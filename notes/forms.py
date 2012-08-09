@@ -130,8 +130,8 @@ class UsherCourseForm(forms.ModelForm):
     """ Create course form with hidden school field
         school is populated with javascript based on the previous School selection
     """
-    captcha     = MathCaptchaField(required=True, \
-                    error_messages={'required': 'Prove you\'re probably a human.'})
+    #captcha     = MathCaptchaField(required=True, \
+    #                error_messages={'required': 'Prove you\'re probably a human.'})
     instructor  = CharInstructorField(required=False, \
                     max_length=127, \
                     error_messages={'required': 'Please Enter your Instructor\'s Name'})

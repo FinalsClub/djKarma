@@ -8,10 +8,11 @@
 <link href="{{ STATIC_URL }}ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />
 {# TODO: Break this script into a js template file #}
 <script>
+  // modal-upload.js arguments
   var ajax_upload_url = "{% url 'ajax_upload' %}";
   var csrf_token = "{{csrf_token}}";
   // Store file_pk received by ajaxUploader
-  
+/*
 
     // Upload form submit listener
     $('#upload').on("submit", "form", function(){
@@ -155,7 +156,7 @@
             // show school selection field
             proceedToCourseSearch();
           });
-          */
+          *//*
         }
         else if(type == "course"){
           course_pk = data.model_pk;
@@ -291,7 +292,7 @@ $("#container").on("click", "#create-model", function() {
         },
         minLength: 3
     });
-
+*/
 </script>
 {% endblock %}
 
@@ -319,8 +320,8 @@ $("#container").on("click", "#create-model", function() {
       </div>
     </div>
 
-    <!-- Form -->
-    <form class="form-horizontal" id="modal-metadata-form" style="display:none">
+    <!-- modal-metadata-form -->
+    <div class="form-horizontal" id="modal-metadata-form" style="display:none">
       <div class="control-group" style="display:none">
         <label class="control-label" for="input01">Upload File</label>
         <div class="controls">
@@ -329,6 +330,8 @@ $("#container").on("click", "#create-model", function() {
         </div>
       </div> <!-- #control-group -->
 
+      <div id="modal-school">
+      <form id="modal-school-form">
       <fieldset>
         <legend>What's your university?</legend>
         <div class="control-group">
@@ -336,32 +339,29 @@ $("#container").on("click", "#create-model", function() {
           <div class="controls">
             <input type="text" class="input-xlarge" id="modal-school-input" placeholder="ex. Harvard University">
             <div class="school not-found" id="school-suggestions" style="display:none">
-              <p><strong>School not found.</strong> Is it one of these?:</p>
-              <ul>
-                <li><a href="#">Some school name</a></li>
-                <li><a href="#">Some school name</a></li>
-              </ul>
-              <p>Not there? <a class="button">Add school</a></p>
             </div> <!-- .not-found -->
-
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
+      </fieldset>
+    </form><!--#modal-school-form-->
+      </div> <!-- #modal-school-->
+      <div id="modal-course" style="display:none">
+        <form id="modal-course-form">
+        <fieldset>
         <legend>About your notes</legend>
         <div class="control-group">
           <label class="control-label" for="modal-course-input">Course Name</label>
           <div class="controls">
             <input type="text" class="input-xlarge" id="modal-course-input" placeholder="ex. Social Analysis 10">
             <div class="course not-found" id="course-suggestions" style="display:none">
-              <p><strong>We don't have that course listed yet.</strong> Could it be one of these?:</p>
-              <ul>
-                <li><a href="#">Some course name</a></li>
-                <li><a href="#">Some course name</a></li>
-                <li><a href="#">Some course name</a></li>
-              </ul>
-              <p>Not there? <a class="button">Add course</a></p>
             </div> <!-- .not-found -->
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
+      </fieldset>
+      </form><!-- #modal-course-form-->
+      </div><!-- #modal-course-->
+      <div id="modal-misc" style="display:none">
+      <fieldset>
         <div class="control-group file-type">
           <label class="control-label" for="input01">File type</label>
           <div class="controls">
@@ -398,6 +398,8 @@ $("#container").on("click", "#create-model", function() {
 
           </div> <!-- .controls -->
         </div> <!-- .control-group .file-type -->
+      </fieldset>
+      <fieldset>
         <div class="control-group">
           <label class="control-label" for="modal-title-input">Note Title</label>
           <div class="controls">
@@ -432,7 +434,7 @@ $("#container").on("click", "#create-model", function() {
           <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
         </div>
       </fieldset>
-    </form>
+    </div><!-- #modal-misc -->
   </div>
 </div>
 
