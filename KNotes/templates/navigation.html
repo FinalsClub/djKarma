@@ -43,7 +43,7 @@
       $('#profile-container').hide();
       $('#file-view').hide();
       $('#searchBySchool').show();
-      
+
     });
 
     // Handle KarmaNotes logo click
@@ -82,7 +82,7 @@
       e.preventDefault();
       $("#alias-label-profile").hide();
       $("#edit-alias-label").hide();
-      // If the user has no alias set, 
+      // If the user has no alias set,
       // show username as alias input initial value
       if($("#alias-label-profile").text() == "")
         alias = $("#username-label-profile").text();
@@ -120,7 +120,7 @@
         request_data['year'] = val;
         editProfile(request_data, year_callback);
       }
-      
+
     });
 
     // Handle search request from navbar search
@@ -142,7 +142,7 @@
     $('#search-results').fadeOut('fast', function(){
       $('#search-results').html(data).fadeIn('fast');
     });
-  
+
   };
 
   // perform ajax /search query
@@ -218,7 +218,7 @@
       $('#karma-label').fadeOut('fast', function(){
         $('#karma-label').html(current_karma + delta_karma).fadeIn('fast');
       });
-      
+
     }
   </script>
 
@@ -262,14 +262,14 @@
               </div>
               <div>
                 <span class="alias-label-description">Alias:</span>
-                <span class="alias-label" id="alias-label-profile"> {% if user.username != user.get_profile.getName %}{{user.get_profile.getName}} {% endif %} </span>
+                <span class="alias-label" id="alias-label-profile">{% if user.username != user.get_profile.getName %}{{user.get_profile.getName}}{% endif %}</span>
                 <span id="edit-alias-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
                 <form class="span2" id="username-form" action="#" style="display:none">
                   <input class="span2" name="username" id="username-input"></input>
                   This is your public alias, you'll still login with your original username ({{request.user.username}})
                 </form>
               </div>
-              
+
               <br><br>
 
               <!-- progress bar -->
@@ -326,7 +326,7 @@
                 <li class="" id="menu0">
                   <form class="navbar-search input-append form-search">
                     <input type="text" class="input-medium search-query" id="navbar-search-input" placeholder="Search">
-                    <a type="submit" class="btn button">Go</a> 
+                    <a type="submit" class="btn button">Go</a>
                   </form>
                 </li>
               </ul>
