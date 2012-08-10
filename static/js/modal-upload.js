@@ -154,7 +154,10 @@
           url: '/filemeta',
           data: response,
           success: function(data){
-            alert('success!');
+            if(data.status === 'success')
+              alert('success!');
+            else
+              alert('invalid form');
           },
           type: 'POST'
         });
@@ -327,13 +330,18 @@
 
   function serializeFormData(){
     response = new Object();
-    response.school = school_pk;
-    response.course = course_pk;
+    response.school_pk = school_pk;
+    response.course_pk = course_pk;
     response.title = $('#modal-title-input').val();
     response.description = $('#modal-description-input').val();
     response.type = $('input[name=optionsRadio]:checked').val();
-    response.in_course = $('#modal-current-course').is(':checked');
-    response.file = file_pk;
+    //javascript booleans are 'true', 'false'. python's are 'True', 'False'
+    if($('#modal-current-course').is(':checked'))
+      response.in_course = 'True';
+    else
+      response.in_course = 'False';
+
+    response.file_pk = file_pk;
     console.log('RESPONSE');
     console.log(response);
     return response;
