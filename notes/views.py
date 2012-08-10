@@ -117,6 +117,7 @@ def fileMeta(request):
         else:
             # Form is invalid
             print "fileMeta form NOT valid!"
+            response["status"] = "invalid"
             response["form"] = form
             response["message"] = "Please check your form data."
             return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
