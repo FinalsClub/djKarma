@@ -147,6 +147,7 @@
     //  event.preventDefault();
     //});
 
+    // file meta data submit
     $("#modal-meta-submit").on("click", function(){
       if(validateForm()){
         var response = serializeFormData();
@@ -154,10 +155,13 @@
           url: '/filemeta',
           data: response,
           success: function(data){
-            if(data.status === 'success')
-              alert('success!');
-            else
-              alert('invalid form');
+            if(data.status === 'success'){
+              $('#modal-upload-button').hide();
+              $('#modal-upload-again-button').show();
+            }
+            else{
+              alert('Please check your form input');
+            }
           },
           type: 'POST'
         });
@@ -227,6 +231,17 @@
       $('#modal-misc').slideDown('fast');
     });
 
+    // upload again button handler
+     $('#modal-upload-again-button').on('click', function(){
+        course = new Object();
+        school = new Object();
+        school.pk = school_pk;
+        school.name = school_name;
+        course.pk = course_pk;
+        course.name = course_name;
+        clearForm(course, school);
+     });
+
   });// end document ready
 
   // Course autocomplete
@@ -263,6 +278,8 @@
   function clearForm(course, school){
     course = typeof course !== 'undefined' ? course : 'None';
     school = typeof school !== 'undefined' ? school : 'None';
+    $('#modal-upload-button').show();
+    $('#modal-upload-again-button').hide();
     $('.qq-upload-list').html('');
     $('#file-uploader').show();
     $('#file-uploader-label').hide();
