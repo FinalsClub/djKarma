@@ -45,6 +45,35 @@ class FileMetaDataForm(forms.Form):
 
     required_css_class = 'required'
 
+class FileMetaDataFormNoCaptcha(forms.Form):
+    file_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-file_pk'}))
+    school_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-school_pk'}))
+    course_pk      = forms.CharField(max_length=255, \
+                    widget=forms.HiddenInput(attrs={'id': 'file-form-course_pk'}))
+    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    title       = forms.CharField(max_length=50, \
+                    error_messages={'required': 'Enter a title.'}, \
+                    widget=forms.TextInput(attrs={'class': 'text-input'}))
+    description = forms.CharField(required=False, max_length=511, \
+                    error_messages={'required': 'Enter a description.'}, \
+                    widget=forms.Textarea(attrs={'class': 'text-input'}))
+    #tags        = forms.CharField(required=False, max_length=511, \
+    #                label="Tags", \
+    #                error_messages={'required': 'Help us organize. Add some tags.'}, \
+    #                widget=forms.TextInput(attrs={'placeholder':'ex: math, uncertainty, statistics', 'class': 'text-input'}))
+    #captcha     = MathCaptchaField(required=True, \
+    #                error_messages={'required': 'Prove you\'re probably a human.'})
+    in_course = forms.BooleanField(required=False, label='I\'m currently in this course')
+    # only show this for new users, or the first time a user uploads. We should stores this on the userprofile
+    # That would require us to create a special user type, called the Zero User 
+    #agree       = forms.BooleanField(required=True, \
+    #                label='I Agree to the Terms of Use',
+    #                error_messages={'required': 'We aren\'t evil, check out the Terms.'})
+
+    required_css_class = 'required'
+
     #school     = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")
     #tags = forms.ModelMultipleChoiceField(Tag, widget=AutocompleteSelectMultiple(Tag, search_fields=['name']), )
 

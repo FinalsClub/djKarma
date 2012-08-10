@@ -91,7 +91,7 @@ def fileMeta(request):
     response = {}
 
     if request.method == "POST" and request.is_ajax():
-        form = KarmaForms.FileMetaDataForm(request.POST)
+        form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
         if form.is_valid():
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
             file.type = form.cleaned_data["type"]
@@ -101,9 +101,9 @@ def fileMeta(request):
                 file.school = School.objects.get(pk=int(form.cleaned_data["school_pk"]))
                 file.course = Course.objects.get(pk=int(form.cleaned_data["course_pk"]))
             except Exception, e:
-                print "school/course fuckup: " + str(e)
+                print "school/course error: " + str(e)
             # process Tags
-            processCsvTags(file, form.cleaned_data['tags'])
+            #processCsvTags(file, form.cleaned_data['tags'])
             file.save()
             response = {}
             response["status"] = "success"
