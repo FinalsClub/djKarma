@@ -56,11 +56,12 @@
             //alert("All complete!");
             // Hide file uploader
             
-            $('#file-uploader').fadeOut('fast', function(){
+            $('#file-uploader').slideUp('fast', function(){
               if(!cancelled){
-                $('#file-uploader').html("<h2>" + uploads[0].file.name + " uploaded!</h2>");
+                $('#file-uploader-label').html("<h2>" + uploads[0].file.name + " uploaded!</h2>").slideDown('fast');
+                //$('#file-uploader').html("<h2>" + uploads[0].file.name + " uploaded!</h2>");
               }
-              $('#file-uploader').fadeIn('fast');
+              //$('#file-uploader').fadeIn('fast');
               $('#modal-body-progress').slideUp('fast');
 
             });
@@ -253,7 +254,9 @@
   function clearForm(course, school){
     course = typeof course !== 'undefined' ? course : 'None';
     school = typeof school !== 'undefined' ? school : 'None';
-
+    $('.qq-upload-list').html('');
+    $('#file-uploader').show();
+    $('#file-uploader-label').hide();
     $('#modal-body-progress').hide();
     $('#modal-metadata-form').hide();
     $('#modal-course').hide();
