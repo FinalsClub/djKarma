@@ -257,6 +257,8 @@
     $('#modal-body-progress').hide();
     $('#modal-metadata-form').hide();
     $('#modal-course').hide();
+    $('#course-suggestions').hide();
+    $('#school-suggestions').hide();
     $('#modal-misc').hide();
     if(course == "None"){
       $("#modal-course-input").val("");
