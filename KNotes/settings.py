@@ -27,7 +27,7 @@ import djcelery
 djcelery.setup_loader()
 
 # Is this running on the karmanotes.org box?
-DEPLOY = True
+DEPLOY = False
 # Is this deployed as the beta server?
 BETA = True
 

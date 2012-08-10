@@ -116,6 +116,9 @@
           data: {'title': $('#modal-school-input').val(),
                 'type': 'school'},
           success: function(data){
+            $('#modal-course-input').val('');
+            course_pk = -1;
+            course_name = '';
             smartModelQueryResponseHandler(data);
           },
           type: 'POST'
@@ -151,6 +154,7 @@
       }
     });
 
+    // Add school click handler
     $('#school-suggestions').on('click', '#modal-add-school', function(){
       //setupAjax();
       console.log("add school");
@@ -170,7 +174,19 @@
           type: 'POST'
       });
     });
-    //'#modal-add-course'
+
+    // select a school from /smartModelQuery suggestions
+    $('#school-suggestions').on('click', '.school-suggestion', function(){
+      console.log("suggest " + $(this).attr('id') + ": " + $(this).html());
+      school_pk = $(this).attr('id');
+      school_name = $(this).html();
+      $('#school-suggestions').slideUp('fast');
+      $('#modal-school-input').val(school_name);
+      enableCourseAutoComplete();
+      $('#modal-course').slideDown('fast');
+    });
+
+    // create new course request
     $('#course-suggestions').on('click', '#modal-add-course', function(){
       //setupAjax();
       console.log("add course");
@@ -189,6 +205,16 @@
           },
           type: 'POST'
       });
+    });
+
+    // select a course from /smartModelQuery suggestions
+    $('#course-suggestions').on('click', '.course-suggestion', function(){
+      console.log("suggest " + $(this).attr('id'));
+      course_pk = $(this).attr('id');
+      course_name = $(this).html();
+      $('#course-suggestions').slideUp('fast');
+      $('#modal-course-input').val(course_name);
+      $('#modal-misc').slideDown('fast');
     });
 
   });// end document ready
@@ -215,11 +241,9 @@
             dataType: "json"
         });
     },
-    select: function(event, ui) { 
+    select: function(event, ui) {
       // ensure suggestion is populated before submit
-      $("#course-search-input").val(ui.item.label);
-      // trigger submit
-      $("#course-search-input").submit();  
+      $('#modal-course-input').val(ui.item.label).submit();
     },
     minLength: 3
     });
@@ -232,27 +256,34 @@
 
     $('#modal-body-progress').hide();
     $('#modal-metadata-form').hide();
+    $('#modal-course').hide();
+    $('#modal-misc').hide();
     if(course == "None"){
-      $("#course-search-input").val("");
+      $("#modal-course-input").val("");
       course_pk = "";
       course_name = "None";
     }
     else{
-      $("#course-search-input").val(course_name);
       course_pk = course.pk;
       course_name = course.name;
+      $("#modal-course-input").val(course_name);
+      $('#modal-course').show();
     }
 
     if(school == "None"){
-      $("#school-search-input").val("");
+      $("#modal-school-input").val("");
       school_pk = "";
       school_name = "None";
     }
     else{
-      $("#school-search-input").val(school_name);
       school_pk = school.pk;
       school_name = school.name;
+      $("#modal-school-input").val(school_name);
+      $('#modal-metadata-form').show();
     }
+
+    if(course !== "None" && school !== "None")
+      $('#modal-misc').show();
   }
 
   function validateForm(){
@@ -306,13 +337,16 @@
         school_pk = data.model_pk;
         school_name = data.model_name;
         enableCourseAutoComplete();
-        $('#modal-course').slideDown('fast');
+        $('#school-suggestions').slideUp('fast', function(){
+          $('#modal-course').slideDown('fast');
+        });
       }
       else if(data.type == 'course'){
         course_pk = data.model_pk;
         course_name = data.model_name;
-
-        $('#modal-misc').slideDown('fast');
+        $('#course-suggestions').slideUp('fast', function(){
+          $('#modal-misc').slideDown('fast');
+        });
       }
     }
     // No model matching query found. Present create form
@@ -325,13 +359,24 @@
         injectCourseSuggestions(data);
       }
     }
+    else if(data.status == 'no_match'){
+      if(data.type == "school"){
+        html = "<p><strong>School not found.</strong><a id=\"modal-add-school\" class=\"button\">Add \""+ $('#modal-school-input').val()+ "\"</a></p>";
+        $('#school-suggestions').html(html).slideDown('fast');
+      }
+      else if(data.type == "course"){
+        html = "<p><strong>Course not found.</strong><a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+        $('#course-suggestions').html(html).slideDown('fast');
+      }
+    }
   }
 
   // Injects school suggestion json response
   // called by smartModelQuery()
   function injectSchoolSuggestions(data){
     console.log("inject school suggestions");
-    html = "<p><strong>School not found.</strong> Is it one of these?:</p>"+
+    console.log(data);
+    html = "<p><strong>School not found.</strong> Is it one of these?</p>"+
             "  <ul>";
 
     $.each(data.suggestions, function(index, school){
@@ -340,7 +385,7 @@
 
 
     html += "  </ul>"+
-            "  <p>Not there? <a id=\"modal-add-school\" class=\"button\">Add school</a></p>";
+            "  <p>Not there? <a id=\"modal-add-school\" class=\"button\">Add \""+ $('#modal-school-input').val()+ "\"</a></p>";
     $('#school-suggestions').html(html).slideDown('fast');
   }
 
@@ -357,7 +402,7 @@
 
 
     html += "  </ul>"+
-            "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add course</a></p>";
+            "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
     $('#course-suggestions').html(html).slideDown('fast');
   }
 

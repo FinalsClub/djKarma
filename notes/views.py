@@ -19,6 +19,10 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
 from ajaxuploader.views import AjaxFileUploader
 
+import forms as KarmaForms
+'''
+Avoid collision with django.contrib.auth.forms
+from forms import CaptchaForm
 from forms import UploadFileForm
 from forms import UsherCourseForm
 from forms import ModelSearchForm
@@ -28,6 +32,7 @@ from forms import InstructorForm
 from forms import ProfileForm
 from forms import FileMetaDataForm
 from forms import SmartSchoolForm
+'''
 from models import School
 from models import Course
 from models import File
@@ -76,8 +81,8 @@ import_uploader = AjaxFileUploader()
 def modalUpload(request):
     """ One-shot file uploader with async Google processing """
     template_data = {}
-    template_data['search_form'] = ModelSearchForm
-    template_data['file_form'] = FileMetaDataForm
+    template_data['search_form'] = KarmaForms.ModelSearchForm
+    template_data['file_form'] = KarmaForms.FileMetaDataForm
     return render(request, 'modalUpload.html', template_data)
 
 
@@ -86,7 +91,7 @@ def fileMeta(request):
     response = {}
 
     if request.method == "POST" and request.is_ajax():
-        form = FileMetaDataForm(request.POST)
+        form = KarmaForms.FileMetaDataForm(request.POST)
         if form.is_valid():
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
             file.type = form.cleaned_data["type"]
@@ -131,7 +136,7 @@ def smartModelQuery(request):
     """
     if request.method == 'POST' and request.is_ajax():
         print "title: " + str(request.POST['title']) + ' type: ' + str(request.POST['type'])
-        search_form = ModelSearchForm(request.POST)
+        search_form = KarmaForms.ModelSearchForm(request.POST)
         if search_form.is_valid():
             if request.POST['type'] == "school":
                 # If no school matching text entry exists, present School Form
@@ -141,13 +146,14 @@ def smartModelQuery(request):
                     schools = School.objects.all().order_by('name').values('name', 'pk')
                     print "smartModelQuery: return create School ajaxFormResponse"
                     response = {}
-                    response['status'] = 'suggestion'
                     response['type'] = 'school'
                     # Django QuerySets are serializable, but when they're empty, error raised
                     if schools != None:
                         response['suggestions'] = list(schools)
+                        response['status'] = 'suggestion'
                     else:
                         response['suggestions'] = []
+                        response['status'] = 'no_match'
                     return HttpResponse(json.dumps(response), mimetype="application/json")
                     #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
@@ -167,13 +173,14 @@ def smartModelQuery(request):
                     if request.GET.get("school", -1) != -1:
                         courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).order_by('title')
                     response = {}
-                    response['status'] = 'success'
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised
                     if courses != None:
                         response['suggestions'] = list(courses)
+                        response['status'] = 'suggestion'
                     else:
                         response['suggestions'] = []
+                        response['status'] = 'no_match'
                     print "smartModelQuery: return create Course sugesstions"
                     return HttpResponse(json.dumps(response), mimetype="application/json")
                     #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
@@ -282,7 +289,7 @@ def get_upload_form(response):
             when course is selected / created submits and saves course to file
             course submit makes the metadata section appear
     """
-    response['school_form'] = SmartSchoolForm
+    response['school_form'] = KarmaForms.SmartSchoolForm
     return response
 
 
@@ -293,7 +300,7 @@ def simpleAddCourseOrSchool(request):
     if request.is_ajax() and request.method == 'POST':
         if 'type' in request.POST:
             type = request.POST['type']
-            form = ModelSearchForm(request.POST)
+            form = KarmaForms.ModelSearchForm(request.POST)
             if form.is_valid():
                 if type == "course":
                     new_model = Course.objects.create(title=form.cleaned_data['title'])
@@ -316,11 +323,11 @@ def addCourseOrSchool(request):
             print "non-ajax request"
         type = request.POST['type']
         if type == "Course":
-            form = UsherCourseForm(request.POST)
+            form = KarmaForms.UsherCourseForm(request.POST)
         elif type == "School":
-            form = SchoolForm(request.POST)
+            form = KarmaForms.SchoolForm(request.POST)
         elif type == "Instructor":
-            form = InstructorForm(request.POST)
+            form = KarmaForms.InstructorForm(request.POST)
         if form.is_valid():
             model = form.save()
 
@@ -346,7 +353,7 @@ def addCourseOrSchool(request):
                 # TODO: Have form reflect pre-populated value
                 # With below line uncommented, the value is set to the form
                 # But the autocomplete field does not reflect this in its display
-                form = UploadFileForm(initial={str(type).lower(): model})
+                form = KarmaForms.UploadFileForm(initial={str(type).lower(): model})
                 return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             # If ajax, return only the form with errors
@@ -360,11 +367,11 @@ def addCourseOrSchool(request):
     else:
         type = request.GET.get('type')
         if type == "Course":
-            form = UsherCourseForm()
+            form = KarmaForms.UsherCourseForm()
         elif type == "School":
-            form = SchoolForm()
+            form = KarmaForms.SchoolForm()
         elif type == "Instructor":
-            form = InstructorForm()
+            form = KarmaForms.InstructorForm()
         else:
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
@@ -638,3 +645,11 @@ def search(request):
                 return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
         raise Http404
     return render(request, 'search2.html')
+
+def captcha(request):
+    ''' For now, the only action the server needs to 
+        take on each invocation of the modal-upload form
+        is to generate a new math captcha answer
+    '''
+    form = KarmaForms.CaptchaForm()
+    return TemplateResponse(request, 'captcha.html', {'form': form})

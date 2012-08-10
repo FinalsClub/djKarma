@@ -32,6 +32,8 @@ sqs = SearchQuerySet().highlight()
 # Remember the trailing $ to avoid partial match
 
 urlpatterns = patterns('',
+    # captcha test
+    url(r'^captcha$', 'notes.views.captcha', name='captcha'),
     # Landing page.
     url(r'^$', 'notes.views.home'),
     url(r'^about$', 'notes.views.about'),

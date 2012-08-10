@@ -77,6 +77,17 @@
 
     });
 
+     // Handle setting up modal-upload form
+     $('.container').on("click", '.course-upload',  function(){
+      course = Object();
+      course.pk = $(this).attr('course-pk');
+      course.name = $(this).attr('course-name');
+      school = Object();
+      school.pk = $(this).attr('school-pk');
+      school.name = $(this).attr('school-name');
+        clearForm(course, school);
+     });
+
     // Handle username edit in place click
     $("#edit-username").on("click", function(e){
       e.preventDefault();
@@ -424,7 +435,7 @@
             </div> <!-- .course-title -->
 
             <div class="upload">
-              <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+              <a class="button course-upload" school-pk="{{course.school.pk}}" school-name="{{course.school.name}}" course-pk="{{course.pk}}" course-name="{{course.title}}" data-toggle="modal" href="#upload">Upload notes</a>
             </div>
             <div style="clear:both"></div>
           </div> <!-- .course -->
