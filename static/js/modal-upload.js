@@ -150,8 +150,14 @@
     $("#modal-meta-submit").on("click", function(){
       if(validateForm()){
         var response = serializeFormData();
-        console.log("RESPONSE");
-        console.log(response);
+        $.ajax({
+          url: '/filemeta',
+          data: response,
+          success: function(data){
+            alert('success!');
+          },
+          type: 'POST'
+        });
       }
     });
 
@@ -326,6 +332,7 @@
     response.title = $('#modal-title-input').val();
     response.description = $('#modal-description-input').val();
     response.type = $('input[name=optionsRadio]:checked').val();
+    response.in_course = $('#modal-current-course').is(':checked');
     response.file = file_pk;
     console.log('RESPONSE');
     console.log(response);
