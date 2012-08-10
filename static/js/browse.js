@@ -34,7 +34,7 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
             +"</div> <!-- .course-info -->"
           +"</div> <!-- .course-title -->"
           +"<div class=\"upload\">"
-            +"<a class=\"button\" data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
+            +"<a class=\"button course-upload\" school-pk=\""+ school._id+"\" school-name=\""+ school.name+"\" course-name=\""+ course.name+"\"course-pk=\""+ course._id+"\"  data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
           +"</div>"
           +"<div style=\"clear:both\"></div>"
         +"</div>" <!-- .course -->
