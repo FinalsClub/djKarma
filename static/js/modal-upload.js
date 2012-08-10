@@ -289,6 +289,8 @@
     $('#course-suggestions').hide();
     $('#school-suggestions').hide();
     $('#modal-misc').hide();
+    $('#modal-title-input').val("");
+    $('#modal-description-input').val("");
     if(course == "None"){
       $("#modal-course-input").val("");
       course_pk = "";
