@@ -12,6 +12,10 @@ from simplemathcaptcha.fields import MathCaptchaField
 from models import School, Course, File, Tag, Instructor
 
 
+class CaptchaForm(forms.Form):
+    captcha     = MathCaptchaField(required=True, \
+                    error_messages={'required': 'Prove you\'re probably a human.'})
+
 class FileMetaDataForm(forms.Form):
     file_pk      = forms.CharField(max_length=255, \
                     widget=forms.HiddenInput(attrs={'id': 'file-form-file_pk'}))
@@ -130,8 +134,8 @@ class UsherCourseForm(forms.ModelForm):
     """ Create course form with hidden school field
         school is populated with javascript based on the previous School selection
     """
-    captcha     = MathCaptchaField(required=True, \
-                    error_messages={'required': 'Prove you\'re probably a human.'})
+    #captcha     = MathCaptchaField(required=True, \
+    #                error_messages={'required': 'Prove you\'re probably a human.'})
     instructor  = CharInstructorField(required=False, \
                     max_length=127, \
                     error_messages={'required': 'Please Enter your Instructor\'s Name'})

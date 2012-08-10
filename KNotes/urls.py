@@ -32,9 +32,11 @@ sqs = SearchQuerySet().highlight()
 # Remember the trailing $ to avoid partial match
 
 urlpatterns = patterns('',
+    # captcha test
+    url(r'^captcha$', 'notes.views.captcha', name='captcha'),
     # Landing page.
-    url(r'^$', 'notes.views.home'),
-    url(r'^about$', 'notes.views.about'),
+    url(r'^$', 'notes.views.home', name='home'),
+    url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
 
     # Upload page (Note Upload Form)
@@ -81,7 +83,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
 
     # Add Course, School forms
-    url(r'^add', 'notes.views.addCourseOrSchool', name='add'),
+    url(r'^add', 'notes.views.simpleAddCourseOrSchool', name='add'),
 
     # Auth
     # This logout allows us to pass a redirect:

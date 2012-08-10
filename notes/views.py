@@ -9,6 +9,7 @@ from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
+from django.core import serializers
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -18,6 +19,10 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
 from ajaxuploader.views import AjaxFileUploader
 
+import forms as KarmaForms
+'''
+Avoid collision with django.contrib.auth.forms
+from forms import CaptchaForm
 from forms import UploadFileForm
 from forms import UsherCourseForm
 from forms import ModelSearchForm
@@ -27,6 +32,7 @@ from forms import InstructorForm
 from forms import ProfileForm
 from forms import FileMetaDataForm
 from forms import SmartSchoolForm
+'''
 from models import School
 from models import Course
 from models import File
@@ -75,8 +81,8 @@ import_uploader = AjaxFileUploader()
 def modalUpload(request):
     """ One-shot file uploader with async Google processing """
     template_data = {}
-    template_data['search_form'] = ModelSearchForm
-    template_data['file_form'] = FileMetaDataForm
+    template_data['search_form'] = KarmaForms.ModelSearchForm
+    template_data['file_form'] = KarmaForms.FileMetaDataForm
     return render(request, 'modalUpload.html', template_data)
 
 
@@ -85,7 +91,7 @@ def fileMeta(request):
     response = {}
 
     if request.method == "POST" and request.is_ajax():
-        form = FileMetaDataForm(request.POST)
+        form = KarmaForms.FileMetaDataForm(request.POST)
         if form.is_valid():
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
             file.type = form.cleaned_data["type"]
@@ -129,18 +135,27 @@ def smartModelQuery(request):
         If not, return model create form with populated title/name
     """
     if request.method == 'POST' and request.is_ajax():
-        search_form = ModelSearchForm(request.POST)
+        print "title: " + str(request.POST['title']) + ' type: ' + str(request.POST['type'])
+        search_form = KarmaForms.ModelSearchForm(request.POST)
         if search_form.is_valid():
-            if request.POST['type'] == "School":
+            if request.POST['type'] == "school":
                 # If no school matching text entry exists, present School Form
                 if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
-                    form = SchoolForm(initial={'name': search_form.cleaned_data['title']})
-                    message = "Tell us a little more about your school"
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
                     # TODO: Try searching school name with input, return mathing results
-                    schools = School.objects.all().values('name', 'pk').order_by('name')
+                    schools = School.objects.all().order_by('name').values('name', 'pk')
                     print "smartModelQuery: return create School ajaxFormResponse"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
+                    response = {}
+                    response['type'] = 'school'
+                    # Django QuerySets are serializable, but when they're empty, error raised
+                    if schools != None:
+                        response['suggestions'] = list(schools)
+                        response['status'] = 'suggestion'
+                    else:
+                        response['suggestions'] = []
+                        response['status'] = 'no_match'
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': model's pk}
@@ -151,16 +166,24 @@ def smartModelQuery(request):
                     response['model_pk'] = response_school.pk
                     response['model_name'] = response_school.name
                     return HttpResponse(json.dumps(response), mimetype="application/json")
-            if request.POST['type'] == "Course":
+            if request.POST['type'] == "course":
                 # If no course matching text entry exists, present Course Form
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
-                    form = UsherCourseForm(initial={'title': search_form.cleaned_data['title']})
-                    message = "Tell us a little more about your course"
                     courses = None
                     if request.GET.get("school", -1) != -1:
-                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).values("title", "pk").order_by('title')
-                    print "smartModelQuery: return create Course ajaxFormResponse"
-                    return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
+                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).order_by('title')
+                    response = {}
+                    response['type'] = 'course'
+                     # Django QuerySets are serializable, but when they're empty, error raised
+                    if courses != None:
+                        response['suggestions'] = list(courses)
+                        response['status'] = 'suggestion'
+                    else:
+                        response['suggestions'] = []
+                        response['status'] = 'no_match'
+                    print "smartModelQuery: return create Course sugesstions"
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
+                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
@@ -171,6 +194,8 @@ def smartModelQuery(request):
                     response['model_pk'] = response_course.pk
                     response['model_name'] = response_course.title
                     return HttpResponse(json.dumps(response), mimetype="application/json")
+        else:
+            print search_form.errors
     raise Http404
 
 @login_required
@@ -264,9 +289,26 @@ def get_upload_form(response):
             when course is selected / created submits and saves course to file
             course submit makes the metadata section appear
     """
-    response['school_form'] = SmartSchoolForm
+    response['school_form'] = KarmaForms.SmartSchoolForm
     return response
 
+
+def simpleAddCourseOrSchool(request):
+    ''' This replaces addCourseOrSchool in the new
+        modal-upload process
+    '''
+    if request.is_ajax() and request.method == 'POST':
+        if 'type' in request.POST:
+            type = request.POST['type']
+            form = KarmaForms.ModelSearchForm(request.POST)
+            if form.is_valid():
+                if type == "course":
+                    new_model = Course.objects.create(title=form.cleaned_data['title'])
+                elif type == "school":
+                    new_model = School.objects.create(name=form.cleaned_data['title'])
+
+                return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
+    raise Http404
 
 def addCourseOrSchool(request):
     """ handles user creation (via HTML forms) of auxillary objects:
@@ -281,11 +323,11 @@ def addCourseOrSchool(request):
             print "non-ajax request"
         type = request.POST['type']
         if type == "Course":
-            form = UsherCourseForm(request.POST)
+            form = KarmaForms.UsherCourseForm(request.POST)
         elif type == "School":
-            form = SchoolForm(request.POST)
+            form = KarmaForms.SchoolForm(request.POST)
         elif type == "Instructor":
-            form = InstructorForm(request.POST)
+            form = KarmaForms.InstructorForm(request.POST)
         if form.is_valid():
             model = form.save()
 
@@ -311,7 +353,7 @@ def addCourseOrSchool(request):
                 # TODO: Have form reflect pre-populated value
                 # With below line uncommented, the value is set to the form
                 # But the autocomplete field does not reflect this in its display
-                form = UploadFileForm(initial={str(type).lower(): model})
+                form = KarmaForms.UploadFileForm(initial={str(type).lower(): model})
                 return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
         else:
             # If ajax, return only the form with errors
@@ -325,11 +367,11 @@ def addCourseOrSchool(request):
     else:
         type = request.GET.get('type')
         if type == "Course":
-            form = UsherCourseForm()
+            form = KarmaForms.UsherCourseForm()
         elif type == "School":
-            form = SchoolForm()
+            form = KarmaForms.SchoolForm()
         elif type == "Instructor":
-            form = InstructorForm()
+            form = KarmaForms.InstructorForm()
         else:
             raise Http404
         return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
@@ -603,3 +645,11 @@ def search(request):
                 return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
         raise Http404
     return render(request, 'search2.html')
+
+def captcha(request):
+    ''' For now, the only action the server needs to 
+        take on each invocation of the modal-upload form
+        is to generate a new math captcha answer
+    '''
+    form = KarmaForms.CaptchaForm()
+    return TemplateResponse(request, 'captcha.html', {'form': form})
