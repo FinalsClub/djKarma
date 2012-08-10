@@ -1,6 +1,7 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
 import datetime
+import hashlib
 import re
 
 from django.db import models
@@ -160,7 +161,7 @@ class School(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
 
     # Facebook keeps a unique identifier for all schools
-    facebook_id         = models.IntegerField(blank=True, null=True)
+    facebook_id = models.BigIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -196,7 +197,7 @@ class Course(models.Model):
     url             = models.URLField(max_length=511, blank=True)
     field           = models.CharField(max_length=255, blank=True, null=True)
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
-    academic_year   = models.IntegerField(blank=True, null=True)
+    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
 
     def __unicode__(self):
@@ -208,6 +209,11 @@ class Course(models.Model):
         if not self.pk:
             increment(self)
         super(Course, self).save(*args, **kwargs)
+
+    class Meta:
+        # sort by "the date" in descending order unless
+        # overridden in the query with order_by()
+        ordering = ['title']
 
 # On Course delete, decrement numCourses
 post_delete.connect(decrement, sender=Course)
@@ -277,6 +283,14 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
+    def ownedBy(user_pk):
+        """ Returns true if the user owns or has "paid" for this file
+        """
+        # If the file is in the user's collection, or the user owns the file
+        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=self.pk).exists():
+            return True
+        return False
+
     def Vote(self, voter, vote_value=0):
         """ Calls UserProfile.awardKarma
             with the appropriate ReputationEventType slug title("upvote", "downvote")
@@ -329,11 +343,11 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
 
+    alias = models.CharField(max_length=16, blank=True, null=True)
+
     # Has a user finished setting up their profile?
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
-    # unique 6 char hex value for invites
-    hash                = models.CharField(max_length=255, default=fast_hash(), unique=True)
 
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
@@ -343,7 +357,7 @@ class UserProfile(models.Model):
 
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
-    gravatar = models.URLField(blank=True)  # Profile glitter
+    gravatar = models.CharField(max_length=100, blank=True)  # gravatar hash make urls in function
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField(default=True)
@@ -374,9 +388,69 @@ class UserProfile(models.Model):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
 
+    def getLevel(self):
+        """ Determine the current level of the user
+            based on their karma and the Levels.
+            Returns a dictionary of
+            [current_level] -> Level
+            [next_level] -> Next Level
+
+        """
+        response = {}
+        levels = Level.objects.all().order_by('karma')
+        for (counter, level) in enumerate(levels):
+            if self.karma < level.karma:
+                if counter > 0:
+                    response['next_level'] = level
+                    response['current_level'] = levels[counter - 1]
+                else:
+                    # If the user has not surpassed the first level
+                    response['current_level'] = level
+                    response['next_level'] = levels[counter + 1]
+                break
+        if not 'next_level' in response:
+            response['current_level'] = levels[len(levels) - 1]
+        return response
+
+    def get_picture(self, size='small'):
+        """ get the url of an appropriately size image for a user
+            :size:  if size is set to anything but small, it will return a 180px image
+                    if size = default of 'small' then it will return a 50px image
+            returns a facebook url if the user has a fb_id
+            returns a gravatar url if the user has an image there
+            returns a placeholder url if the user has neither
+        """
+        # TODO: get and use default user icon if none, use gravatar's 404 function
+        #
+        small_default = u'http://placehold.it/50x50'
+        large_default = u'http://placehold.it/180x180'
+        if self.fb_id:
+            url = u"https://graph.facebook.com/{0}/picture".format(self.username)
+            if size == 'small':
+                return url
+            else:
+                return url + u'?type=large'
+        else:
+            if not self.gravatar:
+                gravatar_hash = update_gravatar(self)
+            else:
+                gravatar_hash = self.gravatar
+            url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
+            if size == 'small':
+                return u'{0}?s=50&d={1}'.format(url, small_default)
+            else:
+                return u'{0}?s=180d={1}'.format(url, large_default)
+
     # Get the "name" of this user for display
     # If no first_name, user username
     def getName(self):
+        """ Generate the front-facing username for this user.
+            Prefer user-supplied alias first,
+            Second, username given on standard account signup
+            Lastly, first name last initial (from social login)
+        """
+        if self.alias and self.alias != "":
+            return self.alias
         if self.user.first_name:
             if self.user.last_name:
                 # First name + Last name initial
@@ -386,7 +460,7 @@ class UserProfile(models.Model):
                 return self.user.first_name
         else:
             # As last resort, use username
-            # Could be user entered username, fb username, or a 
+            # Could be user entered username, fb username, or a
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
@@ -395,7 +469,7 @@ class UserProfile(models.Model):
             and add a new ReputationEvent to UserProfile.reputationEvents
             event is the slug title corresponding to a ReputationEventType
             target_user is a User object corresponding to the target (if applicable)
-            Does not call UserProfile.save() because it is used in 
+            Does not call UserProfile.save() because it is used in
             The UserProfile save() method
         """
         try:
@@ -451,8 +525,15 @@ class UserProfile(models.Model):
         """ Check if school, grad_year fields have been set
             Automatically called on UserProfile post_save
         """
+        # If there is not a gravatar hash, and the user registered by email
+        # make a gravatar hash
+        if not self.gravatar and not self.fb_id:
+            self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
+
         # Grad year was set for the first time, award karma
-        if self.grad_year != None and not self.submitted_grad_year:
+        #print (self.grad_year == "")
+        if self.grad_year != "" and not self.submitted_grad_year:
+            print "grad year submitted"
             self.submitted_grad_year = True
             self.awardKarma('profile-grad-year')
 
@@ -500,13 +581,19 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user.email = response.get('email')
     user.save()
 
-    user_profile.fb_id = response.get('fbid')
+    user_profile.fb_id = response.get('id')
+    #user_profile.gravatar = hashlib.md5(user.email.lower()).hashdigest()
+
     # take the user's school, save it to the UserProfile if found
     # create a new School if not
     # note this only takes the most recent school from a user's education history
+    # FIXME: add a selector for which ofschool from their education history to use
     user_school = response.get('education')[0]
-    user_profile.school = School.objects.get_or_create(name = user_school['name'], facebook_id = user_school['id'])
+    fb_school_name = user_school['school']['name']
+    fb_school_id = user_school['school']['id']
+    user_profile.school, created = School.objects.get_or_create(\
+            name=fb_school_name,
+            facebook_id=fb_school_id)
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
-

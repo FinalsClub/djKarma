@@ -7,14 +7,11 @@
 
 
 {% block header %}
-  <script type="text/javascript">
-    //$('.carousel('pause').carousel()')
-    //$(".collapse").collapse()
-  </script>
 
   <script type="text/javascript">
 
   var current_karma = {{ user.get_profile.karma }};
+  var user_pk = {{user.pk}};
 
   $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
@@ -34,24 +31,69 @@
                  height: 50
               });
 
-    // Handle nav-bar-search form submit
-    $('.nav-collapse').on("submit", "form", function(){
-      event.preventDefault(); // ensure no DOM handling
-      console.log("SEARCH INTERCEPT");
-      if($(this).hasClass("navbar-search")){
-        // redirect to search result page
-        window.location="http://www.someplace.com/ns.html";
-        //ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
-        return false; // do not pass event on to DOM handler
+    // Handle browse notes view
+    var browse_view_initialized = false;
+    $('.container').on("click", "#browse-notes", function(){
+      console.log("BROWSE INTERCEPT");
+      if(!browse_view_initialized){
+        initializeBrowseView();
+        browse_view_initialized = true;
       }
+      $('#search-results').hide();
+      $('#profile-container').hide();
+      $('#file-view').hide();
+      $('#searchBySchool').show();
+
     });
+
+    // Handle KarmaNotes logo click
+     $('.container').on("click", ".brand", function(){
+      console.log("LOGO INTERCEPT");
+      $('#profile-container').show();
+      $('#file-view').hide();
+      $('#searchBySchool').hide();
+      $('#search-results').hide();
+
+    });
+
+     // Handle view file click
+     $('.container').on("click", ".view-file", function(){
+      console.log("FILE VIEW INTERCEPT");
+      file_pk = $(this).attr("id");
+
+      $.ajax({
+        url: "/file/"+file_pk,
+        data: {'user_pk': user_pk},
+        success: function(data){
+          $('#file-view').hide();
+          $('#profile-container').hide();
+          $('#searchBySchool').hide();
+          $('#search-results').hide();
+          $('#file-view').html(data);
+          $('#file-view').show();
+        }
+      });
+
+
+    });
+
+     // Handle setting up modal-upload form
+     $('.container').on("click", '.course-upload',  function(){
+      course = Object();
+      course.pk = $(this).attr('course-pk');
+      course.name = $(this).attr('course-name');
+      school = Object();
+      school.pk = $(this).attr('school-pk');
+      school.name = $(this).attr('school-name');
+        clearForm(course, school);
+     });
 
     // Handle username edit in place click
     $("#edit-username").on("click", function(e){
       e.preventDefault();
       $("#alias-label-profile").hide();
       $("#edit-alias-label").hide();
-      // If the user has no alias set, 
+      // If the user has no alias set,
       // show username as alias input initial value
       if($("#alias-label-profile").text() == "")
         alias = $("#username-label-profile").text();
@@ -89,8 +131,39 @@
         request_data['year'] = val;
         editProfile(request_data, year_callback);
       }
-      
+
     });
+
+    // Handle search request from navbar search
+    $('.nav-collapse').on("submit", ".navbar-search", function(event){
+      event.preventDefault(); // ensure no DOM handling
+      console.log("SEARCH INTERCEPT");
+      if($('#navbar-search-input').val() !== ""){
+        ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
+        return false; // do not pass event on to DOM handler
+      }
+    });
+
+  // handle search response
+  var search_callback = function(data){
+    console.log(data);
+    $('#file-view').hide();
+    $('#profile-container').hide();
+    $('#searchBySchool').hide();
+    $('#search-results').fadeOut('fast', function(){
+      $('#search-results').html(data).fadeIn('fast');
+    });
+
+  };
+
+  // perform ajax /search query
+  function ajaxSearchQuery(query, callback){
+    $.ajax({
+      url: "/search",
+      data: {'q': query , 'user': user_pk},
+      success: callback
+    });
+  }
 
 }); // end on document ready
 
@@ -156,14 +229,16 @@
       $('#karma-label').fadeOut('fast', function(){
         $('#karma-label').html(current_karma + delta_karma).fadeIn('fast');
       });
-      
+
     }
   </script>
-  <script src="/static/js/jquery.screwdefaultbuttons.min.js"/static/></script>
+
+  <!--<script SRC="/static/js/search.js"></script>-->
+  <script SRC="/static/js/browse.js"></script>
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"></script>
   <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"> </script>
 
 {% endblock %}
-
 
 {% block content %}
 
@@ -173,7 +248,7 @@
     <div class="span3">
       <ul class="nav nav-list">
         <li class="active">
-          <a href="/browse">
+          <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
           </a>
@@ -198,14 +273,14 @@
               </div>
               <div>
                 <span class="alias-label-description">Alias:</span>
-                <span class="alias-label" id="alias-label-profile"> {% if user.username != user.get_profile.getName %}{{user.get_profile.getName}} {% endif %} </span>
+                <span class="alias-label" id="alias-label-profile">{% if user.username != user.get_profile.getName %}{{user.get_profile.getName}}{% endif %}</span>
                 <span id="edit-alias-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
                 <form class="span2" id="username-form" action="#" style="display:none">
                   <input class="span2" name="username" id="username-input"></input>
                   This is your public alias, you'll still login with your original username ({{request.user.username}})
                 </form>
               </div>
-              
+
               <br><br>
 
               <!-- progress bar -->
@@ -262,15 +337,42 @@
                 <li class="" id="menu0">
                   <form class="navbar-search input-append form-search">
                     <input type="text" class="input-medium search-query" id="navbar-search-input" placeholder="Search">
-                    <a type="submit" class="btn button">Go</a> 
+                    <a type="submit" class="btn button">Go</a>
                   </form>
                 </li>
+                {% if user.is_authenticated %}
+                <li class="dropdown" id="menu1">
+                  <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
+                    {{ user.get_profile.getName }}
+                    <b class="caret"></b>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
+                    <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+                    <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
+                  </ul>
+                </li>
+                {% else %}
+                {% include 'modal_login.html' %}
+                {% endif %}
               </ul>
             </div><!--/.nav-collapse -->
 
         </div>
       <div class="clear"></div>
       </div>
+      <!-- File view goes here -->
+      <div id="file-view" style="display:none">
+      </div>
+      <!-- Search results go here -->
+      <div id="search-results" style="display:none">
+      </div>
+      <!-- Note browsing goes her -->
+      <div id="searchBySchool" style="display:none">
+      </div>
+      <div id="profile-container">
       <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
 
       {# ------ Messages ------ #}
@@ -329,35 +431,38 @@
         <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
       </div> <!-- #myCarousel .carousel .slide -->
 
-      
-      <div class="search-results">
-      </div>
       <!-- BEGIN COURSE LISTINGS -->
       <!-- one course -->
       <div class="course-listing">
-        {% if user.get_profile.courses.all > 0 %}
-        <h3>Your Courses</h3>
-        {% for course in user.get_profile.courses.all %}
-        <div class="course">
-          <div class="folder icon">
-            <img src="/static/img/icon-folder.png">
-          </div>
-          <div class="course-title">
-            <a href="#">{{ course.title }}</a>
-            <div class="course-info">
-              <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
-              {# TODO: not yet implemented downloaded files #}
-              <!--
-              <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
-            </div> <!-- .course-info -->
-          </div> <!-- .course-title -->
+        {% if user.get_profile.courses.all %}
+          <h3>Your Courses</h3>
+          {% for course in user.get_profile.courses.all %}
+          <div class="course">
+            <div class="folder icon">
+              <img src="/static/img/icon-folder.png">
+            </div>
+            <div class="course-title">
+              <a href="#">{{ course.title }}</a>
+              <div class="course-info">
+                <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
+                {# TODO: not yet implemented downloaded files #}
+                <!--
+                <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
+              </div> <!-- .course-info -->
+            </div> <!-- .course-title -->
 
+            <div class="upload">
+              <a class="button course-upload" school-pk="{{course.school.pk}}" school-name="{{course.school.name}}" course-pk="{{course.pk}}" course-name="{{course.title}}" data-toggle="modal" href="#upload">Upload notes</a>
+            </div>
+            <div style="clear:both"></div>
+          </div> <!-- .course -->
+          {% endfor %}
+        {% else %}
+          <h3>You haven't added any courses yet</h3>
+          <p>Would you like to </p>
           <div class="upload">
             <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
           </div>
-          <div style="clear:both"></div>
-        </div> <!-- .course -->
-        {% endfor %}
         {% endif %}
       </div> <!-- .course-listing -->
 
@@ -408,7 +513,7 @@
         <!-- {% endfor %} -->
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
-
+</div><!-- content container -->
 </div> <!-- .profile-page .container -->
 
 {% endblock %}

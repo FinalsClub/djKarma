@@ -50,7 +50,8 @@ clean_up() {
 
 apt-get install git-core g++ python-pip libssl-dev curl make haproxy ruby rubygems mongodb-server # Will be replaced with OS Ver / check for Fedora, Deb, OS X and BSD.
 setup_env
-install_django
+#install_django
+# Do this via sudo pip install -r requirements.txt
 get_knotes
 clean_up
 

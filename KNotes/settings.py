@@ -16,7 +16,6 @@ from notes.credentials import PROD_DB_PASSWORD
 from notes.credentials import DEV_STATIC_ROOT
 from notes.credentials import BETA_STATIC_ROOT
 from notes.credentials import PROD_STATIC_ROOT
-from notes.credentials import DEV_APP_STATIC_ROOT
 
 from notes.credentials import DEV_UPLOAD_ROOT
 from notes.credentials import BETA_UPLOAD_ROOT
@@ -134,7 +133,7 @@ if DEPLOY:
         STATIC_ROOT = PROD_STATIC_ROOT
 else:
     # This should work for any development machine's local path setting
-    STATIC_ROOT = os.path.join(os.path.dirname(__file__), '../django_static/')
+    STATIC_ROOT = DEV_STATIC_ROOT
 
 
 # URL prefix for static files.
@@ -270,7 +269,7 @@ INSTALLED_APPS = (
     'djcelery',     # Django-Celery apps:
     'kombu.transport.django',
     # Not sure this is necessary, yet
-    #'haystack',
+    'haystack',
 
     # our app(s)
     'notes',
@@ -287,7 +286,7 @@ if DEPLOY:
 else:
     CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
 
-'''
+
 ### HAYSTACK Configuration
 HAYSTACK_SITECONF = 'notes.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'solr'
@@ -296,7 +295,7 @@ HAYSTACK_SEARCH_ENGINE = 'solr'
 HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
 # ...or for multicore...
 #HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/mysite'
-'''
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.

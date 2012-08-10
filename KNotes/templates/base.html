@@ -25,6 +25,50 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
 
+  <script type="text/javascript">
+  $(document).ready(function(){
+    // Show file info on hover
+    $(".container").on("hover","div.file.row-fluid", function(){
+      console.log("file hover");
+      $(this).find('.file-info-action').toggleClass("hide");
+    });
+
+    // Handle file-action icon clicks
+    $('#container').on("click",".vote", function(e){
+      // determine file corresponding to this row
+      {% if user.is_authenticated %}
+      file_pk = $(this).closest('.file-actions').attr("id").split("-")[1];
+      console.log($(this));
+
+      vote = 0;
+      // like -- upvote
+      if($(this).hasClass("upvote")){
+        e.preventDefault();
+        vote = 1;
+      }
+      // flag -- downvote
+      else if($(this).hasClass("downvote")){
+        e.preventDefault();
+        vote = -1;
+      }
+      $.ajax({
+        // /vote/note_pk?v=vote_value
+        url: "/vote/"+file_pk,
+        data: {'vote': vote, 'user':{{ user.pk}} },
+        success: function(data) {
+          alert(data);
+        },
+        dataType: "text"
+      });
+
+      {% else %}
+      alert("You must sign in to Like or Flag a File");
+      {% endif %}
+    });
+
+  });
+  </script>
+
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -37,45 +81,6 @@
 </head>
 
 <body>
-
-<!-- Navbar begin -->
-<div class="navbar">
-  <div class="navbar-inner">
-    <div class="container">
-      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
-      <div class="nav-collapse">
-        <ul class="nav">
-          {% if user.is_authenticated %}
-          <li class="dropdown" id="menu1">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-              {{ user.username }} & Pic
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-              <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
-            </ul>
-          </li>
-          {% else %}
-          <li id="menu1">
-            <a href="{% url 'login' %}">login</a>
-          </li>
-          {% endif %}
-        </ul>
-      </div><!--/.nav-collapse -->
-    </div>
-  </div>
-</div>
-
-<!-- Navbar end -->
-
 
 {% block content %}
 {% endblock %}

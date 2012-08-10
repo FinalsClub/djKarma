@@ -19,16 +19,25 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+from haystack.views import SearchView, search_view_factory
+from haystack.forms import ModelSearchForm
+from haystack.query import SearchQuerySet
+
+from notes.models import School
+
+# Example SearchQuerySet fed to Haystack's SearchView
+sqs = SearchQuerySet().highlight()
+
 # Be mindful of overly broad url patterns
 # Remember the trailing $ to avoid partial match
 
 urlpatterns = patterns('',
-
+    # captcha test
+    url(r'^captcha$', 'notes.views.captcha', name='captcha'),
     # Landing page.
-    url(r'^$', 'notes.views.home'),
-
-    # About page
-    url(r'^about$', 'notes.views.about'),
+    url(r'^$', 'notes.views.home', name='home'),
+    url(r'^about$', 'notes.views.about', name='about'),
+    url(r'^terms$', 'notes.views.terms', name='terms'),
 
     # Upload page (Note Upload Form)
     url(r'^upload$', 'notes.views.modalUpload', name='upload'),
@@ -41,18 +50,24 @@ urlpatterns = patterns('',
 
      # Browse by School / Search by Tag view
     url(r'^browse$', 'notes.views.browse'),
+    url(r'^browse2$', 'notes.views.browse2'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
+    # User Profile Ajax submit
+    url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
 
     # Note View
-    url(r'^file/(\d{1,99})$', 'notes.views.note'),
+    url(r'^file/(\d{1,99})$', 'notes.views.note', name='file'),
 
-    # Haystack Search
-    # url(r'^haysearch/', include('haystack.urls')),
+    # Built-in Haystack Search
+    #url(r'^haysearch$', include('haystack.urls')),
+    # Custom Haystack Search Test
+    url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    url(r'^searchBySchool$', 'notes.views.searchBySchool'),
+    url(r'^searchBySchool/$', 'notes.views.searchBySchool'),
+    url(r'^searchBySchool/(\d{1,99})$', 'notes.views.searchBySchool'),
     url(r'^notesOfCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting
@@ -68,7 +83,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
 
     # Add Course, School forms
-    url(r'^add', 'notes.views.addCourseOrSchool', name='add'),
+    url(r'^add', 'notes.views.simpleAddCourseOrSchool', name='add'),
 
     # Auth
     # This logout allows us to pass a redirect:
@@ -76,7 +91,8 @@ urlpatterns = patterns('',
     #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^accounts/register/$', 'notes.views.register', name='register'),
+    # accepts the username that invited
+    url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
 
 
