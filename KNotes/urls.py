@@ -35,8 +35,8 @@ urlpatterns = patterns('',
     # captcha test
     url(r'^captcha$', 'notes.views.captcha', name='captcha'),
     # Landing page.
-    url(r'^$', 'notes.views.home'),
-    url(r'^about$', 'notes.views.about'),
+    url(r'^$', 'notes.views.home', name='home'),
+    url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
 
     # Upload page (Note Upload Form)
