@@ -338,8 +338,8 @@ class UserProfile(models.Model):
 
         user_profile extends the user to add our extra fields
     """
-    # TODO: add a a many to many relation to courses for profile page
-    ## 1-to-1 relation to user model
+    # TODO: At some point, split our our UserProfile into a separate app, \
+    #       so it may be shared between projects and to limit the size of this file
     user = models.ForeignKey(User, unique=True)
     school = models.ForeignKey(School, blank=True, null=True)
 
@@ -358,6 +358,10 @@ class UserProfile(models.Model):
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
     gravatar = models.CharField(max_length=100, blank=True)  # gravatar hash make urls in function
+    # the cached versions of self.get_picture
+    picture_url_large = models.CharField(max_length=255, default='/static/img/avatar_large.png')
+    picture_url_small = models.CharField(max_length=255, default='/static/img/avatar_small.png')
+
     grad_year = models.CharField(max_length=255, blank=True, null=True)
     fb_id = models.CharField(max_length=255, blank=True, null=True)
     can_upload = models.BooleanField(default=True)
@@ -425,7 +429,7 @@ class UserProfile(models.Model):
         small_default = u'http://placehold.it/50x50'
         large_default = u'http://placehold.it/180x180'
         if self.fb_id:
-            url = u"https://graph.facebook.com/{0}/picture".format(self.username)
+            url = u"https://graph.facebook.com/{0}/picture".format(self.user.username)
             if size == 'small':
                 return url
             else:
@@ -449,6 +453,7 @@ class UserProfile(models.Model):
             Second, username given on standard account signup
             Lastly, first name last initial (from social login)
         """
+        # TODO make a template tag of this
         if self.alias and self.alias != "":
             return self.alias
         if self.user.first_name:
@@ -529,6 +534,10 @@ class UserProfile(models.Model):
         # make a gravatar hash
         if not self.gravatar and not self.fb_id:
             self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
+
+        # Regenerate the picture_urls for easy access
+        self.picture_url_large = self.get_picture('large')
+        self.picture_url_small = self.get_picture('small')
 
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
