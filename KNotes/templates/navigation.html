@@ -14,6 +14,9 @@
   var user_pk = {{user.pk}};
 
   $(document).ready(function(){
+    // enable karma over popover info box
+    $('#karma-info').popover('hide');
+
     $('.dropdown-toggle').dropdown();
 
     $("div.file.row-fluid").hover(function () {
@@ -245,17 +248,29 @@
 
 <div class="profile-page container">
   <div class="row">
-    <div class="span3">
+    <div class="span3 left-sidebar">
       <ul class="nav nav-list">
         <li class="active">
+          <a id="your-courses" href="#">
+            <i class="icon-book"></i>
+            Your courses
+          </a>
+        </li>
+        <li>
           <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
           </a>
         </li>
         <li>
+          <a id="karma-events" href="/karma-events">
+            <i class="icon-time"></i>
+            Karma events
+          </a>
+        </li>
+        <li>
           <a href="#share" class="karma" data-toggle="modal">
-            <i class="icon-user"></i>
+            <i class="icon-share"></i>
             Share KarmaNotes
             <div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
           </a>
@@ -266,7 +281,7 @@
       <ul class="thumbnails">
         <li class="span3">
           <div class="thumbnail">
-            <img alt="" src="http://placehold.it/230x100">
+            <img alt="" src="{{ user.get_profile.picture_url_large }}">
             <div class="caption">
               <div>
                 <span class="username-label" id="username-label-profile">{{ user.username }}</span>
@@ -285,13 +300,17 @@
 
               <!-- progress bar -->
               <p>Karma Points</p>
-              <div class="progress progress-karma">
+              <div class="progress progress-karma" id="karma-info" rel="popover" 
+                data-content="Status1: 25 points<br /> Status2: 50 points<br /> Status3: 75 points<br /> Status4: 100 points<br />" data-original-title="How Karma Status Works">
                 <div id="karma-progress" class="bar"
                      style="width: {{progress}}%;"></div>
+                  <div class="current-karma" style="">
+                      <span class="karma-points">{{ user.get_profile.karma }} points</span>
+                  </div>
               </div>
               <div class="karma-label">
-                <div class="karma-label-left" id="karma-label">{{ user.get_profile.karma }}</div>
-                <div class="karma-label-right">{{ next_level.title}} {% if next_level %} ({{ next_level.karma }}) {% endif %}</div>
+                <div class="karma-label-left" id="karma-label">{{ current_level.title|upper }} ({{ user.get_profile.karma }})</div>
+                <div class="karma-label-right">{{ next_level.title|upper }} {% if next_level %} ({{ next_level.karma }}) {% endif %}</div>
                 <div style="clear:both"></div>
               </div>
 
@@ -326,41 +345,41 @@
       <!-- Static navbar -->
       <div class="navbar">
         <div class="navbar-inner">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="#"><img src="./static/img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
-            <div class="nav-collapse">
-              <ul class="nav">
-                <li class="" id="menu0">
-                  <form class="navbar-search input-append form-search">
-                    <input type="text" class="input-medium search-query" id="navbar-search-input" placeholder="Search">
-                    <a type="submit" class="btn button">Go</a>
-                  </form>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="dropdown" id="menu1">
-                  <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
-                    {{ user.get_profile.getName }}
-                    <b class="caret"></b>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
-                    <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-                    <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-                    <li class="divider"></li>
-                    <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
-                  </ul>
-                </li>
-                {% else %}
-                {% include 'modal_login.html' %}
-                {% endif %}
-              </ul>
-            </div><!--/.nav-collapse -->
-
-        </div>
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#"><img src="./static/img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="" id="menu0">
+                <form class="navbar-search input-append form-search">
+                  <input type="text" class="input-medium search-query" id="navbar-search-input" placeholder="Search">
+                  <a type="submit" class="btn button">Go</a>
+                </form>
+              </li>
+              {% if user.is_authenticated %}
+              <li class="dropdown" id="menu1">
+                <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
+                  {{ user.get_profile.getName }}
+                  <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
+                  <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
+                  <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
+                  <li class="divider"></li>
+                  <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
+                </ul>
+              </li>
+              {% else %}
+              {% include 'modal_login.html' %}
+              {% endif %}
+            </ul> <!-- .nav -->
+          </div><!--/.nav-collapse -->
+        </div> <!-- .navbar-inner -->
+      {% block navinner %}
       <div class="clear"></div>
       </div>
       <!-- File view goes here -->
@@ -514,6 +533,7 @@
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 </div><!-- content container -->
+{% endblock %}
 </div> <!-- .profile-page .container -->
 
 {% endblock %}

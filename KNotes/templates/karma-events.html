@@ -1,0 +1,27 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Karma Events
+{% endblock %}
+
+{% block navinner %}
+
+<table id="events" class="table">
+  <tbody>
+  {% for event in events %}
+    <tr>
+      <td>
+        <i class="icon-plus-sign"></i> 
+      </td>
+      <td>
+        You {{ event }}.
+      </td>
+      <td style="text-align: right;">
+      at {{ event.timestamp }}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody
+</table>
+
+{% endblock %}
