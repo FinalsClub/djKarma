@@ -253,6 +253,7 @@ def getting_started(request):
         t = {}
         t['message'] = task().message
         t['status'] = task().check(request.user.get_profile())
+        t['karma'] = task().karma
         response['tasks'].append(t)
     return render(request, 'getting-started.html', response)
 
