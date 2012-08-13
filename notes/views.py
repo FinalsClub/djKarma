@@ -41,6 +41,7 @@ from models import SiteStats
 from models import Level
 from models import Vote
 from models import ReputationEventType
+from profile_tasks import tasks
 from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import processCsvTags
@@ -243,6 +244,18 @@ def nav_helper(request, response={}):
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
 
     return response
+
+def getting_started(request):
+    """ View for introducing a user to the site and asking them to accomplish intro tasks """
+    response = nav_helper(request)
+    response['tasks'] = []
+    for task in tasks:
+        t = {}
+        t['message'] = task().message
+        t['status'] = task().check(request.user.get_profile())
+        response['tasks'].append(t)
+    return render(request, 'getting-started.html', response)
+
 
 def karma_events(request):
     """ Shows a time sorted log of your events that affect your 

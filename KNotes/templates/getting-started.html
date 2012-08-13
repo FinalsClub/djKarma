@@ -1,0 +1,23 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Getting Started
+{% endblock %}
+
+{% block navinner %}
+  <table id="tasks" class="table"
+    <tbody>
+    {% for task in tasks %}
+      <tr>
+        <td><h4>{{ forloop.counter }}.</td>
+        <td><div {% if task.status %} style="text-decoration: line-through"{% endif %}>
+          {{ task.message }}
+        </div></td>
+        <td>{% if task.status %} <i class="icon-ok"></i> {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
