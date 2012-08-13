@@ -37,17 +37,83 @@ jQuery(document).ready(function() {
 });
 
 </script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+  $('.dropdown-toggle').dropdown();
+
+  $("div.file.row-fluid").hover(function () {
+    $(this).children('.file-info-action').toggleClass("hide");
+  });
+  
+  $("div.showmore").click(function () {
+    $(this).nextAll('div.file').slideToggle('slow');
+  });
+  
+  $('input:radio').screwDefaultButtons({
+               checked: "url(img/check.jpg)",
+               unchecked: "",
+               width: 50,
+               height: 50
+            });
+});
+</script>
 {% endblock %}
 
 {% block content %}
 <div class="container">
+  <!-- Static navbar -->
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#"><img src="/static/img/karma-logo.png" class="logo-mark">
+        <span class="logo-karma">Karma</span>
+        <span class="logo-notes">Notes</span>
+      </a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="dropdown home" id="menu1">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+              Login
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" id="login-menu">
+              <li><a href="{% url 'socialauth_begin' 'facebook' %}"><i class="icon-facebook-sign"></i>Login/Signup with Facebook</a></li>
+              <li class="divider"></li>
+              <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <li>
+                  <span class="label">
+                    Username:
+                  </span>
 
+                  <input id="id_username" type="text" name="username" placeholder="Your Email">
+                  {# form.username #}
+                </li>
+
+                <li>
+                  <span class="label">
+                    Password:
+                  </span>
+                  <input type="password" name="password" id="id_password" placeholder="Your Password">
+                </li>
+                <li>
+                  <button type="submit">Log in</button>
+                </li>
+              </form>
+            </ul>
+          </li> <!-- .dropdown .home #menu1 -->
+        </ul><!-- .nav -->
+      </div><!--/.nav-collapse -->
+    </div> <!-- .navbar-inner -->
+  </div> <!-- .navbar -->
+
+<!-- OLD -->
   <div class="hero-unit">
-    <a class="brand" href="#">
-          <img src="/static/img/karma-logo.png" class="logo-mark">
-          <span class="logo-karma">Karma</span>
-          <span class="logo-notes">Notes</span>
-        </a>
 
 
     <div class="vidholder">
