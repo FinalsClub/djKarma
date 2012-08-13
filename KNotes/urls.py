@@ -49,11 +49,11 @@ urlpatterns = patterns('',
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
 
      # Browse by School / Search by Tag view
-    url(r'^browse$', 'notes.views.browse'),
-    url(r'^browse2$', 'notes.views.browse2'),
+    url(r'^browse$', 'notes.views.browse', name='browse'),
+    url(r'^browse2$', 'notes.views.browse2', name='browse2'),
 
     # Karma events 
-    url(r'^karma-events$', 'notes.views.karma_events'),
+    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
