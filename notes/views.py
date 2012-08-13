@@ -41,6 +41,7 @@ from models import SiteStats
 from models import Level
 from models import Vote
 from models import ReputationEventType
+from profile_tasks import tasks
 from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import processCsvTags
@@ -199,10 +200,15 @@ def smartModelQuery(request):
             print search_form.errors
     raise Http404
 
-@login_required
-def profile(request):
-    """ User Profile """
-    response = {}
+
+def nav_helper(request, response={}):
+    """ calculates information for the navigation sidebar for logged in users
+        :request:  a Requset object that contains a user &etc
+        :response: (optional) a response dictionary to pass to the template
+        returns: a response dictionary
+    """
+    # TODO: turn this into a middleware or decorator
+    # TODO: implement the zero-user-model
 
     # Calculate User's progress towards next Karma level
     # Depends on models.Level objects
@@ -236,6 +242,37 @@ def profile(request):
         response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
     if not user_profile.grad_year:
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
+
+    return response
+
+def getting_started(request):
+    """ View for introducing a user to the site and asking them to accomplish intro tasks """
+    response = nav_helper(request)
+    response['tasks'] = []
+    for task in tasks:
+        t = {}
+        t['message'] = task().message
+        t['status'] = task().check(request.user.get_profile())
+        t['karma'] = task().karma
+        response['tasks'].append(t)
+    return render(request, 'getting-started.html', response)
+
+
+def karma_events(request):
+    """ Shows a time sorted log of your events that affect your 
+        karma score positively or negatively. 
+    """
+    # navigation.html
+    response = nav_helper(request)
+    response['events'] = request.user.get_profile().reputationEvents.all()
+    return render(request, 'karma-events.html', response)
+
+
+@login_required
+def profile(request):
+    """ User Profile """
+    response = nav_helper(request)
+
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
     return render(request, 'navigation.html', response)
 
