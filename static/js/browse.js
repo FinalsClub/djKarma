@@ -3,9 +3,23 @@ $.getJSON('/browseBySchool/', function(schoolsArr) {
     $.each(schoolsArr, function(idx, school) {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
-        $('<div/>', {class:'schoolBtn',
-                     id:   school._id + "-Btn", text: school.name})
-
+        //$('<div/>', {class:'schoolBtn',
+        //             id:   school._id + "-Btn", text: school.name})
+      "<div class=\"course schoolBtn\" id=\""+school._id+"-Btn\">"
+          +"<div class=\"folder icon\">"
+            +"<img src=\"/static/img/icon-folder.png\">"
+          +"</div>"
+          +"<div class=\"course-title\">"
+            +"<a href=\"#\">"+school.name+"</a>"
+            +"<div class=\"course-info\">"
+            +"<span class=\"location\">"+school.location +"</span> <i class=\"icon-paper-clip\"></i><a href=\"#\">"+school.courses.length+"Courses</a>"
+            +"</div> <!-- .course-info -->"
+          +"</div> <!-- .course-title -->"
+          +"<div class=\"upload\">"
+            +"<a class=\"button course-upload\" school-pk=\""+ school._id+"\" school-name=\""+ school.name+"\" data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
+          +"</div>"
+          +"<div style=\"clear:both\"></div>"
+        +"</div>"
       );
       // add a coursesOfSchool div immediately following;
       $('#' + school._id + '-Btn').after(
@@ -37,7 +51,7 @@ $.getJSON('/browseBySchool/', function(schoolsArr) {
             +"<a class=\"button course-upload\" school-pk=\""+ school._id+"\" school-name=\""+ school.name+"\" course-name=\""+ course.title+"\"course-pk=\""+ course._id+"\"  data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
           +"</div>"
           +"<div style=\"clear:both\"></div>"
-        +"</div>" <!-- .course -->
+        +"</div>"
 
         );
         $('#' + slugify(school.name) + '-Courses').append(
