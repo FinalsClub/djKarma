@@ -16,8 +16,8 @@ Profile Tasks.
                     isn't required if the user registers from Facebook
 """
 class AddedUsername():
-    message = "What should we call you? Add a username on the left"
-    div_id = "add-username-alert"
+    message = u"What should we call you? Add a username on the left"
+    div_id = u"add-username-alert"
     karma = 4
     # Tag the div corresponding to this alert so it can be hidden
     # without page reload
@@ -29,8 +29,8 @@ class AddedUsername():
             return False
 
 class InvitedFriend():
-    message = "Last step, invite a friend to complete your profile"
-    div_id = "invite-friend-alert"
+    message = u"Last step, invite a friend to complete your profile"
+    div_id = u"invite-friend-alert"
     karma = 5
 
     def check(self, user_profile):
@@ -38,8 +38,8 @@ class InvitedFriend():
         return user_profile.invited_friend
 
 class AddedSchool():
-    message = "To get the most out of KarmaNotes, you need to add your school."
-    div_id = "add-school-alert"
+    message = u"To get the most out of KarmaNotes, you need to add your school."
+    div_id = u"add-school-alert"
     karma = 5
 
     def check(self, user_profile):
@@ -49,8 +49,8 @@ class AddedSchool():
             return False
 
 class AddedGradYear():
-    message = "Choose the year you are graduating from the dropdown under Profile on the left"
-    div_id = "add-gradyear-alert"
+    message = u"Choose the year you are graduating from the dropdown under Profile on the left"
+    div_id = u"add-gradyear-alert"
     karma = 3
 
     def check(self, user_profile):
@@ -59,4 +59,14 @@ class AddedGradYear():
         else:
             return False
 
-tasks = [ AddedUsername, AddedGradYear, AddedSchool, InvitedFriend ]
+class UploadedFile():
+    message = u"Share your first file with other users of KarmaNotes"
+    div_id = u"upload-a-file"
+    karma = u"5-10"
+
+    def check(self, user_profile):
+        if len(user_profile.files.all()) >= 1:
+            return True
+        return False
+
+tasks = [ AddedUsername, AddedGradYear, AddedSchool, InvitedFriend, UploadedFile ]
