@@ -223,7 +223,7 @@
 
                 {% if request.user.is_authenticated %}
                 <li>
-                  <a href="{% url 'profile' %}" title="You currently have {{ request.user.get_profile.karma }} KarmaPoints">{{request.user.username}} ({{request.user.get_profile.karma}})</a>
+                  <a href="{% url 'profile' %}" title="You currently have {{ request.user.get_profile.karma }} KarmaPoints">{{request.user.get_profile.getName}} ({{request.user.get_profile.karma}})</a>
                 </li>
                 <li class="divider-vertical"></li>
                 <li>

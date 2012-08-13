@@ -36,6 +36,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
         json_result["title"] = model.title
         json_result["instructor"] = model.instructor.name
         json_result["notes"] = []
+        json_result["num_notes"] = len(model.files.all())
         if(depth > 0):
             for note in model.files.all().order_by('-timestamp'):
                 note_json = jsonifyModel(model=note, user_pk=user_pk)

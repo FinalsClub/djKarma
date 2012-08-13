@@ -16,9 +16,10 @@ Questions:
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="">
     <!-- Le styles -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet/less" type="text/css" href="less/styles.less">
+	<link rel="stylesheet" type="text/css" href="less/styles.css">
 
 
     <script src="js/less.js" type="text/javascript"></script>
@@ -32,68 +33,65 @@ Questions:
 
 <!-- stylesheet for homepage carousel -->
 <link rel="stylesheet" type="text/css" href="css/homepage-carousel/tango/skin.css" />
-
+<script type="text/javascript" src="http://use.typekit.net/pnc8diw.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
   </head>
   
   
   <body class="ms">
 		
-		<div class="container">
+    <div class="homepage container">
    <!-- Static navbar -->
       <div class="navbar">
         <div class="navbar-inner">
-
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
             <div class="nav-collapse">
               <ul class="nav">
-                
-								<li class="dropdown home" id="menu1">
-								    <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
-								      Login
-								      <b class="caret"></b>
-								    </a>
-								    <ul class="dropdown-menu" id="login-menu">
-											
-											<li><a href="#"><i class="icon-facebook-sign"></i>Login/Signup with Facebook</a></li>
-											<li class="divider"></li>
-											<form>
-	                    	<li><span class="label">Email:</span> <input name="email" type="text" class="" placeholder="Your Email"></li>
-		                    <li><span class="label">Password:</span> <input name="password" type="text" class="" placeholder="Your Password"></li>
-											</form>
-	                    
-	                  </ul>
-								  </li>
+		<li class="dropdown home" id="menu1">
+		    <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+		      Login
+		      <b class="caret"></b>
+		    </a>
+		    <ul class="dropdown-menu" id="login-menu">    
+		      <li><a href="#"><i class="icon-facebook-sign"></i>Login/Signup with Facebook</a></li>
+		      <li class="divider"></li>
+		      <form>
+			<li><span class="label">Email:</span> <input name="email" type="text" class="" placeholder="Your Email"></li>
+			<li><span class="label">Password:</span> <input name="password" type="text" class="" placeholder="Your Password"></li>
+		      </form>
+		    </ul>
+		  </li>
               </ul>
-
             </div><!--/.nav-collapse -->
           </div>
 
       </div>
    
-    <div class="container">
 
        <div class="hero-unit">
-					<div class="vidholder">
+	<a class="brand" href="#"><img src="img/logo.png" class=""></a>
+	  <div class="vidholder">
             <img src="http://placehold.it/350x280" width="350" height="280">
           </div>
           <div class="block">
             <h1>Share notes.</h1>
             <h1>Ace your exams.</h1>
             <h2>Upload your notes to get instant access to over 503,933 study materials. Free.</h2>
-						<div class="call-to-action">
-	            <a href="#" class="button">UPLOAD FILE</a> <div class="instant">for instant access</div> 
-							<div class="clear"></div>
-	            <div class="dragdrop">Or drag + drop anywhere on this page</div>
-						</div>
-						<div class="clear"></div>
+	      <div class="call-to-action">
+		<a href="#" class="button">UPLOAD FILE</a>
+		<div class="instant clear">for instant access</div> 
+		<div class="clear"></div>
+		
+	      </div>
+	      <div class="clear"></div>
           </div>
+       </div>
           
-        </div> 
+
 
 
 

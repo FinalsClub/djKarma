@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% load url from future %}
 
 {% block scripts %}
@@ -67,8 +67,8 @@
   });
 
     // Form submit listener
-    $('#container').on("submit", "form", function(){
-
+    $('#upload-container').on("submit", "form", function(event){
+      event.preventDefault();
       // Determine model this form relates to
       if($(this).hasClass("school"))
         var type = "school";
@@ -120,6 +120,8 @@
       }
       url = "/filemeta";
       $("#file-form-file_pk").val(file_pk);
+      $("#file-form-course_pk").val(course_pk);
+      $("#file-form-school_pk").val(school_pk);
       // Re-Serialize form data for POSTing
       var form_data = $(this).serializeArray();
       $.post(url, form_data,
@@ -276,7 +278,7 @@
     }
 
 // Model Check pre-Create btn-click listeners
-$("#container").on("click", "#select-suggestion", function() {
+$("#upload-container").on("click", "#select-suggestion", function() {
 console.log("model-suggestion: "+ $("#model-suggestions option:selected").val());
   if($("#model-suggestions").hasClass("course")){
     course_pk = $("#model-suggestions option:selected").val();
@@ -306,7 +308,7 @@ console.log("model-suggestion: "+ $("#model-suggestions option:selected").val())
 });
 
 // User clicks "Create School" after confirming desired model does not exist
-$("#container").on("click", "#create-model", function() {
+$("#upload-container").on("click", "#create-model", function() {
   $("#model-suggestions-div").fadeOut('fast', function(){
     $("#create-model-form").fadeIn('fast');
   });
@@ -349,7 +351,7 @@ $("#container").on("click", "#create-model", function() {
 {% endblock %}
 
 {% block content %}
-<div style="width:400px;margin-right:auto;margin-left:auto;"> <!-- Container -->
+<div id="upload-container" style="width:400px;margin-right:auto;margin-left:auto;"> <!-- Container -->
   <!-- File select / drag-n-drop -->
   <div style="margin-left:200px;padding-bottom:50px;" id="file-uploader">       
           <noscript>          
