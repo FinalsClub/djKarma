@@ -11,17 +11,12 @@
   <script type="text/javascript">
 
   var current_karma = {{ user.get_profile.karma }};
-  var user_pk = {{user.pk}};
 
   $(document).ready(function(){
     // enable karma over popover info box
     $('#karma-info').popover('hide');
 
     $('.dropdown-toggle').dropdown();
-
-    $("div.file.row-fluid").hover(function () {
-          $(this).children('.file-info-action').toggleClass("hide");
-      });
 
     $("div.showmore").click(function () {
             $(this).nextAll('div.file').slideToggle('slow');
@@ -66,7 +61,6 @@
 
       $.ajax({
         url: "/file/"+file_pk,
-        data: {'user_pk': user_pk},
         success: function(data){
           $('#file-view').hide();
           $('#profile-container').hide();
@@ -109,8 +103,8 @@
 
     // Handle username edit in place form submit
     $("#username-form").on("submit", function(e){
-      request_data = { 'user': {{user.pk}} };
       e.preventDefault();
+      request_data = {};
       console.log("form submit");
       request_data['alias'] = $("#username-input").val();
       console.log("alias: " + request_data['alias']);
@@ -119,7 +113,7 @@
 
     // Handle profile school submission
     $(".select").on("change",function(){
-      request_data = { 'user': {{user.pk}} };
+      request_data = {};
       //console.log($(this).val());
       //console.log($("#school-select option:selected").val());
       if($(this).hasClass("school")){
@@ -163,7 +157,7 @@
   function ajaxSearchQuery(query, callback){
     $.ajax({
       url: "/search",
-      data: {'q': query , 'user': user_pk},
+      data: {'q': query},
       success: callback
     });
   }
@@ -257,7 +251,7 @@
             Your courses
           </a>
         </li>
-        <li class="{% navactive request 'browse browse2' %}">
+        <li class="{% navactive request 'browse' %}">
           <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
@@ -484,25 +478,7 @@
         {% if user.get_profile.courses.all %}
           <h3>Your Courses</h3>
           {% for course in user.get_profile.courses.all %}
-          <div class="course">
-            <div class="folder icon">
-              <img src="/static/img/icon-folder.png">
-            </div>
-            <div class="course-title">
-              <a href="#">{{ course.title }}</a>
-              <div class="course-info">
-                <span class="instructor">{% if course.instructor %}{{ course.instructor }}{% else %}No instructor listed{% endif %}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.count }} notes</a>
-                {# TODO: not yet implemented downloaded files #}
-                <!--
-                <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span> -->
-              </div> <!-- .course-info -->
-            </div> <!-- .course-title -->
-
-            <div class="upload">
-              <a class="button course-upload" school-pk="{{course.school.pk}}" school-name="{{course.school.name}}" course-pk="{{course.pk}}" course-name="{{course.title}}" data-toggle="modal" href="#upload">Upload notes</a>
-            </div>
-            <div style="clear:both"></div>
-          </div> <!-- .course -->
+            {% include 'course.html' with course=course %}
           {% endfor %}
         {% else %}
           <h3>You haven't added any courses yet</h3>
@@ -537,27 +513,6 @@
       end INACTIVE courses -->
 
       <div class="file-listing collapse in" id="course-unique-1">
-        <!--
-        {# makes a file for letter in your username #}
-        {% for file in user.username %}
-        <div class="file row-fluid">
-
-          <div class="file icon"></div>
-
-          <div class="file-title">
-            <a href="#">Lecture 1-6 Notes</a>
-          </div>
-
-          <div class="file-description">
-            This is a great file description, so much stuff, it will get cut off...
-          </div>
-
-          <div class="file-info-action hide row">
-            {% include "file-info.html" with file=file user=user%}
-            {% include "file-actions.html" with file=file %}
-          </div> <!-- .file-info-action hide row -->
-        </div> <!-- .file .row-fluid -->
-        <!-- {% endfor %} -->
 
       </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 </div><!-- content container -->

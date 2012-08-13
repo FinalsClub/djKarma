@@ -29,7 +29,7 @@ djcelery.setup_loader()
 # Is this running on the karmanotes.org box?
 DEPLOY = False
 # Is this deployed as the beta server?
-BETA = True
+BETA = False
 
 if DEPLOY:
     if not BETA:
@@ -240,7 +240,9 @@ TEMPLATE_DIRS = (
 
     # Wherever you go, there you are
     os.path.join(os.path.dirname(__file__), 'templates'),
-    './templates'
+    './KNotes/templates/models',
+    './KNotes/templates/modal',
+    './KNotes/templates/ajax',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

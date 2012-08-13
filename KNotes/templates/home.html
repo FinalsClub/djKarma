@@ -140,18 +140,7 @@ $(document).ready(function(){
   <ul id="mycarousel" class="jcarousel jcarousel-skin-tango">
     {% for file in recent_files %}
     <li> <!-- begin one file -->
-      <div class="file row-fluid">
-        <div class="file icon"></div>
-        <div class="file-title">
-          <a href="/file/{{ file.id }}">{{ file.title }}</a>
-        </div>
-        <div class="file-description">
-          {{ file.description }}
-        </div>
-        <div class="file-info-action hide row">
-          {% include "file-info.html" with file=file %}
-        </div> <!-- .file-info-action -->
-      </div> <!-- .file .row-fluid -->
+      {% include "file.html" with file=file %}
     </li> <!-- end one file -->
     {% endfor %}
   </ul>

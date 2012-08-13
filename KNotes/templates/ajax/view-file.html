@@ -6,7 +6,7 @@ $(document).ready(function() {
   // KarmaNotes's css
   var doc = $('#noteframe')[0].contentWindow.document;
   var $body = $('body',doc);
-  $body.html('{{note.html|safe}}');
+  $body.html('{{file.html|safe}}');
   autoResize('noteframe');
 
   // Resize the iframe upon html injection
@@ -33,27 +33,27 @@ $(document).ready(function() {
     <div class="span9">
       <div class="row-fluid">
         <div class="span12">
-          <h2>{{ note.title }}</h2>
+          <h2>{{ file.title }}</h2>
           <div class="file-info-wrapper">
             <h4>About this Class</h4>
-              <h3><a href="#">{{ note.course.title }}</a></h3>
-              <strong>{{ note.course.instructor }} | {{ note.school.name }}</strong>
+              <h3><a href="#">{{ file.course.title }}</a></h3>
+              <strong>{{ file.course.instructor }} | {{ file.school.name }}</strong>
 
 
               <div class="class-info">
-                {% if note.course.files.count >= 1 %}
-                This class has <a href="#">{{ note.course.files.count }} notes</a>.
+                {% if file.course.files.count >= 1 %}
+                This class has <a href="#">{{ file.course.files.count }} notes</a>.
                 {% endif %}
                 <p><span class="your-files">You have <a href="#">1 upload </a> and <a href="#">2 downloads</a></span> from this class. </p>
               </div>
 
             <h4>About this file</h4>
-            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ note.owner.get_profile.getName }}</a></div>
+            <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a></div>
             <div class="points-and-views">
-              <strong>{{ note_type }}:</strong> <span class="karma-points">10 points</span>
-              <span class="views">{{ note.viewCount }} views</a>
+              <strong>{{ file_type }}:</strong> <span class="karma-points">10 points</span>
+              <span class="views">{{ file.viewCount }} views</a>
             </div>
-            {% include "file-actions.html" with file=note %}
+            {% include "file-actions.html" with file=file %}
             <div class="clear"></div>
           </div>
           <div class="note-text">
