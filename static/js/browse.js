@@ -1,5 +1,5 @@
 function initializeBrowseView(){
-$.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
+$.getJSON('/browseBySchool/', function(schoolsArr) {
     $.each(schoolsArr, function(idx, school) {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
@@ -102,7 +102,7 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
     var reqTime = new Date().getTime();
     // Only perform the request if the corresponding notesOfCourse div doesn't have the 'populated' class
     if(!$(this).next().hasClass('populated')){
-      $.getJSON('/notesOfCourse/' + courseID+'?user='+user_pk, function(noteArray) {
+      $.getJSON('/browseByCourse/' + courseID, function(noteArray) {
       //console.log("/notesOfCourse/ in " + (new Date().getTime() - reqTime)/1000+"s");
       reqTime = new Date().getTime();
         // validate json
@@ -242,9 +242,8 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
       
       $.ajax({
                 // /vote/note_pk?v=vote_value
-                // NOTE: user_pk value is provided by page embedding this script
                 url: "/vote/"+note_id.split("-")[0],
-                data: {'vote': vote, 'user':user_pk },
+                data: {'vote': vote},
                 success: function(data) {
                   //alert(data);
                     if (data === "success"){

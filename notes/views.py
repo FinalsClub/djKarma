@@ -20,19 +20,8 @@ from django.utils.encoding import iri_to_uri
 from ajaxuploader.views import AjaxFileUploader
 
 import forms as KarmaForms
-'''
-Avoid collision with django.contrib.auth.forms
-from forms import CaptchaForm
-from forms import UploadFileForm
-from forms import UsherCourseForm
-from forms import ModelSearchForm
-from forms import TypeTagsForm
-from forms import SchoolForm
-from forms import InstructorForm
-from forms import ProfileForm
-from forms import FileMetaDataForm
-from forms import SmartSchoolForm
-'''
+#Avoid collision with django.contrib.auth.forms
+
 from models import School
 from models import Course
 from models import File
@@ -79,14 +68,6 @@ def terms(request):
 import_uploader = AjaxFileUploader()
 
 
-def modalUpload(request):
-    """ One-shot file uploader with async Google processing """
-    template_data = {}
-    template_data['search_form'] = KarmaForms.ModelSearchForm
-    template_data['file_form'] = KarmaForms.FileMetaDataForm
-    return render(request, 'modalUpload.html', template_data)
-
-
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
     response = {}
@@ -126,8 +107,6 @@ def fileMeta(request):
     else:
         # if not POST or not ajax
         response["status"] = "invalid request"
-
-
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -157,7 +136,6 @@ def smartModelQuery(request):
                         response['suggestions'] = []
                         response['status'] = 'no_match'
                     return HttpResponse(json.dumps(response), mimetype="application/json")
-                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': schools})
                 # A school matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': model's pk}
@@ -185,7 +163,6 @@ def smartModelQuery(request):
                         response['status'] = 'no_match'
                     print "smartModelQuery: return create Course sugesstions"
                     return HttpResponse(json.dumps(response), mimetype="application/json")
-                    #return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': request.POST['type'], 'message': message, 'suggestions': courses})
                 # A course matching entry exists
                 else:
                     # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
@@ -203,7 +180,7 @@ def smartModelQuery(request):
 
 def nav_helper(request, response={}):
     """ calculates information for the navigation sidebar for logged in users
-        :request:  a Requset object that contains a user &etc
+        :request:  a Request object that contains a user &etc
         :response: (optional) a response dictionary to pass to the template
         returns: a response dictionary
     """
@@ -276,12 +253,14 @@ def profile(request):
     response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
     return render(request, 'navigation.html', response)
 
-
+@login_required
 def editProfile(request):
+    ''' Handles AJAX requests to edit the user's profile.
+    '''
     if(request.is_ajax()):
         response = {}
         do_save = False
-        user_pk = int(request.GET.get('user', -1))
+        user_pk = request.user.pk
         print user_pk
         if user_pk == -1:
             raise Http404
@@ -331,7 +310,7 @@ def get_upload_form(response):
     return response
 
 
-def simpleAddCourseOrSchool(request):
+def addModel(request):
     ''' This replaces addCourseOrSchool in the new
         modal-upload process
     '''
@@ -347,72 +326,6 @@ def simpleAddCourseOrSchool(request):
 
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
-
-def addCourseOrSchool(request):
-    """ handles user creation (via HTML forms) of auxillary objects:
-        School, Course, and Instructor. Called by /upload
-        UPDATED: Now also handles ajax requests from combined form page
-        i.e: If ajax, just return updated form, not entire html page
-    """
-    if request.method == 'POST':
-        if request.is_ajax():
-            print "ajax request"
-        else:
-            print "non-ajax request"
-        type = request.POST['type']
-        if type == "Course":
-            form = KarmaForms.UsherCourseForm(request.POST)
-        elif type == "School":
-            form = KarmaForms.SchoolForm(request.POST)
-        elif type == "Instructor":
-            form = KarmaForms.InstructorForm(request.POST)
-        if form.is_valid():
-            model = form.save()
-
-            #print "type: " + str(type).lower() + " model: " + str(model)
-            # Trying to format the model properly for display in modelchoicefield
-            #form = UploadFileForm(initial={str(type).lower(): [model.pk, str(model)]})
-
-            # If ajax request, return success message
-            if request.is_ajax():
-                # Return a json object: {'status': 'success', 'model': 'model's pk}
-                response = {}
-                response['status'] = 'success'
-                response['model_pk'] = model.pk
-
-                if type == "Course":
-                    response['model_name'] = model.title
-                elif type == "School":
-                    response['model_name'] = model.name
-
-                return HttpResponse(json.dumps(response), mimetype="application/json")
-            else:
-                # Return to /upload page after object added
-                # TODO: Have form reflect pre-populated value
-                # With below line uncommented, the value is set to the form
-                # But the autocomplete field does not reflect this in its display
-                form = KarmaForms.UploadFileForm(initial={str(type).lower(): model})
-                return render(request, 'upload.html', {'message': str(type) + ' successfully created!', 'form': form})
-        else:
-            # If ajax, return only the form with errors
-            if request.is_ajax():
-                #return HttpResponse(form.errors)
-                return TemplateResponse(request, 'ajaxFormResponse.html', {'form': form, 'type': type})
-                #return render(request, 'ajaxFormResponse.html', {'form': form})
-            # If not ajax, render entire form page
-            else:
-                return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
-    else:
-        type = request.GET.get('type')
-        if type == "Course":
-            form = KarmaForms.UsherCourseForm()
-        elif type == "School":
-            form = KarmaForms.SchoolForm()
-        elif type == "Instructor":
-            form = KarmaForms.InstructorForm()
-        else:
-            raise Http404
-        return render(request, 'addCourseOrSchool.html', {'form': form, 'type': type})
 
 def register(request, invite_user):
     """ Display user login and signup screens
@@ -441,6 +354,9 @@ def register(request, invite_user):
         form = forms.UserCreationForm()
         return render(request, "registration/register.html", {'form': form})
 
+'''
+    AJAX views
+'''
 
 def instructors(request):
     """ Ajax: Instructor autcomplete form field """
@@ -486,6 +402,7 @@ def courses(request):
 
     raise Http404
 
+
 def jqueryui_courses(request):
     """ Ajax: Course autocomplete for jqueryui.autocomplete """
     # TODO: add optional filter by school and the javascript to support it
@@ -498,36 +415,13 @@ def jqueryui_courses(request):
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-
-def browse(request):
-    """ Browse Notes """
-    return render(request, 'browse.html')
-
-
-def browse2(request):
-    """ Browse and Search Notes
-        Instead of jsonifying model,
-        work as standard django template
-        NOTE: This is significantly slower than
-        rendering the html from JSON in the client
-        I don't intend to develop this method further
-    """
-    if request.user.get_profile().school != None:
-        schools = [request.user.get_profile().school]
-    else:
-        schools = School.objects.all()
-
-    return render(request, 'browse2.html', {"schools": schools})
-
-
 @login_required
-def note(request, note_pk):
+def file(request, note_pk):
     """ View Note HTML """
     # Check that user has permission to read
     #profile = request.user.get_profile()
-    user = request.GET.get("user_pk", "")
+    user = request.user
     try:
-        user = User.objects.get(pk=user)
         profile = user.get_profile()
     except:
         raise Http404
@@ -540,12 +434,12 @@ def note(request, note_pk):
         progress = (user_karma / float(level.karma)) * 100
         return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
     try:
-        note = File.objects.get(pk=note_pk)
+        file = File.objects.get(pk=note_pk)
     except:
         raise Http404
     # Increment note view count
-    note.viewCount += 1
-    note.save()
+    file.viewCount += 1
+    file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
     if(not userCanView(user, File.objects.get(pk=note_pk))):
@@ -553,30 +447,31 @@ def note(request, note_pk):
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')
         # Add 'purchased' file to user's collection
-        profile.files.add(note)
+        profile.files.add(file)
         profile.save()
 
     # This is ugly, but is needed to be able to get the note type full name
-    note_type = [t[1] for t in note.FILE_TYPES if t[0] == note.type][0]
-    url = iri_to_uri(note.file.url)
-    return TemplateResponse(request, 'note_ajax.html', {'note': note, 'note_type': note_type, 'url': url})
+    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+    url = iri_to_uri(file.file.url)
+    return TemplateResponse(request, 'view-file.html', {'file': file, 'file_type': file_type, 'url': url})
 
 
-def searchBySchool(request, school_pk=-1):
-    """ Ajax: Return all schools and courses in JSON
-        Used by search page javascript
+def searchBySchool(request):
+    """ Ajax: Return user's school's courses in JSON
+        Used by search page javascript.
+        If user has no school, show all schools
     """
     response_json = []
 
     if request.is_ajax():
-        if school_pk == -1:
+        if request.user.is_authenticated and request.user.get_profile().school != None:
+            school = get_object_or_404(School, pk=request.user.get_profile().school.pk)
+            response_json.append(jsonifyModel(model=school, depth=1))
+        else:
             schools = School.objects.all()
             for school in schools:
                 school_json = jsonifyModel(model=school, depth=1)
                 response_json.append(school_json)
-        else:
-            school = get_object_or_404(School, pk=school_pk)
-            response_json.append(jsonifyModel(model=school, depth=1))
         #print 'searchBySchool: ' + str(response_json)
         return HttpResponse(json.dumps(response_json), mimetype="application/json")
     else:
@@ -596,7 +491,10 @@ def notesOfCourse(request, course_pk):
     # If user id is sent with search, send moderation data per note
     # i.e: has a user voted on this note?
     if request.is_ajax():
-        user_pk = request.GET.get('user', '-1')
+        if request.user.is_authenticated:
+            user_pk = request.user.pk
+        else:
+            user_pk = -1
         # Validate request parameters
         if not Course.objects.filter(pk=course_pk).exists():
             raise Http404
@@ -613,25 +511,10 @@ def notesOfCourse(request, course_pk):
         raise Http404
 
 
-def all_notes(request):
-    """ Display all notes """
-    print "using the all_notes view"
-    response = {}
-    response['schools'] = {}
-    for school in School.objects.all():
-        print school
-        response['schools'][school.name] = {}
-        for course in Course.objects.filter(school=school).all():
-            print course
-            notes = File.objects.filter(course=course).all()
-            response['schools'][school.name][course.title] = notes
-    print response
-    return render(request, 'notes.html', response)
-
-
+@login_required
 def vote(request, file_pk):
     vote_value = request.GET.get('vote', 0)
-    user_pk = request.GET.get('user', -1)
+    user_pk = request.user.pk
     print "note: " + str(file_pk) + " vote: " + vote_value + "user: " + user_pk
 
     # Check that GET parameters are valid
@@ -682,7 +565,8 @@ def search(request):
             else:
                 return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
         raise Http404
-    return render(request, 'search2.html')
+    raise Http404
+
 
 def captcha(request):
     ''' For now, the only action the server needs to 
