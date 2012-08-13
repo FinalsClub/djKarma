@@ -54,7 +54,7 @@ h1,
 h4,
 h5,
 a:link {
-  font-family: 'Open Sans';
+  font-family: 'freight-sans-pro';
   color: #393939;
 }
 .container {
@@ -103,6 +103,7 @@ a:visited {
   -webkit-text-shadow: 0px 0px 3px #809c2b;
   -o-text-shadow: 0px 0px 3px #809c2b;
   color: #ffffff;
+  margin-top: 0px;
   -moz-box-shadow: inset 0px 1px 0px 0px #ffffff;
   -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
   box-shadow: inset 0px 1px 0px 0px #ffffff;
@@ -115,6 +116,9 @@ a:visited {
   -moz-transition: background 1s;
   -webkit-transition: background 1s;
   -o-transition: background 1s;
+}
+.homepage .navbar {
+  height: 30px;
 }
 a.button:hover,
 .navbar .form-search a.button:hover {
@@ -134,7 +138,6 @@ a.button:hover,
 /* search form button mods */
 .navbar .form-search a.button {
   padding: 4px 8px;
-  margin-top: 0px;
   margin-left: -4px;
   border-radius: 0px 12px 12px 0px;
 }
@@ -201,6 +204,7 @@ hide {
 }
 .navbar {
   margin: 0;
+  margin-bottom: 10px;
 }
 .navbar .nav {
   margin: 0;
@@ -316,7 +320,7 @@ hide {
   background: #f4f3ee;
 }
 .nav-list li a {
-  font-family: 'Open Sans';
+  font-family: 'freight-sans-pro';
   font-size: 14px;
   padding: 3px 0px;
 }
@@ -458,7 +462,8 @@ hide {
   padding-left: 0;
 }
 .navbar .navbar-inner .logo-mark {
-  width: 26px;
+  height: 24px;
+  width: 190px;
   margin-bottom: -5px;
   position: relative;
   margin-right: 3px;
@@ -474,7 +479,7 @@ hide {
   font-weight: 600;
 }
 .nav-list {
-  margin-top: 15px;
+  margin-top: 0px;
 }
 .right {
   float: left;
@@ -507,7 +512,6 @@ hide {
 .hero-unit .instant {
   font-size: 18px;
   clear: both;
-  display: inline-block;
   height: 50px;
   margin-top: 10px;
 }
@@ -535,6 +539,7 @@ hide {
   font-weight: 600;
 }
 .carousel.slide {
+  margin-top: 10px;
   background: #f4f3ee;
   padding: 20px;
   border-radius: 5px;

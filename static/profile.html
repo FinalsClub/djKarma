@@ -16,10 +16,10 @@ Questions:
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="">
     <!-- Le styles -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
-	<link rel="stylesheet/less" type="text/css" href="css/styles.less">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet/less" type="text/css" href="less/styles.less">
+	<link rel="stylesheet" type="text/css" href="less/styles.css">
     <script src="js/less.js" type="text/javascript"></script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -33,12 +33,36 @@ Questions:
 		$(".collapse").collapse()
     </script>
 
-
+<script type="text/javascript" src="http://use.typekit.net/pnc8diw.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
   </head>
 
 
   <body class="ms">
    <div class="profile-page container">
+    
+    <!-- logout -->
+  
+      <div class="span12 navbar">
+	<div class="navbar-inner">
+	    
+	<ul class="nav">
+	  <li class="dropdown" id="menu1">
+	    <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
+	      Signout
+	      <b class="caret"></b>
+	    </a>
+	    <ul class="dropdown-menu">
+	      
+	      <li><a href="#">Sign out</a></li>
+	    </ul>
+	  </li>
+	</ul>
+	</div>
+      </div>
+
+    
+  
       <div class="row">     
         <div class="span3 left-sidebar">
           <ul class="nav nav-list">
@@ -60,13 +84,12 @@ Questions:
                 Some other link
               </a>
             </li>
-						<li class="karma">
+	    <li class="karma">
               <a href="#share" class="karma" data-toggle="modal">
                 <i class="icon-user"></i>
                 Share Karma Notes
-								<div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
-              </a>
-							
+		<div class="share-karma">Earn <span class="karma">5 points</span> for every signup</div>
+              </a>					
             </li>
           </ul>
 
@@ -75,47 +98,47 @@ Questions:
           <ul class="thumbnails">
             <li class="span3">
               <div class="thumbnail">
-              <img alt="" src="http://placehold.it/150x150">
+              <img alt="" src="img/avatar.png" style="margin-right:10px;margin-bottom:10px;" align=left>
                 <div class="caption">
                   <p>Profile Name <a href="#">edit</a></p>
                 <!-- progress bar -->
-                <p>Karma Points</p>
+                <p class="clear">Karma Points</p>
                 
                 <!-- the left margin of the current karma point status is
                 the percentage of the progress bar minus 22%.
                 For example, if progress is 60%, margin for status is 38%-->
                 
                     
-                <div class="progress progress-karma" id="karma-info" rel="popover" data-content="Status1: 25 points<br />Status2: 50 points<br />Status3: 75 points<br />Status4: 100 points<br />" data-original-title="How Karma Status Works">
-                  <div class="bar"
-                       style="width: 60%;"></div>
-                            <div class="current-karma" style="">
-                                <span class="karma-points">30 points</span>
-                            </div>
+                <div class="progress progress-karma" id="karma-info" rel="popover" data-content="Status1: 25 points
+		<br />Status2: 50 points<br />
+		Status3: 75 points<br />
+		Status4: 100 points<br />" d
+		ata-original-title="How Karma Status Works">
+                  <div class="bar" style="width: 60%;"></div>
+		  <div class="current-karma" style="">
+		      <span class="karma-points">30 points</span>
+		  </div>
                 </div>
                 <div class="karma-label">
-										<div class="karma-label-left">Recruit (0)</div> <div class="karma-label-right">Apprentice (50)</div> 
-										<div style="clear:both"></div>
-									</div>
-                  
-                  <p>School:</p>
-                    <select id="school-select" class="span2">
-                      <option>Select school</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                    </select>
-
-                  <p>Year of Graduation:</p>
-                    <select id="school-select" class="span2">
-                      <option>Select year</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                    </select>
-
+		  <div class="karma-label-left">Recruit (0)</div> <div class="karma-label-right">Apprentice (50)</div> 
+		  <div style="clear:both"></div>
+		</div>
+		<p>School:</p>
+		  <select id="school-select" class="span2">
+		    <option>Select school</option>
+		    <option>2</option>
+		    <option>3</option>
+		    <option>4</option>
+		    <option>5</option>
+		  </select>
+		<p>Year of Graduation:</p>
+		  <select id="school-select" class="span2">
+		    <option>Select year</option>
+		    <option>2</option>
+		    <option>3</option>
+		    <option>4</option>
+		    <option>5</option>
+		  </select>
               </div>
               </div>
             </li>
@@ -136,31 +159,16 @@ Questions:
 		  <span class="icon-bar"></span>
 		  <span class="icon-bar"></span>
 		</a>
-		<a class="brand" href="#"><img src="img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
+		<a class="brand" href="#"><img src="img/logo.png" alt="KarmaNotes" class="logo-mark"></a>
 		<div class="nav-collapse">
 		  <ul class="nav">
-								    <li class="" id="menu0">
-									    <form class="navbar-search input-append form-search">
-									      <input type="text" class="input-medium search-query" placeholder="Search">
-										    
-									      <a type="submit" class="btn button">Go</a>
-										    
-									    </form>
-								    </li>
-		    <li class="dropdown" id="menu1">
-		      <a class="dropdown-toggle farthest-right" data-toggle="dropdown" href="#menu1">
-			Username & Pic
-			<b class="caret"></b>
-		      </a>
-		      <ul class="dropdown-menu">
-			<li><a href="#"><i class="icon-user"></i> Profile</a></li>
-			<li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-			<li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-			<li class="divider"></li>
-			<li><a href="#">Sign out</a></li>
-		      </ul>
-
+		    <li class="" id="menu0">
+		      <form class="navbar-search input-append form-search">
+			<input type="text" class="input-medium search-query" placeholder="Search"> 
+			<a type="submit" class="btn button">Go</a>
+		      </form>
 		    </li>
+		    
 		  </ul>
 
 		</div><!--/.nav-collapse -->
