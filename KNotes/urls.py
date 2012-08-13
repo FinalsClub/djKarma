@@ -55,6 +55,8 @@ urlpatterns = patterns('',
     # Karma events 
     url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
 
+    url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
+
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
     # User Profile Ajax submit
