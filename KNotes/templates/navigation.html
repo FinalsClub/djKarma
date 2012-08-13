@@ -250,19 +250,20 @@
   <div class="row">
     <div class="span3 left-sidebar">
       <ul class="nav nav-list">
-        <li class="active">
-          <a id="your-courses" href="#">
+        {% load navactive %}
+        <li class="{% navactive request 'profile' %}">
+          <a id="your-courses" href="/profile">
             <i class="icon-book"></i>
             Your courses
           </a>
         </li>
-        <li>
+        <li class="{% navactive request 'browse browse2' %}">
           <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
           </a>
         </li>
-        <li>
+        <li class="{% navactive request 'karma-events' %}">
           <a id="karma-events" href="/karma-events">
             <i class="icon-time"></i>
             Karma events
