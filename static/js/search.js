@@ -1,5 +1,4 @@
 // Handles search form submission and ajax result receiving
-// depends on user_pk being provided by the embedding page
 
     // Handle search request from navbar search
     $('.nav-collapse').on("submit", ".navbar-search", function(event){
@@ -22,7 +21,7 @@
   function ajaxSearchQuery(query, callback){
     $.ajax({
       url: "/search",
-      data: {'q': query , 'user': user_pk},
+      data: {'q': query},
       success: callback
     });
   }

@@ -39,18 +39,11 @@ urlpatterns = patterns('',
     url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
 
-    # Upload page (Note Upload Form)
-    url(r'^upload$', 'notes.views.modalUpload', name='upload'),
-
     # Ajax File Upload
     url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
 
     # File meta data submission
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
-
-     # Browse by School / Search by Tag view
-    url(r'^browse$', 'notes.views.browse', name='browse'),
-    url(r'^browse2$', 'notes.views.browse2', name='browse2'),
 
     # Karma events 
     url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
@@ -63,17 +56,15 @@ urlpatterns = patterns('',
     url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
 
     # Note View
-    url(r'^file/(\d{1,99})$', 'notes.views.note', name='file'),
+    url(r'^file/(\d{1,99})$', 'notes.views.file', name='file'),
+    # Browse
 
-    # Built-in Haystack Search
-    #url(r'^haysearch$', include('haystack.urls')),
     # Custom Haystack Search Test
     url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    url(r'^searchBySchool/$', 'notes.views.searchBySchool'),
-    url(r'^searchBySchool/(\d{1,99})$', 'notes.views.searchBySchool'),
-    url(r'^notesOfCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
+    url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
+    url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting
     url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
@@ -88,7 +79,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
 
     # Add Course, School forms
-    url(r'^add', 'notes.views.simpleAddCourseOrSchool', name='add'),
+    url(r'^add', 'notes.views.addModel', name='add'),
 
     # Auth
     # This logout allows us to pass a redirect:
@@ -99,10 +90,6 @@ urlpatterns = patterns('',
     # accepts the username that invited
     url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
-
-
-    # View all notes (unused)
-    # url(r'^notes$', 'notes.views.all_notes'),
 
     # admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

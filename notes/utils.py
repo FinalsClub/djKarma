@@ -26,6 +26,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
     if isinstance(model, School):
         json_result["_id"] = model.pk
         json_result["name"] = model.name
+        json_result["location"] = model.location
         json_result["courses"] = []
         if(depth > 0):
             for course in model.course_set.all().order_by('title'):

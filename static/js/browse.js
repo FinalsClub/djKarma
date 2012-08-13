@@ -1,11 +1,25 @@
 function initializeBrowseView(){
-$.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
+$.getJSON('/browseBySchool/', function(schoolsArr) {
     $.each(schoolsArr, function(idx, school) {
       // add a schoolBtn for each school;
       $('#searchBySchool').prepend(
-        $('<div/>', {class:'schoolBtn',
-                     id:   school._id + "-Btn", text: school.name})
-
+        //$('<div/>', {class:'schoolBtn',
+        //             id:   school._id + "-Btn", text: school.name})
+      "<div class=\"course schoolBtn\" id=\""+school._id+"-Btn\">"
+          +"<div class=\"folder icon\">"
+            +"<img src=\"/static/img/icon-folder.png\">"
+          +"</div>"
+          +"<div class=\"course-title\">"
+            +"<a href=\"#\">"+school.name+"</a>"
+            +"<div class=\"course-info\">"
+            +"<span class=\"location\">"+school.location +"</span> <i class=\"icon-paper-clip\"></i><a href=\"#\">"+school.courses.length+"Courses</a>"
+            +"</div> <!-- .course-info -->"
+          +"</div> <!-- .course-title -->"
+          +"<div class=\"upload\">"
+            +"<a class=\"button course-upload\" school-pk=\""+ school._id+"\" school-name=\""+ school.name+"\" data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
+          +"</div>"
+          +"<div style=\"clear:both\"></div>"
+        +"</div>"
       );
       // add a coursesOfSchool div immediately following;
       $('#' + school._id + '-Btn').after(
@@ -37,7 +51,7 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
             +"<a class=\"button course-upload\" school-pk=\""+ school._id+"\" school-name=\""+ school.name+"\" course-name=\""+ course.title+"\"course-pk=\""+ course._id+"\"  data-toggle=\"modal\" href=\"#upload\">Upload notes</a>"
           +"</div>"
           +"<div style=\"clear:both\"></div>"
-        +"</div>" <!-- .course -->
+        +"</div>"
 
         );
         $('#' + slugify(school.name) + '-Courses').append(
@@ -102,7 +116,7 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
     var reqTime = new Date().getTime();
     // Only perform the request if the corresponding notesOfCourse div doesn't have the 'populated' class
     if(!$(this).next().hasClass('populated')){
-      $.getJSON('/notesOfCourse/' + courseID+'?user='+user_pk, function(noteArray) {
+      $.getJSON('/browseByCourse/' + courseID, function(noteArray) {
       //console.log("/notesOfCourse/ in " + (new Date().getTime() - reqTime)/1000+"s");
       reqTime = new Date().getTime();
         // validate json
@@ -242,9 +256,8 @@ $.getJSON('/searchBySchool/'+school_pk, function(schoolsArr) {
       
       $.ajax({
                 // /vote/note_pk?v=vote_value
-                // NOTE: user_pk value is provided by page embedding this script
                 url: "/vote/"+note_id.split("-")[0],
-                data: {'vote': vote, 'user':user_pk },
+                data: {'vote': vote},
                 success: function(data) {
                   //alert(data);
                     if (data === "success"){
