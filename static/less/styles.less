@@ -17,7 +17,7 @@
 
 /*** Font Variables ***/
 
-@font: 'Open Sans';
+@font: 'freight-sans-pro';
 @mini-size:12px;
 @body-size: 14px;
 @hero-size: 30px;
@@ -90,6 +90,7 @@ a:visited {
     clear:both;
 }
 
+
 .rounded-corners (@radius: 5px) {
   border-radius: @radius;
   -webkit-border-radius: @radius;
@@ -131,6 +132,7 @@ a.button,
     .rounded-corners;
     .text-shadow(darken(@secondary,10%));
     color: @highlight;
+    /** margin-top:0px; **/
     -moz-box-shadow:inset 0px 1px 0px 0px @highlight;
     -webkit-box-shadow:inset 0px 1px 0px 0px @highlight;
     box-shadow:inset 0px 1px 0px 0px @highlight;
@@ -147,6 +149,9 @@ a.button,
 }
 
 
+.homepage .navbar {
+    height:30px;
+}
 
 
  
@@ -174,6 +179,7 @@ li#menu0 {
 	}
 	.input-append input {
 		float: none;
+		
 		border-radius: 12px 0px 0px 12px;
 		border: 1px solid #CCC;
 		padding: 4px 9px;
@@ -237,6 +243,7 @@ hide {
 
 .navbar {
 	margin:0;
+	margin-bottom:10px;
 	.nav {
 		margin:0;
 	}
@@ -319,7 +326,7 @@ hide {
 			}
 		}
 		a {
-			font-family:'Open Sans';
+			font-family:@font;
 			font-size:@body-size;
 			padding:3px 0px;
 			&:hover {
@@ -466,7 +473,8 @@ hide {
 		padding-left:0;
 		
 		.logo-mark {
-			width:26px;
+			height:24px;
+			width:190px;
 			margin-bottom: -5px;
 			position: relative;
 			margin-right: 3px;
@@ -488,7 +496,7 @@ hide {
 }
 
 .nav-list {
-    margin-top:15px;
+    margin-top:0px;
 }
 
 
@@ -526,7 +534,6 @@ hide {
     .instant {
         font-size:@h3-size;
 	clear:both;
-        display:inline-block;
         height:50px;
         margin-top:10px;
     }
@@ -562,6 +569,7 @@ hide {
 
 .carousel.slide {
 	
+	margin-top:10px;
 	background:@box-color;
 	padding:20px;
 	.rounded-corners;
