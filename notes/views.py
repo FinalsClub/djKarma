@@ -79,7 +79,8 @@ def fileMeta(request):
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
             file.type = form.cleaned_data["type"]
             file.title = form.cleaned_data["title"]
-            file.descriptioin = form.cleaned_data["description"]
+            file.description = form.cleaned_data["description"]
+            file.owner = request.user
             try:
                 file.school = School.objects.get(pk=int(form.cleaned_data["school_pk"]))
                 file.course = Course.objects.get(pk=int(form.cleaned_data["course_pk"]))
@@ -87,6 +88,7 @@ def fileMeta(request):
                 print "school/course error: " + str(e)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
+            print "file.save()"
             file.save()
             response = {}
             response["status"] = "success"

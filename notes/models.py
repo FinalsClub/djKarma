@@ -252,11 +252,13 @@ class File(models.Model):
         if not self.pk:
             increment(self)
 
-        if not self.awarded_karma and self.owner:
+        print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
+        if not self.awarded_karma and self.owner != None:
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=school, course=course)
+            user_profile.awardKarma(karma_event, school=self.school, course=self.course)
+            self.awarded_karma = True
 
         # Escape html field only once
         if(self.html != None and not self.cleaned):
@@ -507,12 +509,16 @@ class UserProfile(models.Model):
                 target_profile.save()
             # Generate new ReputationEvent, add to UserProfile
             event = ReputationEvent.objects.create(type=ret)
+            print "This is an event: %s" % event
             # if school or course are passed, save fkeys on the event
             if school:
+                print 'school %s' % school
                 event.school = school
             if course:
+                print 'course %s' % course
                 event.course = course
             event.save() # FIXME: might be called on UserProfile.save()
+            print "event.id: %s" % event.id
 
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
