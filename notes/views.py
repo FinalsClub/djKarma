@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
 from django.core import serializers
+from django.db.models import Count
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -222,6 +223,20 @@ def nav_helper(request, response={}):
 
     return response
 
+def your_courses(request):
+    """ List a user's courses on a profile-like page using django templates """
+    response = nav_helper(request)
+    response['courses'] = request.user.get_profile().courses.all()
+    return render(request, 'your-courses.html', response)
+
+def browse_schools(request):
+    """ Server-side templated browsing of notes by school, course and note """
+    response = nav_helper(request)
+    # make this order by the most notes in a school
+    response['title'] = u"Schools"
+    response['schools'] = School.objects.annotate(num_course=Count('course')).order_by('num_course').reverse().all()
+    return render(request, 'browse_schools.html', response)
+
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
     response = nav_helper(request)
@@ -383,9 +398,44 @@ def schools(request):
 
     raise Http404
 
-def courses(request):
+def browse_courses(request, school_query):
+    """ View for courses beloging to :school_query:
+        :school_query: comes as unicode, if can be int, pass as int
+    """
+    response = nav_helper(request)
+    try:
+        school_query = int(school_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    # pass the school query to 
+    response['school'], response['courses'] = _courses(request, school_query)
+    return render(request, 'browse_courses.html', response)
+
+
+def _courses(request, school_query=None):
+    """ Private search method.
+        :school_query: unicode or int, will search for a the courses with that school matching
+        returns: school, courses
+    """
+    if isinstance(school_query, int):
+        #_school = School.objects.get_object_or_404(pk=school_query)
+        _school = get_object_or_404(School, pk=school_query)
+    elif isinstance(school_query, unicode):
+        #_school = School.objects.get(name__icontains=school_query)
+        _school = get_object_or_404(School, name__icontains=school_query)
+    else:
+        print "No courses found for this query"
+        return None
+    # if I found a _school
+    return _school, Course.objects.filter(school=_school).distinct()
+
+
+def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
-    if True:
+
+    # Find courses, or school and courses
+    if True: # FIXME: why is this True here?
         query = request.GET.get('q')
         school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
@@ -394,12 +444,13 @@ def courses(request):
         # IF school provided, restrict search
         else:
             courses = Course.objects.filter(title__icontains=query, school=School.objects.get(pk=school_pk)).distinct()
+
+    if request.is_ajax():
+        # if an ajax call, create a list of indexes and titles
         response = []
         for course in courses:
             response.append((course.pk, course.title))
-        print response
         return HttpResponse(json.dumps(response), mimetype="application/json")
-
     raise Http404
 
 
