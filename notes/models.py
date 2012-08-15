@@ -345,7 +345,8 @@ class ReputationEvent(models.Model):
     type = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # optional fkeys to related models. used for displaying activity for school/course
+    # optional fkeys to related models. used for displaying activity for user/school/course
+    user = models.ForeignKey(User, blank=True, null=True)
     course = models.ForeignKey(Course, blank=True, null=True)
     school = models.ForeignKey(School, blank=True, null=True)
 
