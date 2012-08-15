@@ -237,6 +237,69 @@ def browse_schools(request):
     response['schools'] = School.objects.annotate(num_course=Count('course')).order_by('num_course').reverse().all()
     return render(request, 'browse_schools.html', response)
 
+    
+def browse_courses(request, school_query):
+    """ View for courses beloging to :school_query:
+        :school_query: comes as unicode, if can be int, pass as int
+    """
+    response = nav_helper(request)
+    try:
+        school_query = int(school_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    # pass the school query to 
+    response['school'], response['courses'] = _get_courses(request, school_query)
+    return render(request, 'browse_courses.html', response)
+
+def _get_courses(request, school_query=None):
+    """ Private search method.
+        :school_query: unicode or int, will search for a the courses with that school matching
+        returns: School, Courses+
+    """
+    if isinstance(school_query, int):
+        #_school = School.objects.get_object_or_404(pk=school_query)
+        _school = get_object_or_404(School, pk=school_query)
+    elif isinstance(school_query, unicode):
+        #_school = School.objects.get(name__icontains=school_query)
+        _school = get_object_or_404(School, name__icontains=school_query)
+    else:
+        print "No courses found for this query"
+        return Http404
+    # if I found a _school
+    return _school, Course.objects.filter(school=_school).distinct()
+
+def browse_one_course(request, course_query):
+    """ View for viewing notes from a fuzzy course search
+        :course_query: unicode url match, to be type parsed
+    """
+    response = nav_helper(request)
+    try:
+        course_query = int(course_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    # pass the school query to 
+    response['course'], response['files'] = _get_notes(request, course_query)
+    print response['course']
+    return render(request, 'browse_one_course.html', response)
+
+def _get_notes(request, course_query):
+    """ Private search method for a course and it's files
+        :course_query: 
+            if int: Course.pk
+            if unicode: Course.title
+        returns Course, Notes+
+    """
+    if isinstance(course_query, int):
+        _course = get_object_or_404(Course, pk=school_query)
+    elif isinstance(course_query, unicode):
+        _course = get_object_or_404(Course, title__icontains=course_query)
+    else:
+        print "No course found, so no notes"
+        return Http404
+    return _course, File.objects.filter(course=_course).distinct()
+
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
     response = nav_helper(request)
@@ -397,38 +460,6 @@ def schools(request):
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
     raise Http404
-
-def browse_courses(request, school_query):
-    """ View for courses beloging to :school_query:
-        :school_query: comes as unicode, if can be int, pass as int
-    """
-    response = nav_helper(request)
-    try:
-        school_query = int(school_query)
-    except ValueError:
-        # cant be cast as an int, so we will search for it as a string
-        pass
-    # pass the school query to 
-    response['school'], response['courses'] = _courses(request, school_query)
-    return render(request, 'browse_courses.html', response)
-
-
-def _courses(request, school_query=None):
-    """ Private search method.
-        :school_query: unicode or int, will search for a the courses with that school matching
-        returns: school, courses
-    """
-    if isinstance(school_query, int):
-        #_school = School.objects.get_object_or_404(pk=school_query)
-        _school = get_object_or_404(School, pk=school_query)
-    elif isinstance(school_query, unicode):
-        #_school = School.objects.get(name__icontains=school_query)
-        _school = get_object_or_404(School, name__icontains=school_query)
-    else:
-        print "No courses found for this query"
-        return None
-    # if I found a _school
-    return _school, Course.objects.filter(school=_school).distinct()
 
 
 def courses(request, school_query=None):

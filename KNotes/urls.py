@@ -52,6 +52,7 @@ urlpatterns = patterns('',
     url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
     url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
     url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+    url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-courses'),
     #url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
 
     # User Profile

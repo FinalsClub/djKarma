@@ -1,0 +1,34 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Your Courses
+{% endblock %}
+
+{% block navinner %}
+<div style="height:60px; border-top: 1px solid; border-bottom: 1px solid; margin-bottom: 18px;">
+  <h2>Your Courses</h2>
+</div>
+<!-- BEGIN COURSE LISTINGS -->
+<!-- one course -->
+<div class="course-listing">
+{% if request.user.get_profile.courses.all %}
+  {% for course in user.get_profile.courses.all %}
+    {% include 'course.html' with course=course %}
+  {% endfor %}
+{% else %}
+  <h3>You haven't added any courses yet</h3>
+  <p>Would you like to 
+    <div class="upload">
+      <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+    </div>
+  </p>
+{% endif %}
+</div> <!-- .course-listing -->
+
+<div class="course-listing">
+  Would you like to add additional courses?
+
+</div> <!-- .course-listing -->
+
+{% endblock %}
+

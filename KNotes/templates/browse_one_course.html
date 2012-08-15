@@ -1,0 +1,29 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Course -- {{ course.title }}
+{% endblock %}
+
+{% block navinner %}
+<br/>
+<br/>
+<h2>Course: {{ course.title }}</h2>
+{% include 'course_info.html' %}
+
+<div class="course-listing"> {# TODO: change class to 'listing' or make file-listing subclass #}
+{% if files %}
+  {% for file in files %}
+    {% include 'file.html' with file=file %}
+  {% endfor %}
+{% else %}
+  <h3>Sorry, there don't seem to be any courses for this school</h3>
+  <p>Would you like to
+    <div class="upload">
+      <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+    </div>
+  </p>
+{% endif %}
+</div> <!-- .course-listing -->
+
+{% endblock %}
+
