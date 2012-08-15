@@ -257,7 +257,7 @@ class File(models.Model):
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=self.school, course=self.course)
+            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.user)
             self.awarded_karma = True
 
         # Escape html field only once
@@ -493,13 +493,19 @@ class UserProfile(models.Model):
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
-    def awardKarma(self, event, target_user=None, school=None, course=None):
+    def awardKarma(self, event, target_user=None, school=None, course=None, user=None):
         """ Award user karma given a ReputationEventType slug title
             and add a new ReputationEvent to UserProfile.reputationEvents
-            event is the slug title corresponding to a ReputationEventType
-            target_user is a User object corresponding to the target (if applicable)
             Does not call UserProfile.save() because it is used in
             The UserProfile save() method
+
+            :event: is the slug title corresponding to a ReputationEventType
+            :target_user: is a User object corresponding to the target (if applicable)
+            :school: is a School object (optional)
+            :course: a Course object (optional)
+            :user: a User object (optional), for recalling username when showing other's karmaevents
+            returns True or False
+
         """
         try:
             ret = ReputationEventType.objects.get(title=event)
@@ -510,14 +516,13 @@ class UserProfile(models.Model):
                 target_profile.save()
             # Generate new ReputationEvent, add to UserProfile
             event = ReputationEvent.objects.create(type=ret)
-            print "This is an event: %s" % event
             # if school or course are passed, save fkeys on the event
             if school:
-                print 'school %s' % school
                 event.school = school
             if course:
-                print 'course %s' % course
                 event.course = course
+            if user:
+                event.user = user
             event.save() # FIXME: might be called on UserProfile.save()
             print "event.id: %s" % event.id
 
