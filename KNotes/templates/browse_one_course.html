@@ -25,7 +25,11 @@
           <i class="icon-plus-sign"></i> 
         </td>
         <td>
-          You added {{ event }}.
+          {% if event.user %}
+            {{ event.user.get_profile.getName }} added {{ event }}.
+          {% else %}
+            a user added {{ event }}.
+          {% endif %}
         </td>
         <td style="text-align: right;">
         at {{ event.timestamp }}
