@@ -240,6 +240,8 @@ class File(models.Model):
     # has the html content been escaped?
     # This is to assure we don't double escape characters
     cleaned     = models.BooleanField(default=False)
+    # on metadata save, award karma and set this flag
+    awarded_karma = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u"%s at %s" % (self.title, self.course)
@@ -249,6 +251,8 @@ class File(models.Model):
         # If this is a new file, increment SiteStat
         if not self.pk:
             increment(self)
+
+        if not self.awarded_karma and self.owner:
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
