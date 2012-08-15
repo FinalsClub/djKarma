@@ -279,9 +279,11 @@ def browse_one_course(request, course_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    # pass the school query to 
-    response['course'], response['files'] = _get_notes(request, course_query)
-    print response['course']
+    course, files = _get_notes(request, course_query)
+    response['course'], response['files'] = course, files
+    # get the users who are members of the course
+    response['users'] = course.userprofile_set.all()
+
     return render(request, 'browse_one_course.html', response)
 
 def _get_notes(request, course_query):

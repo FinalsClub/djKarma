@@ -10,6 +10,11 @@
 <h2>Course: {{ course.title }}</h2>
 {% include 'course_info.html' %}
 
+<div class="users" >
+    {% for user in users %}
+        <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
+    {% endfor %}
+</div> <!-- .users -->
 <div class="course-listing"> {# TODO: change class to 'listing' or make file-listing subclass #}
 {% if files %}
   {% for file in files %}
