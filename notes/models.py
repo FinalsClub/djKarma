@@ -115,34 +115,6 @@ class Tag(models.Model):
         super(Tag, self).save(*args, **kwargs)
 
 
-class ReputationEventType(models.Model):
-    """ This class will allow us to model different user actions and the
-        karma they should receive. This model will only be altered from the
-        admin interface. Every User will have a collection of Reputation Events
-        that can be used to re-calculate reputation as our metric changes
-    """
-    title = models.SlugField(max_length=160, unique=True)
-    # Karma on person committing action. i.e: User who casts downvote
-    actor_karma = models.IntegerField(default=0)
-    # Karma on person targeted by action. i.e: User who receives downvote
-    target_karma = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        #Note these must be unicode objects
-        return u"%s Actor: %spts Target: %spts" % (self.title, self.actor_karma, self.target_karma)
-
-
-class ReputationEvent(models.Model):
-    """ User objects will have a collection of these events
-        Used to calculate reputation
-    """
-    # TODO: add a fkey to UserProfile and other logic
-    type = models.ForeignKey(ReputationEventType)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return u"%s" % (self.type.title)
-
 
 class Vote(models.Model):
     """ Represents a vote cast on a Note
@@ -231,6 +203,15 @@ class File(models.Model):
         ('A', 'Assignment'),
     )
 
+    # FIXME: only karma for one variation of essay and study-guide
+    KARMA_TYPES = (
+        ('N', 'lecture-note'),
+        ('S', 'syllabus'),
+        ('E', 'exam-or-quiz'),
+        ('G', 'mid-term-study-guide'),
+        ('A', 'essay-medium'),
+    )
+
     # Display point values in upload form
     # TODO: Tie this to ReputationEventType
     FILE_PTS = (
@@ -268,6 +249,9 @@ class File(models.Model):
         # If this is a new file, increment SiteStat
         if not self.pk:
             increment(self)
+            # FIXME: award karma based on submission type
+            karma_event = 'lecture-note'
+            self.owner.get_profile().awardKarma(karma_event, school=school, course=course)
 
         # Escape html field only once
         if(self.html != None and not self.cleaned):
@@ -328,6 +312,38 @@ class File(models.Model):
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
+
+class ReputationEventType(models.Model):
+    """ This class will allow us to model different user actions and the
+        karma they should receive. This model will only be altered from the
+        admin interface. Every User will have a collection of Reputation Events
+        that can be used to re-calculate reputation as our metric changes
+    """
+    title = models.SlugField(max_length=160, unique=True)
+    # Karma on person committing action. i.e: User who casts downvote
+    actor_karma = models.IntegerField(default=0)
+    # Karma on person targeted by action. i.e: User who receives downvote
+    target_karma = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        #Note these must be unicode objects
+        return u"%s Actor: %spts Target: %spts" % (self.title, self.actor_karma, self.target_karma)
+
+
+class ReputationEvent(models.Model):
+    """ User objects will have a collection of these events
+        Used to calculate reputation
+    """
+    # TODO: add a fkey to UserProfile and other logic
+    type = models.ForeignKey(ReputationEventType)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    # optional fkeys to related models. used for displaying activity for school/course
+    course = models.ForeignKey(Course, blank=True, null=True)
+    school = models.ForeignKey(School, blank=True, null=True)
+
+    def __unicode__(self):
+        return u"%s" % (self.type.title)
 
 
 class UserProfile(models.Model):
@@ -469,7 +485,7 @@ class UserProfile(models.Model):
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
-    def awardKarma(self, event, target_user=None):
+    def awardKarma(self, event, target_user=None, school=None, course=None):
         """ Award user karma given a ReputationEventType slug title
             and add a new ReputationEvent to UserProfile.reputationEvents
             event is the slug title corresponding to a ReputationEventType
@@ -486,6 +502,13 @@ class UserProfile(models.Model):
                 target_profile.save()
             # Generate new ReputationEvent, add to UserProfile
             event = ReputationEvent.objects.create(type=ret)
+            # if school or course are passed, save fkeys on the event
+            if school:
+                event.school = school
+            if course:
+                event.course = course
+            event.save() # FIXME: might be called on UserProfile.save()
+
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()

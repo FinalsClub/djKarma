@@ -99,6 +99,7 @@ def fileMeta(request):
                 messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
         else:
             # Form is invalid
+            print form.errors
             print "fileMeta form NOT valid!"
             response["status"] = "invalid"
             response["form"] = form
