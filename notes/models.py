@@ -251,7 +251,8 @@ class File(models.Model):
             increment(self)
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
-            self.owner.get_profile().awardKarma(karma_event, school=school, course=course)
+            user_profile = self.owner.get_profile()
+            user_profile.awardKarma(karma_event, school=school, course=course)
 
         # Escape html field only once
         if(self.html != None and not self.cleaned):
