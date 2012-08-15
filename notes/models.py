@@ -257,7 +257,7 @@ class File(models.Model):
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.user)
+            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
             self.awarded_karma = True
 
         # Escape html field only once
