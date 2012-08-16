@@ -22,7 +22,7 @@
     {% include "school.html" with school=result.object %}
   {% endif %}
 
-  {% highlight result.summary with request.query html_tag "div" css_class "highlight" %}
+  {% highlight result.summary with query html_tag "div" css_class "highlight" %}
 {% endfor %}
 {% if page.has_previous or page.has_next %}
 <!-- Previous / Next page links -->

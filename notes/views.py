@@ -639,17 +639,17 @@ def search(request):
     results = []
     # Process query and return results
     if request.GET.get("q", "") != "":
-        q = request.GET.get("q", "")
+        query = request.GET.get("q", "")
         user_pk = request.GET.get("user", "-1")
-        print "searching for: " + q + " . User: " + str(user_pk)
-        if q != "":
+        print "searching for: " + query + " . User: " + str(user_pk)
+        if query != "":
             #Exact match result:
             #results = SearchQuerySet().filter(content__contains=q)
-            results = SearchQuerySet().filter(content_auto__contains=q).order_by('django_ct')
+            results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct')
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=q)
             #print results
-            return render(request, 'search_results2.html', {'results': results})
+            return render(request, 'search_results2.html', {'results': results, 'query': query})
             '''
             For 'old' ajax search:
             if len(results) == 0:
