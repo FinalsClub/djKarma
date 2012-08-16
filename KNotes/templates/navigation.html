@@ -246,7 +246,7 @@
       <ul class="nav nav-list">
         {% load navactive %}
         <li class="{% navactive request 'profile' %}">
-          <a id="your-courses" href="/profile">
+          <a id="your-courses" href="/your-courses">
             <i class="icon-home"></i>
             Your courses
           </a>
@@ -255,6 +255,12 @@
           <a id="browse-notes" href="#">
             <i class="icon-book"></i>
             Browse notes
+          </a>
+        </li>
+        <li class="{% navactive request 'browse' %}">
+          <a id="browse-notes" href="/browse/schools">
+            <i class="icon-book"></i>
+            Browse schools
           </a>
         </li>
         <li class="{% navactive request 'karma-events' %}">
@@ -377,7 +383,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#"><img src="./static/img/logo.png" class="logo-mark"></a>
+          <a class="brand" href="#"><img src="/static/img/logo.png" class="logo-mark"></a>
           <div class="nav-collapse">
             <ul class="nav">
               <li class="" id="menu0">

@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
 from django.core import serializers
+from django.db.models import Count
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -78,7 +79,8 @@ def fileMeta(request):
             file = File.objects.get(pk=form.cleaned_data["file_pk"])
             file.type = form.cleaned_data["type"]
             file.title = form.cleaned_data["title"]
-            file.descriptioin = form.cleaned_data["description"]
+            file.description = form.cleaned_data["description"]
+            file.owner = request.user
             try:
                 file.school = School.objects.get(pk=int(form.cleaned_data["school_pk"]))
                 file.course = Course.objects.get(pk=int(form.cleaned_data["course_pk"]))
@@ -86,6 +88,7 @@ def fileMeta(request):
                 print "school/course error: " + str(e)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
+            print "file.save()"
             file.save()
             response = {}
             response["status"] = "success"
@@ -98,6 +101,7 @@ def fileMeta(request):
                 messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
         else:
             # Form is invalid
+            print form.errors
             print "fileMeta form NOT valid!"
             response["status"] = "invalid"
             response["form"] = form
@@ -221,6 +225,87 @@ def nav_helper(request, response={}):
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
 
     return response
+
+def your_courses(request):
+    """ List a user's courses on a profile-like page using django templates """
+    response = nav_helper(request)
+    response['courses'] = request.user.get_profile().courses.all()
+    return render(request, 'your-courses.html', response)
+
+def browse_schools(request):
+    """ Server-side templated browsing of notes by school, course and note """
+    response = nav_helper(request)
+    # make this order by the most notes in a school
+    response['title'] = u"Schools"
+    response['schools'] = School.objects.annotate(num_course=Count('course')).order_by('num_course').reverse().all()
+    return render(request, 'browse_schools.html', response)
+
+    
+def browse_courses(request, school_query):
+    """ View for courses beloging to :school_query:
+        :school_query: comes as unicode, if can be int, pass as int
+    """
+    response = nav_helper(request)
+    try:
+        school_query = int(school_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    # pass the school query to 
+    response['school'], response['courses'] = _get_courses(request, school_query)
+    return render(request, 'browse_courses.html', response)
+
+def _get_courses(request, school_query=None):
+    """ Private search method.
+        :school_query: unicode or int, will search for a the courses with that school matching
+        returns: School, Courses+
+    """
+    if isinstance(school_query, int):
+        #_school = School.objects.get_object_or_404(pk=school_query)
+        _school = get_object_or_404(School, pk=school_query)
+    elif isinstance(school_query, unicode):
+        #_school = School.objects.get(name__icontains=school_query)
+        _school = get_object_or_404(School, name__icontains=school_query)
+    else:
+        print "No courses found for this query"
+        return Http404
+    # if I found a _school
+    return _school, Course.objects.filter(school=_school).distinct()
+
+def browse_one_course(request, course_query):
+    """ View for viewing notes from a fuzzy course search
+        :course_query: unicode url match, to be type parsed
+    """
+    response = nav_helper(request)
+    try:
+        course_query = int(course_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    course, files = _get_notes(request, course_query)
+    response['course'], response['files'] = course, files
+    # get the users who are members of the course
+    response['users'] = course.userprofile_set.all()
+    # get the karma events associaged with the course
+    response['events'] = course.reputationevent_set.all() # FIXME: possibly order-by
+
+    return render(request, 'browse_one_course.html', response)
+
+def _get_notes(request, course_query):
+    """ Private search method for a course and it's files
+        :course_query: 
+            if int: Course.pk
+            if unicode: Course.title
+        returns Course, Notes+
+    """
+    if isinstance(course_query, int):
+        _course = get_object_or_404(Course, pk=school_query)
+    elif isinstance(course_query, unicode):
+        _course = get_object_or_404(Course, title__icontains=course_query)
+    else:
+        print "No course found, so no notes"
+        return Http404
+    return _course, File.objects.filter(course=_course).distinct()
 
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
@@ -383,9 +468,12 @@ def schools(request):
 
     raise Http404
 
-def courses(request):
+
+def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
-    if True:
+
+    # Find courses, or school and courses
+    if True: # FIXME: why is this True here?
         query = request.GET.get('q')
         school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
@@ -394,12 +482,13 @@ def courses(request):
         # IF school provided, restrict search
         else:
             courses = Course.objects.filter(title__icontains=query, school=School.objects.get(pk=school_pk)).distinct()
+
+    if request.is_ajax():
+        # if an ajax call, create a list of indexes and titles
         response = []
         for course in courses:
             response.append((course.pk, course.title))
-        print response
         return HttpResponse(json.dumps(response), mimetype="application/json")
-
     raise Http404
 
 

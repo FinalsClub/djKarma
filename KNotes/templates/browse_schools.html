@@ -1,0 +1,27 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Browse Schools
+{% endblock %}
+
+{% block navinner %}
+<div style="height:60px; border-top: 1px solid; border-bottom: 1px solid; margin-bottom: 18px;">
+  <h2>Browse Schools</h2> # this is to be replaced by the right-column header
+</div>
+<div class="course-listing">
+{% if request.user.get_profile.courses.all %}
+  {% for school in schools %}
+    {% include 'school.html' with school=school %}
+  {% endfor %}
+{% else %}
+  <h3>Error, for some reason, there are no schools yet.</h3>
+  <p>Would you like to
+    <div class="upload">
+      <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+    </div>
+  </p>
+{% endif %}
+</div> <!-- .course-listing -->
+
+{% endblock %}
+
