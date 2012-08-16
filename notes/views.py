@@ -649,10 +649,14 @@ def search(request):
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=q)
             #print results
+            return render(request, 'search_results2.html', {'results': results})
+            '''
+            For 'old' ajax search:
             if len(results) == 0:
-                return HttpResponse("No Results")
+                #return HttpResponse("No Results")
             else:
-                return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
+                #return TemplateResponse(request, 'search_results.html', {"results": results, "user_pk": int(user_pk)})
+            '''
         raise Http404
     raise Http404
 

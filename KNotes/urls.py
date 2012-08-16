@@ -64,7 +64,7 @@ urlpatterns = patterns('',
     url(r'^file/(\d{1,99})$', 'notes.views.file', name='file'),
     # Browse
 
-    # Custom Haystack Search Test
+    # Search
     url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
