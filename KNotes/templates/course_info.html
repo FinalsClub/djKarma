@@ -1,5 +1,8 @@
 
 <div class="file-info-wrapper">
+  <div class="upload" style="float:right">
+    <a class="button course-upload" school-pk="{{course.school.pk}}" school-name="{{course.school.name}}" course-pk="{{course.pk}}" course-name="{{course.title}}" data-toggle="modal" href="#upload">Upload notes</a>
+  </div>
   <h4>About this Class</h4>
     <h3><a href="#">{{ course.title }}</a></h3>
     <strong>{{ course.instructor }} | {{ course.school.name }}</strong>
@@ -21,7 +24,8 @@
 
   <h4>About this Professor</h4>
   REMAINDER LEFT HERE AS TEMPLATE FOR PROFESSOR INFORMATION
-  <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a></div>
+  <!--
+  <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a></div> -->
   <div class="points-and-views">
     <strong>{{ file_type }}:</strong> <span class="karma-points">10 points</span>
     <span class="views">{{ file.viewCount }} views</a>
