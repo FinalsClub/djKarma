@@ -7,12 +7,12 @@
   <!-- if result is a Course -->
   {% elif result.object.academic_year %}
 
-    {% include "course.html" with file=result.object %}
+    {% include "course.html" with course=result.object %}
 
   <!-- if result is a School -->
   {% elif result.object.name %}
   <!-- TODO: Have Lingo make a proper school div-->
-    {% include "school.html" with file=result.object %}
+    {% include "school.html" with school=result.object %}
   {% endif %}
 
 {% endfor %}

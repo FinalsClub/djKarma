@@ -302,7 +302,12 @@
               <!-- progress bar -->
               <p>Karma Points</p>
               <div class="progress progress-karma" id="karma-info" rel="popover" 
-                data-content="Status1: 25 points<br /> Status2: 50 points<br /> Status3: 75 points<br /> Status4: 100 points<br />" data-original-title="How Karma Status Works">
+                data-content="Prospect (10 points) - Search and view documents and thank uploaders<br/>
+                Beginner (100 points) - Add a school and comment on courses<br/>
+                Trainee (200 points) - Edit course and note meta data<br/>
+                Apprentice (500 points) - Flag documents<br/>
+                Scholar (2000 points) - Moderate documents for your school<br/>
+                Leader (4000 points) - Edit your school’s CSS">
                 <div id="karma-progress" class="bar"
                      style="width: {{progress}}%;"></div>
                   <div class="current-karma" style="">
@@ -372,7 +377,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#"><img src="./static/img/karma-logo.png" class="logo-mark"><span class="logo-karma">Karma</span><span class="logo-notes">Notes</span></a>
+          <a class="brand" href="#"><img src="./static/img/logo.png" class="logo-mark"></a>
           <div class="nav-collapse">
             <ul class="nav">
               <li class="" id="menu0">
@@ -388,10 +393,6 @@
                   <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="{% url 'notes.views.profile' %}"><i class="icon-user"></i> Profile</a></li>
-                  <li><a href="#"><i class="icon-paper-clip"></i> Downloads</a></li>
-                  <li><a href="#"><i class="icon-paper-clip"></i> Uploads</a></li>
-                  <li class="divider"></li>
                   <li><a href="{% url 'django.contrib.auth.views.logout' %}">Sign out</a></li> {# TODO: implement this as an ajax call #}
                 </ul>
               </li>
