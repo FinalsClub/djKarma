@@ -174,7 +174,7 @@ class Course(models.Model):
 
     def __unicode__(self):
         # Note: these must be unicode objects
-        return u"%s at %s" % (self.title)
+        return u"%s" % (self.title)
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
