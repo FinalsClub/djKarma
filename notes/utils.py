@@ -150,6 +150,7 @@ def uploadForm(user):
         form = UploadFileForm(initial={'course': -1, 'school': -1})
     return form
 
+
 def complete_profile_prompt(user_profile):
     """ Creates a list of prompts for the user to do to complete their profile
         Takes a User object
@@ -164,7 +165,9 @@ def complete_profile_prompt(user_profile):
     messages = [{"body": task.message, "div_id": task.div_id} for task in profile_todo]
     return messages
 
+
 def userCanView(user, file):
     if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
         return True
     return False
+
