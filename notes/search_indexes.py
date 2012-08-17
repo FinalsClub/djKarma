@@ -44,9 +44,32 @@ class CourseIndex(SearchIndex):
 
 class FileIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
+    school = CharField(model_attr='school')
+    corse = CharField(model_attr='course')
 
     # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='title')
+
+    # Use Apache Solr's Rich Content Extraction
+    # To index document text for search
+    def prepare(self, obj):
+        data = super(FileIndex, self).prepare(obj)
+
+        # This could also be a regular Python open() call, a StringIO instance
+        # or the result of opening a URL. Note that due to a library limitation
+        # file_obj must have a .name attribute even if you need to set one
+        # manually before calling extract_file_contents:
+        file_obj = obj.file.open()
+
+        extracted_data = self.backend.extract_file_contents(file_obj)
+
+        # Now we'll finally perform the template processing to render the
+        # text field with *all* of our metadata visible for templating:
+        t = loader.select_template(('search/indexes/notes/file_text.txt', ))
+        data['text'] = t.render(Context({'object': obj,
+                                         'extracted': extracted_data}))
+
+        return data
 
 
 site.register(File, FileIndex)

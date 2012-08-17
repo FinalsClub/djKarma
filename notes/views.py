@@ -499,7 +499,7 @@ def jqueryui_courses(request):
     print "query %s" % query
     courses = Course.objects.filter(title__icontains=query).distinct()
     print "courses %s %s" % (len(courses), courses)
-    response =  [(course.id, course.title) for course in courses]
+    response = [(course.id, course.title) for course in courses]
     print json.dumps(response)
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -633,7 +633,7 @@ def vote(request, file_pk):
     Search testing
 '''
 from haystack.query import SearchQuerySet
-
+#from haystack.utils import Highlighter
 
 def search(request):
     results = []
@@ -643,11 +643,20 @@ def search(request):
         user_pk = request.GET.get("user", "-1")
         print "searching for: " + query + " . User: " + str(user_pk)
         if query != "":
-            #Exact match result:
-            #results = SearchQuerySet().filter(content__contains=q)
-            results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct')
+            #Exact match result. Highlighting works!
+            #results = SearchQuerySet().filter(content__icontains=query).highlight()
+
+            #Exact match results w/Highlighting. Target notes
+            results = SearchQuerySet().filter(content__icontains=query).models(File).highlight()
+
+            #highlight = Highlighter(query)
+            #highlight_test = highlight.highlight('this is a test ' + query + 'yes, a test')
+
+            #Partial match result. Works, but w/out highlighting
+            #results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct').highlight()
+            
             # Partial string matching. Not yet working
-            #results = SearchQuerySet().autocomplete(content_auto=q)
+            #results = SearchQuerySet().autocomplete(content_auto=query).highlight()
             #print results
             return render(request, 'search_results2.html', {'results': results, 'query': query})
             '''

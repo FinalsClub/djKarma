@@ -174,7 +174,7 @@ class Course(models.Model):
 
     def __unicode__(self):
         # Note: these must be unicode objects
-        return u"%s at %s" % (self.title, self.school)
+        return u"%s at %s" % (self.title)
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
@@ -228,6 +228,7 @@ class File(models.Model):
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
     html        = models.TextField(blank=True, null=True)
+    text        = models.TextField(blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
     timestamp   = models.DateTimeField(default=datetime.datetime.now())
     viewCount   = models.IntegerField(default=0)

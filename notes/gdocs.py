@@ -48,8 +48,6 @@ def convertWithGDocsv3(File):
     # Create and Authorize OAuth client
     client = CreateClient()
     print "GDocsv3: client created"
-    # Create a dictionary for extra Google query variables
-    query_args = {'exportFormat': 'html'}
 
     # Get file_type and encoding of uploaded file
     # i.e: file_type = 'text/plain', encoding = None
@@ -74,7 +72,7 @@ def convertWithGDocsv3(File):
     # Encapsulate File in Google's MediaSource Object
     media = gdata.data.MediaSource()
     media.SetFileHandle(File.file.path, file_type)
-    print "GDocsv3: MediaSource created"
+    #print "GDocsv3: MediaSource created"
     # Create a Resource to connect MediaSource to
     if File.title:
         file_title = File.title
@@ -84,7 +82,7 @@ def convertWithGDocsv3(File):
         # name in Karma Note's Google Docs account
         file_title = fileName.rsplit("/", 1)[1]
     doc = gdata.docs.data.Resource(type='document', title=file_title)
-    print "GDocsv3: resource created"
+    #print "GDocsv3: resource created"
     # if pdf, append OCR=true to uri
     if file_type == 'application/pdf':
         create_uri = gdata.docs.client.RESOURCE_UPLOAD_URI + '?ocr=true'
@@ -93,16 +91,36 @@ def convertWithGDocsv3(File):
 
     # Upload document and retrieve representation
     doc = client.CreateResource(entry=doc, create_uri=create_uri, media=media)
-    print "GDocsv3: resource sent"
-    print "file_type: " + str(file_type)
+    #print "GDocsv3: resource sent"
+    #print "file_type: " + str(file_type)
 
+    # Create a dictionary for extra Google query variables
+    query_args = {'exportFormat': 'text/html'}
     # Download html representation of document
     client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params=query_args)
-    print "GDocsv3: resource downloaded"
+    #print "GDocsv3: resource downloaded"
     f = open(str(File.file.path) + '.html')
     File.html = f.read()
     File.save()
     f.close()
+
+    '''
+    Going to try Apache Solr's Rich Content Extraction
+    If that fails, this method will get text content from Google
+    # If the document was not originally plain text
+    # Get a plain text version for search indexing
+    if file_type != 'text/plain':
+        query_args = {'exportFormat': 'text/plain'}
+        client.download_resource(entry=doc, file_path=File.file.path + '.txt', extra_params=query_args)
+        #print "GDocsv3: resource downloaded"
+        f = open(str(File.file.path) + '.txt')
+        File.text = f.read()
+        File.save()
+    else:
+        f = open(str(File.file.path))
+        File.text = f.read()
+    f.close()
+    '''
 
 
 def convertWithGDocs(File):

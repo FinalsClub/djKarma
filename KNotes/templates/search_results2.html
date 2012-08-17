@@ -10,6 +10,10 @@
   {% if result.object.viewCount %}
 
     {% include "file.html" with file=result.object %}
+    {% for highlight in result.highlighted.text %}
+    {{highlight|safe}}
+    {% endfor %}
+    
 
   <!-- if result is a Course -->
   {% elif result.object.academic_year %}
@@ -22,7 +26,6 @@
     {% include "school.html" with school=result.object %}
   {% endif %}
 
-  {% highlight result.summary with query html_tag "div" css_class "highlight" %}
 {% endfor %}
 {% if page.has_previous or page.has_next %}
 <!-- Previous / Next page links -->
