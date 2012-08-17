@@ -5,7 +5,6 @@ from haystack.indexes import *
 from haystack.fields import EdgeNgramField
 from haystack import site
 from models import School, Course, File
-from utils import findFileOnServer
 
 
 class SchoolIndex(SearchIndex):
