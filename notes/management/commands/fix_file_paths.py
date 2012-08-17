@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from notes.models import File
-from settings import MEDIA_ROOT
+from KNotes.settings import MEDIA_ROOT
 import os
 from optparse import make_option
 
