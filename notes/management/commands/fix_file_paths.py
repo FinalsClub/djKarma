@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 proper_file = open(proper_file_path)
                 #Just in case file.save mutates db
                 if do_execute:
-                    aFile.file.save(fileName, djangoFile(proper_file), save=True)
+                    aFile.file.save(fileName, djangoFile(proper_file), save=False)
                 self.stdout.write("> success! new filepath set \n")
                 if not (do_save and do_execute):
                     count += 1
