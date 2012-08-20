@@ -37,20 +37,22 @@ class Command(BaseCommand):
             do_save = False
 
             try:
-                #self.stdout.write("trying orig path: %s \n" % (aFile.file.file.path))
-                test_file = open(aFile.file.file.path)
+                # uploads/notes/Main_Ideas_-_Study_Guide_1.doc
+                self.stdout.write("file path: %s \n" % (aFile.file.name))
+                fileName = os.path.basename(aFile.file.name)
+                proper_file_path = os.path.join(MEDIA_ROOT, fileName)
+                self.stdout.write("> trying: %s \n" % (proper_file_path))
+                # Attempt to find this filename in MEDIA_ROOT
+                # If success, update filefield entry
+                proper_file = open(proper_file_path)
+                #Just in case file.save mutates db
+                if do_execute:
+                    aFile.file.save(fileName, djangoFile(proper_file), save=True)
+                self.stdout.write("> success! new filepath set")
+                #test_file = open(aFile.file.file.path)
             except (IOError, SuspiciousOperation) as e:
-                self.stdout.write(">error: %s \n" % (str(e)))
+                self.stdout.write("> error: %s \n" % (str(e)))
                 # Database file path is incorrect
-                fileName = os.path.basename(aFile.file.file.path)
-                try:
-                    test_file = open(os.path.join(MEDIA_ROOT, fileName))
-                    self.stdout.write("trying alt path: %s \n" % (test_file.path))
-                    aFile.file.save(fileName, djangoFile(test_file), save=True)
-                    #doc.documen.save(filename, File(doc_file), save=True) doc.save()
-                    do_save = True
-                except IOError:
-                    self.stdout.write("Can't find file at %s \n" % (MEDIA_ROOT + "/" + fileName))
             if do_save and do_execute:
                 count += 1
                 aFile.save()
