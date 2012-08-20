@@ -228,7 +228,6 @@ class File(models.Model):
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
     html        = models.TextField(blank=True, null=True)
-    text        = models.TextField(blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
     timestamp   = models.DateTimeField(default=datetime.datetime.now())
     viewCount   = models.IntegerField(default=0)
