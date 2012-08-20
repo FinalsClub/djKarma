@@ -29,7 +29,6 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        self.stdout.write("trying orig path: %s \n" % ("test"))
         do_execute = options.get('execute')
         length = len(File.objects.all())
         count = 0
@@ -38,11 +37,12 @@ class Command(BaseCommand):
             do_save = False
 
             try:
-                self.stdout.write("trying orig path: %s \n" % (aFile.file.file.path))
-                test_file = open(aFile.file.path)
+                #self.stdout.write("trying orig path: %s \n" % (aFile.file.file.path))
+                test_file = open(aFile.file.file.path)
             except (IOError, SuspiciousOperation) as e:
+                self.stdout.write(">error: %s \n" % (str(e)))
                 # Database file path is incorrect
-                fileName = os.path.basename(aFile.file.path)
+                fileName = os.path.basename(aFile.file.file.path)
                 try:
                     test_file = open(os.path.join(MEDIA_ROOT, fileName))
                     self.stdout.write("trying alt path: %s \n" % (test_file.path))
