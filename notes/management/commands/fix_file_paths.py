@@ -32,14 +32,16 @@ class Command(BaseCommand):
         do_execute = options.get('execute')
         length = len(File.objects.all())
         count = 0
+        files = File.objects.all()
 
-        for aFile in File.objects.all():
+        for aFile in files:
             do_save = False
 
             try:
                 # uploads/notes/Main_Ideas_-_Study_Guide_1.doc
                 self.stdout.write("file path: %s \n" % (aFile.file.name))
                 fileName = os.path.basename(aFile.file.name)
+                self.stdout.write("> file name: %s \n" % (fileName))
                 proper_file_path = os.path.join(MEDIA_ROOT, fileName)
                 self.stdout.write("> trying: %s \n" % (proper_file_path))
                 # Attempt to find this filename in MEDIA_ROOT
@@ -48,7 +50,9 @@ class Command(BaseCommand):
                 #Just in case file.save mutates db
                 if do_execute:
                     aFile.file.save(fileName, djangoFile(proper_file), save=True)
-                self.stdout.write("> success! new filepath set")
+                self.stdout.write("> success! new filepath set \n")
+                if not (do_save and do_execute):
+                    count += 1
                 #test_file = open(aFile.file.file.path)
             except (IOError, SuspiciousOperation) as e:
                 self.stdout.write("> error: %s \n" % (str(e)))

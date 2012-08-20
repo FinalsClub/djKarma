@@ -104,7 +104,7 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-DEFAULT_FILE_STORAGE = 'testStorage.TestFileSystemStorage'
+DEFAULT_FILE_STORAGE = 'notes.testStorage.TestFileSystemStorage'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
