@@ -35,9 +35,11 @@ class Command(BaseCommand):
         files = File.objects.all()
 
         for aFile in files:
-            do_save = False
+            do_save = True
 
             try:
+                self.stdout.write("\n")
+                self.stdout.write("file id: %s \n" % (aFile.id))
                 # uploads/notes/Main_Ideas_-_Study_Guide_1.doc
                 self.stdout.write("file path: %s \n" % (aFile.file.name))
                 fileName = os.path.basename(aFile.file.name)
@@ -49,7 +51,8 @@ class Command(BaseCommand):
                 proper_file = open(proper_file_path)
                 #Just in case file.save mutates db
                 if do_execute:
-                    aFile.file.save(fileName, djangoFile(proper_file), save=False)
+                    #aFile.file.save(fileName, djangoFile(proper_file), save=True)
+                    setattr(aFile.file, 'name', proper_file_path)
                 self.stdout.write("> success! new filepath set \n")
                 if not (do_save and do_execute):
                     count += 1
