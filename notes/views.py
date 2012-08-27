@@ -268,8 +268,12 @@ def _get_courses(request, school_query=None):
         #_school = School.objects.get_object_or_404(pk=school_query)
         _school = get_object_or_404(School, pk=school_query)
     elif isinstance(school_query, unicode):
-        #_school = School.objects.get(name__icontains=school_query)
-        _school = get_object_or_404(School, name__icontains=school_query)
+        #_school = get_object_or_404(School, name__icontains=school_query)
+        #_school = School.objects.filter(name__icontains=school_query).all()[0]
+        # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
+        _school = School.objects.filter(name__icontains=school_query) \
+                        .annotate(course_count=Count('course')) \
+                        .order_by('-course_count')[0]
     else:
         print "No courses found for this query"
         return Http404
