@@ -1,12 +1,12 @@
 <!-- TODO: Have Lingo make a proper school div-->
-<div class="school inactive" data-toggle="collapse" data-target="#school-unique-1">
+<div class="course inactive" data-toggle="collapse" data-target="#school-unique-1">
   <div class="folder icon">
     <img src="/static/img/icon-folder-inactive.png">
   </div>
-  <div class="school-title">
-    <a href="#">{{school.name}}</a>
-    <div class="school-info">
-      <span class="location">{{school.location}}</span> <i class="icon-paper-clip"></i><a href="#">{{ school.course_set.all|length}} Courses</a>
+  <div class="course-title">
+    <a href="/browse/{{ school.name }}">{{ school.name }}</a>
+    <div class="course-info">
+      <span class="location">{{ school.location }}</span> <i class="icon-paper-clip"></i><a href="#">{{ school.course_set.all|length}} Courses</a>
       <!-- TODO: Determine how to mash in user data
       <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>-->
     </div>

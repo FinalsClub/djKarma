@@ -62,18 +62,32 @@ see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-fil
 When changes are made to the search index schema (./notes/search_indexes.py), the index must be rebuilt (similiar to models.py and database migrations).
 
 
-**Rebuilding the search index after modifying ./notes/search_indexes.py:**
+##### Rebuilding the search schema AND index after modifying ./notes/search_indexes.py:
 
-1. You can generate the schema from the django application (once Haystack is installed and setup) by running:
+1. **Build the Index Schema**. You can generate the schema from the django application (once Haystack is installed and setup) by running:
 
 		 ./manage.py build_solr_schema > /path/to/solr/conf/schema.xml
 		 
-	*Dev note*: With Solr installed using Homebrew on Mac OS X, the default path will be:
+2. **Restart Solr**
+3. **Build the Search Index**. A shortcut for clear_index followed by update_index. 
+
+		./manage.py rebuild_index
+
+##### Updating the search index after new models are added
+If you've added new models in Django, and haven't touched search_index.py:
+
+		./manage.py update_index
+
+###### Note on Solr location: 
+	
+With Solr installed using Homebrew on Mac OS X, the default path will be:
         
         /usr/local/Cellar/solr/3.6.0/libexec/example/solr/conf/schema.xml
 		 
+On the current server, the path to the solr schema is:
 
-2. Restart Solr.
+		/home/dbro/apache-solr-3.6.0/example/solr/conf/schema.xml
+
 
 ### Celery Task Server
 

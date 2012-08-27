@@ -1,0 +1,59 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Course -- {{ course.title }}
+{% endblock %}
+
+{% block navinner %}
+<br/>
+<br/>
+<h2>Course: {{ course.title }}</h2>
+{% include 'course_info.html' %}
+
+<div class="users" >
+  {% for user in users %}
+    <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
+  {% endfor %}
+</div> <!-- .users -->
+
+{% if events %}
+  <table id="events" class="table">
+    <tbody>
+    {% for event in events %}
+      <tr>
+        <td>
+          <i class="icon-plus-sign"></i> 
+        </td>
+        <td>
+          {% if event.user %}
+            {{ event.user.get_profile.getName }} added {{ event }}.
+          {% else %}
+            a user added {{ event }}.
+          {% endif %}
+        </td>
+        <td style="text-align: right;">
+        at {{ event.timestamp }}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody
+  </table>
+{% endif %}
+
+<div class="course-listing"> {# TODO: change class to 'listing' or make file-listing subclass #}
+{% if files %}
+  {% for file in files %}
+    {% include 'file.html' with file=file %}
+  {% endfor %}
+{% else %}
+  <h3>Sorry, there don't seem to be any courses for this school</h3>
+  <p>Would you like to
+    <div class="upload">
+      <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+    </div>
+  </p>
+{% endif %}
+</div> <!-- .course-listing -->
+
+{% endblock %}
+

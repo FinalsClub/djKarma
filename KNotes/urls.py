@@ -49,6 +49,11 @@ urlpatterns = patterns('',
     url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
 
     url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
+    url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
+    url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
+    url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+    url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-courses'),
+    #url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
@@ -59,7 +64,7 @@ urlpatterns = patterns('',
     url(r'^file/(\d{1,99})$', 'notes.views.file', name='file'),
     # Browse
 
-    # Custom Haystack Search Test
+    # Search
     url(r'^search/', 'notes.views.search'),
 
     # Ajax requests from search page to populate 'Browse by School and Course' accordion

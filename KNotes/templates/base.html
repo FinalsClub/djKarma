@@ -83,6 +83,8 @@
 </head>
 
 <body>
+<!-- modal dialogs -->
+{% include './modal/modal_share_karma.html' %}
 
 {% block content %}
 {% endblock %}
@@ -91,11 +93,7 @@
 {% endblock %}
 
 
-<!-- modal dialogs -->
 {% include 'modal_upload.html' %}
-{% if user %}
-  {% include 'modal_share_karma.html' %}
-{% endif %}
 
 </body>
 </html>

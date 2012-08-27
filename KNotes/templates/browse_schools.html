@@ -1,0 +1,18 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+  Browse Schools
+{% endblock %}
+
+{% block navinner %}
+<div style="height:60px; border-top: 1px solid; border-bottom: 1px solid; margin-bottom: 18px;">
+  <h2>Browse Schools</h2> # this is to be replaced by the right-column header
+</div>
+<div class="course-listing">
+  {% for school in schools %}
+    {% include 'school.html' with school=school %}
+  {% endfor %}
+</div> <!-- .course-listing -->
+
+{% endblock %}
+
