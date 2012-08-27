@@ -1,6 +1,5 @@
 {% load url from future %}
 
-{% block scripts %}
 
 <!-- Django-Ajax-Uploader -->
 <script src="{{ STATIC_URL }}ajaxuploader/js/fileuploader.js" ></script>
@@ -13,9 +12,7 @@
   var csrf_token = "{{csrf_token}}";
 
 </script>
-{% endblock %}
 
-{% block content %}
 <div class="modal-backdrop fade in" style="display: none;"></div>
 <div id="upload" class="modal hide fade in" style="display:none;">
   <div class="modal-header">
@@ -157,6 +154,3 @@
     </div><!-- #modal-misc -->
   </div>
 </div>
-
-
-{% endblock %}
