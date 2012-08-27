@@ -517,11 +517,8 @@ def file(request, note_pk):
     # If the user does not have read permission, and the
     # Requested files is not theirs
     if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        user_karma = profile.karma
-        level = Level.objects.get(title='Prospect')
-        print level.karma
-        progress = (user_karma / float(level.karma)) * 100
-        return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
+        #file_denied(request, note_pk)
+        pass
     try:
         file = File.objects.get(pk=note_pk)
     except:
@@ -542,7 +539,19 @@ def file(request, note_pk):
     # This is ugly, but is needed to be able to get the note type full name
     file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
     url = iri_to_uri(file.file.url)
-    return TemplateResponse(request, 'view-file.html', {'file': file, 'file_type': file_type, 'url': url})
+    return render(request, 'view-file.html', {'file': file, 'file_type': file_type, 'url': url})
+
+def file_denied(request, note_pk):
+    """ What we show someone who is not allowed to view a file
+        NOTE: Not currently used
+        :request:   django request object
+        :note_pk:   id of the file/note
+    """
+    user_karma = profile.karma
+    level = Level.objects.get(title='Prospect')
+    print level.karma
+    progress = (user_karma / float(level.karma)) * 100
+    return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
 
 
 def searchBySchool(request):

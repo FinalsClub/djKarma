@@ -1,3 +1,10 @@
+{% extends 'navigation.html' %}
+
+{% block title %}
+{{ file.course.title }} || {{ file.title }}
+{% endblock %}
+
+{% block header %}
 <script>
 $(document).ready(function() {
   // inject the note's html into the page
@@ -27,6 +34,9 @@ $(document).ready(function() {
     }
 });
 </script>
+{% endblock %}
+
+{% block navinner %}
 <div class="container">
   <div class="row">
 
@@ -66,3 +76,4 @@ $(document).ready(function() {
   </div> <!-- .row -->
 </div> <!-- .container -->
 
+{% endblock %}

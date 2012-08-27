@@ -167,6 +167,10 @@ def complete_profile_prompt(user_profile):
 
 
 def userCanView(user, file):
+    """ :user: django user
+        :file: a notes.models.File object
+        returns True/False
+    """
     if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
         return True
     return False
