@@ -42,6 +42,10 @@ import datetime
 #from django.core import serializers
 
 ## :|: Static pages :|: &
+def e404(request):
+    response = nav_helper(request)
+    return render(request, '404.html', response)
+
 def home(request):
     """ Landing Page [static] """
 

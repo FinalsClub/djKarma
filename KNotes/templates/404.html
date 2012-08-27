@@ -1,0 +1,19 @@
+{# TODO: if not logged in, use base.html. can not nest extends in if tags #}
+{% extends 'navigation.html' %}
+
+{% block title %}
+  404, page not found
+{% endblock %}
+
+{% block navinner %}
+
+  <div style="text-align:center;">
+    <a href="/"><img src="/static/img/error.jpg" style="border:none;"></a>
+  </div>
+{% endblock %}
+
+{% comment %}
+    <div class="homepage container" style="text-align:center;">
+      <a href="/"><img src="/static/img/error.jpg" style="border:none;"></a>
+    </div>
+{% endcomment %}

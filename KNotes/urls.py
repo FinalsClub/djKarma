@@ -32,6 +32,7 @@ sqs = SearchQuerySet().highlight()
 # Remember the trailing $ to avoid partial match
 
 urlpatterns = patterns('',
+    url(r'^404$', 'notes.views.e404', name='404'),
     # captcha test
     url(r'^captcha$', 'notes.views.captcha', name='captcha'),
     # Landing page.
