@@ -16,7 +16,7 @@
 @gray: #f5f5f5;
 
 /*** Font Variables ***/
-
+   
 @font: 'Open Sans';
 @mini-size:12px;
 @body-size: 14px;
@@ -131,8 +131,9 @@ a.button,
     .button-font;
     .rounded-corners;
     .text-shadow(darken(@secondary,10%));
+	display:inline-block;
     color: @highlight;
-    /** margin-top:0px; **/
+    margin-top:0px;
     -moz-box-shadow:inset 0px 1px 0px 0px @highlight;
     -webkit-box-shadow:inset 0px 1px 0px 0px @highlight;
     box-shadow:inset 0px 1px 0px 0px @highlight;
@@ -141,7 +142,6 @@ a.button,
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, lighten(@secondary, 10%)), color-stop(1, @secondary) );
     background:-moz-linear-gradient( center top, lighten(@secondary, 10%) 5%, @secondary 100% );
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='lighten(@secondary, 10%)', endColorstr='@secondary');
-    
     transition: background 1s;
     -moz-transition: background 1s;
     -webkit-transition: background 1s;
@@ -153,8 +153,6 @@ a.button,
     height:30px;
 }
 
-
- 
 a.button:hover,
 .navbar .form-search a.button:hover {
 	color:@highlight;
@@ -179,7 +177,7 @@ li#menu0 {
 	}
 	.input-append input {
 		float: none;
-		
+		background: #FFFFFF;
 		border-radius: 12px 0px 0px 12px;
 		border: 1px solid #CCC;
 		padding: 4px 9px;
@@ -189,6 +187,7 @@ li#menu0 {
 		line-height: 1;
 		color:@text-color;
 		margin-top:0;
+		color:red;
 	}
 }
 	
@@ -299,7 +298,7 @@ hide {
 }
 
 .left-sidebar {
-	margin-top:48px;
+	margin-top:20px;
 }
 
 
@@ -1003,6 +1002,14 @@ a#fb-link .FBConnectButton_Simple .FBConnectButton_Text_Simple {
 	}
 }
 
+
+/** course page styling **/
+
+.file-info-wrapper {
+	.upload a.button {
+		margin:10px 0;
+	}
+}
 
 /** popovers **/
 
