@@ -1,6 +1,7 @@
-<div class="file-actions" id="file-{{file.pk}}">
-          <a href="#" class="vote upvote"><i class="icon-heart"></i>Like ({{file.numUpVotes}})</a>
-          <a href="#" class="vote downvote"><i class="icon-flag"></i>Flag</a>
-          <a href="#"><i class="icon-pencil"></i>Edit</a>
-          <a href="#"><i class="icon-remove-circle"></i>Delete</a>
-</div>
+<div class="file-actions" id="file-{{ file.pk }}">
+  <a href="#" class="vote upvote"><i class="icon-heart"></i>Thank ({{ file.numUpVotes }})</a>
+  <a href="#" class="vote downvote"><i class="icon-flag"></i>Flag</a>
+  {# TODO add conditional edit button #}
+  <a href="#"><i class="icon-pencil"></i>Edit</a>
+  <a href="#"><i class="icon-remove-circle"></i>Delete</a>
+</div> <!-- .file-actions -->

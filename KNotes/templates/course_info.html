@@ -1,16 +1,19 @@
-
 <div class="file-info-wrapper">
-  <div class="upload" style="float:right">
-    <a class="button course-upload" school-pk="{{course.school.pk}}" school-name="{{course.school.name}}" course-pk="{{course.pk}}" course-name="{{course.title}}" data-toggle="modal" href="#upload">Upload notes</a>
-  </div>
   <h4>About this Class</h4>
     <h3><a href="#">{{ course.title }}</a></h3>
     <strong>{{ course.instructor }} | {{ course.school.name }}</strong>
 
+    <div class="upload">
+      <a class="button course-upload" school-pk="{{ course.school.pk }}" school-name="{{ course.school.name }}" course-pk="{{ course.pk }}" course-name="{{ course.title }}" data-toggle="modal" href="#upload">Upload notes</a>
+    </div>
+
     <div class="class-info">
       {% if course.files.count >= 1 %}
-        This class has <a href="#">{{ course.files.count }} notes</a>.
+        This class has {{ course.files.count }} notes.
+      {% else %}
+        This course doesn't have any notes yet.
       {% endif %}
+      &nbsp;&nbsp;
       {% if course.url %}
         <a href="{{ course.url }}">Course Homepage</a>
       {% else %}
@@ -21,16 +24,16 @@
       {# TODO: implement actual count here before launch or remove it #}
       <p><span class="your-files">You have <a href="#">1 upload </a> and <a href="#">2 downloads</a></span> from this class. </p>
     </div>
-
-  <h4>About this Professor</h4>
-  REMAINDER LEFT HERE AS TEMPLATE FOR PROFESSOR INFORMATION
   <div class="clear"></div>
-  <!--
-  <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a></div> -->
-  <div class="points-and-views">
-    <strong>{{ file_type }}:</strong> <span class="karma-points">10 points</span>
-    <span class="views">{{ file.viewCount }} views</a>
-  </div>
-  {% include "file-actions.html" with file=file %}
+
+  {# TODO: include professor email address if we have it #}
+
+	<div class="users">
+	  <h4>Students Enrolled</h4>
+      {# TODO: find limit of horizontal space and set upper bound to forloop #}
+      {% for user in users %}
+        <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
+      {% endfor %}
+	</div> <!-- .users -->
   <div class="clear"></div>
 </div>

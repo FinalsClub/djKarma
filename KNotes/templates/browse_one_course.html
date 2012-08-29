@@ -5,42 +5,41 @@
 {% endblock %}
 
 {% block navinner %}
-<br/>
-<br/>
-<h2>Course: {{ course.title }}</h2>
+
 {% include 'course_info.html' %}
 
-<div class="users" >
-  {% for user in users %}
-    <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
-  {% endfor %}
-</div> <!-- .users -->
+<!-- nav tabs for events and files uploaded-->
+<ul class="nav nav-tabs">
+  <li><a href="#course-notes" data-toggle="tab">Course Notes</a></li>
+  <li><a href="#events-tab" data-toggle="tab">What's New</a></li>
+</ul>
+  
+<div class="tab-content">
+  <div class="tab-pane" id="events-tab">
+    <table id="events" class="table"> 
+      <tbody>
+      {% for event in events %}
+        <tr>
+          <td>
+            <i class="icon-plus-sign"></i> 
+          </td>
+          <td>
+            {% if event.user %}
+              {{ event.user.get_profile.getName }} added {{ event }}.
+            {% else %}
+              a user added {{ event }}.
+            {% endif %}
+          </td>
+          <td style="text-align: right;">
+          at {{ event.timestamp }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div> <!-- end events pane -->
 
-{% if events %}
-  <table id="events" class="table">
-    <tbody>
-    {% for event in events %}
-      <tr>
-        <td>
-          <i class="icon-plus-sign"></i> 
-        </td>
-        <td>
-          {% if event.user %}
-            {{ event.user.get_profile.getName }} added {{ event }}.
-          {% else %}
-            a user added {{ event }}.
-          {% endif %}
-        </td>
-        <td style="text-align: right;">
-        at {{ event.timestamp }}
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody
-  </table>
-{% endif %}
-
-<div class="course-listing"> {# TODO: change class to 'listing' or make file-listing subclass #}
+<div class="tab-pane active" id="course-notes">
 {% if files %}
   {% for file in files %}
     {% include 'file.html' with file=file %}
