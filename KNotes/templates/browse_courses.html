@@ -1,14 +1,12 @@
 {% extends 'navigation.html' %}
 
 {% block title %}
-  Browse Courses of {{ school.name }}
+  Browse {{ school.name }} Courses
 {% endblock %}
 
 {% block navinner %}
-<div style="height:60px; border-top: 1px solid; border-bottom: 1px solid; margin-bottom: 18px;">
-  <h2>
-    Browse Courses of {{ school.name }}
-  </h2> # this area is to be replaced by the right-column header
+<div>
+  <h2> Browse {{ school.name }} Courses </h2> Click on a course to see notes from that course.
 </div>
 <div class="course-listing">
 {% if courses %}
