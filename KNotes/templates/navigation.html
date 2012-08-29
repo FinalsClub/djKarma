@@ -258,22 +258,17 @@
     <div class="span3 left-sidebar">
       <ul class="nav nav-list">
         {% load navactive %}
-        <li class="{% navactive request 'profile' %}">
+        <li class="{% navactive request 'your-courses' %}">
           <a id="your-courses" href="/your-courses">
             <i class="icon-home"></i>
             Your courses
           </a>
         </li>
-        <li class="{% navactive request 'browse' %}">
-          <a id="browse-notes" href="#">
-            <i class="icon-book"></i>
-            Browse notes
-          </a>
-        </li>
-        <li class="{% navactive request 'browse' %}">
+        <li class="{% navactive request 'browse browse-schools' %}">
+          {# TODO: link to your school's courses of school has been set #}
           <a id="browse-notes" href="/browse/schools">
             <i class="icon-book"></i>
-            Browse schools
+            Browse
           </a>
         </li>
         <li class="{% navactive request 'karma-events' %}">
@@ -421,9 +416,9 @@
             </ul> <!-- .nav -->
           </div><!--/.nav-collapse -->
         </div> <!-- .navbar-inner -->
-      {% block navinner %}
       <div class="clear"></div>
       </div>
+      {% block navinner %}
       <!-- File view goes here -->
       <div id="file-view" style="display:none">
       </div>
