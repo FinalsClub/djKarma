@@ -14,7 +14,10 @@
         <i class="icon-plus-sign"></i> 
       </td>
       <td>
-        You added {{ event }}.
+        You added {{ event }}
+        {% if event.course %}
+          to <a href="#">{{ event.course.title }}</a>
+        {% endif %}
       </td>
       <td style="text-align: right;">
       at {{ event.timestamp }}
