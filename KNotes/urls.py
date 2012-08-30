@@ -55,7 +55,6 @@ urlpatterns = patterns('',
     # TODO: change these routes so they are unique regardless of path query for reverse()
     url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
     url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
-    #url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
 
     # User Profile
     url(r'^profile$', 'notes.views.profile', name='profile'),
