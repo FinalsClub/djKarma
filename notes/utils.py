@@ -175,3 +175,25 @@ def userCanView(user, file):
         return True
     return False
 
+
+class Janitor():
+    """ Collection of cleanup functions for the notes app """
+
+    @staticmethod
+    def create_model_slugs(Model):
+        """ Create slug fields for models that do not currently have them
+            model: a model with a name **or** title field, but not both, and a slug field
+            returns t/f, success string
+        """
+        slugs_created = 0
+        for i in Model.objects.filter(slug__isnull=True).all():
+            if hasattr(i, 'name'):
+                i.slug = slugify(i.name)
+            elif hasattr(i, 'title'):
+                i.slug = slugify(i.title)
+            else:
+                return False, u"The model you passed to create slugs, does not have a name or title field"
+            i.save()
+            slugs_created += 1
+        return True, u"Created %s slugs on: %s" % (slugs_created, Model)
+
