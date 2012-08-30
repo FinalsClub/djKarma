@@ -15,7 +15,7 @@
     <p><b>Check your username and password.</b></p>
   {% endif %}
 
-  <form method="post" action="{% url 'register_account' invite_code=None %}">
+  <form method="post" action="{% url 'register_account' None %}">
     {% csrf_token %}
     {% for field in form %}
       <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
