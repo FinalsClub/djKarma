@@ -517,6 +517,7 @@ def file(request, note_pk):
     """ View Note HTML """
     # Check that user has permission to read
     #profile = request.user.get_profile()
+    response = nav_helper(request)
     user = request.user
     try:
         profile = user.get_profile()
@@ -547,7 +548,12 @@ def file(request, note_pk):
     # This is ugly, but is needed to be able to get the note type full name
     file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
     url = iri_to_uri(file.file.url)
-    return render(request, 'view-file.html', {'file': file, 'file_type': file_type, 'url': url})
+
+    response['file'] = file
+    response['file_type'] = file_type
+    response['url'] = url
+
+    return render(request, 'view-file.html', response)
 
 def file_denied(request, note_pk):
     """ What we show someone who is not allowed to view a file
