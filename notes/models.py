@@ -129,8 +129,9 @@ class Vote(models.Model):
 
 
 class School(models.Model):
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, blank=True, null=True)
+    name        = models.CharField(max_length=255)
+    slug        = models.SlugField(null=True)
+    location    = models.CharField(max_length=255, blank=True, null=True)
 
     # Facebook keeps a unique identifier for all schools
     facebook_id = models.BigIntegerField(blank=True, null=True)
@@ -142,6 +143,10 @@ class School(models.Model):
         # If a new School is being saved, increment SiteStat School count
         if not self.pk:
             increment(self)
+        if not self.slug:
+            # FIXME: make this unique
+            # TODO: add a legacy slugs table that provide redirects to new slug pages
+            self.slug = slugify(self.name)
         super(School, self).save(*args, **kwargs)
 
 # On School delete, decrement numSchools
@@ -166,6 +171,7 @@ class Course(models.Model):
     )
     school          = models.ForeignKey(School, blank=True, null=True)
     title           = models.CharField(max_length=255)
+    slug            = models.SlugField(null=True)
     url             = models.URLField(max_length=511, blank=True)
     field           = models.CharField(max_length=255, blank=True, null=True)
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
@@ -180,6 +186,10 @@ class Course(models.Model):
         # If a new Course is being saved, increment SiteStat Course count
         if not self.pk:
             increment(self)
+        if not self.slug:
+            # FIXME: make this unique
+            # TODO: add a legacy slugs table that provide redirects to new slug pages
+            self.slug = slugify(self.name)
         super(Course, self).save(*args, **kwargs)
 
     class Meta:
