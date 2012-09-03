@@ -47,7 +47,7 @@ $(document).ready(function() {
           {# TODO: make this use something like the course_info.html file #}
           <div class="file-info-wrapper">
             <h4>About this Class</h4>
-              <h3><a href="#">{{ file.course.title }}</a></h3>
+              <h3><a href="{{ file.course.school.slug }}/{{ file.course.slug }}">{{ file.course.title }}</a></h3>
               <strong>{{ file.course.instructor }} | {{ file.school.name }}</strong>
 
 

@@ -1,15 +1,15 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
+import datetime
 import json
 
+from ajaxuploader.views import AjaxFileUploader
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
-from django.contrib.sites.models import Site
-from django.core import serializers
 from django.db.models import Count
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -18,7 +18,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
-from ajaxuploader.views import AjaxFileUploader
+from haystack.query import SearchQuerySet
 
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
@@ -34,17 +34,14 @@ from models import ReputationEventType
 from profile_tasks import tasks
 from utils import complete_profile_prompt
 from utils import jsonifyModel
-from utils import processCsvTags
 from utils import userCanView
 
-import datetime
-
-#from django.core import serializers
 
 ## :|: Static pages :|: &
 def e404(request):
     response = nav_helper(request)
     return render(request, '404.html', response)
+
 
 def home(request):
     """ Landing Page [static] """
@@ -56,19 +53,23 @@ def home(request):
         stats = SiteStats.objects.get(pk=1)
 
         #Get recently uploaded files
-        recent_files = File.objects.exclude(title__exact='').order_by('-timestamp')[:7]
+        recent_files = File.objects.exclude(title__exact='') \
+                .order_by('-timestamp')[:7]
         #print recent_files
 
-        return render(request, 'home.html', {'stats': stats, 'recent_files': recent_files})
+        return render(request, 'home.html',
+                {'stats': stats, 'recent_files': recent_files})
+
 
 def about(request):
     return render(request, 'static/about.html')
 
+
 def terms(request):
     return render(request, 'static/ToS.html')
 
-## :|: Uploading :|: &
 
+## :|: Uploading :|: &
 # For Ajax Uploader
 import_uploader = AjaxFileUploader()
 
@@ -86,8 +87,10 @@ def fileMeta(request):
             file.description = form.cleaned_data["description"]
             file.owner = request.user
             try:
-                file.school = School.objects.get(pk=int(form.cleaned_data["school_pk"]))
-                file.course = Course.objects.get(pk=int(form.cleaned_data["course_pk"]))
+                _school_id = int(form.cleaned_data["school_pk"])
+                _course_id = int(form.cleaned_data["course_pk"])
+                file.school = School.objects.get(pk=_school_id)
+                file.course = Course.objects.get(pk=_course_id)
             except Exception, e:
                 print "school/course error: " + str(e)
             # process Tags
@@ -98,11 +101,12 @@ def fileMeta(request):
             response["status"] = "success"
             response["file_pk"] = file.pk
             print "fileMeta form valid! " + str(file.pk)
+            # lets us use django's messaging system for alert-notifications
+            # in our design on upload success at the top of the profile
+            # FIXME: fix this message with proper html
             if request.user.is_authenticated():
-                # This should let us use django's messaging system to do the alert-notifications
-                # in our design on upload success at the top of the profile
-                # FIXME: fix this message with proper html
-                messages.add_message(request, messages.SUCCESS, "Success! You uploaded a file (message brought to you by Django Messaging!")
+                messages.add_message(request, messages.SUCCESS,
+                "Success! You uploaded a file (message: Django Messaging!")
         else:
             # Form is invalid
             print form.errors
@@ -110,7 +114,8 @@ def fileMeta(request):
             response["status"] = "invalid"
             response["form"] = form
             response["message"] = "Please check your form data."
-            return TemplateResponse(request, 'ajaxFormResponse_min.html', response)
+            return TemplateResponse(request,
+                    'ajaxFormResponse_min.html', response)
 
     else:
         # if not POST or not ajax
@@ -137,7 +142,7 @@ def smartModelQuery(request):
                     response = {}
                     response['type'] = 'school'
                     # Django QuerySets are serializable, but when they're empty, error raised
-                    if schools != None:
+                    if schools is not None:
                         response['suggestions'] = list(schools)
                         response['status'] = 'suggestion'
                     else:
@@ -163,7 +168,7 @@ def smartModelQuery(request):
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised
-                    if courses != None:
+                    if courses is not None:
                         response['suggestions'] = list(courses)
                         response['status'] = 'suggestion'
                     else:
@@ -230,11 +235,13 @@ def nav_helper(request, response={}):
 
     return response
 
+
 def your_courses(request):
     """ List a user's courses on a profile-like page using django templates """
     response = nav_helper(request)
     response['courses'] = request.user.get_profile().courses.all()
     return render(request, 'your-courses.html', response)
+
 
 def browse_schools(request):
     """ Server-side templated browsing of notes by school, course and note """
@@ -244,7 +251,7 @@ def browse_schools(request):
     response['schools'] = School.objects.annotate(num_course=Count('course')).order_by('num_course').reverse().all()
     return render(request, 'browse_schools.html', response)
 
-    
+
 def browse_courses(request, school_query):
     """ View for courses beloging to :school_query:
         :school_query: comes as unicode, if can be int, pass as int
@@ -255,9 +262,14 @@ def browse_courses(request, school_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    # pass the school query to 
-    response['school'], response['courses'] = _get_courses(request, school_query)
-    return render(request, 'browse_courses.html', response)
+    # pass the school query to
+    courses = _get_courses(request, school_query)
+    if isinstance(courses, tuple): # FIXME
+        response['school'], response['courses'] = courses
+        return render(request, 'browse_courses.html', response)
+    else:
+        return Http404
+
 
 def _get_courses(request, school_query=None):
     """ Private search method.
@@ -271,14 +283,29 @@ def _get_courses(request, school_query=None):
         #_school = get_object_or_404(School, name__icontains=school_query)
         #_school = School.objects.filter(name__icontains=school_query).all()[0]
         # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
-        _school = School.objects.filter(name__icontains=school_query) \
+        _school_q = School.objects.filter(slug=school_query) \
                         .annotate(course_count=Count('course')) \
-                        .order_by('-course_count')[0]
+                        .order_by('-course_count')
+        if len(_school_q) != 0:
+            _school = _school_q[0]
+        else:
+            return Http404
     else:
         print "No courses found for this query"
         return Http404
     # if I found a _school
     return _school, Course.objects.filter(school=_school).distinct()
+
+
+def b_school_course(request, school_query, course_query):
+    """ This is a cheat. ignore the school query `harvard` from the form of
+        karmanotes.org/harvard/underwater-basket-weaving
+        and return the result of browse_one_course with the course query
+        This will fail if we have courses named the same thing across multiple universities
+    """
+    # TODO add a url redirect, or an error if the school != course school
+    return browse_one_course(request, course_query)
+
 
 def browse_one_course(request, course_query):
     """ View for viewing notes from a fuzzy course search
@@ -295,25 +322,27 @@ def browse_one_course(request, course_query):
     # get the users who are members of the course
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
-    response['events'] = course.reputationevent_set.all() # FIXME: possibly order-by
+    response['events'] = course.reputationevent_set.all()  # FIXME: possibly order-by
 
     return render(request, 'browse_one_course.html', response)
 
+
 def _get_notes(request, course_query):
     """ Private search method for a course and it's files
-        :course_query: 
+        :course_query:
             if int: Course.pk
             if unicode: Course.title
         returns Course, Notes+
     """
     if isinstance(course_query, int):
-        _course = get_object_or_404(Course, pk=school_query)
+        _course = get_object_or_404(Course, pk=course_query)
     elif isinstance(course_query, unicode):
-        _course = get_object_or_404(Course, title__icontains=course_query)
+        _course = get_object_or_404(Course, slug=course_query)
     else:
         print "No course found, so no notes"
         return Http404
     return _course, File.objects.filter(course=_course).distinct()
+
 
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
@@ -329,8 +358,8 @@ def getting_started(request):
 
 
 def karma_events(request):
-    """ Shows a time sorted log of your events that affect your 
-        karma score positively or negatively. 
+    """ Shows a time sorted log of your events that affect your
+        karma score positively or negatively.
     """
     # navigation.html
     response = nav_helper(request)
@@ -342,9 +371,9 @@ def karma_events(request):
 def profile(request):
     """ User Profile """
     response = nav_helper(request)
-
-    response['course_json_url'] = '/jq_course' # FIXME: replace this with a reverse urls.py query
+    response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
     return render(request, 'navigation.html', response)
+
 
 @login_required
 def editProfile(request):
@@ -371,14 +400,12 @@ def editProfile(request):
             response['year'] = user_profile.grad_year
             if not user_profile.submitted_grad_year:
                 response['karma'] = ReputationEventType.objects.get(title="profile-grad-year").actor_karma
-
         if 'alias' in request.GET:
             do_save = True
             print "PRE: " + str(user_profile.alias)
             user_profile.alias = request.GET['alias']
             print "POST: " + str(user_profile.alias)
             response['alias'] = user_profile.alias
-
         if do_save:
             user_profile.save()
             response['status'] = 'success'
@@ -387,6 +414,7 @@ def editProfile(request):
             return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
     else:
         raise Http404
+
 
 def get_upload_form(response):
     """ Appends forms required for upload form to response
@@ -416,9 +444,9 @@ def addModel(request):
                     new_model = Course.objects.create(title=form.cleaned_data['title'])
                 elif type == "school":
                     new_model = School.objects.create(name=form.cleaned_data['title'])
-
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
+
 
 def register(request, invite_user):
     """ Display user login and signup screens
@@ -447,9 +475,11 @@ def register(request, invite_user):
         form = forms.UserCreationForm()
         return render(request, "registration/register.html", {'form': form})
 
-'''
+
+"""
     AJAX views
-'''
+"""
+
 
 def instructors(request):
     """ Ajax: Instructor autcomplete form field """
@@ -481,7 +511,7 @@ def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
 
     # Find courses, or school and courses
-    if True: # FIXME: why is this True here?
+    if True:  # FIXME: why is this True here?
         query = request.GET.get('q')
         school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
@@ -555,6 +585,7 @@ def file(request, note_pk):
 
     return render(request, 'view-file.html', response)
 
+
 def file_denied(request, note_pk):
     """ What we show someone who is not allowed to view a file
         NOTE: Not currently used
@@ -576,7 +607,7 @@ def searchBySchool(request):
     response_json = []
 
     if request.is_ajax():
-        if request.user.is_authenticated and request.user.get_profile().school != None:
+        if request.user.is_authenticated and request.user.get_profile().school is not None:
             school = get_object_or_404(School, pk=request.user.get_profile().school.pk)
             response_json.append(jsonifyModel(model=school, depth=1))
         else:
@@ -655,8 +686,7 @@ def vote(request, file_pk):
 '''
     Search testing
 '''
-from haystack.query import SearchQuerySet
-#from haystack.utils import Highlighter
+
 
 def search(request):
     results = []
@@ -677,7 +707,7 @@ def search(request):
 
             #Partial match result. Works, but w/out highlighting
             #results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct').highlight()
-            
+
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=query).highlight()
             #print results
@@ -694,7 +724,7 @@ def search(request):
 
 
 def captcha(request):
-    ''' For now, the only action the server needs to 
+    ''' For now, the only action the server needs to
         take on each invocation of the modal-upload form
         is to generate a new math captcha answer
     '''
