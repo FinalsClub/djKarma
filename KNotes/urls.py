@@ -15,16 +15,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls import patterns, include, url
-
 from django.contrib import admin
-admin.autodiscover()
 
-from haystack.views import SearchView, search_view_factory
-from haystack.forms import ModelSearchForm
 from haystack.query import SearchQuerySet
 
-from notes.models import School
-
+admin.autodiscover()
 # Example SearchQuerySet fed to Haystack's SearchView
 sqs = SearchQuerySet().highlight()
 
@@ -46,11 +41,12 @@ urlpatterns = patterns('',
     # File meta data submission
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
 
-    # Karma events 
+    # Karma events
     url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
 
     url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
     url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
+
     url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
     url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
@@ -102,4 +98,11 @@ urlpatterns = patterns('',
 
     # admin:
     url(r'^admin/', include(admin.site.urls)),
+
+    # latest browse views, must come last because they are greedy
+    url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
+    # TODO: change these routes so they are unique regardless of path query for reverse()
+    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
+    # Browse the courses of one school
+    url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
 )
