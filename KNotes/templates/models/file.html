@@ -2,7 +2,7 @@
 <div class="file row-fluid">
   <div class="file icon"></div>
   <div class="file-title">
-    <a href="/file/{{ file.pk }}">{{ file.title }}</a>
+    <a href="/b/{{ file.school.slug }}/{{ file.course.slug }}/{{ file.pk }}">{{ file.title }}</a>
   </div>
   <div class="file-description">
     {{ file.description }}
@@ -10,10 +10,10 @@
   <div class="file-info-action row hide">
       <div class="file-info">
         <span class="user">
-          Uploaded by <a href="#"><i class="icon-user"></i>{{file.owner.get_profile.getName }}</a>
+          Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a>
         </span>
         <span class="download">
-          <a id="{{file.pk}}" class="view-file" href="#"><i class="icon-paper-clip"></i>View file</a>
+          <a id="{{ file.pk }}" class="view-file" href="#"><i class="icon-paper-clip"></i>View file</a>
         </span>
       {% if not file|ownedBy:user_pk %}
         <span class="karma-points">-10 points</span>

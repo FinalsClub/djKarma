@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     # latest browse views, must come last because they are greedy
     url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
+    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})$', 'notes.views.nurl_file', name='nurl_file'),
     url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
