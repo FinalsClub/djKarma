@@ -408,7 +408,7 @@ class UserProfile(models.Model):
     files = models.ManyToManyField(File, blank=True, null=True)
 
     # courses a user is currently, or has been enrolled
-    courses = models.ManyToManyField(Course, null=True)
+    courses = models.ManyToManyField(Course, null=True, blank=True)
 
     # Keep record of if user has added school / grad_year
     # Filling out these fields awards karma
