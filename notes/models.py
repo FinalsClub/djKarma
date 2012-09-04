@@ -12,8 +12,6 @@ from django.template.defaultfilters import slugify
 from social_auth.backends.facebook import FacebookBackend
 from social_auth.signals import socialauth_registered
 
-from model_utils import fast_hash
-
 
 class Level(models.Model):
     """ Define User Levels
@@ -115,7 +113,6 @@ class Tag(models.Model):
         super(Tag, self).save(*args, **kwargs)
 
 
-
 class Vote(models.Model):
     """ Represents a vote cast on a Note
         if up is true, it is an upvote
@@ -189,7 +186,7 @@ class Course(models.Model):
         if not self.slug:
             # FIXME: make this unique
             # TODO: add a legacy slugs table that provide redirects to new slug pages
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.title)
         super(Course, self).save(*args, **kwargs)
 
     class Meta:
@@ -263,7 +260,7 @@ class File(models.Model):
             increment(self)
 
         print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner != None:
+        if not self.awarded_karma and self.owner is not None:
             # FIXME: award karma based on submission type
             karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
@@ -271,7 +268,7 @@ class File(models.Model):
             self.awarded_karma = True
 
         # Escape html field only once
-        if(self.html != None and not self.cleaned):
+        if(self.html is not None and not self.cleaned):
             # TODO: Check this security
             self.html = re.escape(self.html)
             self.cleaned = True
@@ -284,7 +281,7 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
-    def ownedBy(user_pk):
+    def ownedBy(self, user_pk):
         """ Returns true if the user owns or has "paid" for this file
         """
         # If the file is in the user's collection, or the user owns the file
@@ -298,7 +295,7 @@ class File(models.Model):
             and target user (if downvote)
             upvote - vote_value=1 , downvote - vote_value=-1
         """
-        print "Creating Vote object. voter: "+str(voter)+" value: "+str(vote_value)
+        print "Creating Vote object. voter: " + str(voter) + " value: " + str(vote_value)
         # Abort of note vote_value provided, or voter is not a User object
         if int(vote_value) == 0 or not isinstance(voter, User):
             print "invalid vote value or voter"
@@ -309,7 +306,7 @@ class File(models.Model):
             # Increment the file's upvote counter
             self.numUpVotes += 1
             # Award karma corresponding to "upvote" ReputationEventType to file owner
-            if self.owner != None:
+            if self.owner is not None:
                 self.owner.get_profile().awardKarma(event="upvote")
             # Add this vote to the file's collection
             self.votes.add(this_vote)
@@ -320,7 +317,7 @@ class File(models.Model):
             self.numDownVotes += 1
             # "Award" negative karma coresponding to "downvote" ReputationEventType to file owner
             # and negative karma corresponding to "downvote" target user to downvoter
-            if self.owner != None:
+            if self.owner is not None:
                 self.owner.get_profile().awardKarma(event="downvote", target_user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
@@ -329,6 +326,7 @@ class File(models.Model):
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
+
 
 class ReputationEventType(models.Model):
     """ This class will allow us to model different user actions and the
@@ -460,8 +458,8 @@ class UserProfile(models.Model):
         """
         # TODO: get and use default user icon if none, use gravatar's 404 function
         #
-        small_default = u'http://placehold.it/50x50'
-        large_default = u'http://placehold.it/180x180'
+        small_default = u'/static/img/avatar-180.png'
+        large_default = u'/static/img/avatar-50.png'
         if self.fb_id:
             url = u"https://graph.facebook.com/{0}/picture".format(self.user.username)
             if size == 'small':
@@ -470,7 +468,7 @@ class UserProfile(models.Model):
                 return url + u'?type=large'
         else:
             if not self.gravatar:
-                gravatar_hash = update_gravatar(self)
+                gravatar_hash = update_gravatar(self)  # FIXME
             else:
                 gravatar_hash = self.gravatar
             url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
@@ -533,7 +531,7 @@ class UserProfile(models.Model):
                 event.course = course
             if user:
                 event.user = user
-            event.save() # FIXME: might be called on UserProfile.save()
+            event.save()  # FIXME: might be called on UserProfile.save()
             print "event.id: %s" % event.id
 
             self.reputationEvents.add(event)
@@ -597,13 +595,13 @@ class UserProfile(models.Model):
             self.awardKarma('profile-grad-year')
 
         # School set for first time, award karma
-        if self.school != None and not self.submitted_school:
+        if self.school is not None and not self.submitted_school:
             print "submitted school!"
             self.submitted_school = True
             self.awardKarma('profile-school')
 
         # Add read permissions if Prospect karma level is reached
-        if self.can_read == False and self.karma >= Level.objects.get(title='Prospect').karma:
+        if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
             self.can_read = True
 
         # Add vote permissions if Prospect karma level is reached
@@ -626,6 +624,7 @@ def ensure_profile_exists(sender, **kwargs):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
+
 
 def facebook_extra_data(sender, user, response, details, **kwargs):
     """
@@ -650,7 +649,7 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_school = response.get('education')[-1]
     fb_school_name = user_school['school']['name']
     fb_school_id = user_school['school']['id']
-    user_profile.school, created = School.objects.get_or_create(\
+    user_profile.school, created = School.objects.get_or_create(
             name=fb_school_name,
             facebook_id=fb_school_id)
     user_profile.save()
