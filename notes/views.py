@@ -51,12 +51,10 @@ def home(request):
     else:
         # Get the 'singleton' SiteStats instance
         stats = SiteStats.objects.get(pk=1)
-
         #Get recently uploaded files
         recent_files = File.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
-
         return render(request, 'home.html',
                 {'stats': stats, 'recent_files': recent_files})
 
@@ -515,7 +513,7 @@ def courses(request, school_query=None):
         query = request.GET.get('q')
         school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
-        if school_pk == 0:
+        if int(school_pk) == 0:
             courses = Course.objects.filter(title__icontains=query).distinct()
         # IF school provided, restrict search
         else:
