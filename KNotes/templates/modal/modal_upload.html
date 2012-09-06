@@ -139,9 +139,11 @@
             <label class="checkbox">
               <input type="checkbox" id="modal-current-course" value"current-course"> Check if you're currently in this course.
             </label>
+            {% if not user %}
             <label class="checkbox">
               <input type="checkbox" id="modal-tos-agree" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
             </label>
+            {% endif %}
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
         <div class="form-actions" id="modal-upload-button">
