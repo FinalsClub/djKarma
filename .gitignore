@@ -2,6 +2,7 @@
 *.swp
 .DS_Store
 *.sql
+*.sql-journal
 *credentials.py
 /uploads
 /notes/migrations
