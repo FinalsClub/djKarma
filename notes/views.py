@@ -320,7 +320,7 @@ def browse_one_course(request, course_query):
     # get the users who are members of the course
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
-    response['events'] = course.reputationevent_set.all()  # FIXME: possibly order-by
+    response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
 
     return render(request, 'browse_one_course.html', response)
 
