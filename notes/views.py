@@ -361,7 +361,7 @@ def karma_events(request):
     """
     # navigation.html
     response = nav_helper(request)
-    response['events'] = request.user.get_profile().reputationEvents.all()
+    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
     return render(request, 'karma-events.html', response)
 
 
