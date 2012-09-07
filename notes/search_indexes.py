@@ -69,8 +69,8 @@ class FileIndex(indexes.SearchIndex, indexes.Indexable):
             # manually before calling extract_file_contents:
             file_obj = obj.file.open()
 
-            extracted_data = self.backend.extract_file_contents(file_obj)
-            #extracted_data = self._get_backend(None).extract_file_contents(file_obj)
+            #extracted_data = self.backend.extract_file_contents(file_obj)
+            extracted_data = self._get_backend(None).extract_file_contents(file_obj)
             # Now we'll finally perform the template processing to render the
             # text field with *all* of our metadata visible for templating:
             t = indexes.loader.select_template(('search/indexes/notes/file_text.txt', ))
