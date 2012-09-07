@@ -74,7 +74,7 @@ When changes are made to the search index schema (./notes/search_indexes.py), th
 		./manage.py rebuild_index
 
 ##### Updating the search index after new models are added
-If you've added new models in Django, and haven't touched search_index.py:
+If you've added new models in Django, and haven't touched search_indexes.py:
 
 		./manage.py update_index
 
@@ -212,4 +212,5 @@ Management Commands (manage.py \<command name>)
    + Checks School, Academic Year, Semester fields of all Course objects.
 + **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
    + Necessary when a backup of the notes app database is made separate of the User table 
++ **fix_file_paths**: Iterate through all File entries and ensure the corresponding file location is within MEDIA_ROOT. After changing MEDIA_ROOT, move all old files to new MEDIA_ROOT and run this script to update the database accordingly.
 

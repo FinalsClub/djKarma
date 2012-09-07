@@ -292,8 +292,18 @@ else:
 
 
 ### HAYSTACK Configuration
-HAYSTACK_SITECONF = 'notes.search_sites'
-HAYSTACK_SEARCH_ENGINE = 'solr'
+
+# Not used in Haystack 2.0+
+#HAYSTACK_SITECONF = 'notes.search_sites'
+#HAYSTACK_SEARCH_ENGINE = 'solr'
+
+# For Haystack 2.0+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr'
+    }
+}
 
 # Don't yet know if we'll be running 'multicore'
 HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
