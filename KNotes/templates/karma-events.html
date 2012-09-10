@@ -18,10 +18,7 @@
         <i class="icon-plus-sign"></i> 
       </td>
       <td>
-        You added {{ event }}
-        {% if event.course %}
-          to <a href="/b/{{ course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
-        {% endif %}
+        {% include 'karma_events/person_log.html' with event=event %}<br/>
       </td>
       <td style="text-align: right;">
       at {{ event.timestamp }}
