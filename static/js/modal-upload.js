@@ -24,16 +24,20 @@
         element: $('#file-uploader')[0],
         multiple: false,
         onCancel: function(id, fileName){
-          $('#modal-body-progress').slideUp('fast');
+          // hide progress bar and show upload button
+          $('#modal-body-progress').slideUp('fast', function(){
+            $('.qq-upload-button').slideDown('fast');
+          });
           cancelled = true;
         },
         onSubmit: function(id, fileName){
-          // show progress bar
+          
           cancelled = false;
-          $('#modal-body-progress').slideDown('fast', function(){
+          // hide upload button and show progress bar
+          $('.qq-upload-button').slideUp('fast', function(){
+            $('#modal-body-progress').slideDown('fast');
             $('#modal-metadata-form').slideDown('fast');
           });
-
         },
         onComplete: function(id, fileName, responseJSON) {
           console.log(responseJSON);
@@ -55,16 +59,19 @@
             console.log(uploads);
             //alert("All complete!");
             // Hide file uploader
-            
-            $('#file-uploader').slideUp('fast', function(){
-              if(!cancelled){
+            if(!cancelled){
+              $('#file-uploader').slideUp('fast', function(){
                 $('#file-uploader-label').html("<h2>" + uploads[0].file.name + " uploaded!</h2>").slideDown('fast');
                 //$('#file-uploader').html("<h2>" + uploads[0].file.name + " uploaded!</h2>");
-              }
               //$('#file-uploader').fadeIn('fast');
               $('#modal-body-progress').slideUp('fast');
 
-            });
+              });
+            }
+            else{
+              $('#modal-body-progress').slideUp('fast');
+            }
+            
         },
         params: {
             'csrf_token': csrf_token,
@@ -278,6 +285,7 @@
   function clearForm(course, school){
     course = typeof course !== 'undefined' ? course : 'None';
     school = typeof school !== 'undefined' ? school : 'None';
+    $('.qq-upload-drop-area').hide();
     $('#modal-upload-button').show();
     $('#modal-upload-again-button').hide();
     $('.qq-upload-list').html('');
