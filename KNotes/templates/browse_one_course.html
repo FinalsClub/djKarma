@@ -24,11 +24,7 @@
             <i class="icon-plus-sign"></i> 
           </td>
           <td>
-            {% if event.user %}
-              {{ event.user.get_profile.getName }} added {{ event }}.
-            {% else %}
-              a user added {{ event }}.
-            {% endif %}
+            {% include 'karma_events/course_log.html' with event=event %}<br/>
           </td>
           <td style="text-align: right;">
           at {{ event.timestamp }}
