@@ -21,7 +21,7 @@
 {% elif event.type.title == 'essay-small' %}
   You uploaded an essay to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'tag' %}
-  You added a tag to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a> FILENAME
+  You added a tag to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}/{{ event.file.id }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'syllabus' %}
   You uploaded a course syllabus to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'assignment' %}
@@ -29,7 +29,7 @@
 {% elif event.type.title == 'course-url' %}
   You added a course homepage to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'like' %}
-  You thanked TARGET_USER for their file FILENAME
+  You thanked TARGET_USER for their file <a href="/b/{{ event.school.slug }}/{{ event.course.slug }}/{{ event.file.id }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'flag' %}
   You flagged the file FILENAME
 {% elif event.type.title == 'upvote' %}
