@@ -74,8 +74,9 @@
 
     });
 
-     // Handle setting up modal-upload form
+     // Handle setting up modal-upload form from course upload button
      $('.container').on("click", '.course-upload',  function(){
+      console.log("preparing form");
       course = Object();
       course.pk = $(this).attr('course-pk');
       course.name = $(this).attr('course-name');
@@ -83,6 +84,14 @@
       school.pk = $(this).attr('school-pk');
       school.name = $(this).attr('school-name');
         clearForm(course, school);
+     });
+
+     // Handle setting up modal-upload from generic
+     // 'Upload notes' button
+     
+     $('.container').on("click", '.generic-upload', function(){
+      console.log("clearing form");
+      clearForm();
      });
 
     // Handle username edit in place click
@@ -290,7 +299,7 @@
           </a>
         </li>
         <li>
-          <a href="#upload" class="karma" data-toggle="modal">
+          <a href="#upload" class="karma generic-upload" data-toggle="modal">
             <i class="icon-share"></i>
             Upload notes
             <div class="share-karma">Earn <span class="karma">5-10 points</span> for every upload</div>
