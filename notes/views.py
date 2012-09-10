@@ -140,7 +140,7 @@ def smartModelQuery(request):
                     response = {}
                     response['type'] = 'school'
                     # Django QuerySets are serializable, but when they're empty, error raised
-                    if schools is not None:
+                    if schools is not None and len(schools) > 0:
                         response['suggestions'] = list(schools)
                         response['status'] = 'suggestion'
                     else:
@@ -161,18 +161,19 @@ def smartModelQuery(request):
                 # If no course matching text entry exists, present Course Form
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
                     courses = None
-                    if request.GET.get("school", -1) != -1:
-                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).order_by('title')
+                    if request.POST.get("school", -1) != -1:
+                        print "course at school: " + request.POST.get("school")
+                        courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised
-                    if courses is not None:
+                    if courses is not None and len(courses) > 0:
                         response['suggestions'] = list(courses)
                         response['status'] = 'suggestion'
                     else:
                         response['suggestions'] = []
                         response['status'] = 'no_match'
-                    print "smartModelQuery: return create Course sugesstions"
+                    print "smartModelQuery: return create Course suggestion"
                     return HttpResponse(json.dumps(response), mimetype="application/json")
                 # A course matching entry exists
                 else:

@@ -141,7 +141,8 @@
       $.ajax({
           url: "/smartModelQuery",
           data: {'title': $('#modal-course-input').val(),
-                'type': 'course'},
+                'type': 'course',
+                'school': school_pk},
           success: function(data){
             smartModelQueryResponseHandler(data);
           },
@@ -449,8 +450,13 @@
 
 
     html += "  </ul>"+
-            "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+            "  <p>Not there? <a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+    $('#course-suggestions').show();
+    //console.log("select course-suggestions: " + $('#course-suggestions').attr('id'));
     $('#course-suggestions').html(html).slideDown('fast');
+    //sanity testing
+    console.log("sanity test");
+    $('#course-suggestions').show();
   }
 
   // set appropriate headers
