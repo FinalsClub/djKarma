@@ -33,7 +33,8 @@ class Command(BaseCommand):
         length = len(File.objects.all())
         count = 0
         files = File.objects.all()
-
+        self.stdout.write("\n")
+        self.stdout.write("do_execute: %s \n" % (do_execute))
         for aFile in files:
             do_save = True
 
@@ -60,7 +61,7 @@ class Command(BaseCommand):
             except (IOError, SuspiciousOperation) as e:
                 self.stdout.write("> error: %s \n" % (str(e)))
                 # Database file path is incorrect
-            if do_save and do_execute:
+            if do_save and do_execute == True:
                 count += 1
                 aFile.save()
 

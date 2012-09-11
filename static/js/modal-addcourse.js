@@ -73,7 +73,7 @@ $(document).ready(function() {
 
       html += "  </ul>"+
               "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
-      $('#course-suggestions').html(html).slideDown('fast');
+      $('#course-add-suggestions').html(html).slideDown('fast');
     }
 
     // Handles response from /smartModelQuery
@@ -92,7 +92,7 @@ $(document).ready(function() {
         else if(data.type == 'course'){
           course_pk = data.model_pk;
           course_name = data.model_name;
-          $('#course-suggestions').slideUp('fast', function(){
+          $('#course-add-suggestions').slideUp('fast', function(){
             $('#modal-misc').slideDown('fast');
           });
         }
@@ -114,7 +114,7 @@ $(document).ready(function() {
         }
         else if(data.type == "course"){
           html = "<p><strong>Course not found.</strong><a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
-          $('#course-suggestions').html(html).slideDown('fast');
+          $('#course-add-suggestions').html(html).slideDown('fast');
         }
       }
     }

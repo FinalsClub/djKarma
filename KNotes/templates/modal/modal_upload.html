@@ -20,12 +20,12 @@
     <span><h3>Upload a file</h3></span><span>2MB limit. Supports .doc, .docx, .pdf, .rtf, and .txt file</span>
   </div> <!-- .modal-header -->
   <!-- File select / drag-n-drop -->
-  <div style="margin-left:200px;padding-bottom:50px;" id="file-uploader">
+  <div style="text-align:center;" id="file-uploader">
     <noscript>
       <p>Please enable JavaScript to use file uploader.</p>
     </noscript>
   </div> <!-- #file-uploader -->
-  <div id="file-uploader-label" style="display:none">
+  <div id="file-uploader-label" style="display:none;text-align:center">
   </div>
   <p class="help-block"></p>
 
@@ -71,7 +71,7 @@
           <label class="control-label" for="modal-course-input">Course Name</label>
           <div class="controls">
             <input type="text" class="input-xlarge" id="modal-course-input" placeholder="ex. Social Analysis 10">
-            <div class="course not-found" id="course-suggestions" style="display:none">
+            <div class="course not-found" id="course-suggestions" style="display:none;">
             </div> <!-- .not-found -->
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
@@ -139,17 +139,23 @@
             <label class="checkbox">
               <input type="checkbox" id="modal-current-course" value"current-course"> Check if you're currently in this course.
             </label>
+            {% if not user %}
             <label class="checkbox">
               <input type="checkbox" id="modal-tos-agree" value"current-course"> I agree to the <a href="#">Terms of Use</a>.
             </label>
+            {% endif %}
           </div> <!-- .controls -->
         </div> <!-- .control-group -->
         <div class="form-actions" id="modal-upload-button">
           <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
         </div>
-        <div class="form-actions" id="modal-upload-again-button" style="display:none">
-          <a class="button" id="modal-meta-submit" type="submit">UPLOAD ANOTHER TO THIS COURSE</a>
-        </div>
+        <div id="modal-upload-success" style="display:none;">
+          <div class="form-actions" id="modal-upload-again-button">
+            <a class="button" id="modal-meta-submit" type="submit">UPLOAD ANOTHER TO THIS COURSE</a>
+          </div> <!-- modal-upload-again-button -->
+          <p>View <a id="new-file-link">your note</a>!</p>
+          <p> You earned <span class="karma" id="new-file-karma">A LOT</span> of karma!</p>
+        </div><!-- modal-upload-success -->
       </fieldset>
     </div><!-- #modal-misc -->
   </div>

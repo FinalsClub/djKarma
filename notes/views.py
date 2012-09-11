@@ -51,12 +51,10 @@ def home(request):
     else:
         # Get the 'singleton' SiteStats instance
         stats = SiteStats.objects.get(pk=1)
-
         #Get recently uploaded files
         recent_files = File.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
-
         return render(request, 'home.html',
                 {'stats': stats, 'recent_files': recent_files})
 
@@ -136,13 +134,13 @@ def smartModelQuery(request):
                 # If no school matching text entry exists, present School Form
                 if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
-                    # TODO: Try searching school name with input, return mathing results
-                    schools = School.objects.all().order_by('name').values('name', 'pk')
+                    #schools = School.objects.all().order_by('name').values('name', 'pk')
+                    schools = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School).values('name', 'pk')
                     print "smartModelQuery: return create School ajaxFormResponse"
                     response = {}
                     response['type'] = 'school'
                     # Django QuerySets are serializable, but when they're empty, error raised
-                    if schools is not None:
+                    if schools is not None and len(schools) > 0:
                         response['suggestions'] = list(schools)
                         response['status'] = 'suggestion'
                     else:
@@ -163,18 +161,20 @@ def smartModelQuery(request):
                 # If no course matching text entry exists, present Course Form
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
                     courses = None
-                    if request.GET.get("school", -1) != -1:
-                        courses = Course.objects.filter(school=School.objects.get(pk=request.GET.get("school"))).order_by('title')
+                    if request.POST.get("school", -1) != -1:
+                        #print "course at school: " + request.POST.get("school")
+                        #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
+                        courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised
-                    if courses is not None:
+                    if courses is not None and len(courses) > 0:
                         response['suggestions'] = list(courses)
                         response['status'] = 'suggestion'
                     else:
                         response['suggestions'] = []
                         response['status'] = 'no_match'
-                    print "smartModelQuery: return create Course sugesstions"
+                    print "smartModelQuery: return create Course suggestion"
                     return HttpResponse(json.dumps(response), mimetype="application/json")
                 # A course matching entry exists
                 else:
@@ -322,7 +322,7 @@ def browse_one_course(request, course_query):
     # get the users who are members of the course
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
-    response['events'] = course.reputationevent_set.all()  # FIXME: possibly order-by
+    response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
 
     return render(request, 'browse_one_course.html', response)
 
@@ -363,7 +363,7 @@ def karma_events(request):
     """
     # navigation.html
     response = nav_helper(request)
-    response['events'] = request.user.get_profile().reputationEvents.all()
+    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
     return render(request, 'karma-events.html', response)
 
 
@@ -515,7 +515,7 @@ def courses(request, school_query=None):
         query = request.GET.get('q')
         school_pk = request.GET.get('school', 0)
         # If no school provided, search all courses
-        if school_pk == 0:
+        if int(school_pk) == 0:
             courses = Course.objects.filter(title__icontains=query).distinct()
         # IF school provided, restrict search
         else:

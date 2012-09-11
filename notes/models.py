@@ -350,13 +350,15 @@ class ReputationEvent(models.Model):
         Used to calculate reputation
     """
     # TODO: add a fkey to UserProfile and other logic
-    type = models.ForeignKey(ReputationEventType)
+    type    = models.ForeignKey(ReputationEventType)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     # optional fkeys to related models. used for displaying activity for user/school/course
-    user = models.ForeignKey(User, blank=True, null=True)
-    course = models.ForeignKey(Course, blank=True, null=True)
-    school = models.ForeignKey(School, blank=True, null=True)
+    user        = models.ForeignKey(User, blank=True, null=True, related_name='actor') # FIXME: rename actor_user
+    target      = models.ForeignKey(User, blank=True, null=True, related_name='target')
+    file        = models.ForeignKey(File, blank=True, null=True)
+    course      = models.ForeignKey(Course, blank=True, null=True)
+    school      = models.ForeignKey(School, blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.type.title)
