@@ -16,7 +16,7 @@ class SchoolIndex(SearchIndex):
     # which apparently can be undesirable
     # See ./KNotes/templates/search/indexes/notes/school_text.txt
     text = CharField(document=True, use_template=True)
-
+    name = CharField(model_attr='name')
     # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='name')
 
@@ -37,19 +37,45 @@ class CourseIndex(SearchIndex):
 
     # Non document fields allow for search filtering
     # i.e: Search "math" at school Harvard
-    school = CharField(model_attr='school')
+    title = CharField(model_attr='title')
+    school = CharField(null=True)
     semester = IntegerField(model_attr='semester')
     academic_year = IntegerField(model_attr='academic_year')
+
+    # When the index is prepared, index
+    # the pk corresponding to this course's school
+    def prepare_school(self, obj):
+        if obj.school is not None:
+            return obj.school.pk
+
+        return None
 
 
 class FileIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
-    school = CharField(model_attr='school')
-    corse = CharField(model_attr='course')
+    title = CharField(model_attr='title')
+    school = CharField(null=True)
+    corse = CharField(null=True)
 
     # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='title')
 
+    # When the index is prepared, index
+    # the pk corresponding to this file's school
+    def prepare_school(self, obj):
+        if obj.school is not None:
+            return obj.school.pk
+
+        return None
+
+    # Store the pk of the corresponding course
+    def prepare_course(self, obj):
+        if obj.course is not None:
+            return obj.course.pk
+
+        return None
+
+    '''
     # Use Apache Solr's Rich Content Extraction
     # To index document text for search
     def prepare(self, obj):
@@ -72,7 +98,7 @@ class FileIndex(SearchIndex):
             print "FileIndex: error accessing " + obj.file.path
             # actual file is not available
         return data
-
+    '''
 
 site.register(File, FileIndex)
 site.register(School, SchoolIndex)

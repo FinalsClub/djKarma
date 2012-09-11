@@ -141,7 +141,8 @@
       $.ajax({
           url: "/smartModelQuery",
           data: {'title': $('#modal-course-input').val(),
-                'type': 'course'},
+                'type': 'course',
+                'school': school_pk},
           success: function(data){
             smartModelQueryResponseHandler(data);
           },
@@ -164,7 +165,7 @@
           success: function(data){
             if(data.status === 'success'){
               $('#modal-upload-button').hide();
-              $('#modal-upload-again-button').show();
+              $('#modal-upload-success').show();
             }
             else{
               alert('Please check your form input');
@@ -287,7 +288,7 @@
     school = typeof school !== 'undefined' ? school : 'None';
     $('.qq-upload-drop-area').hide();
     $('#modal-upload-button').show();
-    $('#modal-upload-again-button').hide();
+    $('#modal-upload-success').hide();
     $('.qq-upload-list').html('');
     $('#file-uploader').show();
     $('#file-uploader-label').hide();
@@ -441,13 +442,18 @@
             "  <ul>";
 
     $.each(data.suggestions, function(index, course){
-      html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.name +"</a></li>";
+      html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.title +"</a></li>";
     });
 
 
     html += "  </ul>"+
-            "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+            "  <p>Not there? <a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+    $('#course-suggestions').show();
+    //console.log("select course-suggestions: " + $('#course-suggestions').attr('id'));
     $('#course-suggestions').html(html).slideDown('fast');
+    //sanity testing
+    console.log("sanity test");
+    $('#course-suggestions').show();
   }
 
   // set appropriate headers
