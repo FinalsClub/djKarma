@@ -352,9 +352,6 @@
     } else if(file_pk === -1){
       alert("Please upload a file first");
       return false;
-    } else if(!$('#modal-tos-agree').is(':checked')){
-      alert("Please read and agree to our Terms of Service");
-      return false;
     }
     return true;
   }
