@@ -289,6 +289,8 @@
   function clearForm(course, school){
     course = typeof course !== 'undefined' ? course : 'None';
     school = typeof school !== 'undefined' ? school : 'None';
+    var file_pk = -1;
+    var file_url = "";
     $('.qq-upload-button').show();
     $('.qq-upload-drop-area').hide();
     $('#modal-upload-button').show();
