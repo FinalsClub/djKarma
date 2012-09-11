@@ -134,8 +134,8 @@ def smartModelQuery(request):
                 # If no school matching text entry exists, present School Form
                 if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
                     # Return a list of all schools to present to user, ensuring duplicate entires aren't made
-                    # TODO: Try searching school name with input, return mathing results
-                    schools = School.objects.all().order_by('name').values('name', 'pk')
+                    #schools = School.objects.all().order_by('name').values('name', 'pk')
+                    schools = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School).values('name', 'pk')
                     print "smartModelQuery: return create School ajaxFormResponse"
                     response = {}
                     response['type'] = 'school'
@@ -162,8 +162,9 @@ def smartModelQuery(request):
                 if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
                     courses = None
                     if request.POST.get("school", -1) != -1:
-                        print "course at school: " + request.POST.get("school")
-                        courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
+                        #print "course at school: " + request.POST.get("school")
+                        #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
+                        courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised

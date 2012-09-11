@@ -445,7 +445,7 @@
             "  <ul>";
 
     $.each(data.suggestions, function(index, course){
-      html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.name +"</a></li>";
+      html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.title +"</a></li>";
     });
 
 
