@@ -1,4 +1,5 @@
   var file_pk = -1;
+  var file_url = "";
 
   var state = "";
   // Keep track of user's School, Course selection (pks) for
@@ -44,6 +45,8 @@
             if(responseJSON.success) {
                 //alert("success! file_pk: " + responseJSON.file_pk);
                 file_pk = responseJSON.file_pk;
+                file_url = responseJSON.file_url;
+                $('#new-file-link').attr('href',file_url);
             }
         },
         onProgress:function(id, fileName, loaded, total){

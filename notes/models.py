@@ -210,14 +210,15 @@ class File(models.Model):
         ('A', 'Assignment'),
     )
 
+    # Relate self.type to reputationEventType
     # FIXME: only karma for one variation of essay and study-guide
-    KARMA_TYPES = (
-        ('N', 'lecture-note'),
-        ('S', 'syllabus'),
-        ('E', 'exam-or-quiz'),
-        ('G', 'mid-term-study-guide'),
-        ('A', 'essay-medium'),
-    )
+    KARMA_TYPES = {
+        'N': 'lecture-note',
+        'S': 'syllabus',
+        'E': 'exam-or-quiz',
+        'G': 'mid-term-study-guide',
+        'A': 'essay-medium'
+    }
 
     # Display point values in upload form
     # TODO: Tie this to ReputationEventType
@@ -253,6 +254,10 @@ class File(models.Model):
     def __unicode__(self):
         return u"%s at %s" % (self.title, self.course)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('file', [str(self.pk)])
+
     def save(self, *args, **kwargs):
 
         # If this is a new file, increment SiteStat
@@ -262,7 +267,11 @@ class File(models.Model):
         print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
         if not self.awarded_karma and self.owner is not None:
             # FIXME: award karma based on submission type
-            karma_event = 'lecture-note'
+            if self.type in self.KARMA_TYPES:
+                karma_event = self.KARMA_TYPES[self.type]
+            else:
+                #Default note type
+                karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
             user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
             self.awarded_karma = True

@@ -1,7 +1,6 @@
 from celery.task import task
 from gdocs import convertWithGDocsv3
 
-
 @task
 def processDocument(File):
     """

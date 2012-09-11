@@ -37,7 +37,6 @@ from utils import jsonifyModel
 from utils import userCanView
 
 
-## :|: Static pages :|: &
 def e404(request):
     response = nav_helper(request)
     return render(request, '404.html', response)
