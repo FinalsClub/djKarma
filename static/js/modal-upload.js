@@ -47,6 +47,7 @@
                 file_pk = responseJSON.file_pk;
                 file_url = responseJSON.file_url;
                 $('#new-file-link').attr('href',file_url);
+
             }
         },
         onProgress:function(id, fileName, loaded, total){
@@ -289,23 +290,23 @@
   function clearForm(course, school){
     course = typeof course !== 'undefined' ? course : 'None';
     school = typeof school !== 'undefined' ? school : 'None';
-    var file_pk = -1;
+    var file_pk = -1; // reset file paramters to avoid resubmission
     var file_url = "";
-    $('.qq-upload-button').show();
-    $('.qq-upload-drop-area').hide();
-    $('#modal-upload-button').show();
-    $('#modal-upload-success').hide();
-    $('.qq-upload-list').html('');
-    $('#file-uploader').show();
-    $('#file-uploader-label').hide();
-    $('#modal-body-progress').hide();
-    $('#modal-metadata-form').hide();
-    $('#modal-course').hide();
-    $('#course-suggestions').hide();
-    $('#school-suggestions').hide();
-    $('#modal-misc').hide();
-    $('#modal-title-input').val("");
-    $('#modal-description-input').val("");
+    $('.qq-upload-button').show(); // Click / Drag to upload btn
+    $('.qq-upload-drop-area').hide(); // Drop area that appears when file dragged into browser
+    $('#modal-upload-button').show(); // finish upload btn
+    $('#modal-upload-success').hide(); // div containing upload again btn and link to note
+    $('.qq-upload-list').html(''); // list of uploaded files, filesize and % uploaded
+    $('#file-uploader').show(); // the root div containing the file uploader
+    $('#file-uploader-label').hide(); // '<filename> uploaded!'
+    $('#modal-body-progress').hide(); // parent div of progress bar
+    $('#modal-metadata-form').hide(); // entire form but file uploader
+    $('#modal-course').hide(); // course selector div
+    $('#course-suggestions').hide(); // course suggestions within modal-course
+    $('#school-suggestions').hide(); // school suggestions within modal-school
+    $('#modal-misc').hide(); // file metadata parent div: title, type, desc
+    $('#modal-title-input').val(""); // title input field
+    $('#modal-description-input').val(""); // desc input field
     if(course == "None"){
       $("#modal-course-input").val("");
       course_pk = "";
