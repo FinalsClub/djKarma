@@ -149,9 +149,13 @@
         <div class="form-actions" id="modal-upload-button">
           <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
         </div>
-        <div class="form-actions" id="modal-upload-again-button" style="display:none">
-          <a class="button" id="modal-meta-submit" type="submit">UPLOAD ANOTHER TO THIS COURSE</a>
-        </div>
+        <div id="modal-upload-success" style="display:none;">
+          <div class="form-actions" id="modal-upload-again-button">
+            <a class="button" id="modal-meta-submit" type="submit">UPLOAD ANOTHER TO THIS COURSE</a>
+          </div> <!-- modal-upload-again-button -->
+          <p>View <a id="new-file-link">your note</a>!</p>
+          <p> You earned <span class="karma" id="new-file-karma">A LOT</span> of karma!</p>
+        </div><!-- modal-upload-success -->
       </fieldset>
     </div><!-- #modal-misc -->
   </div>

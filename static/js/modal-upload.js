@@ -165,7 +165,7 @@
           success: function(data){
             if(data.status === 'success'){
               $('#modal-upload-button').hide();
-              $('#modal-upload-again-button').show();
+              $('#modal-upload-success').show();
             }
             else{
               alert('Please check your form input');
@@ -288,7 +288,7 @@
     school = typeof school !== 'undefined' ? school : 'None';
     $('.qq-upload-drop-area').hide();
     $('#modal-upload-button').show();
-    $('#modal-upload-again-button').hide();
+    $('#modal-upload-success').hide();
     $('.qq-upload-list').html('');
     $('#file-uploader').show();
     $('#file-uploader-label').hide();
