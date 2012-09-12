@@ -90,6 +90,10 @@ def fileMeta(request):
                 file.course = Course.objects.get(pk=_course_id)
             except Exception, e:
                 print "school/course error: " + str(e)
+
+            if _course_id and form.cleaned_data['in_course']:
+                # if in_course selected, add the course to their profile
+                _add_course(request.user.get_profile(), course_id=_course_id)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
             print "file.save()"
@@ -462,10 +466,32 @@ def add_course_to_profile(request):
     """
     if request.is_ajax() and request.method == 'POST':
         print "this is the add_course request\n\t %s" % request.POST
-        new_course = Course.objects.get(title=request.POST['title'])
         user_profile = request.user.get_profile()
-        user_profile.courses.add(new_course)
-        return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+        status = _add_course(user_profile, course_title=request.POST['title'])
+        if status:
+            return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+        else:
+            print "There was an error adding a course to a profile"
+            print "\t profile: %s %s, course: %s %s" % (user_profile, user_profile.id, new_course, new_course.id)
+
+def _add_course(user_profile, course_title=None, course_id=None):
+    """ Helper function to add a course to a userprofile
+        for avoiding duplicate code
+        :user_profile: `notes.models.UserProfile`
+        :course_title:    `notes.models.Course.title`
+        :course_id:    `notes.models.Course.id`
+    """
+    # FIXME: add conditional logic to see if course is already added and error handling
+    if course_title is not None:
+        course = Course.objects.get(title=course_title)
+    elif couse_id is not None:
+        course = Course.objects.get(pk=course_id)
+    else:
+        print "[_add_course]: you passed neither a course_title nor a course_id, \
+        nothing to add"
+        return False
+    user_profile.courses.add(course) # implies save()
+    return True
 
 
 def register(request, invite_user):
