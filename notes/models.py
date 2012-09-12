@@ -136,6 +136,10 @@ class School(models.Model):
     def __unicode__(self):
         return self.name
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('browse-courses', [str(self.slug)])
+
     def save(self, *args, **kwargs):
         # If a new School is being saved, increment SiteStat School count
         if not self.pk:
@@ -178,6 +182,10 @@ class Course(models.Model):
     def __unicode__(self):
         # Note: these must be unicode objects
         return u"%s" % (self.title)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('browse-course', [str(self.school.slug), str(self.slug)])
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
@@ -256,7 +264,7 @@ class File(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('file', [str(self.pk)])
+        return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
 
     def save(self, *args, **kwargs):
 

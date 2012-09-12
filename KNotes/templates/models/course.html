@@ -3,7 +3,7 @@
     <img src="/static/img/icon-folder.png">
   </div>
   <div class="course-title">
-    <a href="/b/{{ course.school.slug }}/{{ course.slug }}">{{ course.title }}</a>
+    <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
     <div class="course-info">
       <span class="instructor">{{ course.instructor.name }}</span> <i class="icon-paper-clip"></i><a href="#">{{ course.files.all|length }} notes</a>
       <!-- TODO: Determine how to mash in user data

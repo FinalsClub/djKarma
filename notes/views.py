@@ -303,10 +303,11 @@ def b_school_course(request, school_query, course_query):
         This will fail if we have courses named the same thing across multiple universities
     """
     # TODO add a url redirect, or an error if the school != course school
-    return browse_one_course(request, course_query)
+    school = get_object_or_404(School, slug=school_query)
+    return browse_one_course(request, course_query, school)
 
 
-def browse_one_course(request, course_query):
+def browse_one_course(request, course_query, school):
     """ View for viewing notes from a fuzzy course search
         :course_query: unicode url match, to be type parsed
     """
@@ -316,7 +317,7 @@ def browse_one_course(request, course_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    course, files = _get_notes(request, course_query)
+    course, files = _get_notes(request, course_query, school)
     response['course'], response['files'] = course, files
     # get the users who are members of the course
     response['users'] = course.userprofile_set.all()
@@ -326,7 +327,7 @@ def browse_one_course(request, course_query):
     return render(request, 'browse_one_course.html', response)
 
 
-def _get_notes(request, course_query):
+def _get_notes(request, course_query, school):
     """ Private search method for a course and it's files
         :course_query:
             if int: Course.pk
@@ -336,7 +337,7 @@ def _get_notes(request, course_query):
     if isinstance(course_query, int):
         _course = get_object_or_404(Course, pk=course_query)
     elif isinstance(course_query, unicode):
-        _course = get_object_or_404(Course, slug=course_query)
+        _course = get_object_or_404(Course, slug=course_query, school=school)
     else:
         print "No course found, so no notes"
         return Http404
@@ -540,8 +541,10 @@ def jqueryui_courses(request):
     print json.dumps(response)
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
+
 def nurl_file(request, school_query, course_query, file_id):
     return file(request, file_id)
+
 
 @login_required
 def file(request, note_pk):
