@@ -294,12 +294,6 @@ class File(models.Model):
             self.html = re.escape(self.html)
             self.cleaned = True
 
-        if self.course and self.owner:
-            # if course and owner, add course to owner's courses
-            user_profile = self.owner.get_profile()
-            user_profile.courses.add(self.course)
-            user_profile.save()
-
         super(File, self).save(*args, **kwargs)
 
     def ownedBy(self, user_pk):
