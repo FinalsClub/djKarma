@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from forms import UploadFileForm
 from simple_autocomplete.widgets import AutoCompleteWidget
 
-from models import School, Course, File, Tag
+from models import School, Course, File, Tag, UserProfile
 from notes import profile_tasks
 
 
@@ -196,4 +196,17 @@ class Janitor():
             i.save()
             slugs_created += 1
         return True, u"Created %s slugs on: %s" % (slugs_created, Model)
+
+    @staticmethod
+    def generate_gravatar_urls():
+        """ Re-generates self.picture_url_small and self.picture_url_large
+            for all users. Run this after changing default image urls in
+            UserProfile.get_picture
+        """
+        users = UserProfile.objects.all()
+        for user in users:
+            if user.user.email != None:
+                user.picture_url_large = user.get_picture('large')
+                user.picture_url_small = user.get_picture('small')
+                user.save
 
