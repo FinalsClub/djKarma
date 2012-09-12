@@ -131,9 +131,8 @@ $(document).ready(function() {
         success: function(data){
           // put callback here to clear form and tell of success
           if(data.status === 'success'){
-            //$('#modal-upload-button').hide();
-            //$('#modal-upload-success').show();
-            alert('success!');
+            alert('Course added to your profile');
+            $('#modal-addcourse-input').val(""),
           }
           else{
             alert('Please check your form input');
