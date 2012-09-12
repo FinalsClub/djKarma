@@ -541,8 +541,15 @@ def jqueryui_courses(request):
     print json.dumps(response)
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
+
+def file_by_slug(request, file_query):
+    file = get_object_or_404(File, slug=file_query)
+    return file(request, file.pk)
+
+
 def nurl_file(request, school_query, course_query, file_id):
     return file(request, file_id)
+
 
 @login_required
 def file(request, note_pk):

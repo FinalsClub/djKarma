@@ -4,7 +4,7 @@
     <img src="/static/img/school.png">
   </div>
   <div class="course-title">
-    <a href="/b/{{ school.slug }}">{{ school.name }}</a>
+    <a href="{{ school.get_absolute_url }}">{{ school.name }}</a>
     <div class="course-info">
       <span class="location">{{ school.location }}</span> <i class="icon-paper-clip"></i><a href="#">{{ school.course_set.all|length }} Courses</a>
       <!-- TODO: Determine how to mash in user data

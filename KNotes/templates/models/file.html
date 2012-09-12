@@ -2,7 +2,7 @@
 <div class="file row-fluid">
   <div class="file icon"></div>
   <div class="file-title">
-    <a href="/b/{{ file.school.slug }}/{{ file.course.slug }}/{{ file.pk }}">{{ file.title }}</a>
+    <a href="{{ file.get_absolute_url }}">{{ file.title }}</a>
   </div>
   <div class="file-description">
     {{ file.description }}
