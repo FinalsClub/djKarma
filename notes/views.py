@@ -164,6 +164,12 @@ def smartModelQuery(request):
                         #print "course at school: " + request.POST.get("school")
                         #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
                         courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
+                    elif (request.user.is_authenticated() and request.user.get_profile().school is not None):
+                        #print "got school from profile"
+                        courses = SearchQuerySet().filter(school=request.user.get_profile().school.pk, content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
+                    else:
+                        #No school available. Search all schools
+                        courses = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised

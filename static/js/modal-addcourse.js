@@ -1,14 +1,14 @@
 $(document).ready(function() {
     var school_pk = "0";
 
-    // Course submit
+    // Submit course name
     $("#modal-addcourse-form").on("submit", function(event){
       event.preventDefault();
       console.log("course submit: " + $('#modal-addcourse-input').val());
       //form_data = $(this).serializeArray();
       $.ajax({
           url: "/smartModelQuery",
-          data: {'title': $('#modal-course-input').val(),
+          data: {'title': $('#modal-addcourse-input').val(),
                 'type': 'course'},
           success: function(data){
             smartModelQueryResponseHandler(data);
@@ -67,12 +67,12 @@ $(document).ready(function() {
               "  <ul>";
 
       $.each(data.suggestions, function(index, course){
-        html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.name +"</a></li>";
+        html += "<li><a class=\"course-suggestion\" id=\""+course.pk+"\" href=\"#\">"+ course.title +"</a></li>";
       });
 
 
       html += "  </ul>"+
-              "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+              "  <p>Not there? <a href\"#\" id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-addcourse-input').val()+ "\"</a></p>";
       $('#course-add-suggestions').html(html).slideDown('fast');
     }
 
@@ -109,11 +109,11 @@ $(document).ready(function() {
       }
       else if(data.status == 'no_match'){
         if(data.type == "school"){
-          html = "<p><strong>School not found.</strong><a id=\"modal-add-school\" class=\"button\">Add \""+ $('#modal-school-input').val()+ "\"</a></p>";
+          html = "<p><strong>School not found.</strong><a id=\"modal-add-school\" class=\"button\">Add \""+ $('#modal-addcourse-input').val()+ "\"</a></p>";
           $('#school-suggestions').html(html).slideDown('fast');
         }
         else if(data.type == "course"){
-          html = "<p><strong>Course not found.</strong><a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-course-input').val()+ "\"</a></p>";
+          html = "<p><strong>Course not found.</strong><a id=\"modal-add-course\" class=\"button\">Add \""+ $('#modal-addcourse-input').val()+ "\"</a></p>";
           $('#course-add-suggestions').html(html).slideDown('fast');
         }
       }
@@ -133,7 +133,10 @@ $(document).ready(function() {
           if(data.status === 'success'){
             //$('#modal-upload-button').hide();
             //$('#modal-upload-success').show();
-            alert('success!');
+            //alert('success!');
+            $('#modal-addcourse-input').val("");
+            //$('#modal-course-submit').hide();
+            indicateSuccess();
           }
           else{
             alert('Please check your form input');
@@ -142,4 +145,44 @@ $(document).ready(function() {
         type: 'POST'
     });
     });
+
+    // create new course request
+    $('#course-add-suggestions').on('click', '#modal-add-course', function(){
+      //setupAjax();
+      console.log("add course");
+      type = 'course';
+      $.ajax({
+          url: '/add',
+          data: {'title': $('#modal-addcourse-input').val(), 'type': type},
+          success: function(data){
+            if(data.status === 'success'){
+              if(data.type === 'course'){
+                course_pk = data.new_pk;
+                $('#course-add-suggestions').slideUp('fast');
+              }
+            }
+          },
+          type: 'POST'
+      });
+    });
+
+    // select a course from /smartModelQuery suggestions
+    $('#course-add-suggestions').on('click', '.course-suggestion', function(){
+      console.log("suggest " + $(this).attr('id'));
+      course_pk = $(this).attr('id');
+      course_name = $(this).html();
+      $('#course-add-suggestions').slideUp('fast');
+      $('#modal-addcourse-input').val(course_name);
+    });
+
+    function indicateSuccess(){
+      resetAddCourseForm();
+      $('#course-add-success').fadeIn('fast').delay(2000).fadeOut('slow');
+    }
+    function resetAddCourseForm(){
+      $('#modal-addcourse-input').val("");
+      $('#course-add-success').hide();
+      //$('#modal-course-submit').show();
+
+    }
 });
