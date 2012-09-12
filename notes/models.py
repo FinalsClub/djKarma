@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import re
 
+from KNotes.settings import BETA
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
@@ -264,7 +265,10 @@ class File(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
+        if self.school is None or self.course is None:
+            return ('file', [str(self.pk)])
+        else:
+            return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
 
     def save(self, *args, **kwargs):
 
@@ -477,8 +481,13 @@ class UserProfile(models.Model):
         """
         # TODO: get and use default user icon if none, use gravatar's 404 function
         #
-        small_default = u'/static/img/avatar-180.png'
-        large_default = u'/static/img/avatar-50.png'
+        # Make absolute url so they work w/ gravatar 404 function
+        if BETA:
+            small_default = u'http://beta.karmanotes.org/static/img/avatar-180.png'
+            large_default = u'http://beta.karmanotes.org/static/img/avatar-50.png'
+        else:
+            small_default = u'http://karmanotes.org/static/img/avatar-180.png'
+            large_default = u'http://karmanotes.org/static/img/avatar-50.png'
         if self.fb_id:
             url = u"https://graph.facebook.com/{0}/picture".format(self.user.username)
             if size == 'small':
@@ -487,7 +496,7 @@ class UserProfile(models.Model):
                 return url + u'?type=large'
         else:
             if not self.gravatar:
-                gravatar_hash = update_gravatar(self)  # FIXME
+                gravatar_hash = self.update_gravatar(self)  # FIXME
             else:
                 gravatar_hash = self.gravatar
             url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
@@ -592,6 +601,12 @@ class UserProfile(models.Model):
         # Assign user points as prescribed by ReputationEventType
         self.karma += repType.actor_karma
         self.save()
+
+    def update_gravatar(self, *args, **kwargs):
+         # If there is not a gravatar hash, and the user registered by email
+        # make a gravatar hash
+        if self.user.email is not None and self.gravatar is None and self.fb_id is None:
+            self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
 
     def save(self, *args, **kwargs):
         """ Check if school, grad_year fields have been set
