@@ -170,6 +170,7 @@
             if(data.status === 'success'){
               $('#modal-upload-button').hide();
               $('#modal-upload-success').show();
+              $('#modal-metadata-form').slideUp('slow');
             }
             else{
               alert('Please check your form input');
