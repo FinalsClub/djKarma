@@ -72,7 +72,7 @@ urlpatterns = patterns('',
     # Ajax Voting
     url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
 
-    # Ajax requets from upload usher. Text input to model get / create
+    # Ajax requests from upload usher. Text input to model get / create
     url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
 
     # Ajax requests from note upload form for autocomplete fields
@@ -80,6 +80,9 @@ urlpatterns = patterns('',
     url(r'^schools$', 'notes.views.schools'),
     url(r'^instructors$', 'notes.views.instructors'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
+
+    # Ajax request to add a course to a user's profile
+    url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
 
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),

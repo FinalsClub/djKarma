@@ -121,4 +121,25 @@ $(document).ready(function() {
 
     setupAjax();
     enableCourseAutoComplete();
+
+    // Add course submit
+    $("#modal-course-submit").on("click", function(){
+      //var response = serializeCourseFormData();
+      $.ajax({
+        url: '/add-course',
+        data: {'title': $('#modal-addcourse-input').val()},
+        success: function(data){
+          // put callback here to clear form and tell of success
+          if(data.status === 'success'){
+            //$('#modal-upload-button').hide();
+            //$('#modal-upload-success').show();
+            alert('success!');
+          }
+          else{
+            alert('Please check your form input');
+          }
+        },
+        type: 'POST'
+    });
+    });
 });

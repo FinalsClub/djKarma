@@ -235,6 +235,7 @@ def nav_helper(request, response={}):
     return response
 
 
+@login_required
 def your_courses(request):
     """ List a user's courses on a profile-like page using django templates """
     response = nav_helper(request)
@@ -446,6 +447,19 @@ def addModel(request):
                     new_model = School.objects.create(name=form.cleaned_data['title'])
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
+
+@login_required
+def add_course_to_profile(request):
+    """ ajax endpoint to add a course to a user's profile
+        alternatively, to be used when the 'are you in this course' checkbox
+        is selected in the upload modal
+    """
+    if request.is_ajax() and request.method == 'POST':
+        print "this is the add_course request\n\t %s" % request.POST
+        new_course = Course.objects.get(title=request.POST['title'])
+        user_profile = request.user.get_profile()
+        user_profile.courses.add(new_course)
+        return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
 
 
 def register(request, invite_user):
