@@ -91,7 +91,7 @@ def fileMeta(request):
             except Exception, e:
                 print "school/course error: " + str(e)
 
-            if _course_id and form.cleaned_data['in_course']:
+            if _course_id is not None and form.cleaned_data['in_course'] == "True":
                 # if in_course selected, add the course to their profile
                 _add_course(request.user.get_profile(), course_id=_course_id)
             # process Tags
