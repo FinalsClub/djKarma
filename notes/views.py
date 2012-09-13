@@ -727,14 +727,17 @@ def notesOfCourse(request, course_pk):
 
 @login_required
 def vote(request, file_pk):
-    vote_value = request.GET.get('vote', 0)
-    user_pk = request.user.pk
-    print "note: " + str(file_pk) + " vote: " + vote_value + "user: " + user_pk
+    vote_value = int(request.POST.get('vote', 0))
+    # Validate vote value
+    if not (vote_value == 0 or vote_value == -1 or vote_value == 1):
+        raise Http404
+
+    print "note: " + str(file_pk) + " vote: " + str(vote_value) + "user: " + str(request.user.pk)
 
     # Check that GET parameters are valid
-    if vote_value != 0 and File.objects.filter(pk=file_pk).exists() and User.objects.filter(pk=user_pk).exists():
+    if vote_value != 0 and File.objects.filter(pk=file_pk).exists():
         voting_file = File.objects.get(pk=file_pk)
-        voting_user = User.objects.get(pk=user_pk)
+        voting_user = request.user
     else:
         raise Http404
 
