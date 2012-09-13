@@ -353,6 +353,7 @@ def browse_one_course(request, course_query, school):
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
+    response['viewed_files'] = request.user.get_profile().files.all()
 
     return render(request, 'browse_one_course.html', response)
 
@@ -636,7 +637,8 @@ def file(request, note_pk):
     file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
+    #if(not userCanView(user, File.objects.get(pk=note_pk))):
+    if file not in profile.files.all():
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')
