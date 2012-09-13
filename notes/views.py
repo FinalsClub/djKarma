@@ -23,6 +23,8 @@ from haystack.query import SearchQuerySet
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
 
+from KNotes import settings
+
 from models import School
 from models import Course
 from models import File
@@ -108,6 +110,13 @@ def fileMeta(request):
             if request.user.is_authenticated():
                 messages.add_message(request, messages.SUCCESS,
                 "Success! You uploaded a file (message: Django Messaging!")
+            # If user is not authenticated, store this file pk in their session
+            else:
+                if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY].append(file.pk)
+                else:
+                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY] = [file.pk]
+
         else:
             # Form is invalid
             print form.errors
@@ -235,6 +244,16 @@ def nav_helper(request, response={}):
     response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.getName())
     response['user_profile'] = user_profile
     response = get_upload_form(response)
+
+    # Check to see if the user has unclaimed files uploaded 
+    # before they logged in
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
+            unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+            unclaimed_file.owner = request.user
+            unclaimed_file.save
+            request.user.get_profile.awardKarma(File.KARMA_TYPES[unclaimed_file.type])
+        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
 
     # home built auto-complete
     if not user_profile.school:
