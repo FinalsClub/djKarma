@@ -36,7 +36,7 @@
 
     // Handle file-action icon clicks
     $('.container').on("click",".vote", function(e){
-      console.log("vote");
+      //console.log(" vote");
       // determine file corresponding to this row
       {% if user.is_authenticated %}
       file_pk = $(this).closest('.file-actions').attr("id").split("-")[1];
