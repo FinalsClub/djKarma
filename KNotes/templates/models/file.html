@@ -15,19 +15,26 @@
         <span class="download">
           <a id="{{ file.pk }}" class="view-file" href="#"><i class="icon-paper-clip"></i>View file</a>
         </span>
-      {% if not file|ownedBy:user_pk %}
-        <span class="karma-points">-10 points</span>
-        <span class="views">
-          {{ file.viewCount }} Views
-        </span>
-      </div> <!-- .file-info -->
-      {% else %}
+      {% if file in viewed_files %}
         <span class="karma-points">VIEWED</span>
         <span class="views">
           {{ file.viewCount }} Views
         </span>
       </div> <!-- .file-info -->
+      {% elif file.owner == user %}
+        <span class="karma-points">OWNED</span>
+        <span class="views">
+          {{ file.viewCount }} Views
+        </span>
+      </div> <!-- .file-info -->
       {% include "file-actions.html" with file=file %}
+      {% else %}
+        {#<span class="karma-points">-10 points</span>#}
+        <span class="views">
+          {{ file.viewCount }} Views
+        </span>
+      </div> <!-- .file-info -->
+
       {% endif %}
 
   </div> <!-- .file-info-action hide row -->

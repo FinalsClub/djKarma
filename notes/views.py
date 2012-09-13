@@ -353,6 +353,7 @@ def browse_one_course(request, course_query, school):
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
+    response['viewed_files'] = request.user.get_profile().files.all()
 
     return render(request, 'browse_one_course.html', response)
 
@@ -491,7 +492,7 @@ def add_course_to_profile(request):
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
             print "There was an error adding a course to a profile"
-            print "\t profile: %s %s, course: %s %s" % (user_profile, user_profile.id, new_course, new_course.id)
+            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
 
 def _add_course(user_profile, course_title=None, course_id=None):
     """ Helper function to add a course to a userprofile
@@ -503,7 +504,7 @@ def _add_course(user_profile, course_title=None, course_id=None):
     # FIXME: add conditional logic to see if course is already added and error handling
     if course_title is not None:
         course = Course.objects.get(title=course_title)
-    elif couse_id is not None:
+    elif course_id is not None:
         course = Course.objects.get(pk=course_id)
     else:
         print "[_add_course]: you passed neither a course_title nor a course_id, \
@@ -636,7 +637,8 @@ def file(request, note_pk):
     file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
+    #if(not userCanView(user, File.objects.get(pk=note_pk))):
+    if file not in profile.files.all():
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')

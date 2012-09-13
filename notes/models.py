@@ -554,8 +554,6 @@ class UserProfile(models.Model):
             if user:
                 event.user = user
             event.save()  # FIXME: might be called on UserProfile.save()
-            print "event.id: %s" % event.id
-
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()

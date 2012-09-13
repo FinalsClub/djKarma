@@ -340,7 +340,7 @@
                 <div id="karma-progress" class="bar"
                      style="width: {{progress}}%;"></div>
                   <div class="current-karma" style="">
-                      <span class="karma-points">{{ user.get_profile.karma }} points</span>
+                      <span class="karma-points"{% if user.get_profile.karma < 1 %} style="background: red;"{% endif %}>{{ user.get_profile.karma }} points</span>
                   </div>
               </div>
               <div class="karma-label">
