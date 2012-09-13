@@ -751,7 +751,10 @@ def vote(request, file_pk):
     elif voting_user.get_profile().files.filter(pk=voting_file.pk).exists():
         print "casting vote"
         voting_file.Vote(voter=voting_user, vote_value=vote_value)
-        return HttpResponse("success")
+        if vote_value == 1:
+            return HttpResponse("thank recorded")
+        elif vote_value == -1:
+            return HttpResponse("file flagged")
     # If valid use does not own file, has not voted, but not viewed the file
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
