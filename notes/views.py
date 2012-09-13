@@ -472,7 +472,7 @@ def add_course_to_profile(request):
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
             print "There was an error adding a course to a profile"
-            print "\t profile: %s %s, course: %s %s" % (user_profile, user_profile.id, new_course, new_course.id)
+            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
 
 def _add_course(user_profile, course_title=None, course_id=None):
     """ Helper function to add a course to a userprofile
@@ -484,7 +484,7 @@ def _add_course(user_profile, course_title=None, course_id=None):
     # FIXME: add conditional logic to see if course is already added and error handling
     if course_title is not None:
         course = Course.objects.get(title=course_title)
-    elif couse_id is not None:
+    elif course_id is not None:
         course = Course.objects.get(pk=course_id)
     else:
         print "[_add_course]: you passed neither a course_title nor a course_id, \
