@@ -271,9 +271,26 @@ def nav_helper(request, response={}):
     return response
 
 
+def _post_user_create_session_hook(request):
+    """ 
+        After a user logs in for the first time, their landing page needs to be
+        hooked into this function. This takes any files they may have uploaded
+        as an anon user and saves them to the new user object.
+        This might make more sense as a middleware, but this works for now.
+    """
+    if request.session['files']:
+        try:
+            file = File.objects.get(request.session['files'])
+            file.owner = request.user
+            file.save()
+        except:
+            print "We couldn't save this user's files"
+
+
 @login_required
 def your_courses(request):
     """ List a user's courses on a profile-like page using django templates """
+    _post_user_create_session_hook(request)
     response = nav_helper(request)
     response['courses'] = request.user.get_profile().courses.all()
     return render(request, 'your-courses.html', response)
