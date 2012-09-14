@@ -114,12 +114,8 @@ def fileMeta(request):
                 messages.add_message(request, messages.SUCCESS,
                 "Success! You uploaded a file (message: Django Messaging!")
             # If user is not authenticated, store this file pk in their session
-            else:
-                if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
-                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY].append(file.pk)
-                else:
-                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY] = [file.pk]
-
+            # TODO: IF a user isn't authenticated - present them
+            # an indication that they can claim karma by logging in
         else:
             # Form is invalid
             print form.errors
@@ -248,15 +244,9 @@ def nav_helper(request, response={}):
     response['user_profile'] = user_profile
     response = get_upload_form(response)
 
-    # Check to see if the user has unclaimed files uploaded 
-    # before they logged in
-    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
-        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
-            unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
-            unclaimed_file.owner = request.user
-            unclaimed_file.save
-            request.user.get_profile.awardKarma(File.KARMA_TYPES[unclaimed_file.type])
-        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
+    # Check for uploads made during this django session
+    # while user was not authenticated
+    _post_user_create_session_hook(request)
 
     # home built auto-complete
     '''
@@ -278,19 +268,25 @@ def _post_user_create_session_hook(request):
         as an anon user and saves them to the new user object.
         This might make more sense as a middleware, but this works for now.
     """
-    if request.session['files']:
-        try:
-            file = File.objects.get(request.session['files'])
-            file.owner = request.user
-            file.save()
-        except:
-            print "We couldn't save this user's files"
+
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
+            try:
+                unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+            except:
+                print "We couldn't save this user's files"
+            unclaimed_file.owner = request.user
+            unclaimed_file.save() # Handles generating Event + Awarding Karma
+        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
+
 
 
 @login_required
 def your_courses(request):
     """ List a user's courses on a profile-like page using django templates """
-    _post_user_create_session_hook(request)
+    # We can perform this logic in nav_helper since that 
+    # covers more views (say we decide to change the default view for logged-in users)
+    #_post_user_create_session_hook(request)
     response = nav_helper(request)
     response['courses'] = request.user.get_profile().courses.all()
     return render(request, 'your-courses.html', response)
