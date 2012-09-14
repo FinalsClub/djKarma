@@ -21,6 +21,7 @@
           {{ file.viewCount }} Views
         </span>
       </div> <!-- .file-info -->
+      {% include "file-actions.html" with file=file %}
       {% elif file.owner == user %}
         <span class="karma-points">OWNED</span>
         <span class="views">
