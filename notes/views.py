@@ -84,7 +84,10 @@ def fileMeta(request):
             file.type = form.cleaned_data["type"]
             file.title = form.cleaned_data["title"]
             file.description = form.cleaned_data["description"]
-            file.owner = request.user
+            if request.user.is_authenticated():
+                file.owner = request.user
+            else:
+                file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
             try:
                 _school_id = int(form.cleaned_data["school_pk"])
                 _course_id = int(form.cleaned_data["course_pk"])
