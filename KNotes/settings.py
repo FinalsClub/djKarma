@@ -106,6 +106,11 @@ USE_TZ = True
 
 DEFAULT_FILE_STORAGE = 'notes.testStorage.TestFileSystemStorage'
 
+# Used to store pks of uploaded but unclaimed files
+# So an anon user can signup and claim the files / karma
+# ... if the session still exists
+SESSION_UNCLAIMED_FILES_KEY = 'unclaimed_files'
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 if DEPLOY:

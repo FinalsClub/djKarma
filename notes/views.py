@@ -23,6 +23,8 @@ from haystack.query import SearchQuerySet
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
 
+from KNotes import settings
+
 from models import School
 from models import Course
 from models import File
@@ -90,6 +92,10 @@ def fileMeta(request):
                 file.course = Course.objects.get(pk=_course_id)
             except Exception, e:
                 print "school/course error: " + str(e)
+
+            if _course_id is not None and form.cleaned_data['in_course'] == "True":
+                # if in_course selected, add the course to their profile
+                _add_course(request.user.get_profile(), course_id=_course_id)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
             print "file.save()"
@@ -104,6 +110,13 @@ def fileMeta(request):
             if request.user.is_authenticated():
                 messages.add_message(request, messages.SUCCESS,
                 "Success! You uploaded a file (message: Django Messaging!")
+            # If user is not authenticated, store this file pk in their session
+            else:
+                if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY].append(file.pk)
+                else:
+                    request.session[settings.SESSION_UNCLAIMED_FILES_KEY] = [file.pk]
+
         else:
             # Form is invalid
             print form.errors
@@ -164,6 +177,12 @@ def smartModelQuery(request):
                         #print "course at school: " + request.POST.get("school")
                         #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
                         courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
+                    elif (request.user.is_authenticated() and request.user.get_profile().school is not None):
+                        #print "got school from profile"
+                        courses = SearchQuerySet().filter(school=request.user.get_profile().school.pk, content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
+                    else:
+                        #No school available. Search all schools
+                        courses = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
                     response = {}
                     response['type'] = 'course'
                      # Django QuerySets are serializable, but when they're empty, error raised
@@ -226,11 +245,25 @@ def nav_helper(request, response={}):
     response['user_profile'] = user_profile
     response = get_upload_form(response)
 
+    # Check to see if the user has unclaimed files uploaded 
+    # before they logged in
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
+            unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+            unclaimed_file.owner = request.user
+            unclaimed_file.save
+            request.user.get_profile.awardKarma(File.KARMA_TYPES[unclaimed_file.type])
+        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
+
     # home built auto-complete
+    '''
     if not user_profile.school:
         response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
     if not user_profile.grad_year:
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
+    '''
+    response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
 
     return response
 
@@ -324,6 +357,7 @@ def browse_one_course(request, course_query, school):
     response['users'] = course.userprofile_set.all()
     # get the karma events associaged with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
+    response['viewed_files'] = request.user.get_profile().files.all()
 
     return render(request, 'browse_one_course.html', response)
 
@@ -456,10 +490,32 @@ def add_course_to_profile(request):
     """
     if request.is_ajax() and request.method == 'POST':
         print "this is the add_course request\n\t %s" % request.POST
-        new_course = Course.objects.get(title=request.POST['title'])
         user_profile = request.user.get_profile()
-        user_profile.courses.add(new_course)
-        return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+        status = _add_course(user_profile, course_title=request.POST['title'])
+        if status:
+            return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+        else:
+            print "There was an error adding a course to a profile"
+            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
+
+def _add_course(user_profile, course_title=None, course_id=None):
+    """ Helper function to add a course to a userprofile
+        for avoiding duplicate code
+        :user_profile: `notes.models.UserProfile`
+        :course_title:    `notes.models.Course.title`
+        :course_id:    `notes.models.Course.id`
+    """
+    # FIXME: add conditional logic to see if course is already added and error handling
+    if course_title is not None:
+        course = Course.objects.get(title=course_title)
+    elif course_id is not None:
+        course = Course.objects.get(pk=course_id)
+    else:
+        print "[_add_course]: you passed neither a course_title nor a course_id, \
+        nothing to add"
+        return False
+    user_profile.courses.add(course) # implies save()
+    return True
 
 
 def register(request, invite_user):
@@ -585,7 +641,8 @@ def file(request, note_pk):
     file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
+    #if(not userCanView(user, File.objects.get(pk=note_pk))):
+    if file not in profile.files.all():
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file')
@@ -674,14 +731,17 @@ def notesOfCourse(request, course_pk):
 
 @login_required
 def vote(request, file_pk):
-    vote_value = request.GET.get('vote', 0)
-    user_pk = request.user.pk
-    print "note: " + str(file_pk) + " vote: " + vote_value + "user: " + user_pk
+    vote_value = int(request.POST.get('vote', 0))
+    # Validate vote value
+    if not (vote_value == 0 or vote_value == -1 or vote_value == 1):
+        raise Http404
+
+    print "note: " + str(file_pk) + " vote: " + str(vote_value) + "user: " + str(request.user.pk)
 
     # Check that GET parameters are valid
-    if vote_value != 0 and File.objects.filter(pk=file_pk).exists() and User.objects.filter(pk=user_pk).exists():
+    if vote_value != 0 and File.objects.filter(pk=file_pk).exists():
         voting_file = File.objects.get(pk=file_pk)
-        voting_user = User.objects.get(pk=user_pk)
+        voting_user = request.user
     else:
         raise Http404
 
@@ -695,7 +755,10 @@ def vote(request, file_pk):
     elif voting_user.get_profile().files.filter(pk=voting_file.pk).exists():
         print "casting vote"
         voting_file.Vote(voter=voting_user, vote_value=vote_value)
-        return HttpResponse("success")
+        if vote_value == 1:
+            return HttpResponse("thank recorded")
+        elif vote_value == -1:
+            return HttpResponse("file flagged")
     # If valid use does not own file, has not voted, but not viewed the file
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")

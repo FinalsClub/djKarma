@@ -131,12 +131,17 @@ $(document).ready(function() {
         success: function(data){
           // put callback here to clear form and tell of success
           if(data.status === 'success'){
+<<<<<<< HEAD
             //$('#modal-upload-button').hide();
             //$('#modal-upload-success').show();
             //alert('success!');
             $('#modal-addcourse-input').val("");
             //$('#modal-course-submit').hide();
             indicateSuccess();
+=======
+            alert('Course added to your profile');
+            $('#modal-addcourse-input').val(""),
+>>>>>>> e39c2459e51169aabc99448e2c3e14484455380c
           }
           else{
             alert('Please check your form input');

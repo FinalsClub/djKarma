@@ -15,12 +15,13 @@
         <label class="control-label" for="modal-add-course-input">Course Name</label>
         <div class="controls">
           <input type="text" class="input-xlarge" id="modal-addcourse-input" placeholder="ex. Social Analysis 10">
-          <div class="course not-found" id="course-add-suggestions">
+          <div class="course not-found" style="display:none" id="course-add-suggestions">
           </div> <!-- .not-found -->
         </div> <!-- .controls -->
       </div> <!-- .control-group -->
       <div class="form-actions" id="modal-addcourse-button">
         <a class="button" id="modal-course-submit" type="submit">ADD COURSE</a>
+        <a class="btn btn-success" style="float:right; display:none" id="course-add-success" >COURSE ADDED</a>
       </div>
     </fieldset>
     </form><!-- #modal-addcourse-form-->

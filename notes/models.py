@@ -294,12 +294,6 @@ class File(models.Model):
             self.html = re.escape(self.html)
             self.cleaned = True
 
-        if self.course and self.owner:
-            # if course and owner, add course to owner's courses
-            user_profile = self.owner.get_profile()
-            user_profile.courses.add(self.course)
-            user_profile.save()
-
         super(File, self).save(*args, **kwargs)
 
     def ownedBy(self, user_pk):
@@ -560,8 +554,6 @@ class UserProfile(models.Model):
             if user:
                 event.user = user
             event.save()  # FIXME: might be called on UserProfile.save()
-            print "event.id: %s" % event.id
-
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()

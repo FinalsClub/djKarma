@@ -3,7 +3,7 @@
     <h3><a href="/b/{{ course.school.slug }}/{{ course.slug }}">{{ course.title }}</a></h3>
     <strong>{{ course.instructor }} | {{ course.school.name }}</strong>
 
-    <div class="upload">
+    <div style="padding-top:10px; padding-bottom:10px;" class="upload">
       <a class="button course-upload" school-pk="{{ course.school.pk }}" school-name="{{ course.school.name }}" course-pk="{{ course.pk }}" course-name="{{ course.title }}" data-toggle="modal" href="#upload">Upload notes</a>
     </div>
 

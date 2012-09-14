@@ -70,7 +70,7 @@ urlpatterns = patterns('',
     url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting
-    url(r'^vote/(\d{1,99})$', 'notes.views.vote'),
+    url(r'^vote/(\d{1,9999})$', 'notes.views.vote'),
 
     # Ajax requests from upload usher. Text input to model get / create
     url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
