@@ -11,8 +11,20 @@
   <script type="text/javascript">
 
   var current_karma = {{ user.get_profile.karma }};
+  var editing_profile = false;
 
   $(document).ready(function(){
+
+    {% if not request.user.get_profile.submitted_school %}
+    // user has not submitted school, show karma reward
+    $('#school-karma').show();
+    $('#school-select-div').show();
+    {% endif %}
+    {% if not request.user.get_profile.submitted_grad_year %}
+    $('#year-karma').show();
+    $('#gradyear-select-div').show();
+    {% endif %}
+
     // enable karma over popover info box
     $('#karma-info').popover('hide');
 
@@ -95,19 +107,38 @@
      });
 
     // Handle username edit in place click
-    $("#edit-username").on("click", function(e){
+    $("#edit-profile").on("click", function(e){
       e.preventDefault();
-      $("#alias-label-profile").hide();
-      $("#edit-alias-label").hide();
-      // If the user has no alias set,
-      // show username as alias input initial value
-      if($("#alias-label-profile").text() == "")
-        alias = $("#username-label-profile").text();
-      else
-        alias = $("#alias-label-profile").text();
-      console.log("edit username: " + alias);
-      $("#username-input").val(alias);
-      $("#username-form").show();
+      // Remove profile field selectors
+      // The edit-profile link is in "done" state
+      if(editing_profile == true){
+        editing_profile = false;
+        $('#edit-profile').html("edit");
+        $("#username-form").hide();
+        $('#school-select-div').hide();
+        $('#gradyear-select-div').hide();
+        $('#alias-label-profile').show();
+      }
+      else{
+        editing_profile = true;
+        $('#edit-profile').html("done");
+
+        // show alias editing field
+        $("#alias-label-profile").hide();
+        // If the user has no alias set,
+        // show username as alias input initial value
+        if($("#alias-label-profile").text() == "")
+          alias = $("#username-label-profile").text();
+        else
+          alias = $("#alias-label-profile").text();
+        console.log("edit username: " + alias);
+        $("#username-input").val(alias);
+        $("#username-form").show();
+        // show school, gradyear selects
+        $('#school-select-div').show();
+        $('#gradyear-select-div').show();
+      }
+
     });
 
     // Handle username edit in place form submit
@@ -199,7 +230,7 @@
     function year_callback(data){
       if(data.status === "success"){
         $("#year-karma").fadeOut('slow', function(){
-          $("#year-select").slideUp('slow',function(){
+          $("#gradyear-select-div").slideUp('slow',function(){
             $("#year-label").html(data.year).fadeIn('slow');
             if(data.karma){
               console.log(data.karma);
@@ -213,7 +244,7 @@
     function school_callback(data){
       if(data.status === "success"){
         $("#school-karma").fadeOut('slow', function(){
-          $("#school-select").slideUp('slow',function(){
+          $("#school-select-div").slideUp('slow',function(){
             $("#school-label").html(data.school).fadeIn('slow');
             if(data.karma){
               console.log(data.karma);
@@ -231,13 +262,15 @@
         console.log(data.alias);
         $("#username-form").hide();
         // show username-alias-label?
-        $("#edit-alias-label").show();
         $(".alias-label").text(data.alias);
         $("#alias-label-profile").show();
       }
     }
 
     function animate_karma(delta_karma){
+      // TODO: current_level can become out of sync b/t
+      // page refreshes
+      current_level = "{{ current_level.title|upper }}";
       current_karma += delta_karma
       end_karma = {{ request.user.get_profile.getLevel.next_level.karma }};
       new_progress = (current_karma + delta_karma) / (end_karma)*100;
@@ -245,8 +278,12 @@
       $('#karma-progress').animate({
         width: String(new_progress+'%'),
       }, 5000);
+      // bug: hide/showing the karma-hover-label 
+      // breaks the label placement
+      //$('#karma-hover-label').fadeOut('fast');
       $('#karma-label').fadeOut('fast', function(){
-        $('#karma-label').html(current_karma + delta_karma).fadeIn('fast');
+        $('#karma-label').html(current_level + " (" + String(current_karma + delta_karma) + ")").fadeIn('fast');
+        $('#karma-hover-label').html(String(current_karma + delta_karma) + " POINTS");
       });
 
     }
@@ -307,7 +344,7 @@
         </li>
       </ul>
 
-      <h3>Profile</h3>
+      <h3>Profile<span style="padding-left:10px"><a id="edit-profile">edit</a></span></h3>
       <ul class="thumbnails">
         <li class="span3">
           <div class="thumbnail">
@@ -319,7 +356,6 @@
               <div>
                 <span class="alias-label-description">Alias:</span>
                 <span class="alias-label" id="alias-label-profile">{% if user.username != user.get_profile.getName %}{{user.get_profile.getName}}{% endif %}</span>
-                <span id="edit-alias-label" style="margin-left:5px"><a href="#" id="edit-username">edit</a></span>
                 <form class="span2" id="username-form" action="#" style="display:none">
                   <input class="span2" name="username" id="username-input"></input>
                   This is your public alias, you'll still login with your original username ({{request.user.username}})
@@ -340,7 +376,7 @@
                 <div id="karma-progress" class="bar"
                      style="width: {{progress}}%;"></div>
                   <div class="current-karma" style="">
-                      <span class="karma-points"{% if user.get_profile.karma < 1 %} style="background: red;"{% endif %}>{{ user.get_profile.karma }} points</span>
+                      <span id="karma-hover-label" class="karma-points"{% if user.get_profile.karma < 1 %} style="background: red;"{% endif %}>{{ user.get_profile.karma }} points</span>
                   </div>
               </div>
               <div class="karma-label">
@@ -352,24 +388,23 @@
               <p>Karma Status: <div class="karma-status">{{ current_level.title }}</div></p>
 
               <p><span>School:</span><span style="margin-left:5px" id="school-label">{{ user_profile.school }}</span></p>
-              {% if not user_profile.school %}
-              <select style="padding-top:5px" id="school-select" class="span2 select school">
-                <option>...</option>
-                {% for school in available_schools %}
-                <option value="{{school.1}}">{{school.0}}</option>
-                {% endfor %}
-              </select><span id="school-karma" class="karma-points">+5&nbsp;points</span>
-              {% endif %}
+              <div id="school-select-div" style="display:none">
+                <select style="padding-top:5px" id="school-select" class="span2 select school">
+                  <option>...</option>
+                  {% for school in available_schools %}
+                  <option value="{{school.1}}">{{school.0}}</option>
+                  {% endfor %}
+                </select>
+              </div><span id="school-karma" style="display:none" class="karma-points">+5&nbsp;points</span>
               <p style="padding-top:5px"><span>Year of Graduation:</span><span style="margin-left:5px" id="year-label">{{ user_profile.grad_year }}</span></p>
-              {# TODO: make this display inline if filled out #}
-              {% if not user_profile.grad_year %}
-              <select id="year-select" class="span2 select year">
-                <option>...</option>
-                {% for year in available_years %}
-                <option>{{year}}</option>
-                {% endfor %}
-              </select><span id="year-karma" class="karma-points">+5&nbsp;points</span>
-              {% endif %}
+              <div id="gradyear-select-div" style="display:none">
+                <select id="year-select" class="span2 select year">
+                  <option>...</option>
+                  {% for year in available_years %}
+                  <option>{{year}}</option>
+                  {% endfor %}
+                </select>
+              </div><span id="year-karma" style="display:none"class="karma-points">+5&nbsp;points</span>
             </div>
           </div>
         </li>
