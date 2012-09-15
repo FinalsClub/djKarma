@@ -268,8 +268,7 @@ def _post_user_create_session_hook(request):
         as an anon user and saves them to the new user object.
         This might make more sense as a middleware, but this works for now.
     """
-
-    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+    if 'unclaimed_files' in request.session:
         for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
             try:
                 unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
