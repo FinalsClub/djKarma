@@ -7,30 +7,7 @@
 <div class="profile-page container">
 
   <div class="row">
-    <div class="span3">
-      <ul class="nav nav-list">
-        {# TODO: What do we want, if anything, in this sidebar? rss feed from blog? #}
-        <li class="active">
-          <a href="#">
-            <i class="icon-book"></i>
-            Browse notes
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="icon-book"></i>
-            Some link
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="icon-book"></i>
-            Some other link
-          </a>
-        </li>
-      </ul>
-    </div> <!-- .span3 -->
-    <div class="span9">
+    <div class="offset2 span8">
       <div class="row-fluid">
         <div class="span12">
           <h2>KarmaNotes.org Terms of Service</h2>
@@ -91,4 +68,5 @@
     </div> <!-- .span9-->
   </div> <!-- .row -->
 </div> <!-- .profile-page .container -->
+{% include 'footer.html' %}
 {% endblock %}

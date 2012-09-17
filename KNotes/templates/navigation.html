@@ -298,6 +298,7 @@
 {% block content %}
 
 
+<div class="wrap">
 <div class="profile-page container">
   <div class="row">
     <div class="span3 left-sidebar">
@@ -409,7 +410,7 @@
           </div>
         </li>
       </ul>
-      <div id="foot" style="position:fixed">
+      <div id="foot">
         <div id="license">
           This website's content is openly licened <br/>
           CC-by-sa-3.0
@@ -424,9 +425,14 @@
           <a class="btn" href="{% url 'terms' %}">
             Terms
           </a>
-          <a class="btn">
-            More
+          <a class="btn dropdown-toggle" data-toggle="dropdown">
+            More ▾
           </a>
+          <ul class="dropdown-menu">
+            <li><a href="http://github.com/FinalsClub/djKarma/">Open Source Code</a></li>
+            <li><a href="http://www.reddit.com/r/karmanotes">Feedback / Discussion</a></li>
+
+          </ul> <!-- .dropdown-menu -->
         </div>
         <br/>
       </div> <!-- #foot -->
@@ -466,122 +472,48 @@
             </ul> <!-- .nav -->
           </div><!--/.nav-collapse -->
         </div> <!-- .navbar-inner -->
-      <div class="clear"></div>
-      </div>
+        <div class="clear"></div>
+      </div> <!-- .navbar -->
       {% block navinner %}
-      <!-- File view goes here -->
-      <div id="file-view" style="display:none">
-      </div>
-      <!-- Search results go here -->
-      <div id="search-results" style="display:none">
-      </div>
-      <!-- Note browsing goes her -->
-      <div id="searchBySchool" style="display:none">
-      </div>
       <div id="profile-container">
-      <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
+        <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
 
-      {# ------ Messages ------ #}
-      {% for message in messages %}
-      <div class="alert alert-success" id="{{message.div_id}}">
-        <button class="close" data-dismiss="alert">x</button>
-        {{ message.body}}
-      </div> <!-- .alert .alert-success -->
-      {% endfor %}
-      <!--
-      <div class="alert alert-success">
-        <button class="close" data-dismiss="alert">x</button>
-        Success! <i class="icon-paper-clip"></i>
-        Sample message for a success, you earned <span class="karma-points">+5 points</span>. Would you like to <a href="%">upload another</a>?
-      </div> <!-- .alert .alert-success -->
-      {# ------ End Messages ------ #}
+        {% comment %}
+        {# disabling messages for now #}
+        {# ------ Messages ------ #}
+        {% for message in messages %}
+        <div class="alert alert-success" id="{{message.div_id}}">
+          <button class="close" data-dismiss="alert">x</button>
+          {{ message.body}}
+        </div> <!-- .alert .alert-success -->
+        {% endfor %}
+        {% endcomment%}
 
-      <!-- Carousel items -->
-      <div id="myCarousel" class="carousel slide">
-        <span class="counter">
-          <span class="karma">2/5</span> profile completion tasks left
-        </span>
-
-        <p>You need <span class="karma">5 more karma points</span> to earn your first download. How about you:</p>
-
-        <div class="carousel-inner">
-
-          {% for message in messages %}
-          <div class="{% if forloop.first %}active {% endif %}item">
-            <div class="reminder">
-              <a href="#">link to do thing</a>
-              {{ message.body }}
-              <span class="karma-points">+10 points</span>
-            </div> <!-- .reminder -->
-          </div> <!-- .active .item -->
-          {% endfor %}
-
-          <!-- more sample items -->
-          <div class="item">
-            <div class="reminder">
-              <a href="#">Make a cake</a> and get some points.
-              <span class="karma-points">+10 points</span>
+        <!-- BEGIN COURSE LISTINGS -->
+        <!-- one course -->
+        <div class="course-listing">
+          {% if user.get_profile.courses.all %}
+            <h3>Your Courses</h3>
+            {% for course in user.get_profile.courses.all %}
+              {% include 'course.html' with course=course %}
+            {% endfor %}
+          {% else %}
+            <h3>You haven't added any courses yet</h3>
+            <p>Would you like to </p>
+            <div class="upload">
+              <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
             </div>
-          </div> <!-- .item -->
+          {% endif %}
+        </div> <!-- .course-listing -->
 
-          <div class="item">
-            <div class="reminder">
-              <a href="#">Eat a chicken</a> and get lots of protein. <span class="karma-points">+10 points</span>
-            </div>
-          </div> <!-- .item -->
-          <!-- end sample items -->
+        <div class="file-listing collapse in" id="course-unique-1">
+        </div> <!-- #course-unique-1 .file-listing .collapse .in -->
 
-        </div> <!-- carousel-inner -->
-        <!-- Carousel nav -->
-        <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-        <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
-      </div> <!-- #myCarousel .carousel .slide -->
-
-      <!-- BEGIN COURSE LISTINGS -->
-      <!-- one course -->
-      <div class="course-listing">
-        {% if user.get_profile.courses.all %}
-          <h3>Your Courses</h3>
-          {% for course in user.get_profile.courses.all %}
-            {% include 'course.html' with course=course %}
-          {% endfor %}
-        {% else %}
-          <h3>You haven't added any courses yet</h3>
-          <p>Would you like to </p>
-          <div class="upload">
-            <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
-          </div>
-        {% endif %}
-      </div> <!-- .course-listing -->
-
-      <!-- begin file listing structure
-      *** INACTIVE courses have "inactive" class in the wrapper
-      and icon name is icon-folder-inactive.png
-      {# replace this with an IF in for course in courses loop #}
-
-      <div class="course inactive" data-toggle="collapse" data-target="#course-unique-1">
-        <div class="folder icon">
-          <img src="/static/img/icon-folder-inactive.png">
-        </div>
-        <div class="course-title">
-          <a href="#">Shakespeare 101</a>
-          <div class="course-info">
-            <span class="instructor">Bill Spears</span> <i class="icon-paper-clip"></i><a href="#">21 notes</a>
-            <span class="your-files">Your: <a href="#">Uploads (1)</a> <a href="#">Downloads (2)</a></span>
-          </div>
-        </div>
-        <div class="upload">
-          <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
-        </div>
-        <div style="clear:both"></div>
-      </div>
-      end INACTIVE courses -->
-
-      <div class="file-listing collapse in" id="course-unique-1">
-
-      </div> <!-- #course-unique-1 .file-listing .collapse .in -->
-</div><!-- content container -->
+      </div><!-- #profile-container -->
 {% endblock %}
+    </div> <!-- .span-9  -->
+  </div> <!-- .row -->
+</div> <!-- .wrap -->
 </div> <!-- .profile-page .container -->
 
 {% endblock %}
