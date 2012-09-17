@@ -13,7 +13,7 @@
           Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a>
         </span>
         <span class="download">
-          <a id="{{ file.pk }}" class="view-file" href="#"><i class="icon-paper-clip"></i>View file</a>
+          <a id="{{ file.pk }}" class="view-file" href="{{ file.get_absolute_url }}"><i class="icon-paper-clip"></i>View file</a>
         </span>
       {% if file in viewed_files %}
         <span class="karma-points">VIEWED</span>
