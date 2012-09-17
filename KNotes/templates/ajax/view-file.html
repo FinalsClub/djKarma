@@ -4,38 +4,6 @@
 {{ file.course.title }} || {{ file.title }}
 {% endblock %}
 
-{% block header %}
-<script>
-$(document).ready(function() {
-  // inject the note's html into the page
-  // this method is used to preserve css data
-  // in the source document without overriding
-  // KarmaNotes's css
-  var doc = $('#noteframe')[0].contentWindow.document;
-  var $body = $('body',doc);
-  $body.html('{{file.html|safe}}');
-  autoResize('noteframe');
-
-  // Resize the iframe upon html injection
-  // Note: IE6 does not support contentWindow
-  // Test this case
-  function autoResize(id){
-    var newheight;
-    var newwidth;
-
-    if(document.getElementById){
-      newheight=document.getElementById(id).contentWindow.document .body.scrollHeight;
-      newwidth=document.getElementById(id).contentWindow.document .body.scrollWidth;
-    }
-
-    document.getElementById(id).height= (newheight) + "px";
-    //document.getElementById(id).width= (newwidth) + "px";
-    //alert('height: ' + newheight);
-    }
-});
-</script>
-{% endblock %}
-
 {% block navinner %}
 <div class="container">
   <div class="row">
@@ -43,7 +11,10 @@ $(document).ready(function() {
     <div class="span9">
       <div class="row-fluid">
         <div class="span12">
-          <h2>{{ file.title }}</h2>
+          <h2 id="file-title">{{ file.title }}</h2>
+          <div id="file-title-editable" style="display:none">
+            <input type="text" class="input-xxlarge" id="file-title-editable-input" placeholder="File title"  role="textbox">
+            </div>
           {# TODO: make this use something like the course_info.html file #}
           <div class="file-info-wrapper">
             <h4>About this Class</h4>
@@ -59,12 +30,19 @@ $(document).ready(function() {
               </div>
 
             <h4>About this file</h4>
+            <div id="file-description">{{file.description}}
+            </div>
+            <div id="file-description-editable" style="display:none">
+              <input type="text" class="input-xxlarge" id="file-description-editable-input" placeholder="File description" role="textbox">
+            </div>
             <div class="user">Uploaded by <a href="#"><i class="icon-user"></i>{{ file.owner.get_profile.getName }}</a></div>
             <div class="points-and-views">
               <strong>{{ file_type }}:</strong> <span class="karma-points">10 points</span>
               <span class="views">{{ file.viewCount }} views</a>
             </div>
+            <div id="file-actions">
             {% include "file-actions.html" with file=file %}
+            </div>
             <div class="clear"></div>
           </div>
           <div class="note-text">
@@ -76,4 +54,11 @@ $(document).ready(function() {
   </div> <!-- .row -->
 </div> <!-- .container -->
 
+{% endblock %}
+
+{% block scripts %}
+<!-- view-file.js requires vars: 
+     file_html, file_pk, file_title, file_description -->
+<script>var view_file_html = "{{file.html|safe}}"; var view_file_pk = {{file.pk}}; var view_file_title = "{{file.title}}"; var view_file_description = "{{file.description}}";</script>
+<script src="{{ STATIC_URL }}/js/view-file.js" ></script>
 {% endblock %}

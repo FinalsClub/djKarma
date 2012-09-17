@@ -60,6 +60,7 @@ urlpatterns = patterns('',
 
     # Note View
     url(r'^file/(\d{1,99})$', 'notes.views.file', name='file'),
+    url(r'^editFileMeta$', 'notes.views.editFileMeta', name='editFileMeta'),
     # Browse
 
     # Search

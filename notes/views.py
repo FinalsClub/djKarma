@@ -467,6 +467,37 @@ def editProfile(request):
         raise Http404
 
 
+@login_required
+def editFileMeta(request):
+    ''' Handles AJAX requests to edit file meta data.
+        Now, just title and description
+    '''
+    if request.is_ajax() and 'file_pk' in request.POST:
+        file = get_object_or_404(File, pk=request.POST['file_pk'])
+        if request.user == file.owner:
+            do_save = False
+            response = {}
+            if 'title' in request.POST:
+                form = KarmaForms.GenericCharForm({"text": request.POST['title']})
+                if form.is_valid():
+                    file.title = form.cleaned_data['text']
+                    response['title'] = form.cleaned_data['text']
+                    do_save = True
+            if 'description' in request.POST:
+                form = KarmaForms.GenericCharForm({"text": request.POST['description']})
+                if form.is_valid():
+                    file.description = form.cleaned_data['text']
+                    response['description'] = form.cleaned_data['text']
+                    do_save = True
+            if do_save:
+                file.save()
+                response['status'] = 'success'
+                return HttpResponse(json.dumps(response), mimetype="application/json")
+            else:
+                return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
+    
+    raise Http404
+
 def get_upload_form(response):
     """ Appends forms required for upload form to response
         The way to make this smooth is:
@@ -543,7 +574,7 @@ def register(request, invite_user):
     # TODO: use give the invite_user some karma for referring someone
     if request.method == 'POST':
         #Fill form with POSTed data
-        form = forms.UserCreationForm(request.POST)
+        form = KarmaForms.UserCreateForm(request.POST)
         if form.is_valid():
             print 'form valid'
             #Save the new user from form data
@@ -558,7 +589,7 @@ def register(request, invite_user):
             return render(request, "registration/register.html", {
         'form': form})
     else:
-        form = forms.UserCreationForm()
+        form = KarmaForms.UserCreateForm()
         return render(request, "registration/register.html", {'form': form})
 
 
@@ -645,9 +676,11 @@ def file(request, note_pk):
         raise Http404
     # If the user does not have read permission, and the
     # Requested files is not theirs
+    '''
     if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
         #file_denied(request, note_pk)
         pass
+    '''
     try:
         file = File.objects.get(pk=note_pk)
     except:
@@ -669,7 +702,7 @@ def file(request, note_pk):
     # This is ugly, but is needed to be able to get the note type full name
     file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
     url = iri_to_uri(file.file.url)
-
+    response['owns_file'] = (file.owner == request.user)
     response['file'] = file
     response['file_type'] = file_type
     response['url'] = url

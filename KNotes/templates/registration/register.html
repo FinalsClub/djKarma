@@ -3,13 +3,12 @@
 
 {% block content %}
 <div class="hero-unit" style="text-align:center;">
-  <h2>Sign up!</h2>
-  <br/><br/>
-  <a href="{% url "socialauth_begin" "facebook" %}"><img src="/static/img/fb_connect.png"/></a>
-  <br/><br/><br/>
-  or
-  <br/><br/><br/>
-  <p>Create a non-social KarmaNotes account:</a></p>
+  <img src="{{STATIC_URL}}img/logo.png"/>
+  <h1>Sign up</h1>
+  <p style="margin:50px"><a  href="{% url "socialauth_begin" "facebook" %}"><img src="/static/img/fb_connect.png"/></a></p>
+  <h2>or</h2>
+  <div style="backgroud-color:red">
+  <p style="margin-top:50px">Create a non-social KarmaNotes account:</a></p>
 
   {% if form.errors %}
     <p><b>Check your username and password.</b></p>
@@ -19,8 +18,9 @@
     {% csrf_token %}
     {% for field in form %}
       <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
-      {{ field.label_tag }}
-      {{ field }}
+      <h3>{{ field.label}}</h3>
+      {{ field }}<br/>
+      <span style="opacity:.5">{{ field.help_text|safe }}</span><br>
     {% endfor %}
 
     <br/>
@@ -28,6 +28,7 @@
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
   <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</div>
 </div>
 
 {% endblock %}
