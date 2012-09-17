@@ -56,8 +56,9 @@ def home(request):
         recent_files = File.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
+        file_count = File.objects.count()
         return render(request, 'home.html',
-                {'stats': stats, 'recent_files': recent_files})
+                {'stats': stats, 'recent_files': recent_files, 'file_count': file_count})
 
 
 def about(request):
