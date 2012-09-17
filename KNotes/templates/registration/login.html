@@ -3,12 +3,10 @@
 
 {% block content %}
 <div class="hero-unit" style="text-align:center;">
-  <h2>Come in!</h2>
-  <br/><br/>
-  <a href="{% url 'socialauth_begin' 'facebook' %}"><img src="/static/img/fb_connect.png"/></a>
-  <br/><br/><br/>
-  or
-  <br/><br/><br/>
+  <img src="{{STATIC_URL}}img/logo.png"/>
+  <h1>Login</h1>
+  <p style="margin:50px"><a href="{% url 'socialauth_begin' 'facebook' %}"><img src="/static/img/fb_connect.png"/></a></p>
+  <h2>or</h2>
 
   {% if form.errors %}
     <p><b>Check your username and password.</b></p>
@@ -17,12 +15,12 @@
   <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
     {% csrf_token %}
 
-    {{ form.username.label_tag }}
-    {{ form.username }}
-
-
-    {{ form.password.label_tag }}
-    {{ form.password }}
+    {% for field in form %}
+      <div style="font-weight:bold;margin-left:auto;margin-right:auto;width:300px">{{ field.errors }}</div>
+      <h3>{{ field.label}}</h3>
+      {{ field }}<br/>
+      <span style="opacity:.5">{{ field.help_text|safe }}</span><br>
+    {% endfor %}
 
     <br/>
     <input class="btn btn-primary" type="submit" value="Login" />

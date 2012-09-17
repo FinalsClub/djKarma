@@ -5,12 +5,28 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from simple_autocomplete.widgets import AutoCompleteWidget
 from simplemathcaptcha.fields import MathCaptchaField
 
 from models import School, Course, File, Tag, Instructor
 
+
+class UserCreateForm(UserCreationForm):
+    email = forms.EmailField(required=True, help_text='Pick your on-site avatar with <a href=\"http://www.gravatar.com\">Gravatar</a>')
+ 
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
+ 
+    def save(self, commit=True):
+        user = super(UserCreateForm, self).save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
 
 class CaptchaForm(forms.Form):
     captcha     = MathCaptchaField(required=True, \
@@ -139,6 +155,10 @@ class CharCourseField(forms.CharField):
             raise forms.ValidationError("Sorry, the seleted Course does not exist.")
         return course
 
+
+class GenericCharForm(forms.Form):
+    """ Provides a means to sanitize generic text received via GET/POST """
+    text = forms.CharField(max_length=255)
 
 class ModelSearchForm(forms.Form):
     """ Provides the form of the Search field """
