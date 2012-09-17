@@ -478,6 +478,8 @@
       <div id="profile-container">
         <h2>Welcome, <span class="alias-label">{{ user.get_profile.getName }}</span>!</h2>
 
+        {% comment %}
+        {# disabling messages for now #}
         {# ------ Messages ------ #}
         {% for message in messages %}
         <div class="alert alert-success" id="{{message.div_id}}">
@@ -485,6 +487,7 @@
           {{ message.body}}
         </div> <!-- .alert .alert-success -->
         {% endfor %}
+        {% endcomment%}
 
         <!-- BEGIN COURSE LISTINGS -->
         <!-- one course -->
