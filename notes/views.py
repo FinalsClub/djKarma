@@ -436,6 +436,7 @@ def profile(request):
     """ User Profile """
     response = nav_helper(request)
     response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
+    response['your_files'] = File.objects.filter(owner=request.user).all()
     return render(request, 'navigation.html', response)
 
 
