@@ -47,7 +47,7 @@ def convertWithGDocsv3(File):
     """
     # Create and Authorize OAuth client
     client = CreateClient()
-    print "GDocsv3: client created"
+    #print "GDocsv3: client created"
 
     # Get file_type and encoding of uploaded file
     # i.e: file_type = 'text/plain', encoding = None
@@ -95,9 +95,11 @@ def convertWithGDocsv3(File):
     #print "file_type: " + str(file_type)
 
     # Create a dictionary for extra Google query variables
-    query_args = {'exportFormat': 'text/html'}
+    #query_args = {'exportFormat': 'text/html'}
     # Download html representation of document
-    client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params=query_args)
+    #client.download_resource(entry=doc, file_path=File.file.path + '.html', extra_params=query_args)
+    # exportFormat default is html. Sending exportFormat: text/html now produces 404s
+    client.download_resource(entry=doc, file_path=File.file.path + '.html')
     #print "GDocsv3: resource downloaded"
     f = open(str(File.file.path) + '.html')
     File.html = f.read()
