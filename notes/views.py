@@ -526,7 +526,7 @@ def get_upload_form(response):
     response['school_form'] = KarmaForms.SmartSchoolForm
     return response
 
-
+@login_required
 def addModel(request):
     ''' This replaces addCourseOrSchool in the new
         modal-upload process
@@ -536,8 +536,8 @@ def addModel(request):
             type = request.POST['type']
             form = KarmaForms.ModelSearchForm(request.POST)
             if form.is_valid():
-                if type == "course":
-                    new_model = Course.objects.create(title=form.cleaned_data['title'])
+                if type == "course" and request.user.get_profile().school != None:
+                    new_model = Course.objects.create(title=form.cleaned_data['title'], school=request.user.get_profile().school)
                 elif type == "school":
                     new_model = School.objects.create(name=form.cleaned_data['title'])
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
