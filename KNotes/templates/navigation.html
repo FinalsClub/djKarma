@@ -367,15 +367,18 @@
 
               <!-- progress bar -->
               <p>Karma Points</p>
-              <div class="progress progress-karma" id="karma-info" rel="popover" 
+              <div class="progress progress-karma" id="karma-info">
+                {% comment %}
+                rel="popover" 
                 data-content="Prospect (10 points) - Search and view documents and thank uploaders<br/>
                 Beginner (100 points) - Add a school and comment on courses<br/>
                 Trainee (200 points) - Edit course and note meta data<br/>
                 Apprentice (500 points) - Flag documents<br/>
                 Scholar (2000 points) - Moderate documents for your school<br/>
                 Leader (4000 points) - Edit your school’s CSS">
+                {% endcomment %}
                 <div id="karma-progress" class="bar"
-                     style="width: {{progress}}%;"></div>
+                     style="width: {{ progress }}%;"></div>
                   <div class="current-karma" style="">
                       <span id="karma-hover-label" class="karma-points"{% if user.get_profile.karma < 1 %} style="background: red;"{% endif %}>{{ user.get_profile.karma }} points</span>
                   </div>
