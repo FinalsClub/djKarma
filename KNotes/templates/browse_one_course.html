@@ -16,7 +16,7 @@
   
 <div class="tab-content">
   <div class="tab-pane" id="events-tab">
-    <table id="events" class="table"> 
+    <table id="events" class="table">
       <tbody>
       {% for event in events %}
         <tr>
@@ -41,7 +41,7 @@
     {% include 'file.html' with file=file %}
   {% endfor %}
 {% else %}
-  <h3>Sorry, there don't seem to be any courses for this school</h3>
+  <h3>There aren't any notes for this course yet. Would you like to upload some?</h3>
   <p>Would you like to
     <div class="upload">
       <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
