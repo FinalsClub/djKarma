@@ -304,10 +304,10 @@
     <div class="span3 left-sidebar">
       <ul class="nav nav-list">
         {% load navactive %}
-        <li class="{% navactive request 'your-courses' %}">
-          <a id="your-courses" href="/your-courses">
+        <li class="{% navactive request 'profile' %}">
+          <a id="your-courses" href="/profile">
             <i class="icon-home"></i>
-            Your courses
+            Home
           </a>
         </li>
         <li class="{% navactive request 'browse browse-schools' %}">
@@ -405,7 +405,7 @@
                 <select id="year-select" class="span2 select year">
                   <option>...</option>
                   {% for year in available_years %}
-                  <option>{{year}}</option>
+                  <option>{{ year }}</option>
                   {% endfor %}
                 </select>
               </div><span id="year-karma" style="display:none"class="karma-points">+5&nbsp;points</span>
@@ -509,8 +509,14 @@
           {% endif %}
         </div> <!-- .course-listing -->
 
-        <div class="file-listing collapse in" id="course-unique-1">
-        </div> <!-- #course-unique-1 .file-listing .collapse .in -->
+        {% if user.get_profile.files.all %}
+          <div class="file-listing collapse in" id="course-unique-1">
+            <h3>Your Files</h3>
+            {% for file in user.get_profile.files.all %}
+              {% include 'file.html' with file=file %}
+            {% endfor %}
+          </div> <!-- #course-unique-1 .file-listing .collapse .in -->
+        {% endif %}
 
       </div><!-- #profile-container -->
 {% endblock %}
