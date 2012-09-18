@@ -509,10 +509,10 @@
           {% endif %}
         </div> <!-- .course-listing -->
 
-        {% if user.get_profile.files.all %}
+        {% if your_files %}
           <div class="file-listing collapse in" id="course-unique-1">
             <h3>Your Files</h3>
-            {% for file in user.get_profile.files.all %}
+            {% for file in your_files %}
               {% include 'file.html' with file=file %}
             {% endfor %}
           </div> <!-- #course-unique-1 .file-listing .collapse .in -->
