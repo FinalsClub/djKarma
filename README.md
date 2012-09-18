@@ -112,6 +112,12 @@ To install and run the celery task server:
 6. chmod +x /etc/init.d/celeryd
 7. run /etc/init.d/celeryd start
 
+###Production Note:
+On the new Amazon instance, celery logs are located at:
+
+	/run/celery
+
+
 
 Note on Database migrations
 ---------------------------
