@@ -58,7 +58,8 @@ def home(request):
         #print recent_files
         file_count = File.objects.count()
         return render(request, 'home.html',
-                {'stats': stats, 'recent_files': recent_files, 'file_count': file_count})
+                {'stats': stats, 'recent_files': recent_files,\
+                'file_count': file_count})
 
 
 def about(request):
@@ -374,6 +375,18 @@ def browse_one_course(request, course_query, school):
     # get the karma events associaged with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     response['viewed_files'] = request.user.get_profile().files.all()
+    #response['thanked_files'] = [file.id for file in files if request.user in [vote.user for vote in file.votes.all()]]
+
+    # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this 
+    response['thanked_files'] = []
+    response['flagged_files'] = []
+    for file in files:
+        _vote = file.votes.filter(user=request.user)
+        if _vote.exists():
+            if _vote[0].up: # assuming only one vote result
+                response['thanked_files'].append(file.id)
+            else:
+                response['flagged_files'].append(file.id)
 
     return render(request, 'browse_one_course.html', response)
 

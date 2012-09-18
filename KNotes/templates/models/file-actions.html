@@ -1,8 +1,14 @@
 <div class="file-actions" id="file-{{ file.pk }}">
-  <a href="#" class="vote upvote"><i class="icon-heart"></i>Thank ({{ file.numUpVotes }})</a>
-  <a href="#" class="vote downvote"><i class="icon-flag"></i>Flag</a>
+  {% if file.id in thanked_files or flagged_files %}
+    {# TODO: implement un-thanking #}
+    <a class="" style="color: #8C1274;"><i class="icon-heart"></i>Thank{% if file.id in thanked_files %}ed{% endif %} ({{ file.numUpVotes }})</a>
+    <a class="" style="color: #8C1274;"><i class="icon-flag"></i>Flag{% if file.id in flagged_files %}ged{% endif %}</a>
+  {% else %}
+    <a href="#" class="vote upvote"><i class="icon-heart"></i>Thank ({{ file.numUpVotes }})</a>
+    <a href="#" class="vote downvote"><i class="icon-flag"></i>Flag</a>
+  {% endif %}
   {# TODO add conditional edit button #}
-  {% if user == file.owner %}
+  {% if user == file.owner and False %}
     <a class="edit-file" href="#"><i class="icon-pencil"></i>Edit</a>
     <a href="#"><i class="icon-remove-circle"></i>Delete</a>
   {% endif %}
