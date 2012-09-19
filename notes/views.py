@@ -844,13 +844,13 @@ def search(request):
             #results = SearchQuerySet().filter(content__icontains=query).highlight()
 
             #Exact match results w/Highlighting. Target notes
-            results = SearchQuerySet().filter(content__icontains=query).models(File).highlight()
+            #results = SearchQuerySet().filter(content__icontains=query).models(File).highlight()
 
             #highlight = Highlighter(query)
             #highlight_test = highlight.highlight('this is a test ' + query + 'yes, a test')
 
             #Partial match result. Works, but w/out highlighting
-            #results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct').highlight()
+            results = SearchQuerySet().filter(content_auto__contains=query).order_by('django_ct')
 
             # Partial string matching. Not yet working
             #results = SearchQuerySet().autocomplete(content_auto=query).highlight()
