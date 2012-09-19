@@ -708,7 +708,7 @@ def file(request, note_pk):
     if file not in profile.files.all():
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
-        profile.awardKarma('view-file')
+        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
         # Add 'purchased' file to user's collection
         profile.files.add(file)
         profile.save()

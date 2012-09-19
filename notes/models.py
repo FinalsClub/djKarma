@@ -523,7 +523,7 @@ class UserProfile(models.Model):
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
-    def awardKarma(self, event, target_user=None, school=None, course=None, user=None):
+    def awardKarma(self, event, target_user=None, school=None, course=None, user=None, file=None):
         """ Award user karma given a ReputationEventType slug title
             and add a new ReputationEvent to UserProfile.reputationEvents
             Does not call UserProfile.save() because it is used in
@@ -534,6 +534,7 @@ class UserProfile(models.Model):
             :school: is a School object (optional)
             :course: a Course object (optional)
             :user: a User object (optional), for recalling username when showing other's karmaevents
+            :file: a notes.models.File object (optional)
             returns True or False
 
         """
@@ -553,6 +554,8 @@ class UserProfile(models.Model):
                 event.course = course
             if user:
                 event.user = user
+            if file:
+                event.file = file
             event.save()  # FIXME: might be called on UserProfile.save()
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called

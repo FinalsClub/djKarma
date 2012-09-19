@@ -7,7 +7,11 @@ $(document).ready(function() {
   // KarmaNotes's css
   var doc = $('#noteframe')[0].contentWindow.document;
   var $body = $('body',doc);
-  $body.html(view_file_html);
+  if(view_file_html === "None")
+    $('.note-error').show();
+  else
+    $body.html(view_file_html);
+
   autoResize('noteframe');
 
   $('.edit-file').click(function(e){
