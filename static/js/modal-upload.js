@@ -17,12 +17,14 @@
     // Assumes variable csrf_token is available
     // in embedding document
     setupAjax();
-
+    //.doc, .docx, .pdf, .rtf, and .txt file
     // Configure AJAX file uploader
     var cancelled = false;
     var uploader = new qq.FileUploader({
         action: ajax_upload_url,
         element: $('#file-uploader')[0],
+        allowedExtensions: ['doc', 'docx', 'pdf' ,'txt', 'rtf'],
+        sizeLimit: 2097152,
         multiple: false,
         onCancel: function(id, fileName){
           // hide progress bar and show upload button
