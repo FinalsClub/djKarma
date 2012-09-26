@@ -18,7 +18,7 @@
           {# TODO: make this use something like the course_info.html file #}
           <div class="file-info-wrapper">
             <h4>About this Class</h4>
-              <h3><a href="{{ file.course.getAbsoluteUrl }}">{{ file.course.title }}</a></h3>
+              <h3><a href="{{ file.course.get_absolute_url }}">{{ file.course.title }}</a></h3>
               <strong>{{ file.course.instructor }} | {{ file.school.name }}</strong>
 
 

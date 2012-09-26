@@ -1,7 +1,13 @@
 <div class="file-info-wrapper">
   <h4>About this Class</h4>
-    <h3><a href="/b/{{ course.school.slug }}/{{ course.slug }}">{{ course.title }}</a></h3>
-    <strong>{{ course.instructor }} | {{ course.school.name }}</strong>
+    <h3 id="course-title"><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></h3>
+    <div id="course-title-editable" style="display:none">
+            <input type="text" class="input-xxlarge" id="course-title-editable-input" placeholder="Course title"  role="textbox">
+            </div>
+    <strong id="course-professor">{{ course.instructor }} </strong><strong>| {{ course.school.name }}</strong>
+    <div id="course-professor-editable" style="display:none">
+              <input type="text" class="input-xxlarge" id="course-professor-editable-input" placeholder="Course Professor" role="textbox">
+    </div>
 
     <div style="padding-top:10px; padding-bottom:10px;" class="upload">
       <a class="button course-upload" school-pk="{{ course.school.pk }}" school-name="{{ course.school.name }}" course-pk="{{ course.pk }}" course-name="{{ course.title }}" data-toggle="modal" href="#upload">Upload notes</a>
@@ -23,6 +29,9 @@
 
       {# TODO: implement actual count here before launch or remove it #}
       <!--<p><span class="your-files">You have <a href="#">1 upload </a> and <a href="#">2 downloads</a></span> from this class. </p>-->
+      <div id="course-actions">
+        {% include "course-actions.html" with course=course %}
+      </div>
     </div>
   <div class="clear"></div>
 

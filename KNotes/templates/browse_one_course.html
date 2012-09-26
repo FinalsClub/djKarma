@@ -52,3 +52,13 @@
 
 {% endblock %}
 
+{% block scripts %}
+<script>
+var editing_course = false;
+var view_course_pk = {{ course.pk }};
+var view_course_title = "{{ course.title }}";
+var view_course_professor = "{{course.instructor.name}}";
+</script>
+<script src="{{ STATIC_URL }}/js/view-course.js" ></script>
+{% endblock %}
+

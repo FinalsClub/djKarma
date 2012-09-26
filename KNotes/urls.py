@@ -90,6 +90,9 @@ urlpatterns = patterns('',
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),
 
+    # Edit course
+    url(r'^editCourseMeta$', 'notes.views.editCourseMeta', name='editCourseMeta'),
+
     # Auth
     # This logout allows us to pass a redirect:
     # <a href="{% url auth_logout_next /some/location %}">Logout</a>

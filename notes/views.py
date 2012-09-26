@@ -509,6 +509,46 @@ def editFileMeta(request):
     
     raise Http404
 
+@login_required
+def editCourseMeta(request):
+    ''' Handles AJAX requests to edit course meta data.
+        Now, just title and professor
+    '''
+    if request.is_ajax() and 'course_pk' in request.POST:
+        course = get_object_or_404(Course, pk=request.POST['course_pk'])
+        # TODO: Create site-wide karma constants tied to privileges
+        if request.user.get_profile().karma > 200:
+            do_save = False
+            response = {}
+            if 'title' in request.POST:
+                form = KarmaForms.GenericCharForm({"text": request.POST['title']})
+                if form.is_valid():
+                    course.title = form.cleaned_data['text']
+                    response['title'] = form.cleaned_data['text']
+                    do_save = True
+            if 'professor' in request.POST:
+                form = KarmaForms.GenericCharForm({"text": request.POST['professor']})
+                if form.is_valid():
+                    # If a professor by the name given doesn't exist
+                    # Create a new model. TODO: provide suggestions before model creation
+                    try:
+                        professor = Instructor.objects.filter(name__icontains=form.cleaned_data['text'])[0]
+                    except:
+                        professor = Instructor.objects.create(name=form.cleaned_data['text'], school=request.user.get_profile().school)
+                        # TODO: Index Instructors and search -> return suggestions? Ugh :)
+                    course.professor = professor
+                    # get_or_create professor here!
+                    response['professor'] = professor.name
+                    do_save = True
+            if do_save:
+                course.save()
+                response['status'] = 'success'
+                return HttpResponse(json.dumps(response), mimetype="application/json")
+            else:
+                return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
+
+    raise Http404
+
 def get_upload_form(response):
     """ Appends forms required for upload form to response
         The way to make this smooth is:
