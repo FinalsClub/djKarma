@@ -172,6 +172,7 @@ def userCanView(user, file):
         returns True/False
     """
     if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
+        print "user can view!"
         return True
     return False
 

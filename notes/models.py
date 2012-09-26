@@ -276,7 +276,7 @@ class File(models.Model):
         if not self.pk:
             increment(self)
 
-        print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
+        #print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
         if not self.awarded_karma and self.owner is not None:
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:

@@ -9,7 +9,7 @@
   {% endif %}
   {# TODO add conditional edit button #}
   {% if user == file.owner %}
-    <a class="edit-file" href="#"><i class="icon-pencil"></i>Edit</a>
+    <a class="edit-file" href="{{ file.get_absolute_url }}/edit"><i class="icon-pencil"></i>Edit</a>
     {# <a href="#"><i class="icon-remove-circle"></i>Delete</a> #}
   {% endif %}
 </div> <!-- .file-actions -->

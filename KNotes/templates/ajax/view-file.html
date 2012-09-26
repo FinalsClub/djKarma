@@ -62,6 +62,13 @@
 {% block scripts %}
 <!-- view-file.js requires vars: 
      file_html, file_pk, file_title, file_description -->
-<script>var view_file_html = "{{file.html|safe}}"; var view_file_pk = {{file.pk}}; var view_file_title = "{{file.title}}"; var view_file_description = "{{file.description}}";</script>
+<script>var view_file_html = "{{file.html|safe}}"; var view_file_pk = {{file.pk}}; var view_file_title = "{{file.title}}"; var view_file_description = "{{file.description}}";
+
+  {% if editing_file %}
+  var editing_file = true;
+  {% else %}
+  var editing_file = false;
+  {% endif %}
+</script>
 <script src="{{ STATIC_URL }}/js/view-file.js" ></script>
 {% endblock %}

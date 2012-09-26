@@ -1,12 +1,15 @@
+var edit_file_element;
+
 $(document).ready(function() {
-  var editing = false;
-  var edit_file_element = $('#file-actions').find('.edit-file');
+  edit_file_element = $('#file-actions').find('.edit-file');
   // inject the note's html into the page
   // this method is used to preserve css data
   // in the source document without overriding
   // KarmaNotes's css
   var doc = $('#noteframe')[0].contentWindow.document;
   var $body = $('body',doc);
+
+  // If file has None Content, show error div
   if(view_file_html === "None")
     $('.note-error').show();
   else
@@ -14,9 +17,24 @@ $(document).ready(function() {
 
   autoResize('noteframe');
 
-  $('.edit-file').click(function(e){
-    editing = !editing;
-    if(editing === true){
+  $('.edit-file').click(function(event){editFileClickListener(event);});
+
+  // If the user got to this page by clicking 
+  // an 'edit' widget on a file row, editing == true
+  if(editing_file === true){
+    editing_file = false;
+    $('.edit-file').click();
+  }
+    
+}); // end on document ready
+
+// handle clicks to the .edit-file widget
+function editFileClickListener(event){
+  // the edit widget directs to file.get_absolute_url()/edit
+  // On this page, ignore the href link
+  event.preventDefault();
+  editing_file = !editing_file;
+    if(editing_file === true){
       console.log('edit file. ');
       edit_file_element.html(edit_file_element.html().replace("Edit","Done"));
       $('#file-title').hide();
@@ -35,11 +53,8 @@ $(document).ready(function() {
       $('#file-description').show();
       $('#file-description-editable').hide();
     }
-  });
 
-  
-    
-});
+}
 
 // Resize the iframe upon html injection
 // Note: IE6 does not support contentWindow

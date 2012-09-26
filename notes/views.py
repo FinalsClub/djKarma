@@ -673,13 +673,20 @@ def jqueryui_courses(request):
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def nurl_file(request, school_query, course_query, file_id):
-    return file(request, file_id)
+
+def nurl_file(request, school_query, course_query, file_id, action=None):
+    return file(request, file_id, action)
 
 
 @login_required
-def file(request, note_pk):
-    """ View Note HTML """
+def file(request, note_pk, action=None):
+    """ View Note HTML 
+        Args:
+            request: Django request object
+            note_pk: file_pk int
+            action: last url segment string indicating initial state. i.e: 'edit'
+    """
+
     # Check that user has permission to read
     #profile = request.user.get_profile()
     response = nav_helper(request)
@@ -704,8 +711,8 @@ def file(request, note_pk):
     file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
-    #if(not userCanView(user, File.objects.get(pk=note_pk))):
-    if file not in profile.files.all():
+    #if file not in profile.files.all():
+    if(not userCanView(user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
@@ -720,6 +727,13 @@ def file(request, note_pk):
     response['file'] = file
     response['file_type'] = file_type
     response['url'] = url
+
+    if action == 'edit':
+        #print 'ACTION EDIT'
+        response['editing_file'] = True
+    else:
+        response['editing_file'] = False
+        #print 'ACTION NONE'
 
     return render(request, 'view-file.html', response)
 
