@@ -3,35 +3,35 @@
 {% elif event.type.title == 'mid-term-study-guide' %}
   {{ event.user.get_profile.getName }} uploaded a <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">mid-term study guide</a>
 {% elif event.type.title == 'lecture-note' %}
-  {{ event.user.get_profile.getName }} uploaded <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">lecture notes</a>
+  {{ event.user.get_profile.getName }} uploaded <a href="{{ event.file.get_absolute_url }}">lecture notes</a>
 {% elif event.type.title == 'exam-or-quiz' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">exam or quiz</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">exam or quiz</a>
 {% elif event.type.title == 'equation-sheet' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">equation sheet</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">equation sheet</a>
 {% elif event.type.title == 'essay-large' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">essay</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">essay</a>
 {% elif event.type.title == 'essay-medium' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">essay</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">essay</a>
 {% elif event.type.title == 'essay-small' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">essay</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">essay</a>
 {% elif event.type.title == 'tag' %}
-  {{ event.user.get_profile.getName }} added a tag to <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">FILENAME</a>
+  {{ event.user.get_profile.getName }} added a tag to <a href="{{ event.file.get_absolute_url }}">{{event.file.title}}</a>
 {% elif event.type.title == 'syllabus' %}
-  {{ event.user.get_profile.getName }} uploaded a <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">course syllabus</a>
+  {{ event.user.get_profile.getName }} uploaded a <a href="{{ event.file.get_absolute_url }}">course syllabus</a>
 {% elif event.type.title == 'assignment' %}
-  {{ event.user.get_profile.getName }} uploaded an <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">assignment</a>
+  {{ event.user.get_profile.getName }} uploaded an <a href="{{ event.file.get_absolute_url }}">assignment</a>
 {% elif event.type.title == 'course-url' %}
   {{ event.user.get_profile.getName }} added a course homepage
 {% elif event.type.title == 'like' %}
-  {{ event.user.get_profile.getName }} thanked TARGET_USER for their file <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">FILENAME</a>
+  {{ event.user.get_profile.getName }} thanked {{ event.target.username }} for their file <a href="{{ event.file.get_absolute_url }}">{{event.file.title}}</a>
 {% elif event.type.title == 'flag' %}
-  {{ event.user.get_profile.getName }} flagged the file FILENAME
+  {{ event.user.get_profile.getName }} flagged {{event.file.title}}
 {% elif event.type.title == 'upvote' %}
-  {{ event.user.get_profile.getName }} upvoted <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">FILENAME</a>
+  {{ event.user.get_profile.getName }} upvoted <a href="{{ event.file.get_absolute_url }}">{{event.file.title}}</a>
 {% elif event.type.title == 'downvote' %}
-  {{ event.user.get_profile.getName }} downvoted <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">FILENAME</a>
+  {{ event.user.get_profile.getName }} downvoted <a href="{{ event.file.get_absolute_url }}">{{event.file.title}}</a>
 {% elif event.type.title == 'view-file' %}
-  {{ event.user.get_profile.getName }} viewed a <a href="/{{ event.school.slug }}/{{ event.course.slug}}/{{ event.file.id }}">file</a>
+  {{ event.user.get_profile.getName }} viewed <a href="{{ event.file.get_absolute_url }}">{{event.file.title}}</a>
 
 {% endif %}
 

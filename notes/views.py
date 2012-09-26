@@ -348,10 +348,7 @@ def _get_courses(request, school_query=None):
 
 
 def b_school_course(request, school_query, course_query):
-    """ This is a cheat. ignore the school query `harvard` from the form of
-        karmanotes.org/harvard/underwater-basket-weaving
-        and return the result of browse_one_course with the course query
-        This will fail if we have courses named the same thing across multiple universities
+    """ lookup course given course and school names
     """
     # TODO add a url redirect, or an error if the school != course school
     school = get_object_or_404(School, slug=school_query)

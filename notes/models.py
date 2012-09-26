@@ -561,7 +561,9 @@ class UserProfile(models.Model):
             # Don't self.save(), because this method is called
             # from UserProfile.save()
             return True
-        except:
+        except Exception, e:
+            print "error in awardKarma:"
+            print e
             return False
 
     def addFile(self, File):

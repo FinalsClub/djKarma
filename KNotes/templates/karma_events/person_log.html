@@ -5,39 +5,39 @@
 {% elif event.type.title == 'major' %}
   You added a major to your profile
 {% elif event.type.title == 'full-course-study-guide' %}
-  You uploaded a course study guide to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded a course study guide to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'mid-term-study-guide' %}
-  You uploaded a mid-term study guide to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded a mid-term study guide to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'lecture-note' %}
-  You uploaded lecture notes to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded lecture notes to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'exam-or-quiz' %}
-  You uploaded a exam or quiz to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded a exam or quiz to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'equation-sheet' %}
-  You uploaded a equation sheet to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded a equation sheet to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'essay-large' %}
-  You uploaded an essay to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded an essay to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'essay-medium' %}
-  You uploaded an essay to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded an essay to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'essay-small' %}
-  You uploaded an essay to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded an essay to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'tag' %}
-  You added a tag to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}/{{ event.file.id }}">{{ event.file.title }}</a>
+  You added a tag to <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'syllabus' %}
-  You uploaded a course syllabus to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded a course syllabus to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'assignment' %}
-  You uploaded an assignment to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You uploaded an assignment to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'course-url' %}
-  You added a course homepage to <a href="/b/{{ event.course.school.slug }}/{{ event.course.slug }}">{{ event.course.title }}</a>
+  You added a course homepage to <a href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'like' %}
-  You thanked TARGET_USER for their file <a href="/b/{{ event.school.slug }}/{{ event.course.slug }}/{{ event.file.id }}">{{ event.file.title }}</a>
+  You thanked {{ event.target.username }} for their file <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'flag' %}
-  You flagged the file FILENAME
+  You flagged <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'upvote' %}
-  You upvoted FILENAME
+  You upvoted <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'downvote' %}
-  You downvoted FILENAME
+  You downvoted <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'view-file' %}
-  You viewed the file FILENAME
+  You viewed <a href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'profile-grad-year' %}
   You added a graduation year to your profile
 {% elif event.type.title == 'profile-school' %}
