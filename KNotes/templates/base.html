@@ -18,15 +18,33 @@
   <!-- Le fonts -->
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600,800' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Macondo+Swash+Caps' rel='stylesheet' type='text/css'>
-  <script type="text/javascript" src="http://use.typekit.net/pnc8diw.js"></script>
-  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
-  <!-- Le scripts -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-  <script src="/static/js/bootstrap.min.js"></script>
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
-  <script type="text/javascript">
+  <title>Karma Notes -- {% block title %}{% endblock %}</title>
+
+  {% block header %}
+  {% endblock %}
+</head>
+
+<body>
+<!-- modal dialogs -->
+
+{% block content %}
+{% endblock %}
+
+<!-- Font related scripts -->
+<script type="text/javascript" src="http://use.typekit.net/pnc8diw.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!-- Le scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script type="text/javascript">
   $(document).ready(function(){
     // Show file info on hover
     $(".container").on("hover","div.file.row-fluid", function(){
@@ -71,31 +89,11 @@
 
   });
   </script>
-
-  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-
-  <title>Karma Notes -- {% block title %}{% endblock %}</title>
-
-  {% block header %}
-  {% endblock %}
-</head>
-
-<body>
-<!-- modal dialogs -->
-
-{% block content %}
-{% endblock %}
-
-{% block scripts %}
-{% endblock %}
-
-
 {% include 'modal_add_course.html' %}
 {% include 'modal_share_karma.html' %}
 {% include 'modal_upload.html' %}
 
+{% block scripts %}
+{% endblock %}
 </body>
 </html>

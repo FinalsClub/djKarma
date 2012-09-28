@@ -108,6 +108,7 @@ def fileMeta(request):
             response = {}
             response["status"] = "success"
             response["file_pk"] = file.pk
+            response["karma"] = file.karmaValue()
             print "fileMeta form valid! " + str(file.pk)
             # lets us use django's messaging system for alert-notifications
             # in our design on upload success at the top of the profile

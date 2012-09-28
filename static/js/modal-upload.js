@@ -48,7 +48,7 @@
                 //alert("success! file_pk: " + responseJSON.file_pk);
                 file_pk = responseJSON.file_pk;
                 file_url = responseJSON.file_url;
-                $('#new-file-link').attr('href',file_url);
+                //$('#new-file-link').attr('href',file_url);
 
             }
         },
@@ -172,7 +172,7 @@
             if(data.status === 'success'){
               // TODO: put thank you message and clear form here
               $('#modal-upload-button').hide();
-              $('#modal-upload-success').show();
+              showUploadSuccessMessage(data);
               $('#modal-metadata-form').slideUp('slow');
             }
             else{
@@ -249,8 +249,8 @@
 
     // upload again button handler
      $('#modal-upload-again-button').on('click', function(){
-        course = new Object();
-        school = new Object();
+        course = {};
+        school = {};
         school.pk = school_pk;
         school.name = school_name;
         course.pk = course_pk;
@@ -259,6 +259,15 @@
      });
 
   });// end document ready
+
+  function showUploadSuccessMessage(data){
+    message = "You just uploaded <a href=\""+file_url+"\">" + $('#modal-title-input').val() + "</a> to " + $('#modal-course-input').val() + " at " + $('#modal-school-input').val() + ".<br/>" +
+              "You've been awarded <span class=\"karma\">+" + data.karma + " </span> karma points for your contribution.";
+    $('#upload-success-message').html(message);
+    animate_karma(data.karma);
+    $('#modal-upload-success').show();
+
+  }
 
   // Course autocomplete
   function enableCourseAutoComplete(){

@@ -338,6 +338,28 @@ class File(models.Model):
             self.votes.add(this_vote)
         self.save()
 
+    def karmaValue(self):
+        """ Reports Karma value of file based on
+            ReputationEvent listing
+        """
+        if self.type == 'N':
+            title = 'lecture-note'
+        elif self.type == 'G':
+            title = 'mid-term-study-guide'
+        elif self.type == 'S':
+            title = 'syllabus'
+        elif self.type == 'A':
+            title = 'assignment'
+        elif self.type == 'E':
+            title = 'exam-or-quiz'
+
+        # Remember to load all ReputationEventTypes with
+        # python manage.py loaddata ./fixtures/data.json
+        try:
+            repType = ReputationEventType.objects.get(title=title)
+            return repType.actor_karma
+        except:
+            return 0
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
