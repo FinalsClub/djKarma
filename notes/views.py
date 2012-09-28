@@ -226,6 +226,10 @@ def nav_helper(request, response={}):
 
     user_level = request.user.get_profile().getLevel()
     response['current_level'] = user_level['current_level']
+    if user_profile.school != None:
+        response['school_pk'] = user_profile.school.pk
+    else:
+        response['school_pk'] = 0
 
     # The user has reached the top level
     if not 'next_level' in user_level:
@@ -454,6 +458,7 @@ def editProfile(request):
             do_save = True
             user_profile.school = School.objects.get(pk=int(request.GET['school']))
             response['school'] = user_profile.school.name
+            response['school_pk'] = user_profile.school.pk
             # When the user_profile is saved, submitted_school / year are adjusted
             if not user_profile.submitted_school:
                 response['karma'] = ReputationEventType.objects.get(title="profile-school").actor_karma

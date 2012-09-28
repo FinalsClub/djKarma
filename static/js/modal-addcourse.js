@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var school_pk = "0";
+    //var school_pk = "0";
 
     // Submit course name
     $("#modal-addcourse-form").on("submit", function(event){
@@ -34,7 +34,7 @@ $(document).ready(function() {
       $("#modal-addcourse-input").autocomplete({
       source: function(request, response){
           $.ajax({
-              url: "/courses?school="+school_pk,
+              url: "/courses?school="+user_school_pk,
               data: {'q': request.term },
               success: function(data) {
                   if (data != 'CACHE_MISS')

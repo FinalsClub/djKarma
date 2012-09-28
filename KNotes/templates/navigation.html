@@ -483,6 +483,8 @@
 
     function school_callback(data){
       if(data.status === "success"){
+        // update global school_pk
+        user_school_pk = data.school_pk;
         $("#school-karma").fadeOut('slow', function(){
           $("#school-select-div").slideUp('slow',function(){
             $("#school-label").html(data.school).fadeIn('slow');
