@@ -203,6 +203,11 @@ class Course(models.Model):
         # overridden in the query with order_by()
         ordering = ['title']
 
+        # Enforce uniqueness so that the url resolver
+        # /school-name/course-slug
+        # can't refer to more than one course
+        unique_together = ('school', 'slug')
+
 # On Course delete, decrement numCourses
 post_delete.connect(decrement, sender=Course)
 
