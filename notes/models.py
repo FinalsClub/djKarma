@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import re
 
+from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
 from django.db import models
 from django.contrib.auth.models import User
@@ -203,6 +204,11 @@ class Course(models.Model):
         # overridden in the query with order_by()
         ordering = ['title']
 
+        # Enforce uniqueness so that the url resolver
+        # /school-name/course-slug
+        # can't refer to more than one course
+        unique_together = ('school', 'slug')
+
 # On Course delete, decrement numCourses
 post_delete.connect(decrement, sender=Course)
 
@@ -276,8 +282,9 @@ class File(models.Model):
         if not self.pk:
             increment(self)
 
-        #print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner is not None:
+        print "awarded_karma : %s, self.owner: %s" % (self.awarded_karma, self.owner)
+        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME):
+            print "awarding karma for file!"
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:
                 karma_event = self.KARMA_TYPES[self.type]
@@ -338,6 +345,28 @@ class File(models.Model):
             self.votes.add(this_vote)
         self.save()
 
+    def karmaValue(self):
+        """ Reports Karma value of file based on
+            ReputationEvent listing
+        """
+        if self.type == 'N':
+            title = 'lecture-note'
+        elif self.type == 'G':
+            title = 'mid-term-study-guide'
+        elif self.type == 'S':
+            title = 'syllabus'
+        elif self.type == 'A':
+            title = 'assignment'
+        elif self.type == 'E':
+            title = 'exam-or-quiz'
+
+        # Remember to load all ReputationEventTypes with
+        # python manage.py loaddata ./fixtures/data.json
+        try:
+            repType = ReputationEventType.objects.get(title=title)
+            return repType.actor_karma
+        except:
+            return 0
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)

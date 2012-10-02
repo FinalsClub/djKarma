@@ -21,6 +21,8 @@ from notes.credentials import DEV_UPLOAD_ROOT
 from notes.credentials import BETA_UPLOAD_ROOT
 from notes.credentials import PROD_UPLOAD_ROOT
 
+from notes.credentials import RECAPTCHA_PRIVATE_KEY
+
 import os
 import djcelery
 
@@ -110,6 +112,14 @@ DEFAULT_FILE_STORAGE = 'notes.testStorage.TestFileSystemStorage'
 # So an anon user can signup and claim the files / karma
 # ... if the session still exists
 SESSION_UNCLAIMED_FILES_KEY = 'unclaimed_files'
+
+# This is the username to be get_or_created and assigned
+# to File.owner when an uploaded file is recieved from
+# a user with .is_authenticated() returning False (see local.py)
+# in django-ajax-uploader
+# File.save will not award karma to this username, so the file
+# can be claimed for karma if the anon user logs in / registers
+DEFAULT_UPLOADER_USERNAME = 'KarmaNotes'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"

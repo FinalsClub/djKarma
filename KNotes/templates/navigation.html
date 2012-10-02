@@ -5,296 +5,6 @@
   Your Personal Profile Page {{ user.get_profile.getName }}
 {% endblock %}
 
-
-{% block header %}
-
-  <script type="text/javascript">
-
-  var current_karma = {{ user.get_profile.karma }};
-  var editing_profile = false;
-
-  $(document).ready(function(){
-
-    {% if not request.user.get_profile.submitted_school %}
-    // user has not submitted school, show karma reward
-    $('#school-karma').show();
-    $('#school-select-div').show();
-    {% endif %}
-    {% if not request.user.get_profile.submitted_grad_year %}
-    $('#year-karma').show();
-    $('#gradyear-select-div').show();
-    {% endif %}
-
-    // enable karma over popover info box
-    $('#karma-info').popover('hide');
-
-    $('.dropdown-toggle').dropdown();
-
-    $("div.showmore").click(function () {
-            $(this).nextAll('div.file').slideToggle('slow');
-      });
-
-    $('input:radio').screwDefaultButtons({
-                 checked: "url({{STATIC_URL}}img/check.jpg)",
-                 unchecked: "",
-                 width: 50,
-                 height: 50
-              });
-
-    // Handle browse notes view
-    var browse_view_initialized = false;
-    $('.container').on("click", "#browse-notes", function(){
-      console.log("BROWSE INTERCEPT");
-      if(!browse_view_initialized){
-        initializeBrowseView();
-        browse_view_initialized = true;
-      }
-      $('#search-results').hide();
-      $('#profile-container').hide();
-      $('#file-view').hide();
-      $('#searchBySchool').show();
-
-    });
-
-    // Handle KarmaNotes logo click
-     $('.container').on("click", ".brand", function(){
-      console.log("LOGO INTERCEPT");
-      $('#profile-container').show();
-      $('#file-view').hide();
-      $('#searchBySchool').hide();
-      $('#search-results').hide();
-
-    });
-
-     // Handle view file click
-     $('.container').on("click", ".view-file", function(){
-      console.log("FILE VIEW INTERCEPT");
-      file_pk = $(this).attr("id");
-
-      $.ajax({
-        url: "/file/"+file_pk,
-        success: function(data){
-          $('#file-view').hide();
-          $('#profile-container').hide();
-          $('#searchBySchool').hide();
-          $('#search-results').hide();
-          $('#file-view').html(data);
-          $('#file-view').show();
-        }
-      });
-
-
-    });
-
-     // Handle setting up modal-upload form from course upload button
-     $('.container').on("click", '.course-upload',  function(){
-      console.log("preparing form");
-      course = Object();
-      course.pk = $(this).attr('course-pk');
-      course.name = $(this).attr('course-name');
-      school = Object();
-      school.pk = $(this).attr('school-pk');
-      school.name = $(this).attr('school-name');
-        clearForm(course, school);
-     });
-
-     // Handle setting up modal-upload from generic
-     // 'Upload notes' button
-     
-     $('.container').on("click", '.generic-upload', function(){
-      console.log("clearing form");
-      clearForm();
-     });
-
-    // Handle username edit in place click
-    $("#edit-profile").on("click", function(e){
-      e.preventDefault();
-      // Remove profile field selectors
-      // The edit-profile link is in "done" state
-      if(editing_profile == true){
-        editing_profile = false;
-        $('#edit-profile').html("edit");
-        $("#username-form").hide();
-        $('#school-select-div').hide();
-        $('#gradyear-select-div').hide();
-        $('#alias-label-profile').show();
-      }
-      else{
-        editing_profile = true;
-        $('#edit-profile').html("done");
-
-        // show alias editing field
-        $("#alias-label-profile").hide();
-        // If the user has no alias set,
-        // show username as alias input initial value
-        if($("#alias-label-profile").text() == "")
-          alias = $("#username-label-profile").text();
-        else
-          alias = $("#alias-label-profile").text();
-        console.log("edit username: " + alias);
-        $("#username-input").val(alias);
-        $("#username-form").show();
-        // show school, gradyear selects
-        $('#school-select-div').show();
-        $('#gradyear-select-div').show();
-      }
-
-    });
-
-    // Handle username edit in place form submit
-    $("#username-form").on("submit", function(e){
-      e.preventDefault();
-      request_data = {};
-      console.log("form submit");
-      request_data['alias'] = $("#username-input").val();
-      console.log("alias: " + request_data['alias']);
-      editProfile(request_data, alias_callback);
-    });
-
-    // Handle profile school submission
-    $(".select").on("change",function(){
-      request_data = {};
-      //console.log($(this).val());
-      //console.log($("#school-select option:selected").val());
-      if($(this).hasClass("school")){
-        val = $("#school-select option:selected").val();
-        if(val != "..."){
-          console.log("submit school");
-          request_data['school'] = val;
-          editProfile(request_data, school_callback);
-        }
-      }else if($(this).hasClass("year")){
-        val = $("#year-select option:selected").val();
-        request_data['year'] = val;
-        editProfile(request_data, year_callback);
-      }
-
-    });
-
-    // Search
-    $('.nav-collapse').on("submit", ".navbar-search", function(event){
-      event.preventDefault(); // ensure no DOM handling
-      console.log("SEARCH INTERCEPT");
-      if($('#navbar-search-input').val() !== ""){
-        window.location = '/search?q=\''+$('#navbar-search-input').val()+'\'';
-        return false; // do not pass event on to DOM handler
-      }
-    });
-
-    /*
-    'Old' ajax search
-    // Handle search request from navbar search
-    $('.nav-collapse').on("submit", ".navbar-search", function(event){
-      event.preventDefault(); // ensure no DOM handling
-      console.log("SEARCH INTERCEPT");
-      if($('#navbar-search-input').val() !== ""){
-        ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
-        return false; // do not pass event on to DOM handler
-      }
-    });
-    */
-
-  // handle search response
-  var search_callback = function(data){
-    console.log(data);
-    $('#file-view').hide();
-    $('#profile-container').hide();
-    $('#searchBySchool').hide();
-    $('#search-results').fadeOut('fast', function(){
-      $('#search-results').html(data).fadeIn('fast');
-    });
-
-  };
-
-  // perform ajax /search query
-  function ajaxSearchQuery(query, callback){
-    $.ajax({
-      url: "/search",
-      data: {'q': query},
-      success: callback
-    });
-  }
-
-}); // end on document ready
-
-
-    function editProfile(request_data, callback){
-      $.ajax({
-              url: "/editProfile",
-              data: request_data,
-              success: callback,
-              dataType: "json"
-          });
-    }
-
-    function year_callback(data){
-      if(data.status === "success"){
-        $("#year-karma").fadeOut('slow', function(){
-          $("#gradyear-select-div").slideUp('slow',function(){
-            $("#year-label").html(data.year).fadeIn('slow');
-            if(data.karma){
-              console.log(data.karma);
-              animate_karma(data.karma);
-            }
-          });
-        });
-      }
-    }
-
-    function school_callback(data){
-      if(data.status === "success"){
-        $("#school-karma").fadeOut('slow', function(){
-          $("#school-select-div").slideUp('slow',function(){
-            $("#school-label").html(data.school).fadeIn('slow');
-            if(data.karma){
-              console.log(data.karma);
-              animate_karma(data.karma);
-              $('#add-school-alert').slideUp('slow');
-            }
-          });
-        });
-      }
-    }
-
-    function alias_callback(data){
-      if(data.status === "success"){
-        console.log("Alias callback!");
-        console.log(data.alias);
-        $("#username-form").hide();
-        // show username-alias-label?
-        $(".alias-label").text(data.alias);
-        $("#alias-label-profile").show();
-      }
-    }
-
-    function animate_karma(delta_karma){
-      // TODO: current_level can become out of sync b/t
-      // page refreshes
-      current_level = "{{ current_level.title|upper }}";
-      current_karma += delta_karma
-      end_karma = {{ request.user.get_profile.getLevel.next_level.karma }};
-      new_progress = (current_karma + delta_karma) / (end_karma)*100;
-      console.log(String(new_progress+'%'));
-      $('#karma-progress').animate({
-        width: String(new_progress+'%'),
-      }, 5000);
-      // bug: hide/showing the karma-hover-label 
-      // breaks the label placement
-      //$('#karma-hover-label').fadeOut('fast');
-      $('#karma-label').fadeOut('fast', function(){
-        $('#karma-label').html(current_level + " (" + String(current_karma + delta_karma) + ")").fadeIn('fast');
-        $('#karma-hover-label').html(String(current_karma + delta_karma) + " POINTS");
-      });
-
-    }
-  </script>
-
-  <!--<script SRC="/static/js/search.js"></script>-->
-  <!--<script SRC="/static/js/browse.js"></script>-->
-  <script src="/static/js/jquery.screwdefaultbuttons.min.js"></script>
-
-{% endblock %}
-
 {% block content %}
 
 
@@ -504,7 +214,7 @@
             <h3>You haven't added any courses yet</h3>
             <p>Would you like to </p>
             <div class="upload">
-              <a class="button" data-toggle="modal" href="#upload">Upload notes</a>
+              <a class="button generic-upload" data-toggle="modal" href="#upload">Upload notes</a>
             </div>
           {% endif %}
         </div> <!-- .course-listing -->
@@ -534,5 +244,288 @@
   </div> <!-- .row -->
 </div> <!-- .wrap -->
 </div> <!-- .profile-page .container -->
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+  var current_karma = {{ user.get_profile.karma }};
+  var editing_profile = false;
+
+  $(document).ready(function(){
+
+    {% if not request.user.get_profile.submitted_school %}
+    // user has not submitted school, show karma reward
+    $('#school-karma').show();
+    $('#school-select-div').show();
+    {% endif %}
+    {% if not request.user.get_profile.submitted_grad_year %}
+    $('#year-karma').show();
+    $('#gradyear-select-div').show();
+    {% endif %}
+
+    // enable karma over popover info box
+    $('#karma-info').popover('hide');
+
+    $('.dropdown-toggle').dropdown();
+
+    $("div.showmore").click(function () {
+            $(this).nextAll('div.file').slideToggle('slow');
+      });
+
+    $('input:radio').screwDefaultButtons({
+                 checked: "url({{STATIC_URL}}img/check.jpg)",
+                 unchecked: "",
+                 width: 50,
+                 height: 50
+              });
+
+    // Handle browse notes view
+    var browse_view_initialized = false;
+    $('.container').on("click", "#browse-notes", function(){
+      console.log("BROWSE INTERCEPT");
+      if(!browse_view_initialized){
+        initializeBrowseView();
+        browse_view_initialized = true;
+      }
+      $('#search-results').hide();
+      $('#profile-container').hide();
+      $('#file-view').hide();
+      $('#searchBySchool').show();
+
+    });
+
+    // Handle KarmaNotes logo click
+     $('.container').on("click", ".brand", function(){
+      console.log("LOGO INTERCEPT");
+      $('#profile-container').show();
+      $('#file-view').hide();
+      $('#searchBySchool').hide();
+      $('#search-results').hide();
+
+    });
+
+     // Handle view file click
+     $('.container').on("click", ".view-file", function(){
+      console.log("FILE VIEW INTERCEPT");
+      file_pk = $(this).attr("id");
+
+      $.ajax({
+        url: "/file/"+file_pk,
+        success: function(data){
+          $('#file-view').hide();
+          $('#profile-container').hide();
+          $('#searchBySchool').hide();
+          $('#search-results').hide();
+          $('#file-view').html(data);
+          $('#file-view').show();
+        }
+      });
+
+
+    });
+
+     // Handle setting up modal-upload form from course upload button
+     $('.container').on("click", '.course-upload',  function(){
+      console.log("preparing form");
+      course = Object();
+      course.pk = $(this).attr('course-pk');
+      course.name = $(this).attr('course-name');
+      school = Object();
+      school.pk = $(this).attr('school-pk');
+      school.name = $(this).attr('school-name');
+        clearForm(course, school);
+     });
+
+    // Handle username edit in place click
+    $("#edit-profile").on("click", function(e){
+      e.preventDefault();
+      // Remove profile field selectors
+      // The edit-profile link is in "done" state
+      if(editing_profile == true){
+        editing_profile = false;
+        $('#edit-profile').html("edit");
+        $("#username-form").hide();
+        $('#school-select-div').hide();
+        $('#gradyear-select-div').hide();
+        $('#alias-label-profile').show();
+      }
+      else{
+        editing_profile = true;
+        $('#edit-profile').html("done");
+
+        // show alias editing field
+        $("#alias-label-profile").hide();
+        // If the user has no alias set,
+        // show username as alias input initial value
+        if($("#alias-label-profile").text() == "")
+          alias = $("#username-label-profile").text();
+        else
+          alias = $("#alias-label-profile").text();
+        console.log("edit username: " + alias);
+        $("#username-input").val(alias);
+        $("#username-form").show();
+        // show school, gradyear selects
+        $('#school-select-div').show();
+        $('#gradyear-select-div').show();
+      }
+
+    });
+
+    // Handle username edit in place form submit
+    $("#username-form").on("submit", function(e){
+      e.preventDefault();
+      request_data = {};
+      console.log("form submit");
+      request_data['alias'] = $("#username-input").val();
+      console.log("alias: " + request_data['alias']);
+      editProfile(request_data, alias_callback);
+    });
+
+    // Handle profile school submission
+    $(".select").on("change",function(){
+      request_data = {};
+      //console.log($(this).val());
+      //console.log($("#school-select option:selected").val());
+      if($(this).hasClass("school")){
+        val = $("#school-select option:selected").val();
+        if(val != "..."){
+          console.log("submit school");
+          request_data['school'] = val;
+          editProfile(request_data, school_callback);
+        }
+      }else if($(this).hasClass("year")){
+        val = $("#year-select option:selected").val();
+        request_data['year'] = val;
+        editProfile(request_data, year_callback);
+      }
+
+    });
+
+    // Search
+    $('.nav-collapse').on("submit", ".navbar-search", function(event){
+      event.preventDefault(); // ensure no DOM handling
+      console.log("SEARCH INTERCEPT");
+      if($('#navbar-search-input').val() !== ""){
+        window.location = '/search?q=\''+$('#navbar-search-input').val()+'\'';
+        return false; // do not pass event on to DOM handler
+      }
+    });
+
+    /*
+    'Old' ajax search
+    // Handle search request from navbar search
+    $('.nav-collapse').on("submit", ".navbar-search", function(event){
+      event.preventDefault(); // ensure no DOM handling
+      console.log("SEARCH INTERCEPT");
+      if($('#navbar-search-input').val() !== ""){
+        ajaxSearchQuery($('#navbar-search-input').val(), search_callback);
+        return false; // do not pass event on to DOM handler
+      }
+    });
+    */
+
+  // handle search response
+  var search_callback = function(data){
+    console.log(data);
+    $('#file-view').hide();
+    $('#profile-container').hide();
+    $('#searchBySchool').hide();
+    $('#search-results').fadeOut('fast', function(){
+      $('#search-results').html(data).fadeIn('fast');
+    });
+
+  };
+
+  // perform ajax /search query
+  function ajaxSearchQuery(query, callback){
+    $.ajax({
+      url: "/search",
+      data: {'q': query},
+      success: callback
+    });
+  }
+
+}); // end on document ready
+
+
+    function editProfile(request_data, callback){
+      $.ajax({
+              url: "/editProfile",
+              data: request_data,
+              success: callback,
+              dataType: "json"
+          });
+    }
+
+    function year_callback(data){
+      if(data.status === "success"){
+        $("#year-karma").fadeOut('slow', function(){
+          $("#gradyear-select-div").slideUp('slow',function(){
+            $("#year-label").html(data.year).fadeIn('slow');
+            if(data.karma){
+              console.log(data.karma);
+              animate_karma(data.karma);
+            }
+          });
+        });
+      }
+    }
+
+    function school_callback(data){
+      if(data.status === "success"){
+        // update global school_pk
+        user_school_pk = data.school_pk;
+        $("#school-karma").fadeOut('slow', function(){
+          $("#school-select-div").slideUp('slow',function(){
+            $("#school-label").html(data.school).fadeIn('slow');
+            if(data.karma){
+              console.log(data.karma);
+              animate_karma(data.karma);
+              $('#add-school-alert').slideUp('slow');
+            }
+          });
+        });
+      }
+    }
+
+    function alias_callback(data){
+      if(data.status === "success"){
+        console.log("Alias callback!");
+        console.log(data.alias);
+        $("#username-form").hide();
+        // show username-alias-label?
+        $(".alias-label").text(data.alias);
+        $("#alias-label-profile").show();
+      }
+    }
+
+    
+    function animate_karma(delta_karma){
+        // TODO: current_level can become out of sync b/t
+        // page refreshes
+        current_level = "{{ current_level.title|upper }}";
+        current_karma += delta_karma
+        end_karma = {{ request.user.get_profile.getLevel.next_level.karma }};
+        new_progress = (current_karma + delta_karma) / (end_karma)*100;
+        console.log(String(new_progress+'%'));
+        $('#karma-progress').animate({
+          width: String(new_progress+'%'),
+        }, 5000);
+        // bug: hide/showing the karma-hover-label 
+        // breaks the label placement
+        //$('#karma-hover-label').fadeOut('fast');
+        $('#karma-label').fadeOut('fast', function(){
+          $('#karma-label').html(current_level + " (" + String(current_karma + delta_karma) + ")").fadeIn('fast');
+          $('#karma-hover-label').html(String(current_karma + delta_karma) + " POINTS");
+        });
+
+  }
+  </script>
+
+  <!--<script SRC="/static/js/search.js"></script>-->
+  <!--<script SRC="/static/js/browse.js"></script>-->
+  <script src="/static/js/jquery.screwdefaultbuttons.min.js"></script>
 
 {% endblock %}

@@ -38,6 +38,8 @@ from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import userCanView
 
+from recaptcha.client import captcha as recaptcha
+
 
 def e404(request):
     response = nav_helper(request)
@@ -90,6 +92,23 @@ def fileMeta(request):
                 file.owner = request.user
             else:
                 file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
+                # Perform reCAPTCHA check
+                if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
+                    print 'challenge: ' + str(request.POST['recaptcha_challenge'])
+                    print 'response: ' + str(request.POST['recaptcha_response'])
+                    print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
+                    check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
+                        request.POST['recaptcha_response'],
+                        settings.RECAPTCHA_PRIVATE_KEY, {})
+                else:
+                    print 'recaptcha keys not found in request.POST'
+                    raise Http404
+
+                if not check_captcha.is_valid:
+                    print check_captcha.error_code
+                    response['status'] = 'invalid'
+                    response['message'] = 'Incorrect captcha response. Please try again.'
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
             try:
                 _school_id = int(form.cleaned_data["school_pk"])
                 _course_id = int(form.cleaned_data["course_pk"])
@@ -108,6 +127,7 @@ def fileMeta(request):
             response = {}
             response["status"] = "success"
             response["file_pk"] = file.pk
+            response["karma"] = file.karmaValue()
             print "fileMeta form valid! " + str(file.pk)
             # lets us use django's messaging system for alert-notifications
             # in our design on upload success at the top of the profile
@@ -125,12 +145,11 @@ def fileMeta(request):
             response["status"] = "invalid"
             response["form"] = form
             response["message"] = "Please check your form data."
-            return TemplateResponse(request,
-                    'ajaxFormResponse_min.html', response)
+            return HttpResponse(json.dumps(response), mimetype="application/json")
 
     else:
         # if not POST or not ajax
-        response["status"] = "invalid request"
+        response["status"] = "invalid"
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -225,6 +244,10 @@ def nav_helper(request, response={}):
 
     user_level = request.user.get_profile().getLevel()
     response['current_level'] = user_level['current_level']
+    if user_profile.school != None:
+        response['school_pk'] = user_profile.school.pk
+    else:
+        response['school_pk'] = 0
 
     # The user has reached the top level
     if not 'next_level' in user_level:
@@ -270,14 +293,17 @@ def _post_user_create_session_hook(request):
         as an anon user and saves them to the new user object.
         This might make more sense as a middleware, but this works for now.
     """
-    if 'unclaimed_files' in request.session:
+    print 'post_user_create hook!'
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        print 'found unclaimed files session key'
         for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
             try:
                 unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+                print "saved " + str(unclaimed_file.title)
             except:
                 print "We couldn't save this user's files"
             unclaimed_file.owner = request.user
-            unclaimed_file.save() # Handles generating Event + Awarding Karma
+            unclaimed_file.save()  # Handles generating Event + Awarding Karma
         del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
 
 
@@ -453,6 +479,7 @@ def editProfile(request):
             do_save = True
             user_profile.school = School.objects.get(pk=int(request.GET['school']))
             response['school'] = user_profile.school.name
+            response['school_pk'] = user_profile.school.pk
             # When the user_profile is saved, submitted_school / year are adjusted
             if not user_profile.submitted_school:
                 response['karma'] = ReputationEventType.objects.get(title="profile-school").actor_karma

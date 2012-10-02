@@ -4,61 +4,6 @@
 {% block header %}
 
 <link rel="stylesheet" type="text/css" href="/static/css/homepage-carousel/tango/skin.css">
-<script type="text/javascript" src="static/js/jquery.jcarousel.min.js"></script>
-<script type="text/javascript" src="static/js/jquery.screwdefaultbuttons.min.js"></script>
-
-<script type="text/javascript">
-function mycarousel_initCallback(carousel) {
-  // Disable autoscrolling if the user clicks the prev or next button.
-  carousel.buttonNext.bind('click', function() {
-    carousel.startAuto(0);
-  });
-
-  carousel.buttonPrev.bind('click', function() {
-    carousel.startAuto(0);
-  });
-
-  // Pause autoscrolling if the user moves with the cursor over the clip.
-  carousel.clip.hover(function() {
-    carousel.stopAuto();
-  }, function() {
-    carousel.startAuto();
-  });
-};
-
-jQuery(document).ready(function() {
-  jQuery('#mycarousel').jcarousel({
-    vertical: true,
-    auto: 2,
-    scroll: 1,
-    wrap:'circular',
-    itemFallbackDimension: 300,
-    initCallback: mycarousel_initCallback
-  });
-});
-
-</script>
-<script type="text/javascript">
-
-$(document).ready(function(){
-  $('.dropdown-toggle').dropdown();
-
-  $("div.file.row-fluid").hover(function () {
-    $(this).children('.file-info-action').toggleClass("hide");
-  });
-  
-  $("div.showmore").click(function () {
-    $(this).nextAll('div.file').slideToggle('slow');
-  });
-  
-  $('input:radio').screwDefaultButtons({
-               checked: "url(img/check.jpg)",
-               unchecked: "",
-               width: 50,
-               height: 50
-            });
-});
-</script>
 {% endblock %}
 
 {% block content %}
@@ -121,7 +66,7 @@ $(document).ready(function(){
       <h1>Share notes. Ace your exams.</h1>
       <h2>Upload your notes to get instant access to over {{ file_count }} study materials. Free.</h2>
       <div class="call-to-action">
-        <a data-toggle="modal" href="#upload" class="button">UPLOAD FILE</a>
+        <a data-toggle="modal" href="#upload" class="button generic-upload">UPLOAD FILE</a>
         <div class="clear"></div>
         <div class="instant">for instant access</div>
         {# <div class="dragdrop">Or drag + drop anywhere on this page</div> #}
@@ -144,4 +89,62 @@ $(document).ready(function(){
   </ul>
 </div> <!-- #home -->
 {% include 'footer.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="static/js/jquery.jcarousel.min.js"></script>
+<script type="text/javascript" src="static/js/jquery.screwdefaultbuttons.min.js"></script>
+
+<script type="text/javascript">
+function mycarousel_initCallback(carousel) {
+  // Disable autoscrolling if the user clicks the prev or next button.
+  carousel.buttonNext.bind('click', function() {
+    carousel.startAuto(0);
+  });
+
+  carousel.buttonPrev.bind('click', function() {
+    carousel.startAuto(0);
+  });
+
+  // Pause autoscrolling if the user moves with the cursor over the clip.
+  carousel.clip.hover(function() {
+    carousel.stopAuto();
+  }, function() {
+    carousel.startAuto();
+  });
+};
+
+jQuery(document).ready(function() {
+  jQuery('#mycarousel').jcarousel({
+    vertical: true,
+    auto: 2,
+    scroll: 1,
+    wrap:'circular',
+    itemFallbackDimension: 300,
+    initCallback: mycarousel_initCallback
+  });
+});
+
+</script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+  $('.dropdown-toggle').dropdown();
+
+  $("div.file.row-fluid").hover(function () {
+    $(this).children('.file-info-action').toggleClass("hide");
+  });
+  
+  $("div.showmore").click(function () {
+    $(this).nextAll('div.file').slideToggle('slow');
+  });
+  
+  $('input:radio').screwDefaultButtons({
+               checked: "url(img/check.jpg)",
+               unchecked: "",
+               width: 50,
+               height: 50
+            });
+});
+</script>
 {% endblock %}
