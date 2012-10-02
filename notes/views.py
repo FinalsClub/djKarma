@@ -38,6 +38,8 @@ from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import userCanView
 
+from recaptcha.client import captcha as recaptcha
+
 
 def e404(request):
     response = nav_helper(request)
@@ -90,6 +92,23 @@ def fileMeta(request):
                 file.owner = request.user
             else:
                 file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
+                # Perform reCAPTCHA check
+                if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
+                    print 'challenge: ' + str(request.POST['recaptcha_challenge'])
+                    print 'response: ' + str(request.POST['recaptcha_response'])
+                    print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
+                    check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
+                        request.POST['recaptcha_response'],
+                        settings.RECAPTCHA_PRIVATE_KEY, {})
+                else:
+                    print 'recaptcha keys not found in request.POST'
+                    raise Http404
+
+                if not check_captcha.is_valid:
+                    print check_captcha.error_code
+                    response['status'] = 'invalid'
+                    response['message'] = 'Incorrect captcha response. Please try again.'
+                    return HttpResponse(json.dumps(response), mimetype="application/json")
             try:
                 _school_id = int(form.cleaned_data["school_pk"])
                 _course_id = int(form.cleaned_data["course_pk"])
@@ -126,12 +145,11 @@ def fileMeta(request):
             response["status"] = "invalid"
             response["form"] = form
             response["message"] = "Please check your form data."
-            return TemplateResponse(request,
-                    'ajaxFormResponse_min.html', response)
+            return HttpResponse(json.dumps(response), mimetype="application/json")
 
     else:
         # if not POST or not ajax
-        response["status"] = "invalid request"
+        response["status"] = "invalid"
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 

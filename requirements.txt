@@ -14,4 +14,5 @@ django-haystack==1.2.7
 pysolr==2.1.0-beta
 celery==2.5.3
 django-celery==2.5.5
+recaptcha-client==1.0.6
 -e git://github.com/FinalsClub/django-ajax-uploader.git#egg=ajaxuploader-dev

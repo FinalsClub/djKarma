@@ -21,6 +21,8 @@ from notes.credentials import DEV_UPLOAD_ROOT
 from notes.credentials import BETA_UPLOAD_ROOT
 from notes.credentials import PROD_UPLOAD_ROOT
 
+from notes.credentials import RECAPTCHA_PRIVATE_KEY
+
 import os
 import djcelery
 

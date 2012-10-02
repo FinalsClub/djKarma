@@ -176,7 +176,7 @@
               $('#modal-metadata-form').slideUp('slow');
             }
             else{
-              alert('Please check your form input');
+              alert(data.message);
             }
           },
           type: 'POST'
@@ -261,10 +261,15 @@
   });// end document ready
 
   function showUploadSuccessMessage(data){
-    message = "You just uploaded <a href=\""+file_url+"\">" + $('#modal-title-input').val() + "</a> to " + $('#modal-course-input').val() + " at " + $('#modal-school-input').val() + ".<br/>" +
-              "You've been awarded <span class=\"karma\">+" + data.karma + " </span> karma points for your contribution.";
+    message = "You just uploaded <a href=\""+file_url+"\">" + $('#modal-title-input').val() + "</a> to " + $('#modal-course-input').val() + " at " + $('#modal-school-input').val() + ".<br/>";
+    
+    if(!anon_user)
+      message += "You've been awarded <span class=\"karma\">+" + data.karma + " </span> karma points for your contribution.";
+    else
+      message += "<a href=\"/accounts/register/\">Create an account</a> now and earn <span class=\"karma\">+" + data.karma + " </span> karma points for your contribution.";
     $('#upload-success-message').html(message);
-    animate_karma(data.karma);
+    if(!anon_user)
+      animate_karma(data.karma);
     $('#modal-upload-success').show();
 
   }
@@ -346,6 +351,24 @@
 
     if(course !== "None" && school !== "None")
       $('#modal-misc').show();
+
+    if(anon_user === true){
+      console.log('init recaptcha');
+      // Initialize the reCAPTCHA
+      Recaptcha.create("6Lc-LNcSAAAAANMkBPJkyROrG8kt7TcpXvm_RIhC",
+        "recaptcha",
+        {
+          theme: "red",
+          callback: Recaptcha.focus_response_field
+        }
+      );
+
+      // show TOS and reCaptcha div
+      $('#zero-user-form-extras').show();
+    } else{
+      console.log('do not init recaptcha');
+    }
+
   }
 
   function validateForm(){
@@ -370,21 +393,33 @@
       alert("Please upload a file first");
       return false;
     }
+    // if anon user, check that TOS is agreed
+    if( anon_user === true && !$('#modal-tos-agree').is(':checked') ){
+      alert("Please read and indicate you agree to our terms.");
+    }
     return true;
   }
 
   function serializeFormData(){
-    response = new Object();
+    response = {};
     response.school_pk = school_pk;
     response.course_pk = course_pk;
     response.title = $('#modal-title-input').val();
     response.description = $('#modal-description-input').val();
     response.type = $('input[name=optionsRadio]:checked').val();
+
     //javascript booleans are 'true', 'false'. python's are 'True', 'False'
     if($('#modal-current-course').is(':checked'))
       response.in_course = 'True';
     else
       response.in_course = 'False';
+
+    // If anon user, bundle re-Captcha data
+    if(anon_user === true){
+      response.tos = 'True';
+      response.recaptcha_challenge = $('#recaptcha_challenge_field').val();
+      response.recaptcha_response = $('#recaptcha_response_field').val();
+    }
 
     response.file_pk = file_pk;
     console.log('RESPONSE');

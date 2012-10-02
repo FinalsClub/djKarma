@@ -338,14 +338,6 @@
         clearForm(course, school);
      });
 
-     // Handle setting up modal-upload from generic
-     // 'Upload notes' button
-     
-     $('.container').on("click", '.generic-upload', function(){
-      console.log("clearing form");
-      clearForm();
-     });
-
     // Handle username edit in place click
     $("#edit-profile").on("click", function(e){
       e.preventDefault();
@@ -509,26 +501,27 @@
       }
     }
 
+    
     function animate_karma(delta_karma){
-      // TODO: current_level can become out of sync b/t
-      // page refreshes
-      current_level = "{{ current_level.title|upper }}";
-      current_karma += delta_karma
-      end_karma = {{ request.user.get_profile.getLevel.next_level.karma }};
-      new_progress = (current_karma + delta_karma) / (end_karma)*100;
-      console.log(String(new_progress+'%'));
-      $('#karma-progress').animate({
-        width: String(new_progress+'%'),
-      }, 5000);
-      // bug: hide/showing the karma-hover-label 
-      // breaks the label placement
-      //$('#karma-hover-label').fadeOut('fast');
-      $('#karma-label').fadeOut('fast', function(){
-        $('#karma-label').html(current_level + " (" + String(current_karma + delta_karma) + ")").fadeIn('fast');
-        $('#karma-hover-label').html(String(current_karma + delta_karma) + " POINTS");
-      });
+        // TODO: current_level can become out of sync b/t
+        // page refreshes
+        current_level = "{{ current_level.title|upper }}";
+        current_karma += delta_karma
+        end_karma = {{ request.user.get_profile.getLevel.next_level.karma }};
+        new_progress = (current_karma + delta_karma) / (end_karma)*100;
+        console.log(String(new_progress+'%'));
+        $('#karma-progress').animate({
+          width: String(new_progress+'%'),
+        }, 5000);
+        // bug: hide/showing the karma-hover-label 
+        // breaks the label placement
+        //$('#karma-hover-label').fadeOut('fast');
+        $('#karma-label').fadeOut('fast', function(){
+          $('#karma-label').html(current_level + " (" + String(current_karma + delta_karma) + ")").fadeIn('fast');
+          $('#karma-hover-label').html(String(current_karma + delta_karma) + " POINTS");
+        });
 
-    }
+  }
   </script>
 
   <!--<script SRC="/static/js/search.js"></script>-->
