@@ -396,6 +396,7 @@
     // if anon user, check that TOS is agreed
     if( anon_user === true && !$('#modal-tos-agree').is(':checked') ){
       alert("Please read and indicate you agree to our terms.");
+      return false;
     }
     return true;
   }

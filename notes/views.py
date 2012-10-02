@@ -293,14 +293,17 @@ def _post_user_create_session_hook(request):
         as an anon user and saves them to the new user object.
         This might make more sense as a middleware, but this works for now.
     """
-    if 'unclaimed_files' in request.session:
+    print 'post_user_create hook!'
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        print 'found unclaimed files session key'
         for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
             try:
                 unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+                print "saved " + str(unclaimed_file.title)
             except:
                 print "We couldn't save this user's files"
             unclaimed_file.owner = request.user
-            unclaimed_file.save() # Handles generating Event + Awarding Karma
+            unclaimed_file.save()  # Handles generating Event + Awarding Karma
         del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
 
 

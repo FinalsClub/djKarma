@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import re
 
+from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
 from django.db import models
 from django.contrib.auth.models import User
@@ -281,8 +282,9 @@ class File(models.Model):
         if not self.pk:
             increment(self)
 
-        #print "awarded_karma: %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner is not None:
+        print "awarded_karma : %s, self.owner: %s" % (self.awarded_karma, self.owner)
+        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME):
+            print "awarding karma for file!"
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:
                 karma_event = self.KARMA_TYPES[self.type]
