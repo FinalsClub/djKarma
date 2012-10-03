@@ -299,11 +299,11 @@ def _post_user_create_session_hook(request):
         for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
             try:
                 unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+                unclaimed_file.owner = request.user
+                unclaimed_file.save()  # Handles generating Event + Awarding Karma
                 print "saved " + str(unclaimed_file.title)
             except:
                 print "We couldn't save this user's files"
-            unclaimed_file.owner = request.user
-            unclaimed_file.save()  # Handles generating Event + Awarding Karma
         del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
 
 
