@@ -324,7 +324,13 @@ def browse_schools(request):
     response = nav_helper(request)
     # make this order by the most notes in a school
     response['title'] = u"Schools"
-    response['schools'] = School.objects.annotate(num_course=Count('course')).order_by('num_course').reverse().all()
+    response['schools'] = School.objects.annotate(num_course=Count('course'))\
+                .order_by('num_course').reverse().filter(num_course__gt=0).all()
+    if request.user.get_profile().school not in response['schools']:
+        # create a new list of the user's school, extend it with the current list of schools
+        # this prepends the user's school to the top of the school list
+        response['schools'] = [request.user.get_profile().school] + list(response['schools'])
+        # this converts the QuerySet into a list, so this is not typesafe, but django templates do not care
     return render(request, 'browse_schools.html', response)
 
 
@@ -952,3 +958,10 @@ def captcha(request):
     '''
     form = KarmaForms.CaptchaForm()
     return TemplateResponse(request, 'captcha.html', {'form': form})
+
+
+def jobs(request):
+    ''' Jobs listing page
+    '''
+
+    return render(request, 'jobs.html')
