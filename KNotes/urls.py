@@ -35,6 +35,7 @@ urlpatterns = patterns('',
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
+    url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
     # Ajax File Upload
     url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
