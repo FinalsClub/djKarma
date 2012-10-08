@@ -960,3 +960,10 @@ def captcha(request):
     '''
     form = KarmaForms.CaptchaForm()
     return TemplateResponse(request, 'captcha.html', {'form': form})
+
+
+def jobs(request):
+    ''' Jobs listing page
+    '''
+
+    return render(request, 'jobs.html')
