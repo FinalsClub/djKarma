@@ -608,6 +608,8 @@ def addModel(request):
             if form.is_valid():
                 if type == "course" and request.user.get_profile().school != None:
                     new_model = Course.objects.create(title=form.cleaned_data['title'], school=request.user.get_profile().school)
+                    # add the newly created course to the requesting user's profile
+                    request.user.get_profile().courses.add(new_model)
                 elif type == "school":
                     new_model = School.objects.create(name=form.cleaned_data['title'])
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')

@@ -1,0 +1,27 @@
+Karmanotes.org sitemap (djKarma)
+
+/           homepage
+/404        404 display page
+/about      static about page
+/terms      terms of service
+/jobs       jobs at FinalsClub
+
+@require login
+/karma-events       list of a user's karma events (uploaded file, downloaded file)
+/profile            landing page for users, lists courses and files of that user
+/getting-started    checklist of initial actions for users
+/search             search results
+/browse/schools     list of schools
+/b/<school_slug>    School page, contains list of courses
+/b/<school_slug>/<course_slug>
+                    Course page, contains list of files
+/b/<school_slug>/<course_slug>/<file_id>
+                    File page, contains test of file
+
+@accout info
+/accounts/logout    logout page
+/accounts/login     login page and login fail redirect
+/accounts/register[/<invite_code]
+                    registration page, with optional field of who invited you to the site (they receive karma)
+
+/admin/*            backend admin interface, currently the default django styling for admin tools
