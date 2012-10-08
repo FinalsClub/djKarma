@@ -346,11 +346,11 @@ def browse_courses(request, school_query):
         pass
     # pass the school query to
     courses = _get_courses(request, school_query)
-    if isinstance(courses, tuple): # FIXME
+    if isinstance(courses, tuple):  # FIXME
         response['school'], response['courses'] = courses
         return render(request, 'browse_courses.html', response)
     else:
-        return Http404
+        raise Http404
 
 
 def _get_courses(request, school_query=None):

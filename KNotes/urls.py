@@ -17,6 +17,9 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+#from django.conf.urls.defaults import *
+from django.contrib.auth.views import password_reset
+
 from haystack.query import SearchQuerySet
 
 admin.autodiscover()
@@ -51,7 +54,7 @@ urlpatterns = patterns('',
 
     url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
-    url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+    #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
     url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
 
     # User Profile
@@ -103,6 +106,8 @@ urlpatterns = patterns('',
     # accepts the username that invited
     url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
+    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'password_reset.html'}),
+    #url(r'^accounts/password/reset/$', password_reset, {}),
 
     # admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
