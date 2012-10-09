@@ -113,6 +113,71 @@ def profile(request):
     response['your_files'] = File.objects.filter(owner=request.user).all()
     return render(request, 'navigation.html', response)
 
+""" ===========================================
+    Viewing and browsing lists and single pages
+    ===========================================
+"""
+@login_required
+def file(request, note_pk, action=None):
+    """ View Note HTML 
+        Args:
+            request: Django request object
+            note_pk: file_pk int
+            action: last url segment string indicating initial state. i.e: 'edit'
+    """
+
+    # Check that user has permission to read
+    #profile = request.user.get_profile()
+    response = nav_helper(request)
+    user = request.user
+    try:
+        profile = user.get_profile()
+    except:
+        raise Http404
+    # If the user does not have read permission, and the
+    # Requested files is not theirs
+    '''
+    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
+        #file_denied(request, note_pk)
+        pass
+    '''
+    try:
+        file = File.objects.get(pk=note_pk)
+    except:
+        raise Http404
+    # Increment note view count
+    file.viewCount += 1
+    file.save()
+
+    # If this file is not in the user's collection, karmic purchase occurs
+    #if file not in profile.files.all():
+    if(not userCanView(user, File.objects.get(pk=note_pk))):
+        # Buy Note viewing privelege for karma
+        # awardKarma will handle deducting appropriate karma
+        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
+        # Add 'purchased' file to user's collection
+        profile.files.add(file)
+        profile.save()
+
+    # This is ugly, but is needed to be able to get the note type full name
+    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+    url = iri_to_uri(file.file.url)
+    response['owns_file'] = (file.owner == request.user)
+    response['file'] = file
+    response['file_type'] = file_type
+    response['url'] = url
+
+    if action == 'edit':
+        #print 'ACTION EDIT'
+        response['editing_file'] = True
+    else:
+        response['editing_file'] = False
+        #print 'ACTION NONE'
+
+    return render(request, 'view-file.html', response)
+
+
+
 
 # AJAX
 def fileMeta(request):
@@ -652,66 +717,6 @@ def jqueryui_courses(request):
 
 def nurl_file(request, school_query, course_query, file_id, action=None):
     return file(request, file_id, action)
-
-
-@login_required
-def file(request, note_pk, action=None):
-    """ View Note HTML 
-        Args:
-            request: Django request object
-            note_pk: file_pk int
-            action: last url segment string indicating initial state. i.e: 'edit'
-    """
-
-    # Check that user has permission to read
-    #profile = request.user.get_profile()
-    response = nav_helper(request)
-    user = request.user
-    try:
-        profile = user.get_profile()
-    except:
-        raise Http404
-    # If the user does not have read permission, and the
-    # Requested files is not theirs
-    '''
-    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        #file_denied(request, note_pk)
-        pass
-    '''
-    try:
-        file = File.objects.get(pk=note_pk)
-    except:
-        raise Http404
-    # Increment note view count
-    file.viewCount += 1
-    file.save()
-
-    # If this file is not in the user's collection, karmic purchase occurs
-    #if file not in profile.files.all():
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
-        # Buy Note viewing privelege for karma
-        # awardKarma will handle deducting appropriate karma
-        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
-        # Add 'purchased' file to user's collection
-        profile.files.add(file)
-        profile.save()
-
-    # This is ugly, but is needed to be able to get the note type full name
-    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
-    url = iri_to_uri(file.file.url)
-    response['owns_file'] = (file.owner == request.user)
-    response['file'] = file
-    response['file_type'] = file_type
-    response['url'] = url
-
-    if action == 'edit':
-        #print 'ACTION EDIT'
-        response['editing_file'] = True
-    else:
-        response['editing_file'] = False
-        #print 'ACTION NONE'
-
-    return render(request, 'view-file.html', response)
 
 
 def file_denied(request, note_pk):
