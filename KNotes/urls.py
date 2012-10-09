@@ -50,7 +50,6 @@ urlpatterns = patterns('',
     url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
 
     url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
-    url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
 
     url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
