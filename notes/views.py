@@ -36,9 +36,18 @@ from models import ReputationEventType
 from profile_tasks import tasks
 from utils import complete_profile_prompt
 from utils import jsonifyModel
+from utils import nav_helper
 from utils import userCanView
 
 from recaptcha.client import captcha as recaptcha
+
+# For Ajax Uploader
+import_uploader = AjaxFileUploader()
+
+
+"""  Static pages, or nearly static pages  """
+def about(request):
+    return render(request, 'static/about.html')
 
 
 def e404(request):
@@ -64,19 +73,113 @@ def home(request):
                 'file_count': file_count})
 
 
-def about(request):
-    return render(request, 'static/about.html')
+def jobs(request):
+    ''' Jobs listing page '''
+    return render(request, 'jobs.html')
 
 
 def terms(request):
     return render(request, 'static/ToS.html')
 
+""" People pages, pages that are heavily customized for a particular user """
+def getting_started(request):
+    """ View for introducing a user to the site and asking them to accomplish intro tasks """
+    response = nav_helper(request)
+    response['tasks'] = []
+    for task in tasks:
+        t = {}
+        t['message'] = task().message
+        t['status'] = task().check(request.user.get_profile())
+        t['karma'] = task().karma
+        response['tasks'].append(t)
+    return render(request, 'getting-started.html', response)
 
-## :|: Uploading :|: &
-# For Ajax Uploader
-import_uploader = AjaxFileUploader()
+
+def karma_events(request):
+    """ Shows a time sorted log of your events that affect your
+        karma score positively or negatively.
+    """
+    # navigation.html
+    response = nav_helper(request)
+    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
+    return render(request, 'karma-events.html', response)
 
 
+@login_required
+def profile(request):
+    """ User Profile """
+    response = nav_helper(request)
+    response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
+    response['your_files'] = File.objects.filter(owner=request.user).all()
+    return render(request, 'navigation.html', response)
+
+""" ===========================================
+    Viewing and browsing lists and single pages
+    ===========================================
+"""
+@login_required
+def file(request, note_pk, action=None):
+    """ View Note HTML 
+        Args:
+            request: Django request object
+            note_pk: file_pk int
+            action: last url segment string indicating initial state. i.e: 'edit'
+    """
+
+    # Check that user has permission to read
+    #profile = request.user.get_profile()
+    response = nav_helper(request)
+    user = request.user
+    try:
+        profile = user.get_profile()
+    except:
+        raise Http404
+    # If the user does not have read permission, and the
+    # Requested files is not theirs
+    '''
+    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
+        #file_denied(request, note_pk)
+        pass
+    '''
+    try:
+        file = File.objects.get(pk=note_pk)
+    except:
+        raise Http404
+    # Increment note view count
+    file.viewCount += 1
+    file.save()
+
+    # If this file is not in the user's collection, karmic purchase occurs
+    #if file not in profile.files.all():
+    if(not userCanView(user, File.objects.get(pk=note_pk))):
+        # Buy Note viewing privelege for karma
+        # awardKarma will handle deducting appropriate karma
+        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
+        # Add 'purchased' file to user's collection
+        profile.files.add(file)
+        profile.save()
+
+    # This is ugly, but is needed to be able to get the note type full name
+    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+    url = iri_to_uri(file.file.url)
+    response['owns_file'] = (file.owner == request.user)
+    response['file'] = file
+    response['file_type'] = file_type
+    response['url'] = url
+
+    if action == 'edit':
+        #print 'ACTION EDIT'
+        response['editing_file'] = True
+    else:
+        response['editing_file'] = False
+        #print 'ACTION NONE'
+
+    return render(request, 'view-file.html', response)
+
+
+
+
+# AJAX
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
     response = {}
@@ -229,96 +332,6 @@ def smartModelQuery(request):
     raise Http404
 
 
-def nav_helper(request, response={}):
-    """ calculates information for the navigation sidebar for logged in users
-        :request:  a Request object that contains a user &etc
-        :response: (optional) a response dictionary to pass to the template
-        returns: a response dictionary
-    """
-    # TODO: turn this into a middleware or decorator
-    # TODO: implement the zero-user-model
-
-    # Calculate User's progress towards next Karma level
-    # Depends on models.Level objects
-    user_profile = request.user.get_profile()
-
-    user_level = request.user.get_profile().getLevel()
-    response['current_level'] = user_level['current_level']
-    if user_profile.school != None:
-        response['school_pk'] = user_profile.school.pk
-    else:
-        response['school_pk'] = 0
-
-    # The user has reached the top level
-    if not 'next_level' in user_level:
-        #print user_level['current_level'].title + " Top Level"
-        response['progress'] = 100
-    else:
-        #print user_level['current_level'].title + " " + user_level['next_level'].title
-        response['next_level'] = user_level['next_level']
-        response['progress'] = (user_profile.karma / float(response['next_level'].karma)) * 100
-
-    #Pre-populate ProfileForm with user's data
-
-        # If user has a school selected, fetch recent additions to School
-        # For the user's news feed
-        #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
-
-    response['messages'] = complete_profile_prompt(user_profile)
-    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.getName())
-    response['user_profile'] = user_profile
-    response = get_upload_form(response)
-
-    # Check for uploads made during this django session
-    # while user was not authenticated
-    _post_user_create_session_hook(request)
-
-    # home built auto-complete
-    '''
-    if not user_profile.school:
-        response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
-    if not user_profile.grad_year:
-        response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
-    '''
-    response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
-    response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
-
-    return response
-
-
-def _post_user_create_session_hook(request):
-    """ 
-        After a user logs in for the first time, their landing page needs to be
-        hooked into this function. This takes any files they may have uploaded
-        as an anon user and saves them to the new user object.
-        This might make more sense as a middleware, but this works for now.
-    """
-    print 'post_user_create hook!'
-    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
-        print 'found unclaimed files session key'
-        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
-            try:
-                unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
-                unclaimed_file.owner = request.user
-                unclaimed_file.save()  # Handles generating Event + Awarding Karma
-                print "saved " + str(unclaimed_file.title)
-            except:
-                print "We couldn't save this user's files"
-        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
-
-
-
-@login_required
-def your_courses(request):
-    """ List a user's courses on a profile-like page using django templates """
-    # We can perform this logic in nav_helper since that 
-    # covers more views (say we decide to change the default view for logged-in users)
-    #_post_user_create_session_hook(request)
-    response = nav_helper(request)
-    response['courses'] = request.user.get_profile().courses.all()
-    return render(request, 'your-courses.html', response)
-
-
 def browse_schools(request):
     """ Server-side templated browsing of notes by school, course and note """
     response = nav_helper(request)
@@ -346,11 +359,11 @@ def browse_courses(request, school_query):
         pass
     # pass the school query to
     courses = _get_courses(request, school_query)
-    if isinstance(courses, tuple): # FIXME
+    if isinstance(courses, tuple):  # FIXME
         response['school'], response['courses'] = courses
         return render(request, 'browse_courses.html', response)
     else:
-        return Http404
+        raise Http404
 
 
 def _get_courses(request, school_query=None):
@@ -436,37 +449,6 @@ def _get_notes(request, course_query, school):
         return Http404
     return _course, File.objects.filter(course=_course).distinct()
 
-
-def getting_started(request):
-    """ View for introducing a user to the site and asking them to accomplish intro tasks """
-    response = nav_helper(request)
-    response['tasks'] = []
-    for task in tasks:
-        t = {}
-        t['message'] = task().message
-        t['status'] = task().check(request.user.get_profile())
-        t['karma'] = task().karma
-        response['tasks'].append(t)
-    return render(request, 'getting-started.html', response)
-
-
-def karma_events(request):
-    """ Shows a time sorted log of your events that affect your
-        karma score positively or negatively.
-    """
-    # navigation.html
-    response = nav_helper(request)
-    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
-    return render(request, 'karma-events.html', response)
-
-
-@login_required
-def profile(request):
-    """ User Profile """
-    response = nav_helper(request)
-    response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
-    response['your_files'] = File.objects.filter(owner=request.user).all()
-    return render(request, 'navigation.html', response)
 
 
 @login_required
@@ -582,19 +564,6 @@ def editCourseMeta(request):
 
     raise Http404
 
-def get_upload_form(response):
-    """ Appends forms required for upload form to response
-        The way to make this smooth is:
-            user types option in autocomplete field >
-            after 3 characters, we search that via ajax
-            user is presented with options
-            when user clicks one of the options or hits enter, submits and saves school on field
-            the submit button also triggers the course field to appear like the school
-            when course is selected / created submits and saves course to file
-            course submit makes the metadata section appear
-    """
-    response['school_form'] = KarmaForms.SmartSchoolForm
-    return response
 
 @login_required
 def addModel(request):
@@ -608,6 +577,8 @@ def addModel(request):
             if form.is_valid():
                 if type == "course" and request.user.get_profile().school != None:
                     new_model = Course.objects.create(title=form.cleaned_data['title'], school=request.user.get_profile().school)
+                    # add the newly created course to the requesting user's profile
+                    request.user.get_profile().courses.add(new_model)
                 elif type == "school":
                     new_model = School.objects.create(name=form.cleaned_data['title'])
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
@@ -746,66 +717,6 @@ def jqueryui_courses(request):
 
 def nurl_file(request, school_query, course_query, file_id, action=None):
     return file(request, file_id, action)
-
-
-@login_required
-def file(request, note_pk, action=None):
-    """ View Note HTML 
-        Args:
-            request: Django request object
-            note_pk: file_pk int
-            action: last url segment string indicating initial state. i.e: 'edit'
-    """
-
-    # Check that user has permission to read
-    #profile = request.user.get_profile()
-    response = nav_helper(request)
-    user = request.user
-    try:
-        profile = user.get_profile()
-    except:
-        raise Http404
-    # If the user does not have read permission, and the
-    # Requested files is not theirs
-    '''
-    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        #file_denied(request, note_pk)
-        pass
-    '''
-    try:
-        file = File.objects.get(pk=note_pk)
-    except:
-        raise Http404
-    # Increment note view count
-    file.viewCount += 1
-    file.save()
-
-    # If this file is not in the user's collection, karmic purchase occurs
-    #if file not in profile.files.all():
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
-        # Buy Note viewing privelege for karma
-        # awardKarma will handle deducting appropriate karma
-        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
-        # Add 'purchased' file to user's collection
-        profile.files.add(file)
-        profile.save()
-
-    # This is ugly, but is needed to be able to get the note type full name
-    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
-    url = iri_to_uri(file.file.url)
-    response['owns_file'] = (file.owner == request.user)
-    response['file'] = file
-    response['file_type'] = file_type
-    response['url'] = url
-
-    if action == 'edit':
-        #print 'ACTION EDIT'
-        response['editing_file'] = True
-    else:
-        response['editing_file'] = False
-        #print 'ACTION NONE'
-
-    return render(request, 'view-file.html', response)
 
 
 def file_denied(request, note_pk):
@@ -960,8 +871,3 @@ def captcha(request):
     return TemplateResponse(request, 'captcha.html', {'form': form})
 
 
-def jobs(request):
-    ''' Jobs listing page
-    '''
-
-    return render(request, 'jobs.html')

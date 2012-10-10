@@ -17,6 +17,9 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+#from django.conf.urls.defaults import *
+from django.contrib.auth.views import password_reset
+
 from haystack.query import SearchQuerySet
 
 admin.autodiscover()
@@ -28,34 +31,32 @@ sqs = SearchQuerySet().highlight()
 
 urlpatterns = patterns('',
 
+    # Test url patterns
     url(r'^404$', 'notes.views.e404', name='404'),
     # captcha test
     url(r'^captcha$', 'notes.views.captcha', name='captcha'),
-    # Landing page.
+
+    # Static pages
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
+    ## Personal pages
+    # Karma events
+    url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
+    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
+    url(r'^profile$', 'notes.views.profile', name='profile'),
+
+    ## Ajax endpoints
     # Ajax File Upload
     url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
-
     # File meta data submission
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
 
-    # Karma events
-    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
-
-    url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
-    url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
 
     url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
-    # TODO: change these routes so they are unique regardless of path query for reverse()
-    url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
-    url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
 
-    # User Profile
-    url(r'^profile$', 'notes.views.profile', name='profile'),
     # User Profile Ajax submit
     url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
 
@@ -69,9 +70,6 @@ urlpatterns = patterns('',
     # Search
     url(r'^search/', 'notes.views.search'),
 
-    # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
 
     # Ajax Voting
     url(r'^vote/(\d{1,9999})$', 'notes.views.vote'),
@@ -103,6 +101,8 @@ urlpatterns = patterns('',
     # accepts the username that invited
     url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
+    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'password_reset.html'}),
+    #url(r'^accounts/password/reset/$', password_reset, {}),
 
     # admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -119,3 +119,10 @@ urlpatterns = patterns('',
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
 )
+    # Ajax requests from search page to populate 'Browse by School and Course' accordion
+    # Not being used and might be depricated
+    #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
+    #url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
+    # TODO: change these routes so they are unique regardless of path query for reverse()
+    #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
+    #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
