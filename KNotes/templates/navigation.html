@@ -62,7 +62,7 @@
             <img alt="" src="{{ user.get_profile.picture_url_large }}">
             <div class="caption">
               <div>
-                <span class="username-label" id="username-label-profile">{{ user.username }}</span>
+                <span class="username-label" id="username-label-profile">{{ user.get_profile.getName }}</span>
               </div>
               <div>
                 <span class="alias-label-description">Alias:</span>
@@ -99,7 +99,7 @@
                 <div style="clear:both"></div>
               </div>
 
-              <p>Karma Status: <div class="karma-status">{{ current_level.title }}</div></p>
+              <p style="display:inline;">Karma Status: <div class="karma-status">{{ current_level.title }}</div></p>
 
               <p><span>School:</span><span style="margin-left:5px" id="school-label">{{ user_profile.school }}</span></p>
               <div id="school-select-div" style="display:none">
