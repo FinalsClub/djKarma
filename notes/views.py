@@ -81,7 +81,38 @@ def jobs(request):
 def terms(request):
     return render(request, 'static/ToS.html')
 
-""" People pages, pages that are heavily customized for a particular user """
+
+def register(request, invite_user):
+    """ Display user login and signup screens
+        the registration/login.html template redirects login attempts
+        to django's built-in login view (django.contrib.auth.views.login).
+        new user registration is handled by this view (because there is no built-in)
+    """
+    # TODO: use give the invite_user some karma for referring someone
+    if request.method == 'POST':
+        #Fill form with POSTed data
+        form = KarmaForms.UserCreateForm(request.POST)
+        if form.is_valid():
+            print 'form valid'
+            #Save the new user from form data
+            new_user = form.save()
+            #Authenticate the new user
+            new_user = authenticate(username=request.POST['username'],
+                                    password=request.POST['password1'])
+            #Login in the new user
+            login(request, new_user)
+            return HttpResponseRedirect("/profile")
+        else:
+            return render(request, "registration/register.html", {
+        'form': form})
+    else:
+        form = KarmaForms.UserCreateForm()
+        return render(request, "registration/register.html", {'form': form})
+
+
+""" =====================================================================
+    People pages, pages that are heavily customized for a particular user
+    ===================================================================== """
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
     response = nav_helper(request)
@@ -115,11 +146,10 @@ def profile(request):
 
 """ ===========================================
     Viewing and browsing lists and single pages
-    ===========================================
-"""
+    =========================================== """
 @login_required
 def file(request, note_pk, action=None):
-    """ View Note HTML 
+    """ View Note HTML
         Args:
             request: Django request object
             note_pk: file_pk int
@@ -179,6 +209,9 @@ def file(request, note_pk, action=None):
 
 
 
+""" ==============
+    AJAX endpoints
+    ============== """
 # AJAX
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
@@ -371,6 +404,7 @@ def _get_courses(request, school_query=None):
         :school_query: unicode or int, will search for a the courses with that school matching
         returns: School, Courses+
     """
+    # TODO: move this to School
     if isinstance(school_query, int):
         #_school = School.objects.get_object_or_404(pk=school_query)
         _school = get_object_or_404(School, pk=school_query)
@@ -404,6 +438,8 @@ def browse_one_course(request, course_query, school):
     """ View for viewing notes from a fuzzy course search
         :course_query: unicode url match, to be type parsed
     """
+    # TODO: combine these function with `b_school_course`
+    # TOOD: move this to Course
     response = nav_helper(request)
     try:
         course_query = int(course_query)
@@ -419,7 +455,7 @@ def browse_one_course(request, course_query, school):
     response['viewed_files'] = request.user.get_profile().files.all()
     #response['thanked_files'] = [file.id for file in files if request.user in [vote.user for vote in file.votes.all()]]
 
-    # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this 
+    # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
     response['flagged_files'] = []
     for file in files:
@@ -521,7 +557,7 @@ def editFileMeta(request):
                 return HttpResponse(json.dumps(response), mimetype="application/json")
             else:
                 return HttpResponse(json.dumps({"status": "no input"}), mimetype="application/json")
-    
+
     raise Http404
 
 @login_required
@@ -607,6 +643,7 @@ def _add_course(user_profile, course_title=None, course_id=None):
         :course_title:    `notes.models.Course.title`
         :course_id:    `notes.models.Course.id`
     """
+    # TODO make a @staticmethod on UserProfile
     # FIXME: add conditional logic to see if course is already added and error handling
     if course_title is not None:
         course = Course.objects.get(title=course_title)
@@ -618,39 +655,6 @@ def _add_course(user_profile, course_title=None, course_id=None):
         return False
     user_profile.courses.add(course) # implies save()
     return True
-
-
-def register(request, invite_user):
-    """ Display user login and signup screens
-        the registration/login.html template redirects login attempts
-        to django's built-in login view (django.contrib.auth.views.login).
-        new user registration is handled by this view (because there is no built-in)
-    """
-    # TODO: use give the invite_user some karma for referring someone
-    if request.method == 'POST':
-        #Fill form with POSTed data
-        form = KarmaForms.UserCreateForm(request.POST)
-        if form.is_valid():
-            print 'form valid'
-            #Save the new user from form data
-            new_user = form.save()
-            #Authenticate the new user
-            new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            #Login in the new user
-            login(request, new_user)
-            return HttpResponseRedirect("/profile")
-        else:
-            return render(request, "registration/register.html", {
-        'form': form})
-    else:
-        form = KarmaForms.UserCreateForm()
-        return render(request, "registration/register.html", {'form': form})
-
-
-"""
-    AJAX views
-"""
 
 
 def instructors(request):
