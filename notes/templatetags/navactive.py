@@ -12,4 +12,5 @@ def navactive(request, urls):
     """
     if request.path in ( reverse(url) for url in urls.split() ):
         return "active" # class name for currently active link
-    return ""
+    else:
+        return ""
