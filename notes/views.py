@@ -390,40 +390,12 @@ def browse_courses(request, school_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    # pass the school query to
-    courses = _get_courses(request, school_query)
+    courses = School.get_courses(school_query)
     if isinstance(courses, tuple):  # FIXME
         response['school'], response['courses'] = courses
         return render(request, 'browse_courses.html', response)
     else:
         raise Http404
-
-
-def _get_courses(request, school_query=None):
-    """ Private search method.
-        :school_query: unicode or int, will search for a the courses with that school matching
-        returns: School, Courses+
-    """
-    # TODO: move this to School
-    if isinstance(school_query, int):
-        #_school = School.objects.get_object_or_404(pk=school_query)
-        _school = get_object_or_404(School, pk=school_query)
-    elif isinstance(school_query, unicode):
-        #_school = get_object_or_404(School, name__icontains=school_query)
-        #_school = School.objects.filter(name__icontains=school_query).all()[0]
-        # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
-        _school_q = School.objects.filter(slug=school_query) \
-                        .annotate(course_count=Count('course')) \
-                        .order_by('-course_count')
-        if len(_school_q) != 0:
-            _school = _school_q[0]
-        else:
-            return Http404
-    else:
-        print "No courses found for this query"
-        return Http404
-    # if I found a _school
-    return _school, Course.objects.filter(school=_school).distinct()
 
 
 def b_school_course(request, school_query, course_query):

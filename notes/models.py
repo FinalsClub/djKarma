@@ -8,6 +8,7 @@ from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Count
 from django.db.models.signals import post_save, post_delete
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -143,6 +144,33 @@ class School(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('browse-courses', [str(self.slug)])
+
+    @staticmethod
+    def get_courses(school_query=None):
+        """ Private search method.
+            :school_query: unicode or int, will search for a the courses with that school matching
+            returns: School, Courses+
+        """
+        # TODO: move this to School
+        if isinstance(school_query, int):
+            #_school = School.objects.get_object_or_404(pk=school_query)
+            _school = get_object_or_404(School, pk=school_query)
+        elif isinstance(school_query, unicode):
+            #_school = get_object_or_404(School, name__icontains=school_query)
+            #_school = School.objects.filter(name__icontains=school_query).all()[0]
+            # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
+            _school_q = School.objects.filter(slug=school_query) \
+                            .annotate(course_count=Count('course')) \
+                            .order_by('-course_count')
+            if len(_school_q) != 0:
+                _school = _school_q[0]
+            else:
+                raise Http404
+        else:
+            print "No courses found for this query"
+            raise Http404
+        # if I found a _school
+        return _school, Course.objects.filter(school=_school).distinct()
 
     def save(self, *args, **kwargs):
         # If a new School is being saved, increment SiteStat School count
