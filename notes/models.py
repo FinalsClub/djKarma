@@ -6,9 +6,10 @@ import re
 
 from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save, post_delete
+from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
 
 from social_auth.backends.facebook import FacebookBackend
@@ -188,6 +189,24 @@ class Course(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('browse-course', [str(self.school.slug), str(self.slug)])
+
+    @staticmethod
+    def get_notes(course_query, school):
+        """ Search method for a course and it's files
+            :course_query:
+                if int: Course.pk
+                if unicode: Course.title
+            returns Course, Notes+
+        """
+        if isinstance(course_query, int):
+            _course = get_object_or_404(Course, pk=course_query)
+        elif isinstance(course_query, unicode):
+            _course = get_object_or_404(Course, slug=course_query, school=school)
+        else:
+            print "No course found, so no notes"
+            return Http404
+        return _course, File.objects.filter(course=_course).distinct()
+
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count

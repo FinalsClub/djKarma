@@ -446,7 +446,7 @@ def browse_one_course(request, course_query, school):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    course, files = _get_notes(request, course_query, school)
+    course, files = Course.get_notes(course_query, school)
     response['course'], response['files'] = course, files
     # get the users who are members of the course
     response['users'] = course.userprofile_set.all()
@@ -467,24 +467,6 @@ def browse_one_course(request, course_query, school):
                 response['flagged_files'].append(file.id)
 
     return render(request, 'browse_one_course.html', response)
-
-
-def _get_notes(request, course_query, school):
-    """ Private search method for a course and it's files
-        :course_query:
-            if int: Course.pk
-            if unicode: Course.title
-        returns Course, Notes+
-    """
-    if isinstance(course_query, int):
-        _course = get_object_or_404(Course, pk=course_query)
-    elif isinstance(course_query, unicode):
-        _course = get_object_or_404(Course, slug=course_query, school=school)
-    else:
-        print "No course found, so no notes"
-        return Http404
-    return _course, File.objects.filter(course=_course).distinct()
-
 
 
 @login_required
@@ -873,5 +855,3 @@ def captcha(request):
     '''
     form = KarmaForms.CaptchaForm()
     return TemplateResponse(request, 'captcha.html', {'form': form})
-
-
