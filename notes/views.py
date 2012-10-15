@@ -556,8 +556,7 @@ def editCourseMeta(request):
 
 @login_required
 def addModel(request):
-    ''' This replaces addCourseOrSchool in the new
-        modal-upload process
+    ''' AJAX: add a new course or school
     '''
     if request.is_ajax() and request.method == 'POST':
         if 'type' in request.POST:
