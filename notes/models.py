@@ -9,6 +9,7 @@ from KNotes.settings import BETA
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save, post_delete
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
 
@@ -204,7 +205,7 @@ class Course(models.Model):
             _course = get_object_or_404(Course, slug=course_query, school=school)
         else:
             print "No course found, so no notes"
-            return Http404
+            raise Http404
         return _course, File.objects.filter(course=_course).distinct()
 
 
@@ -488,6 +489,25 @@ class UserProfile(models.Model):
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
+
+    def add_course(self, course_title=None, course_id=None):
+        """ Helper function to add a course to a userprofile
+            for avoiding duplicate code
+            :user_profile: `notes.models.UserProfile`
+            :course_title:    `notes.models.Course.title`
+            :course_id:    `notes.models.Course.id`
+        """
+        # FIXME: add conditional logic to see if course is already added and error handling
+        if course_title is not None:
+            course = Course.objects.get(title=course_title)
+        elif course_id is not None:
+            course = Course.objects.get(pk=course_id)
+        else:
+            print "[_add_course]: you passed neither a course_title nor a course_id, \
+            nothing to add"
+            return False
+        self.courses.add(course) # implies save()
+        return True
 
     def getLevel(self):
         """ Determine the current level of the user

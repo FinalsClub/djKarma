@@ -255,7 +255,7 @@ def fileMeta(request):
 
             if _course_id is not None and form.cleaned_data['in_course'] == "True":
                 # if in_course selected, add the course to their profile
-                _add_course(request.user.get_profile(), course_id=_course_id)
+                request.user.get_profile().add_course(course_id=_course_id)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
             print "file.save()"
@@ -438,8 +438,7 @@ def browse_one_course(request, course_query, school):
     """ View for viewing notes from a fuzzy course search
         :course_query: unicode url match, to be type parsed
     """
-    # TODO: combine these function with `b_school_course`
-    # TOOD: move this to Course
+    # TODO: combine this function with `b_school_course`
     response = nav_helper(request)
     try:
         course_query = int(course_query)
@@ -449,11 +448,11 @@ def browse_one_course(request, course_query, school):
     course, files = Course.get_notes(course_query, school)
     response['course'], response['files'] = course, files
     # get the users who are members of the course
-    response['users'] = course.userprofile_set.all()
-    # get the karma events associaged with the course
+    response['profiles'] = course.userprofile_set.all()
+
+    # get the karma events associated with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     response['viewed_files'] = request.user.get_profile().files.all()
-    #response['thanked_files'] = [file.id for file in files if request.user in [vote.user for vote in file.votes.all()]]
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
@@ -609,34 +608,16 @@ def add_course_to_profile(request):
         is selected in the upload modal
     """
     if request.is_ajax() and request.method == 'POST':
-        print "this is the add_course request\n\t %s" % request.POST
         user_profile = request.user.get_profile()
-        status = _add_course(user_profile, course_title=request.POST['title'])
+        if 'title' in request.POST:
+            status = user_profile.add_course(course_title=request.POST['title'])
+        elif 'id' in request.POST:  # passing the course ID rather than title
+            status = user_profile.add_course(course_id=request.POST['id'])
+
         if status:
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
-            print "There was an error adding a course to a profile"
-            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
-
-def _add_course(user_profile, course_title=None, course_id=None):
-    """ Helper function to add a course to a userprofile
-        for avoiding duplicate code
-        :user_profile: `notes.models.UserProfile`
-        :course_title:    `notes.models.Course.title`
-        :course_id:    `notes.models.Course.id`
-    """
-    # TODO make a @staticmethod on UserProfile
-    # FIXME: add conditional logic to see if course is already added and error handling
-    if course_title is not None:
-        course = Course.objects.get(title=course_title)
-    elif course_id is not None:
-        course = Course.objects.get(pk=course_id)
-    else:
-        print "[_add_course]: you passed neither a course_title nor a course_id, \
-        nothing to add"
-        return False
-    user_profile.courses.add(course) # implies save()
-    return True
+            return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
 
 def instructors(request):
