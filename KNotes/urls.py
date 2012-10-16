@@ -101,6 +101,7 @@ urlpatterns = patterns('',
     # This logout allows us to pass a redirect:
     # <a href="{% url auth_logout_next /some/location %}">Logout</a>
     #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
+    url(r'^accounts/confirm/(?P<confirmation_code>[^/]+)$', 'notes.views.confirm_email', name='confirm_email'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
     # accepts the username that invited
@@ -123,4 +124,5 @@ urlpatterns = patterns('',
     url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+
 )

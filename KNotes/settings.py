@@ -23,6 +23,9 @@ from notes.credentials import PROD_UPLOAD_ROOT
 
 from notes.credentials import RECAPTCHA_PRIVATE_KEY
 
+from notes.credentials import SMTP_USERNAME
+from notes.credentials import SMTP_PASSWORD
+
 import os
 import djcelery
 
@@ -264,8 +267,8 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.request", # Makes request accessible to templates
-    "django.core.context_processors.static", # Makes STATIC_URL available
+    "django.core.context_processors.request",  # Makes request accessible to templates
+    "django.core.context_processors.static",  # Makes STATIC_URL available
 )
 
 INSTALLED_APPS = (
@@ -284,10 +287,9 @@ INSTALLED_APPS = (
     'south',
     'gunicorn',
     'simplemathcaptcha',
-    'ajaxuploader', # Ajax fileUpload
+    'ajaxuploader',  # Ajax fileUpload
     'djcelery',     # Django-Celery apps:
     'kombu.transport.django',
-    # Not sure this is necessary, yet
     'haystack',
 
     # our app(s)
@@ -343,6 +345,15 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_USE_TLS       = True
+EMAIL_HOST          = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_HOST_USER     = SMTP_USERNAME
+EMAIL_HOST_PASSWORD = SMTP_PASSWORD
+EMAIL_PORT          = 587
+
+TEMPLATED_EMAIL_TEMPLATE_DIR = 'templated_email/'  # use '' for top level template dir, ensure there is a trailing slash
+TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
 
 try:
     # For development, mv the initial file `dev_settings.py` to be named `local_settings.py`
