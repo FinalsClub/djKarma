@@ -10,6 +10,9 @@ def navactive(request, urls):
         :request: a django request object, required for looking up current url
         :urls:  the list of url names that should highlight this URL
     """
+    if isinstance(request, str):
+        return ""
     if request.path in ( reverse(url) for url in urls.split() ):
         return "active" # class name for currently active link
-    return ""
+    else:
+        return ""

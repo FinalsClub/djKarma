@@ -31,72 +31,66 @@ sqs = SearchQuerySet().highlight()
 
 urlpatterns = patterns('',
 
+    #   ---------------------------------------------------
+    # Test url patterns
     url(r'^404$', 'notes.views.e404', name='404'),
     # captcha test
     url(r'^captcha$', 'notes.views.captcha', name='captcha'),
-    # Landing page.
+
+    #   ---------------------------------------------------
+    # Static pages
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
-    # Ajax File Upload
-    url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
-
-    # File meta data submission
-    url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
-
+    #   ---------------------------------------------------
+    ## Personal pages
     # Karma events
-    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
-
     url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
-    url(r'^your-courses$', 'notes.views.your_courses', name='your-courses'),
-
-    url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
-    # TODO: change these routes so they are unique regardless of path query for reverse()
-    #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
-    url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
-
-    # User Profile
+    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
     url(r'^profile$', 'notes.views.profile', name='profile'),
-    # User Profile Ajax submit
-    url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
 
-    # Note View
-    url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
-    url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),
-
-    url(r'^editFileMeta$', 'notes.views.editFileMeta', name='editFileMeta'),
-    # Browse
-
+    #   ---------------------------------------------------
     # Search
     url(r'^search/', 'notes.views.search'),
 
-    # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
-
+    #   ---------------------------------------------------
+    ## Ajax endpoints
+    # Editing ajax points
+    url(r'^editProfile$', 'notes.views.editProfile', name='editProfile'),
+    url(r'^editFileMeta$', 'notes.views.editFileMeta', name='editFileMeta'),
+    url(r'^editCourseMeta$', 'notes.views.editCourseMeta', name='editCourseMeta'),
+    # Ajax File Upload
+    url(r'^ajax-upload$', 'notes.views.import_uploader', name="ajax_upload"),
+    # File meta data submission
+    url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
     # Ajax Voting
     url(r'^vote/(\d{1,9999})$', 'notes.views.vote'),
-
     # Ajax requests from upload usher. Text input to model get / create
     url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
-
     # Ajax requests from note upload form for autocomplete fields
     url(r'^courses$', 'notes.views.courses'),
     url(r'^schools$', 'notes.views.schools'),
     url(r'^instructors$', 'notes.views.instructors'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
-
     # Ajax request to add a course to a user's profile
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
-
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),
-
     # Edit course
-    url(r'^editCourseMeta$', 'notes.views.editCourseMeta', name='editCourseMeta'),
 
+    #   ---------------------------------------------------
+    ## Browsing schools, courses and files
+    url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
+    # TODO: change these routes so they are unique regardless of path query for reverse()
+    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})/(?P<action>[^/]+)$', 'notes.views.nurl_file'),
+    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})$', 'notes.views.nurl_file', name='nurl_file'),
+    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
+    # Browse the courses of one school
+    url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+
+    #   ---------------------------------------------------
     # Auth
     # This logout allows us to pass a redirect:
     # <a href="{% url auth_logout_next /some/location %}">Logout</a>
@@ -115,14 +109,16 @@ urlpatterns = patterns('',
 
     # admin:
     url(r'^admin/', include(admin.site.urls)),
-
-    # latest browse views, must come last because they are greedy
-    url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
-    # TODO: change these routes so they are unique regardless of path query for reverse()
-    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})/(?P<action>[^/]+)$', 'notes.views.nurl_file'),
-    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})$', 'notes.views.nurl_file', name='nurl_file'),
-    url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
-    # Browse the courses of one school
-    url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
-
 )
+    # Ajax requests from search page to populate 'Browse by School and Course' accordion
+    # Not being used and might be depricated
+    #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
+    #url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
+    # TODO: change these routes so they are unique regardless of path query for reverse()
+    #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
+    #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
+    # latest browse views, must come last because they are greedy
+    #url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
+    # Note View
+    #url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
+    #url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),

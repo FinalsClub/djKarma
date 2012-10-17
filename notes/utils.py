@@ -1,13 +1,110 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
+import datetime
+
 from django import forms as djangoforms
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from forms import SmartSchoolForm
 from forms import UploadFileForm
 from simple_autocomplete.widgets import AutoCompleteWidget
 
+from KNotes import settings
 from models import School, Course, File, Tag, UserProfile
 from notes import profile_tasks
+
+def _post_user_create_session_hook(request):
+    """ 
+        After a user logs in for the first time, their landing page needs to be
+        hooked into this function. This takes any files they may have uploaded
+        as an anon user and saves them to the new user object.
+        This might make more sense as a middleware, but this works for now.
+    """
+    print 'post_user_create hook!'
+    if settings.SESSION_UNCLAIMED_FILES_KEY in request.session:
+        print 'found unclaimed files session key'
+        for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
+            try:
+                unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+                unclaimed_file.owner = request.user
+                unclaimed_file.save()  # Handles generating Event + Awarding Karma
+                print "saved " + str(unclaimed_file.title)
+            except:
+                print "We couldn't save this user's files"
+        del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
+
+
+
+def nav_helper(request, response={}):
+    """ calculates information for the navigation sidebar for logged in users
+        :request:  a Request object that contains a user &etc
+        :response: (optional) a response dictionary to pass to the template
+        returns: a response dictionary
+    """
+    # TODO: turn this into a middleware or decorator
+    # TODO: implement the zero-user-model
+
+    # Calculate User's progress towards next Karma level
+    # Depends on models.Level objects
+    user_profile = request.user.get_profile()
+
+    user_level = request.user.get_profile().getLevel()
+    response['current_level'] = user_level['current_level']
+    if user_profile.school != None:
+        response['school_pk'] = user_profile.school.pk
+    else:
+        response['school_pk'] = 0
+
+    # The user has reached the top level
+    if not 'next_level' in user_level:
+        #print user_level['current_level'].title + " Top Level"
+        response['progress'] = 100
+    else:
+        #print user_level['current_level'].title + " " + user_level['next_level'].title
+        response['next_level'] = user_level['next_level']
+        response['progress'] = (user_profile.karma / float(response['next_level'].karma)) * 100
+
+    #Pre-populate ProfileForm with user's data
+
+        # If user has a school selected, fetch recent additions to School
+        # For the user's news feed
+        #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
+
+    response['messages'] = complete_profile_prompt(user_profile)
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.getName())
+    response['user_profile'] = user_profile
+    response = get_upload_form(response)
+
+    # Check for uploads made during this django session
+    # while user was not authenticated
+    _post_user_create_session_hook(request)
+
+    # home built auto-complete
+    '''
+    if not user_profile.school:
+        response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    if not user_profile.grad_year:
+        response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
+    '''
+    response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
+
+    return response
+
+
+def get_upload_form(response):
+    """ Appends forms required for upload form to response
+        The way to make this smooth is:
+            user types option in autocomplete field >
+            after 3 characters, we search that via ajax
+            user is presented with options
+            when user clicks one of the options or hits enter, submits and saves school on field
+            the submit button also triggers the course field to appear like the school
+            when course is selected / created submits and saves course to file
+            course submit makes the metadata section appear
+    """
+    response['school_form'] = SmartSchoolForm
+    return response
 
 
 def jsonifyModel(model, depth=0, user_pk=-1):

@@ -8,9 +8,12 @@ from binascii import hexlify
 
 from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Count
 from django.db.models.signals import post_save, post_delete
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
 
 from social_auth.backends.facebook import FacebookBackend
@@ -144,6 +147,33 @@ class School(models.Model):
     def get_absolute_url(self):
         return ('browse-courses', [str(self.slug)])
 
+    @staticmethod
+    def get_courses(school_query=None):
+        """ Private search method.
+            :school_query: unicode or int, will search for a the courses with that school matching
+            returns: School, Courses+
+        """
+        # TODO: move this to School
+        if isinstance(school_query, int):
+            #_school = School.objects.get_object_or_404(pk=school_query)
+            _school = get_object_or_404(School, pk=school_query)
+        elif isinstance(school_query, unicode):
+            #_school = get_object_or_404(School, name__icontains=school_query)
+            #_school = School.objects.filter(name__icontains=school_query).all()[0]
+            # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
+            _school_q = School.objects.filter(slug=school_query) \
+                            .annotate(course_count=Count('course')) \
+                            .order_by('-course_count')
+            if len(_school_q) != 0:
+                _school = _school_q[0]
+            else:
+                raise Http404
+        else:
+            print "No courses found for this query"
+            raise Http404
+        # if I found a _school
+        return _school, Course.objects.filter(school=_school).distinct()
+
     def save(self, *args, **kwargs):
         # If a new School is being saved, increment SiteStat School count
         if not self.pk:
@@ -190,6 +220,24 @@ class Course(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('browse-course', [str(self.school.slug), str(self.slug)])
+
+    @staticmethod
+    def get_notes(course_query, school):
+        """ Search method for a course and it's files
+            :course_query:
+                if int: Course.pk
+                if unicode: Course.title
+            returns Course, Notes+
+        """
+        if isinstance(course_query, int):
+            _course = get_object_or_404(Course, pk=course_query)
+        elif isinstance(course_query, unicode):
+            _course = get_object_or_404(Course, slug=course_query, school=school)
+        else:
+            print "No course found, so no notes"
+            raise Http404
+        return _course, File.objects.filter(course=_course).distinct()
+
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
@@ -485,6 +533,25 @@ class UserProfile(models.Model):
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
+
+    def add_course(self, course_title=None, course_id=None):
+        """ Helper function to add a course to a userprofile
+            for avoiding duplicate code
+            :user_profile: `notes.models.UserProfile`
+            :course_title:    `notes.models.Course.title`
+            :course_id:    `notes.models.Course.id`
+        """
+        # FIXME: add conditional logic to see if course is already added and error handling
+        if course_title is not None:
+            course = Course.objects.get(title=course_title)
+        elif course_id is not None:
+            course = Course.objects.get(pk=course_id)
+        else:
+            print "[_add_course]: you passed neither a course_title nor a course_id, \
+            nothing to add"
+            return False
+        self.courses.add(course) # implies save()
+        return True
 
     def getLevel(self):
         """ Determine the current level of the user
