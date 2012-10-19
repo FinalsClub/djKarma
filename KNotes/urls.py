@@ -19,6 +19,9 @@ from django.contrib import admin
 
 #from django.conf.urls.defaults import *
 from django.contrib.auth.views import password_reset
+from django.contrib.auth.views import password_reset_done
+from django.contrib.auth.views import password_reset_confirm
+from django.contrib.auth.views import password_reset_complete
 
 from haystack.query import SearchQuerySet
 
@@ -101,7 +104,11 @@ urlpatterns = patterns('',
     # accepts the username that invited
     url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
-    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'password_reset.html'}),
+    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'registration/password_reset.html', 'post_reset_redirect': '/accounts/password/reset/done/'}, name='password_reset'),
+    url(r'^accounts/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', password_reset_confirm, {'template_name': 'registration/password_reset.html',  'post_reset_redirect': '/'}, name='password_reset_confirm'),
+    url(r'^accounts/password/reset/done/?$', password_reset_done, {'template_name': 'registration/password_reset_done.html'}),
+    url(r'^accounts/password/reset/confirm/?$', password_reset_confirm, {'template_name': 'registration/password_reset_confirm.html'}),
+    url(r'^accounts/password/reset/complete/?$', password_reset_complete, {'template_name': 'registration/password_reset_complete.html'}),
     #url(r'^accounts/password/reset/$', password_reset, {}),
 
     # admin documentation:

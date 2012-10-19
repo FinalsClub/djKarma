@@ -26,6 +26,8 @@ from notes.credentials import RECAPTCHA_PRIVATE_KEY
 from notes.credentials import SMTP_USERNAME
 from notes.credentials import SMTP_PASSWORD
 
+from notes.credentials import DEFAULT_FROM_EMAIL
+
 import os
 import djcelery
 
