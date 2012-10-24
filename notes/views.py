@@ -4,6 +4,8 @@ import datetime
 import json
 
 from ajaxuploader.views import AjaxFileUploader
+from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -26,6 +28,7 @@ import forms as KarmaForms
 
 from notes.gdrive import accept_auth
 from KNotes import settings
+from templated_email import send_templated_mail
 
 from models import School
 from models import Course
@@ -83,6 +86,20 @@ def terms(request):
     return render(request, 'static/ToS.html')
 
 
+@login_required
+def confirm_email(request, confirmation_code):
+    ''' Confirm email
+    '''
+    user_profile = request.user.get_profile()
+    if confirmation_code == user_profile.email_confirmation_code:
+        user_profile.email_confirmed = True
+        user_profile.save()
+        #return HttpResponseRedirect(reverse('profile'))
+        return render(request, 'email_confirmed.html', {'redirect_url': reverse('profile')})
+    else:
+        return HttpResponse('Invalid email confirmation code.')
+
+
 def register(request, invite_user):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
@@ -94,14 +111,33 @@ def register(request, invite_user):
         #Fill form with POSTed data
         form = KarmaForms.UserCreateForm(request.POST)
         if form.is_valid():
-            print 'form valid'
-            #Save the new user from form data
-            new_user = form.save()
-            #Authenticate the new user
+
+            new_user = form.save()  # Save the new user from form data
+            confirmation_code = new_user.get_profile().setEmailConfirmationCode()
+            # TODO: switch to django-templated-email
+            activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
+            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
+
+            send_templated_mail(
+                template_name='confirm_email',
+                from_email='info@karmanotes.org',
+                recipient_list=[new_user.email],
+                context={
+                    'username': new_user.username,
+                    'activation_link': activation_link
+                },
+                # Optional:
+                # cc=['cc@example.com'],
+                # bcc=['bcc@example.com'],
+                # headers={'My-Custom-Header':'Custom Value'},
+                # template_prefix="my_emails/",
+                template_suffix="email",
+            )
+
             new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            #Login in the new user
-            login(request, new_user)
+                                    password=request.POST['password1'])  # Authenticate the new user
+
+            login(request, new_user)  # Login in the new user
             return HttpResponseRedirect("/profile")
         else:
             return render(request, "registration/register.html", {

@@ -3,6 +3,8 @@
 import datetime
 import hashlib
 import re
+import os
+from binascii import hexlify
 
 from KNotes.settings import DEFAULT_UPLOADER_USERNAME
 from KNotes.settings import BETA
@@ -475,6 +477,9 @@ class UserProfile(models.Model):
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
 
+    email_confirmation_code = models.CharField(max_length=254, blank=True, null=True)
+    email_confirmed = models.BooleanField(default=False)
+
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
     # vs summing all ReputationEvents every time karma is needed
@@ -508,11 +513,22 @@ class UserProfile(models.Model):
     # While stil allowing user to switch school /year
     submitted_school = models.BooleanField(default=False)
     submitted_grad_year = models.BooleanField(default=False)
-    # TODO: On post_save, check to see if school, grad year not NOne
+    # TODO: On post_save, check to see if school, grad year not None
     # set appropriate Bool True and award karma points
 
     # TODO: store all reputation-related activity
     # To a separate file
+
+    def setEmailConfirmationCode(self):
+        ''' Generates email confirmation code
+            and returns activation url for inclusion
+            in email
+        '''
+        # Returns 254 chars
+        confirmation = hexlify(os.urandom(127))
+        self.email_confirmation_code = confirmation
+        self.save()
+        return confirmation
 
     def __unicode__(self):
         #Note these must be unicode objects
@@ -716,7 +732,7 @@ class UserProfile(models.Model):
 
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
-        if self.grad_year != "" and not self.submitted_grad_year:
+        if self.grad_year != "" and self.grad_year is not None and not self.submitted_grad_year:
             print "grad year submitted"
             self.submitted_grad_year = True
             self.awardKarma('profile-grad-year')
