@@ -108,6 +108,8 @@ urlpatterns = patterns('',
 
     # admin:
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^oauth2callback', 'notes.views.gdrive_oauth_handshake'),
 )
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     # Not being used and might be depricated

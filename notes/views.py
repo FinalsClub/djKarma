@@ -19,10 +19,12 @@ from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
 from haystack.query import SearchQuerySet
+from recaptcha.client import captcha as recaptcha
 
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
 
+from notes.gdrive import accept_auth
 from KNotes import settings
 
 from models import School
@@ -39,7 +41,6 @@ from utils import jsonifyModel
 from utils import nav_helper
 from utils import userCanView
 
-from recaptcha.client import captcha as recaptcha
 
 # For Ajax Uploader
 import_uploader = AjaxFileUploader()
@@ -807,3 +808,16 @@ def captcha(request):
     '''
     form = KarmaForms.CaptchaForm()
     return TemplateResponse(request, 'captcha.html', {'form': form})
+
+def gdrive_oauth_handshake(request):
+    """ Take the oauth authentication_code and finish the oauth2 handshake """
+    print "loading gdrive oauth 2"
+    print request.GET, dir(request.GET)
+    auth_code = request.GET['code']
+    print "auth_code:\n"
+    print auth_code
+    print type(auth_code)
+    print dir(auth_code)
+    creds = accept_auth(auth_code)
+    print creds
+    return HttpResponse(creds)
