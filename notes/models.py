@@ -1,4 +1,6 @@
-# Copyright (C) 2012  FinalsClub Foundation
+#!/usr/bin/python2.7
+# -*- coding:utf8 -*-
+""" Copyright (C) 2012  FinalsClub Foundation """
 
 import datetime
 import hashlib
@@ -6,8 +8,6 @@ import re
 import os
 from binascii import hexlify
 
-from KNotes.settings import DEFAULT_UPLOADER_USERNAME
-from KNotes.settings import BETA
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Count
@@ -15,9 +15,47 @@ from django.db.models.signals import post_save, post_delete
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
+from oauth2client.client import Credentials
 
 from social_auth.backends.facebook import FacebookBackend
 from social_auth.signals import socialauth_registered
+
+from KNotes.settings import DEFAULT_UPLOADER_USERNAME
+from KNotes.settings import BETA
+from notes.credentials import GOOGLE_USER
+
+
+class DriveAuth(models.Model):
+    """ stored google drive authentication and refresh token
+        used for interacting with google drive """
+
+    email = models.EmailField(default=GOOGLE_USER)
+    # JSON representation of Oauth2Credential object
+    credentials = models.TextField()
+    stored_at = models.DateTimeField(auto_now=True)
+
+
+    @staticmethod
+    def get(email=GOOGLE_USER):
+        # FIXME: this is untested
+        DriveAuth.objects.filter(email=email).reverse()[0]
+
+
+    def store(self, creds):
+        """ Transform an existing credentials object to a db serialized """
+        self.email = creds.id_token['email']
+        self.credentials = creds.to_json()
+        self.save()
+
+
+    def transform_to_cred(self):
+        """ take stored credentials and produce a Credentials object """
+        return Credentials.new_from_json(self.credentials)
+
+
+    def __unicode__(self):
+        return u'Gdrive auth for %s created/updated at %s' % \
+                    (self.email, self.stored_at)
 
 
 class Level(models.Model):
@@ -798,3 +836,4 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
+
