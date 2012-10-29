@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
-# Copyright (C) 2012  FinalsClub Foundation
+""" Copyright (C) 2012  FinalsClub Foundation """
 
 #Dependencies
 #gdata

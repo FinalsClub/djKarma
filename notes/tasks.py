@@ -11,6 +11,7 @@ def processDocument(File):
     """
     print "processing document"
     try:
+        # Switch to GDrive integration here
         convertWithGDocsv3(File)
     except Exception, e:
         print "Error processing document: " + str(e)
