@@ -2,6 +2,8 @@
 # -*- coding:utf8 -*-
 """ Copyright (C) 2012  FinalsClub Foundation """
 
+import datetime
+
 from apiclient.discovery import build
 import httplib2
 from oauth2client.client import flow_from_clientsecrets
