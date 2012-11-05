@@ -1,13 +1,11 @@
 # Copyright (C) 2012  FinalsClub Foundation
 
-import datetime
 import json
 
 from ajaxuploader.views import AjaxFileUploader
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.db.models import Count
@@ -18,7 +16,9 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
+from django.core.urlresolvers import reverse
 from haystack.query import SearchQuerySet
+
 
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
@@ -31,21 +31,22 @@ from models import File
 from models import Instructor
 from models import SiteStats
 from models import Level
-from models import Vote
 from models import ReputationEventType
 from profile_tasks import tasks
-from utils import complete_profile_prompt
 from utils import jsonifyModel
 from utils import nav_helper
 from utils import userCanView
 
 from recaptcha.client import captcha as recaptcha
+from templated_email import send_templated_mail
 
 # For Ajax Uploader
 import_uploader = AjaxFileUploader()
 
 
 """  Static pages, or nearly static pages  """
+
+
 def about(request):
     return render(request, 'static/about.html')
 
@@ -84,7 +85,7 @@ def terms(request):
 
 def register(request, invite_user):
     """ Display user login and signup screens
-        the registration/login.html template redirects login attempts
+        the redef registergistration/login.html template redirects login attempts
         to django's built-in login view (django.contrib.auth.views.login).
         new user registration is handled by this view (because there is no built-in)
     """
@@ -93,14 +94,33 @@ def register(request, invite_user):
         #Fill form with POSTed data
         form = KarmaForms.UserCreateForm(request.POST)
         if form.is_valid():
-            print 'form valid'
-            #Save the new user from form data
-            new_user = form.save()
-            #Authenticate the new user
+
+            new_user = form.save()  # Save the new user from form data
+            confirmation_code = new_user.get_profile().setEmailConfirmationCode()
+            # TODO: switch to django-templated-email
+            activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
+            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
+
+            send_templated_mail(
+                template_name='confirm_email',
+                from_email='info@karmanotes.org',
+                recipient_list=[new_user.email],
+                context={
+                    'username': new_user.username,
+                    'activation_link': activation_link
+                },
+                # Optional:
+                # cc=['cc@example.com'],
+                # bcc=['bcc@example.com'],
+                # headers={'My-Custom-Header':'Custom Value'},
+                # template_prefix="my_emails/",
+                template_suffix="email",
+            )
+
             new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            #Login in the new user
-            login(request, new_user)
+                                    password=request.POST['password1'])  # Authenticate the new user
+
+            login(request, new_user)  # Login in the new user
             return HttpResponseRedirect("/profile")
         else:
             return render(request, "registration/register.html", {
@@ -113,6 +133,8 @@ def register(request, invite_user):
 """ =====================================================================
     People pages, pages that are heavily customized for a particular user
     ===================================================================== """
+
+
 def getting_started(request):
     """ View for introducing a user to the site and asking them to accomplish intro tasks """
     response = nav_helper(request)
@@ -147,6 +169,8 @@ def profile(request):
 """ ===========================================
     Viewing and browsing lists and single pages
     =========================================== """
+
+
 @login_required
 def file(request, note_pk, action=None):
     """ View Note HTML
@@ -207,12 +231,11 @@ def file(request, note_pk, action=None):
     return render(request, 'view-file.html', response)
 
 
-
-
 """ ==============
     AJAX endpoints
     ============== """
-# AJAX
+
+
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
     response = {}
@@ -255,7 +278,7 @@ def fileMeta(request):
 
             if _course_id is not None and form.cleaned_data['in_course'] == "True":
                 # if in_course selected, add the course to their profile
-                _add_course(request.user.get_profile(), course_id=_course_id)
+                request.user.get_profile().add_course(course_id=_course_id)
             # process Tags
             #processCsvTags(file, form.cleaned_data['tags'])
             print "file.save()"
@@ -390,40 +413,12 @@ def browse_courses(request, school_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    # pass the school query to
-    courses = _get_courses(request, school_query)
+    courses = School.get_courses(school_query)
     if isinstance(courses, tuple):  # FIXME
         response['school'], response['courses'] = courses
         return render(request, 'browse_courses.html', response)
     else:
         raise Http404
-
-
-def _get_courses(request, school_query=None):
-    """ Private search method.
-        :school_query: unicode or int, will search for a the courses with that school matching
-        returns: School, Courses+
-    """
-    # TODO: move this to School
-    if isinstance(school_query, int):
-        #_school = School.objects.get_object_or_404(pk=school_query)
-        _school = get_object_or_404(School, pk=school_query)
-    elif isinstance(school_query, unicode):
-        #_school = get_object_or_404(School, name__icontains=school_query)
-        #_school = School.objects.filter(name__icontains=school_query).all()[0]
-        # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
-        _school_q = School.objects.filter(slug=school_query) \
-                        .annotate(course_count=Count('course')) \
-                        .order_by('-course_count')
-        if len(_school_q) != 0:
-            _school = _school_q[0]
-        else:
-            return Http404
-    else:
-        print "No courses found for this query"
-        return Http404
-    # if I found a _school
-    return _school, Course.objects.filter(school=_school).distinct()
 
 
 def b_school_course(request, school_query, course_query):
@@ -438,22 +433,21 @@ def browse_one_course(request, course_query, school):
     """ View for viewing notes from a fuzzy course search
         :course_query: unicode url match, to be type parsed
     """
-    # TODO: combine these function with `b_school_course`
-    # TOOD: move this to Course
+    # TODO: combine this function with `b_school_course`
     response = nav_helper(request)
     try:
         course_query = int(course_query)
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    course, files = _get_notes(request, course_query, school)
+    course, files = Course.get_notes(course_query, school)
     response['course'], response['files'] = course, files
     # get the users who are members of the course
-    response['users'] = course.userprofile_set.all()
-    # get the karma events associaged with the course
+    response['profiles'] = course.userprofile_set.all()
+
+    # get the karma events associated with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     response['viewed_files'] = request.user.get_profile().files.all()
-    #response['thanked_files'] = [file.id for file in files if request.user in [vote.user for vote in file.votes.all()]]
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
@@ -461,30 +455,12 @@ def browse_one_course(request, course_query, school):
     for file in files:
         _vote = file.votes.filter(user=request.user)
         if _vote.exists():
-            if _vote[0].up: # assuming only one vote result
+            if _vote[0].up:  # assuming only one vote result
                 response['thanked_files'].append(file.id)
             else:
                 response['flagged_files'].append(file.id)
 
     return render(request, 'browse_one_course.html', response)
-
-
-def _get_notes(request, course_query, school):
-    """ Private search method for a course and it's files
-        :course_query:
-            if int: Course.pk
-            if unicode: Course.title
-        returns Course, Notes+
-    """
-    if isinstance(course_query, int):
-        _course = get_object_or_404(Course, pk=course_query)
-    elif isinstance(course_query, unicode):
-        _course = get_object_or_404(Course, slug=course_query, school=school)
-    else:
-        print "No course found, so no notes"
-        return Http404
-    return _course, File.objects.filter(course=_course).distinct()
-
 
 
 @login_required
@@ -560,6 +536,7 @@ def editFileMeta(request):
 
     raise Http404
 
+
 @login_required
 def editCourseMeta(request):
     ''' Handles AJAX requests to edit course meta data.
@@ -603,8 +580,7 @@ def editCourseMeta(request):
 
 @login_required
 def addModel(request):
-    ''' This replaces addCourseOrSchool in the new
-        modal-upload process
+    ''' AJAX: add a new course or school
     '''
     if request.is_ajax() and request.method == 'POST':
         if 'type' in request.POST:
@@ -620,6 +596,7 @@ def addModel(request):
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
 
+
 @login_required
 def add_course_to_profile(request):
     """ ajax endpoint to add a course to a user's profile
@@ -627,34 +604,16 @@ def add_course_to_profile(request):
         is selected in the upload modal
     """
     if request.is_ajax() and request.method == 'POST':
-        print "this is the add_course request\n\t %s" % request.POST
         user_profile = request.user.get_profile()
-        status = _add_course(user_profile, course_title=request.POST['title'])
+        if 'title' in request.POST:
+            status = user_profile.add_course(course_title=request.POST['title'])
+        elif 'id' in request.POST:  # passing the course ID rather than title
+            status = user_profile.add_course(course_id=request.POST['id'])
+
         if status:
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
-            print "There was an error adding a course to a profile"
-            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
-
-def _add_course(user_profile, course_title=None, course_id=None):
-    """ Helper function to add a course to a userprofile
-        for avoiding duplicate code
-        :user_profile: `notes.models.UserProfile`
-        :course_title:    `notes.models.Course.title`
-        :course_id:    `notes.models.Course.id`
-    """
-    # TODO make a @staticmethod on UserProfile
-    # FIXME: add conditional logic to see if course is already added and error handling
-    if course_title is not None:
-        course = Course.objects.get(title=course_title)
-    elif course_id is not None:
-        course = Course.objects.get(pk=course_id)
-    else:
-        print "[_add_course]: you passed neither a course_title nor a course_id, \
-        nothing to add"
-        return False
-    user_profile.courses.add(course) # implies save()
-    return True
+            return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
 
 def instructors(request):
@@ -716,7 +675,6 @@ def jqueryui_courses(request):
     response = [(course.id, course.title) for course in courses]
     print json.dumps(response)
     return HttpResponse(json.dumps(response), mimetype="application/json")
-
 
 
 def nurl_file(request, school_query, course_query, file_id, action=None):
@@ -875,3 +833,15 @@ def captcha(request):
     return TemplateResponse(request, 'captcha.html', {'form': form})
 
 
+@login_required
+def confirm_email(request, confirmation_code):
+    ''' Confirm email
+    '''
+    user_profile = request.user.get_profile()
+    if confirmation_code == user_profile.email_confirmation_code:
+        user_profile.email_confirmed = True
+        user_profile.save()
+        #return HttpResponseRedirect(reverse('profile'))
+        return render(request, 'email_confirmed.html', {'redirect_url': reverse('profile')})
+    else:
+        return HttpResponse('Invalid email confirmation code.')

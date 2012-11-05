@@ -15,7 +15,7 @@ from models import School, Course, File, Tag, Instructor
 
 
 class UserCreateForm(UserCreationForm):
-    email = forms.EmailField(required=True, help_text='Pick your on-site avatar with <a href=\"http://www.gravatar.com\">Gravatar</a>')
+    email = forms.EmailField(required=True, help_text='We\'ll send you a confirmation message. Your on-site avatar is linked to your email with <a href=\"http://www.gravatar.com\">Gravatar</a>')
  
     class Meta:
         model = User
