@@ -17,4 +17,6 @@ django-celery==2.5.5
 recaptcha-client==1.0.6
 django-templated-email==0.4.7
 -e git://github.com/FinalsClub/django-ajax-uploader.git#egg=ajaxuploader-dev
+apiclient==1.0.2
+oauth2client==1.0
 google-api-python-client==1.0
