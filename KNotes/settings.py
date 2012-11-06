@@ -262,6 +262,7 @@ TEMPLATE_DIRS = (
 
     # Wherever you go, there you are
     os.path.join(os.path.dirname(__file__), 'templates'),
+    './notes/templates',
     './KNotes/templates/models',
     './KNotes/templates/modal',
     './KNotes/templates/ajax',
