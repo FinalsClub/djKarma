@@ -1,0 +1,81 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="static/css/home.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="home_content">
+
+    <div class="row" id="home_video_container">
+      <div class="twelve columns">
+        <div class="row">
+          <div class="twelve columns">
+            <div class="flex-video widescreen" id="home_video">
+              <iframe src="http://player.vimeo.com/video/52954469?badge=0" width="1020" height="574" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="twelve columns">
+            <div class="row" id="home_video_overlay">
+              <div class="twelve columns">
+                <div class="row">
+                  <div class="ten columns offset-by-one" id="home_video_overlay_headline">
+                    KarmaNotes rocks. Here's a sentence to tell you how much it rocks.
+                  </div><!--/home_video_overlay_headline-->
+                </div>
+                <div class="row">
+                  <div class="ten columns offset-by-one" id="home_video_overlay_more">
+                    Watch the awesome video for more.
+                    <img src="static/img/home_video_arrow.png" id="home_video_overlay_more_arrow" alt="home_video_arrow" width="77" height="85" align="middle"/>
+                  </div><!--/home_video_overlay_more-->
+                </div>
+              </div>
+            </div><!--/home_video_overlay-->
+          </div>
+        </div>
+      </div>
+    </div><!--/home_video_container-->
+
+    <div class="row" id="recent_uploaded_container">
+
+      <div class="ten columns offset-by-one">
+        <div class="row">
+          <div class="three columns" id="recent_uploaded_headline">
+            recently&nbsp;uploaded&nbsp;notes
+          </div>
+          <div class="eight columns end" id="recent_uploaded_scroller">
+            <div id="recent_uploaded_scroller_screen">
+              &nbsp;
+            </div>
+            <div id="recent_uploaded_scroller_sled">
+              <ul>
+                <li class="recent_upload_note_name">Study Guide: Justice and the American Way</li>
+                <li class="recent_upload_note_school">Harvard University</li>
+                <li class="recent_upload_note_name">Themes and Motifs With Johnson</li>
+                <li class="recent_upload_note_school">Massachusetts College of Art & Design</li>
+              </ul>
+            </div>
+            <div id="recent_uploaded_scroller_screen_right">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!--/recent_uploaded_container-->
+
+    <div class="row" id="home_copy">
+      <div class="ten columns offset-by-one">
+        <p>
+          Proin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt auctor a ornare odio.
+        </p>
+      </div>
+    </div>
+
+  </section><!--/home_content-->
+{% endblock %}

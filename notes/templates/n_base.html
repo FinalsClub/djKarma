@@ -1,0 +1,32 @@
+{% load url from future %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>KarmaNotes -- {% block title %}{% endblock %}</title>
+	
+  <link rel="stylesheet" type="text/css" media="all" href="static/css/fontface/fontface.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static/css/foundation.min.css">
+  <link rel="stylesheet" type="text/css" media="all" href="static/css/global.css">
+
+  {% block pagescripts %}
+  {% endblock %}
+
+  {% block pagestyle %}
+  {% endblock %}
+	
+</head>
+<body>
+<!-- header include -->
+{% include 'n_header.html' %}
+<!-- header end -->
+
+{% block content %}
+{% endblock %}
+
+<!-- footer include -->
+{% include 'n_footer.html' %}
+<!-- footer end -->
+
+</body>
+</html>

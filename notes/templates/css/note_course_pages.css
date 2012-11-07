@@ -1,0 +1,105 @@
+/* NOTE PAGE */
+
+#note_content, #course_content
+{
+  padding-top: 46px;
+}
+
+#note_back_to_course, #course_subhead
+{
+  font-family: "MuseoSans-900";
+  font-size: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  padding-top: 47px;
+  padding-bottom: 1px;
+}
+
+#note_back_to_course img
+{
+  margin-bottom: -1px;
+  margin-right: 3px;
+}
+
+#note_name, #course_name
+{
+  text-align: center;
+  font-family: "MuseoSlab-500";
+  font-size: 24px;
+}
+
+#note_status
+{
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#note_author
+{
+  font-family: "MuseoSans-900";
+  font-size: 10px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#note_author a, #note_author a:hover
+{
+  text-decoration: underline;
+  color: #555555;
+  font-family: "MuseoSlab-900";
+  font-size: 11px;
+}
+
+#note_actions
+{
+  padding-top: 22px;
+  padding-bottom: 17px;
+}
+
+#note_actions .column
+{
+  text-align: center;
+}
+
+#note_container
+{
+  padding-bottom: 45px;
+}
+
+/* COURSES */
+
+#course_meta
+{
+  text-align: center;
+}
+
+#course_actions
+{
+  padding-top: 15px;
+  padding-bottom: 17px;
+}
+
+#course_meta_action_gear
+{
+  text-align: center;
+}
+
+.course_meta_action
+{
+  margin: 1px auto 0;
+}
+
+#course_description
+{
+  text-align: center;
+  font-family: "MuseoSlab-500";
+  font-size: 12px;
+  line-height: 150%;
+  padding-bottom: 15px;
+}
+
+#course_container
+{
+  padding-top: 45px;
+}

@@ -1,0 +1,171 @@
+{% if not user.is_authenticated %}
+{# If the user is not logged in #}
+  <header id="global_header">
+    <div class="row">
+      <div id="logo_container" class="two columns offset-by-one">
+        <img src="static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+      </div><!--/logo container-->
+
+      <div id="browse_container" class="one column">
+        Browse
+      </div><!--/browse_container-->
+
+      <div id="login_container" class="three columns offset-by-four end">
+        LOGIN/SIGNUP <img src="static/img/global_header_login_menu_arrow.png" alt="Open Login" id="login_arrow" width="9" height="6" />
+
+        <div id="login_box">
+          <div class="row">
+            <div class="twelve columns">
+
+              <div class="row" id="login_fb">
+                <div class="twelve columns">
+                  <img src="static/img/global_header_login_fbbtn.png" alt="global_header_login_fbbtn" width="223" height="45" />
+                </div>
+              </div><!--/login_fb-->
+
+              <div class="row" id="login_form">
+                <div class="twelve columns">
+                  <form>
+
+                    <div class="row">
+                      <div class="twelve columns">
+                        <input type="text" name="username">
+                      </div>
+                      <div class="twelve columns">
+                        Username
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="twelve columns">
+                        <input type="password" name="password">
+                      </div>
+                      <div class="twelve columns">
+                        Password
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+              </div><!--/login_form-->
+
+              <div class="row" id="login_submit">
+                <div class="twelve columns">
+                  LOG IN
+                </div>
+              </div><!--/login_submit-->
+
+            </div>
+          </div>
+        </div>
+
+      </div><!--/login container-->
+    </div>
+  </header><!--/global header-->
+
+{% else %}
+{# If the user is logged in #}
+  <header id="global_header">
+    <div class="row">
+      <div id="logo_container" class="five columns offset-by-one">
+        <div class="row">
+          <div class="five columns">
+            <img src="static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+          </div>
+          <div class="seven columns">
+            <div id="search_container">
+              <input type="text" id="search_txt">
+            </div>
+          </div>
+        </div>
+
+      </div><!--/logo container-->
+
+      <div id="browse_container" class="one column">
+        Browse
+      </div><!--/browse_container-->
+
+      <div class="four columns end">
+        <div id="global_header_logged_in_content">
+          <div class="row">
+
+            <div class="five columns half-padding" id="global_header_addnote">
+              <img src="static/img/global_header_plusnote.png" alt="global_header_plusnote" width="115" height="67" />
+            </div><!-- /global_header_addnote -->
+
+            <div class="four columns half-padding" id="global_header_mycourses">
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_mycourses_copy">
+                  My Courses <img src="static/img/global_header_login_menu_arrow.png" alt="global_header_login_menu_arrow" width="9" height="6" />
+                </div><!-- /global_header_mycourses_copy -->
+              </div>
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_mycourses_list">
+                  <ul>
+                    <li>Economics</li>
+                    <li>History</li>
+                    <li>Latin</li>
+                    <li>Spanglish</li>
+                  </ul>
+                </div><!-- /global_header_mycourses_list -->
+              </div>
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_add_course">
+                  <img src="static/img/global_header_add_course.png" alt="global_header_add_course" width="132" height="20" />
+                </div><!-- /global_header_add_course -->
+              </div>
+
+            </div><!-- /global_header_mycourses -->
+
+            <div class="three columns">
+              <div id="global_header_avatar_menu">
+                <div class="row">
+                  <div class="five columns no-padding" id="global_header_avatar_container">
+                    <img src="static/img/global_header_avatar.jpg" alt="global_header_avatar" width="31" height="33" />
+                  </div>
+                  <div class="six columns no-padding" id="global_header_note_count">
+                    473
+                  </div>
+                  <div class="one column half-padding" id="global_header_arrow_container">
+                    <img src="static/img/global_header_login_menu_arrow.png" alt="global_header_login_menu_arrow" width="9" height="6" />
+                  </div>
+                </div>
+              </div><!-- /global_haader_avatar_menu -->
+
+              <div id="global_header_avatar_moreinfo">
+                <div class="row" id="global_header_avatar_moreinfo_content">
+                  <div class="nine columns">
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_name">
+                        René Decartes
+                      </div><!-- /global_header_avatar_moreinfo_name -->
+                    </div>
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_school">
+                        harvard university
+                      </div><!-- /global_header_avatar_moreinfo_school -->
+                    </div>
+                  </div>
+                  <div id="global_header_avatar_moreinfo_gear" class="three columns">
+                    <img src="static/img/global_header_gear.png" alt="global_header_gear" width="12" height="14" />
+                  </div><!-- /global_header_avatar_moreinfo_gear -->
+                </div>
+                <div class="row">
+                  <div class="twelve columns" id="global_header_avatar_moreinfo_mynotes">
+                    <img src="static/img/global_header_my_notes.png" alt="global_header_my_notes" width="105" height="20" />
+                  </div><!-- /global_header_add_course -->
+                </div>
+              </div><!-- /global_header_avatar_moreinfo -->
+
+            </div>
+          </div>
+        </div><!-- /global_header_logged_in_content -->
+      </div>
+
+    </div>
+
+  </header><!--/global header-->
+{% endif %}
