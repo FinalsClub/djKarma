@@ -5,6 +5,7 @@
 *.sql-journal
 *credentials.py
 tags
+/src
 /uploads
 /new_uploads
 /django-ajax-uploader
