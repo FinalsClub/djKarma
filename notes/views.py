@@ -51,7 +51,7 @@ import_uploader = AjaxFileUploader()
 
 """  Static pages, or nearly static pages  """
 def about(request):
-    return render(request, 'static/about.html')
+    return render(request, 'n_about.html')
 
 
 def e404(request):

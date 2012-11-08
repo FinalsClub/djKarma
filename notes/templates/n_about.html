@@ -1,0 +1,121 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="static/css/about.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="about_content">
+
+    <div class="row">
+      <div id="hero_image" class="twelve columns">
+        <div id="hero_image_caption_container">
+          <div class="row">
+            <div id="hero_image_caption" class="seven columns offset-by-one">
+              This is a picture of the KarmaNotes team or something.If there’s no picture, the text just starts at the top of the page.
+            </div><!-- /hero_image_caption -->
+          </div>
+        </div><!-- /hero_image_caption_container -->
+      </div><!-- /hero_image -->
+    </div>
+
+    <div class="row">
+      <div id="about_copy_header" class="ten columns offset-by-one">
+        Thank you for helping to spread the academic wealth!
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="about_copy_body" class="ten columns offset-by-one">
+        <p>A common learning database for scholars everywhere, KarmaNotes encourages you to upload your notes, study guides, syllabi and assignments to the cloud. By sharing your knowledge on KarmaNotes, you can earn Karma Points and access a constantly growing library of academic resources.</p>
+        <p>Because KarmaNotes is a non-profit project all content is freely shared under Creative Commons Share-Alike license to encourage open access and remixing. We also respect the rights of copyright holders and maintain full compliance with the Digital Millennium Copyright Act. Please do not upload any copyrighted files or they will be subject to removal.</p>
+        <p>Want to know more? Check out our free and <a href="https://github.com/FinalsClub/djKarma">open source code</a> or <a href="#">email us</a>.</p>
+      </div>
+    </div>
+
+    <div id="about_rule" class="twelve columns"></div>
+
+    <div id="donate_container">
+      <div class="row">
+        <div class="five columns offset-by-one">
+          <div class="row">
+            <div id="donate_copy_header" class="twelve columns">
+              Love KarmaNotes?
+            </div><!-- /donate_copy_header -->
+          </div>
+          <div class="row">
+            <div id="donate_copy_body" class="twelve columns">
+              Support the movement for free and open education.
+            </div><!-- /donate_copy_body -->
+          </div>
+        </div>
+
+        <div class="three columns offset-by-two end">
+          <div id="donate_button_container" class="button_bevel">
+            <div id="donate_button" class="button_interior">
+              DONATE
+            </div><!-- /donate_button -->
+          </div><!-- /donate_button_container -->
+        </div>
+
+      </div>
+    </div><!-- /donate_container -->
+
+    <div class="row">
+      <div id="leaderboard_header" class="ten columns offset-by-one">
+        Karma University Leaderboard
+      </div><!-- /leaderboard_header -->
+    </div>
+
+    <div class="row">
+      <div id="leaderboard_copy" class="ten columns offset-by-one">
+        These schools are tops spreading the Karma
+      </div><!-- /leaderboard_copy -->
+    </div>
+
+    <div class="row">
+      <div id="leaderboard_table" class="ten columns offset-by-one">
+
+        <div class="row leaderboard_item">
+          <div class="one column leaderboard_rank">
+            1
+          </div>
+          <div class="eight columns leaderboard_school">
+            Massachusetts Institute of Technology
+          </div><!-- /leaderboard_school -->
+          <div class="one column leaderboard_score">
+            15,189
+          </div><!-- /leaderboard_score -->
+        </div><!-- /leaderboard_item -->
+
+         <div class="row leaderboard_item">
+          <div class="one column leaderboard_rank">
+            2
+          </div>
+          <div class="eight columns leaderboard_school">
+            University of California Berkeley
+          </div><!-- /leaderboard_school -->
+          <div class="one column leaderboard_score">
+            8,720
+          </div><!-- /leaderboard_score -->
+        </div><!-- /leaderboard_item -->
+
+        <div class="row leaderboard_item">
+          <div class="one column leaderboard_rank">
+            3
+          </div>
+          <div class="eight columns leaderboard_school">
+            Carnegie Melon University
+          </div><!-- /leaderboard_school -->
+          <div class="one column leaderboard_score">
+            5,130
+          </div><!-- /leaderboard_score -->
+        </div><!-- /leaderboard_item -->
+
+      </div><!-- /leaderboard_table -->
+    </div>
+
+  </section><!--/about_content-->
+{% endblock %}
