@@ -651,7 +651,7 @@ class UserProfile(models.Model):
 
     # Get the "name" of this user for display
     # If no first_name, user username
-    def getName(self):
+    def get_name(self):
         """ Generate the front-facing username for this user.
             Prefer user-supplied alias first,
             Second, username given on standard account signup
