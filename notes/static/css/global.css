@@ -523,3 +523,9 @@ footer#global_footer a
   margin-right: 5px;
   margin-top: 3px;
 }
+
+/* EDITS POST DESIGN */
+ul#course_menu li a
+{
+  color: white;
+}

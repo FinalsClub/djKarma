@@ -104,8 +104,11 @@
               </div>
 
               <div class="row">
-                <div class="twelve columns" id="global_header_mycourses_list">
-                  <ul>
+                <div class="twelve columns" id="global_header_mycourses_list" style="display:none;">
+                  <ul id="course_menu">
+                    {% for course in user.get_profile.courses.all %}
+                      <li><a href="#"> {{ course.title }} </a></li>
+                    {% endfor %}
                     <li>Economics</li>
                     <li>History</li>
                     <li>Latin</li>
@@ -115,7 +118,7 @@
               </div>
 
               <div class="row">
-                <div class="twelve columns" id="global_header_add_course">
+                <div class="twelve columns" id="global_header_add_course" style="display:none;">
                   <img src="static/img/global_header_add_course.png" alt="global_header_add_course" width="132" height="20" />
                 </div><!-- /global_header_add_course -->
               </div>
@@ -126,10 +129,10 @@
               <div id="global_header_avatar_menu">
                 <div class="row">
                   <div class="five columns no-padding" id="global_header_avatar_container">
-                    <img src="static/img/global_header_avatar.jpg" alt="global_header_avatar" width="31" height="33" />
+                    <img alt="" src="{{ user.get_profile.picture_url_small }}" width="31" height="33">
                   </div>
                   <div class="six columns no-padding" id="global_header_note_count">
-                    473
+                    {{ user.get_profile.karma }}
                   </div>
                   <div class="one column half-padding" id="global_header_arrow_container">
                     <img src="static/img/global_header_login_menu_arrow.png" alt="global_header_login_menu_arrow" width="9" height="6" />
@@ -137,17 +140,17 @@
                 </div>
               </div><!-- /global_haader_avatar_menu -->
 
-              <div id="global_header_avatar_moreinfo">
+              <div id="global_header_avatar_moreinfo" style="display:none;">
                 <div class="row" id="global_header_avatar_moreinfo_content">
                   <div class="nine columns">
                     <div class="row">
                       <div class="twelve columns" id="global_header_avatar_moreinfo_name">
-                        René Decartes
+                        {{ user.get_profile.get_name }}
                       </div><!-- /global_header_avatar_moreinfo_name -->
                     </div>
                     <div class="row">
                       <div class="twelve columns" id="global_header_avatar_moreinfo_school">
-                        harvard university
+                        {{ user.get_profile.school }}
                       </div><!-- /global_header_avatar_moreinfo_school -->
                     </div>
                   </div>
