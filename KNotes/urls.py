@@ -44,6 +44,7 @@ urlpatterns = patterns('',
     # Static pages
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
+    url(r'^dashboard$', 'notes.views.dashboard', name='dashboard'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 

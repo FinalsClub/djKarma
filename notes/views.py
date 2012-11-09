@@ -59,6 +59,12 @@ def e404(request):
     return render(request, '404.html', response)
 
 
+def dashboard(request):
+    """ Render the new template style dashboard """
+    response = {}
+    return render(request, 'n_dashboard.html', response)
+
+
 def home(request):
     """ Landing Page [static] """
 
