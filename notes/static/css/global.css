@@ -115,7 +115,7 @@ header#global_header
   font-size: 14px;
 }
 
-#login_submit
+#login_submit, #login_signup
 {
   background-color: #f05a28;
   padding-top: 10px;
@@ -123,7 +123,7 @@ header#global_header
   cursor: pointer;
 }
 
-#login_submit .columns
+#login_submit .columns, #login_signup .columns
 {
   font-size: 14px;
   text-align: center;

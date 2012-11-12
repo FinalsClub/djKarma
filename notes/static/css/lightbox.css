@@ -1,5 +1,5 @@
 /* MODAL CONTENT */
-#modal_content
+.modal_content
 {
   width: 100%;
   height: 100%;
@@ -8,16 +8,17 @@
   left: 0px;
   background-color: rgba(0, 0, 0, .8);
   z-index: 999;
+  display:none;
 }
 
-#lightbox_modal
+.lightbox_modal
 {
   margin: 121px auto 0px;
   background-color: #000;
   border: solid 1px rgba(255, 255, 255, .5);
 }
 
-#lightbox_header
+.lightbox_header
 {
   font-family: "MuseoSlab-700";
   font-size: 43px;
@@ -27,7 +28,7 @@
   color: #FFF;
 }
 
-#lightbox_header.short_row
+.lightbox_header.short_row
 {
   padding-bottom: 15px!important;
 }
@@ -107,7 +108,7 @@
   color: #fff;
 }
 
-#lightbox_field_label
+.lightbox_field_label
 {
   font-family: "MuseoSlab-700";
   font-size: 16px;
@@ -162,7 +163,7 @@
 }
 
 /* LIGHTBOX CLOSE */
-#lightbox_close
+.lightbox_close
 {
   width: 38px;
   height: 38px;
