@@ -27,5 +27,10 @@ $(document).ready(function(){
     $(".modal_content").hide();
   });
 
+  // Submit login form
+  $("#login_submit").click(function() {
+    $("form#login_form").submit();
+  });
+
 
 });

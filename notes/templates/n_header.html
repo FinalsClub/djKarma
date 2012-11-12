@@ -1,3 +1,4 @@
+{% load url from future %}
 {% if not user.is_authenticated %}
 {# Logged out #}
   <header id="global_header">
@@ -27,13 +28,17 @@
 
               <div class="row" id="login_fb">
                 <div class="twelve columns">
-                  <img src="static/img/global_header_login_fbbtn.png" alt="global_header_login_fbbtn" width="223" height="45" />
+                  <a href="{% url 'socialauth_begin' 'facebook' %}">
+                    <img src="static/img/global_header_login_fbbtn.png" alt="global_header_login_fbbtn" width="223" height="45" />
+                  </a>
                 </div>
               </div><!--/login_fb-->
 
+
               <div class="row" id="login_form">
                 <div class="twelve columns">
-                  <form>
+                  <form id="login_form" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
 
                     <div class="row">
                       <div class="twelve columns">
@@ -52,16 +57,16 @@
                         Password
                       </div>
                     </div>
-
                   </form>
                 </div>
               </div><!--/login_form-->
 
               <div class="row" id="login_submit">
                 <div class="twelve columns">
-                  LOG IN
+                    LOG IN
                 </div>
               </div><!--/login_submit-->
+
 
             </div>
           </div>
