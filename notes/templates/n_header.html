@@ -1,5 +1,5 @@
 {% if not user.is_authenticated %}
-{# If the user is not logged in #}
+{# Logged out #}
   <header id="global_header">
     <div class="row">
       <div id="logo_container" class="two columns offset-by-one">
@@ -18,6 +18,12 @@
         <div id="login_box" style="display:none">
           <div class="row">
             <div class="twelve columns">
+
+              <div class="row" id="login_signup">
+                <div class="twelve columns">
+                  SIGN UP
+                </div>
+              </div><!--/login_signup-->
 
               <div class="row" id="login_fb">
                 <div class="twelve columns">
@@ -66,7 +72,7 @@
   </header><!--/global header-->
 
 {% else %}
-{# If the user is logged in #}
+{# Logged IN #}
   <header id="global_header">
     <div class="row">
       <div id="logo_container" class="five columns offset-by-one">
