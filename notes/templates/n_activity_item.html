@@ -1,0 +1,46 @@
+<div class="row"><!-- activity_item_container -->
+  <div class="ten columns offset-by-one">
+
+    <div class="activity_item">
+
+      <div class="row">
+        <div class="twelve columns">
+          <div class="activity_timestamp">
+            <span class="activity_time">{{ event.timestamp|date:"gA" }}</span> // <span class="activity_date">{{ event.timestamp|date:"D M d o" }}</span>
+          </div><!-- /activity_timestamp -->
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="one column">
+          {# FIXME: if event belongs to self, a lot of this would have shorter lookups #}
+          <img src="{{ event.user.get_profile.picture_url_large }}" alt="dashboard_profile_avatar" width="71" height="71" />
+        </div>
+
+        <div class="eleven columns activity_details">
+          <div class="row">
+            <div class="twleve columns activity_details_action">
+              {# Actor #}
+              <a href="#" class="activity_actor">
+              {% if event.user == request.user %}
+                You
+              {% else %}
+                {{ event.get_profile.get_name }}
+              {% endif %}
+              </a>
+              {# Action and Subject #}
+              {% include 'n_activity_verb+subject.html' %}
+            </div><!-- /activity_details_action -->
+          </div>
+          <div class="row">
+            <div class="twelve columns activity_details_context">
+              <a href="#" class="course_link">{{ event.course.title }}</a>//<a href="#" class="school_link">{{ event.school.name }}</a>
+            </div><!-- /activity_details_context -->
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /activity_item -->
+
+  </div>
+</div><!-- /activity_item_container -->

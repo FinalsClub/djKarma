@@ -62,6 +62,7 @@ def e404(request):
 def dashboard(request):
     """ Render the new template style dashboard """
     response = {}
+    response['events']= request.user.get_profile().reputationEvents.order_by('-id').all()
     return render(request, 'n_dashboard.html', response)
 
 
@@ -90,6 +91,10 @@ def jobs(request):
 
 def terms(request):
     return render(request, 'static/ToS.html')
+
+
+def browse(request):
+    pass
 
 
 @login_required

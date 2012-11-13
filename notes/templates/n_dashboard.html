@@ -69,7 +69,7 @@
           <div class="three columns">
             <div class="row">
               <div class="four columns">
-                <img src="{{ user.get_profile.picture_url_large }}" alt="dashboard_profile_avatar" width="71" height="71" align="top"/>
+                <img src="{{ user.get_profile.picture_url_large }}" alt="dashboard_profile_avatar" align="top"/>
               </div>
               <div id="profile_name" class="eight columns">
                 {{ user.get_profile.get_name }}
@@ -126,6 +126,9 @@
         </div>
       </div>
 
+      {% for event in events %}
+        {% include 'n_activity_item.html' %}
+      {% endfor %}
       <div class="row"><!-- activity_item_container -->
         <div class="ten columns offset-by-one">
 
