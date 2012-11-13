@@ -417,7 +417,7 @@ class File(models.Model):
             self.numUpVotes += 1
             # Award karma corresponding to "upvote" ReputationEventType to file owner
             if self.owner is not None:
-                self.owner.get_profile().awardKarma(event="upvote")
+                self.owner.get_profile().awardKarma(event="upvote", course=self.course, school=self.school, user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
         elif int(vote_value) == -1:
@@ -771,15 +771,13 @@ class UserProfile(models.Model):
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
         if self.grad_year != "" and self.grad_year is not None and not self.submitted_grad_year:
-            print "grad year submitted"
             self.submitted_grad_year = True
-            self.awardKarma('profile-grad-year')
+            self.awardKarma('profile-grad-year', user=self.user)
 
         # School set for first time, award karma
         if self.school is not None and not self.submitted_school:
-            print "submitted school!"
             self.submitted_school = True
-            self.awardKarma('profile-school')
+            self.awardKarma('profile-school', user=self.user)
 
         # Add read permissions if Prospect karma level is reached
         if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
