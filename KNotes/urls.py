@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     #   ---------------------------------------------------
     # Search
     url(r'^search/', 'notes.views.search'),
+    url(r'^multisearch/', 'notes.views.multisearch'),
 
     #   ---------------------------------------------------
     ## Ajax endpoints

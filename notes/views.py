@@ -807,12 +807,13 @@ def vote(request, file_pk):
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
 
+def multi_search(request):
+    if request.GET.get("q", "") != "":
+        query = request.GET.get("q", "")
+        results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
+        return HttpResponse(results, content_type="text/plain")
 
-'''
-    Search testing
-'''
-
-
+''' Search testing '''
 def search(request):
     results = []
     # Process query and return results
