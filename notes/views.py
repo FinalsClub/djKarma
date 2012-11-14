@@ -812,9 +812,9 @@ def multisearch(request):
         response = {}
 
         query = request.GET.get("q", "")
-        response['schools'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School)
-        response['courses'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course)
-        response['notes'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(File)
+        response['schools'] = SearchQuerySet().filter(content_auto__contains=query).models(School)
+        response['courses'] = SearchQuerySet().filter(content_auto__contains=query).models(Course)
+        response['notes'] = SearchQuerySet().filter(content_auto__contains=query).models(File)
 
         results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
         return HttpResponse(results, content_type="text/plain")
