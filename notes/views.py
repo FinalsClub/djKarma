@@ -807,9 +807,15 @@ def vote(request, file_pk):
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
 
-def multi_search(request):
+def multisearch(request):
     if request.GET.get("q", "") != "":
+        response = {}
+
         query = request.GET.get("q", "")
+        response['schools'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School)
+        response['courses'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course)
+        response['notes'] = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(File)
+
         results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
         return HttpResponse(results, content_type="text/plain")
 
