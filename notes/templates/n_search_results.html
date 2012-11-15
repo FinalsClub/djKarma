@@ -37,16 +37,22 @@
             <li>
               <div id="search_courses" class="filter_button" data-target='#course_results'>courses</div>
             </li>
+            {% if instructors|length > 0 %}
             <li>
               {# TODO: disable, not implemented yet #}
               <div id="search_professors" class="filter_button">professors</div>
             </li>
+            {% endif %}
+            {% if schools|length > 0 %}
             <li>
               <div id="search_schools" class="filter_button">schools</div>
             </li>
+            {% endif %}
+            {% if users|length > 0 %}
             <li>
               <div id="search_users" class="filter_button">users</div>
             </li>
+            {% endif %}
           </ul>
         </div><!-- /search_filters -->
       </div>
@@ -81,17 +87,22 @@
         </div><!-- /notes -->
       <!-- end Note results -->
 
-      <!-- Prof results -->
         <div class="two columns end">
+        <!-- Prof results -->
+        {% if instructors|length > 0 %}
           <div class="column_header">
             professors
           </div><!-- /column_header -->
 
+
           {% for instructor in instructors|slice:":1" %}
             {% include 'partials/prof_result_short.html' %}
           {% endfor %}
+        {% endif %}
 
-      <!-- School results -->
+
+        {% if schools|length > 0 %}
+          <!-- School results -->
           <div class="column_header">
             schools
           </div><!-- /column_header -->
@@ -99,6 +110,7 @@
           {% for school in schools|slice:":1" %}
             {% include 'partials/school_result_short.html' %}
           {% endfor %}
+        {% endif %}
 
           {% comment %}
           <div class="row school_result_container">
@@ -108,7 +120,8 @@
           </div>
           {% endcomment %}
 
-      <!-- User results -->
+        <!-- User results -->
+        {% if users|length > 0 %}
           <div class="column_header">
             users
           </div><!-- /column_header -->
@@ -116,6 +129,7 @@
           {% for user in users|slice:":1" %}
             {% include 'partials/user_result_short.html' %}
           {% endfor %}
+        {% endif %}
 
         </div>
       </div><!-- /columns -->
