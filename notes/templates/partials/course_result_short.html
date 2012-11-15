@@ -24,11 +24,11 @@
         last updated {# FIXME: not implemented #} -- october 23, 2012 4:45pm
       </div><!-- /activity_timestamp -->
       <div class="activity_details_action">
-        {{ course.title }}
+        {{ course.object.title }}
       </div><!-- /activity_details_action -->
       <div class="activity_details_context">
-        <a href="#" class="prof_link">{{ course.instructor.name }} -- professor neil degrasse tyson</a><br>
-        <a href="#" class="school_link">{{ course.school.name }}</a>
+        <a href="#" class="prof_link">{{ course.object.instructor.name }} -- professor neil degrasse tyson</a><br>
+        <a href="#" class="school_link">{{ course.object.school.name }}</a>
       </div><!-- /activity_details_context -->
     </div>
   </div>
