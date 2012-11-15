@@ -37,10 +37,16 @@ $(document).ready(function(){
   var slide_in = {'direction': 'left', 'mode': 'show'};
 
   $(".filter_button").click(function() {
+    // Slide out the current content
     $(".results_container").effect("slide", slide_out, 1000);
+    // remove the current active button
+    $(".filter_button .button_interior").parent().removeClass("bevel_button");
+    $(".filter_button .button_interior").removeClass("button_interior");
+    // activate the clicked button
+    $(this).parent().addClass("bevel_button");
+    $(this).addClass("button_interior");
+    // Slide in the new content
     $($(this).data('target')).effect("slide", slide_in, 1000);
-    $(".filter_button .button_interior").removeClass("button_interior);
-    $(this).addClass("button_interior);
   });
 
 
