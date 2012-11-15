@@ -27,8 +27,8 @@
         {{ course.object.title }}
       </div><!-- /activity_details_action -->
       <div class="activity_details_context">
-        <a href="#" class="prof_link">{{ course.object.instructor.name }} -- professor neil degrasse tyson</a><br>
-        <a href="#" class="school_link">{{ course.object.school.name }}</a>
+        <a href="#" class="prof_link">{{ course.object.instructor.name }}</a><br>
+        <a href="{{ course.object.get_absolute_url }}" class="school_link">{{ course.object.school.name }}</a>
       </div><!-- /activity_details_context -->
     </div>
   </div>
