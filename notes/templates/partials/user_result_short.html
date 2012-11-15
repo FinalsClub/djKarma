@@ -2,10 +2,10 @@
   <div class="twelve columns user_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
     <div class="row">
       <div class="four columns">
-          <img src="{{ user.get_profile.profile_url_small" alt="dashboard_profile_avatar_jh" width="45" height="45" />
+          <img src="{{ user.object.get_profile.profile_url_small" alt="dashboard_profile_avatar_jh" width="45" height="45" />
       </div>
       <div class="eight columns user_name half-padding">
-        {{ user.get_name }}
+        {{ user.object.get_profile.get_name }}
       </div> <!-- /user_name -->
     </div>
   </div><!-- /user_result -->

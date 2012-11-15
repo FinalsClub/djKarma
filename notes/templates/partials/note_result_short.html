@@ -1,14 +1,14 @@
 <div class="row notes_result_container">
   <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
     <div class="activity_timestamp">
-      5pm // tues nov 23 2012 -- {{ note.timestamp }}
+      5pm // tues nov 23 2012 -- {{ note.object.timestamp }}
     </div>
     <div class="activity_details_action">
-      <a href="#" class="activity_target">{{ note.title }}</a>
+      <a href="#" class="activity_target">{{ note.object.title }}</a>
     </div>
     <div class="activity_details_context">
       {# TODO: Hook up absolute URLS #}
-      <a href="#" class="course_link">{{ note.course.title }}</a>//<a href="#" class="school_link">{{ note.school.name }}</a>
+      <a href="#" class="course_link">{{ note.object.course.title }}</a>//<a href="#" class="school_link">{{ note.object.school.name }}</a>
     </div>
     <div class="activity_details_callout">
       <div class="activity_details_callout_copy">
