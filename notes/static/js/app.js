@@ -38,10 +38,9 @@ $(document).ready(function(){
 
   $(".filter_button").click(function() {
     $(".results_container").effect("slide", slide_out, 1000);
-    $(".button_interior").removeClass("button_interior);
     $($(this).data('target')).effect("slide", slide_in, 1000);
+    $(".button_interior").removeClass("button_interior);
     $(this).addClass("button_interior);
-
   });
 
 
