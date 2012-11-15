@@ -118,7 +118,7 @@
                 <div class="twelve columns" id="global_header_mycourses_list" style="display:none;">
                   <ul id="course_menu">
                     {% for course in user.get_profile.courses.all %}
-                      <li><a href="#"> {{ course.title }} </a></li>
+                      <li><a href="{{ course.get_absolute_url }}"> {{ course.title }} </a></li>
                     {% endfor %}
                   </ul>
                 </div><!-- /global_header_mycourses_list -->
