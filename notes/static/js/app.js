@@ -40,8 +40,8 @@ $(document).ready(function(){
     // Slide out the current content
     $(".results_container").effect("slide", slide_out, 1000);
     // remove the current active button
-    $(".filter_button .button_interior").parent().removeClass("bevel_button");
-    $(".filter_button .button_interior").removeClass("button_interior");
+    $(".filter_button.button_interior").parent().removeClass("bevel_button");
+    $(".filter_button.button_interior").removeClass("button_interior");
     // activate the clicked button
     $(this).parent().addClass("bevel_button");
     $(this).addClass("button_interior");
