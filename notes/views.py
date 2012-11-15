@@ -819,7 +819,7 @@ def multisearch(request):
         response['notes'] = SearchQuerySet().filter(content__icontains=query).models(File)
 
         results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
-        return HttpResponse(results, content_type="text/plain")
+        return render(request, 'n_search_results.html', response)
 
 ''' Search testing '''
 def search(request):
