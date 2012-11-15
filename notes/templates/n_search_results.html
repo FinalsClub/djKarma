@@ -54,72 +54,77 @@
   </div><!-- /search_header -->
 
   <div id="all_results" class="results_container">
-  <!-- Course results -->
-  <div class="row"><!-- columns -->
-    <div class="four columns offset-by-one"><!-- courses -->
-      <div class="column_header">
-        courses
-      </div><!-- /column_header -->
+      <!-- Course results -->
+      <div class="row"><!-- columns -->
+        <div class="four columns offset-by-one"><!-- courses -->
+          <div class="column_header">
+            courses
+          </div><!-- /column_header -->
 
-      {% for course in courses|slice:":3" %}
-        {% include 'partials/course_result_short.html' %}
-      {% endfor %}
+          {% for course in courses|slice:":3" %}
+            {% include 'partials/course_result_short.html' %}
+          {% endfor %}
 
-    </div><!-- /courses -->
-  <!-- end Course results -->
+        </div><!-- /courses -->
+      <!-- end Course results -->
 
-  <!-- Note results -->
-    <div class="four columns"><!-- notes -->
-      <div class="column_header">
-        notes
-      </div><!-- /column_header -->
+      <!-- Note results -->
+        <div class="four columns"><!-- notes -->
+          <div class="column_header">
+            notes
+          </div><!-- /column_header -->
 
-      {% for note in notes|slice:":3" %}
-        {% include 'partials/note_result_short.html' %}
-      {% endfor %}
+          {% for note in notes|slice:":3" %}
+            {% include 'partials/note_result_short.html' %}
+          {% endfor %}
 
-    </div><!-- /notes -->
-  <!-- end Note results -->
+        </div><!-- /notes -->
+      <!-- end Note results -->
 
-  <!-- Prof results -->
-    <div class="two columns end">
-      <div class="column_header">
-        professors
-      </div><!-- /column_header -->
+      <!-- Prof results -->
+        <div class="two columns end">
+          <div class="column_header">
+            professors
+          </div><!-- /column_header -->
 
-      {% for instructor in instructors|slice:":1" %}
-        {% include 'partials/prof_result_short.html' %}
-      {% endfor %}
+          {% for instructor in instructors|slice:":1" %}
+            {% include 'partials/prof_result_short.html' %}
+          {% endfor %}
 
-  <!-- School results -->
-      <div class="column_header">
-        schools
-      </div><!-- /column_header -->
+      <!-- School results -->
+          <div class="column_header">
+            schools
+          </div><!-- /column_header -->
 
-      {% for school in schools|slice:":1" %}
-        {% include 'partials/school_result_short.html' %}
-      {% endfor %}
+          {% for school in schools|slice:":1" %}
+            {% include 'partials/school_result_short.html' %}
+          {% endfor %}
 
-      {% comment %}
-      <div class="row school_result_container">
-        <div class="twelve columns user_result no_result">
-          No schools are associated with this search. Better luck next time.
+          {% comment %}
+          <div class="row school_result_container">
+            <div class="twelve columns user_result no_result">
+              No schools are associated with this search. Better luck next time.
+            </div>
+          </div>
+          {% endcomment %}
+
+      <!-- User results -->
+          <div class="column_header">
+            users
+          </div><!-- /column_header -->
+
+          {% for user in users|slice:":1" %}
+            {% include 'partials/user_result_short.html' %}
+          {% endfor %}
+
         </div>
-      </div>
-      {% endcomment %}
-
-  <!-- User results -->
-      <div class="column_header">
-        users
-      </div><!-- /column_header -->
-
-      {% for usser in users|slice:":1" %}
-        {% include 'partials/user_result_short.html' %}
-      {% endfor %}
-
-    </div>
-  </div><!-- /columns -->
+      </div><!-- /columns -->
   </div><!-- #all_results .results_container -->
+  {% if notes|length > 0 %}
+  <div id="note_results" class="results_container" style="display:none">
+    {% include 'n_note_results.html' %}
+  </div><!-- #note_results .results_container -->
+  {% endif %}
 
   <div class="row">
     <div id="add_result" class="six columns centered">
