@@ -60,7 +60,7 @@
         courses
       </div><!-- /column_header -->
 
-      {% for course in courses[:3] %}
+      {% for course in courses|slice:":3" %}
         {% include 'course_result_short.html' %}
       {% endfor %}
 
@@ -74,7 +74,7 @@
         notes
       </div><!-- /column_header -->
 
-      {% for note in notes[:3] %}
+      {% for note in notes|slice:":3" %}
         {% include 'note_result_short.html' %}
       {% endfor %}
 
@@ -87,7 +87,7 @@
         professors
       </div><!-- /column_header -->
 
-      {% for instructor in instructors[:1] %}
+      {% for instructor in instructors|slice:":1" %}
         {% include 'prof_result_short.html %}
       {% endfor %}
 
@@ -96,7 +96,7 @@
         schools
       </div><!-- /column_header -->
 
-      {% for school in schools[:1] %}
+      {% for school in schools|slice:":1" %}
         {% include 'school_result_short.html %}
       {% endfor %}
 
@@ -113,7 +113,7 @@
         users
       </div><!-- /column_header -->
 
-      {% for usser in users[:1] %}
+      {% for usser in users|slice:":1" %}
         {% include 'user_result_short.html %}
       {% endfor %}
 
