@@ -32,10 +32,10 @@
               <div id="search_main" class="filter_button button_interior">top results</div>
             </li>
             <li>
-              <div id="search_notes" class="filter_button" data-target='note_results'>notes</div>
+              <div id="search_notes" class="filter_button" data-target='#note_results'>notes</div>
             </li>
             <li>
-              <div id="search_courses" class="filter_button">courses</div>
+              <div id="search_courses" class="filter_button" data-target='#course_results'>courses</div>
             </li>
             <li>
               {# TODO: disable, not implemented yet #}
@@ -120,6 +120,11 @@
         </div>
       </div><!-- /columns -->
   </div><!-- #all_results .results_container -->
+  {% if course|length > 0 %}
+  <div id="course_results" class="results_container" style="display:none">
+    {% include 'n_course_results.html' %}
+  </div><!-- #course_results .results_container -->
+  {% endif %}
   {% if notes|length > 0 %}
   <div id="note_results" class="results_container" style="display:none">
     {% include 'n_note_results.html' %}

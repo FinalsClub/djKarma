@@ -33,8 +33,8 @@ $(document).ready(function(){
   });
 
   // Search results
-  var side_out = {'direction': 'left', 'mode': 'hide'};
-  var side_in = {'direction': 'left', 'mode': 'show'};
+  var slide_out = {'direction': 'left', 'mode': 'hide'};
+  var slide_in = {'direction': 'left', 'mode': 'show'};
 
   $(".filter_button").click(function() {
     $(".results_container").effect("slide", slide_out, 1000);
