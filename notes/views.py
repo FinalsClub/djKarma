@@ -812,6 +812,8 @@ def multisearch(request):
         response = {}
 
         query = request.GET.get("q", "")
+        response['query'] = query
+
         response['schools'] = SearchQuerySet().filter(content__icontains=query).models(School)
         response['courses'] = SearchQuerySet().filter(content__icontains=query).models(Course)
         response['notes'] = SearchQuerySet().filter(content__icontains=query).models(File)
