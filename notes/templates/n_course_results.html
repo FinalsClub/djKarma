@@ -5,8 +5,10 @@
       courses
     </div><!-- /column_header -->
 
-    <div class="row course_result">
+    {% for course in courses %}
+    <div class="row course_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
       <div class="one columns course_meta">
+          {# TODO: make contextual and connect to join course js #}
           <div class="course_meta_action course_meta_join">
             join
           </div>
@@ -15,19 +17,19 @@
       <div class="eleven columns end">
         <div class="activity_details">
           <div class="activity_timestamp">
-            last updated october 23, 2012 4:45pm
+            last updated {{ course.object.timestamp }} -- october 23, 2012 4:45pm
           </div><!-- /activity_timestamp -->
           <div class="activity_details_action">
-            Dilemmas in Bio-Medical Ethics: Playing God or Doing good?
+            {{ course.object.title }}
           </div><!-- /activity_details_action -->
           <div class="activity_details_context">
-            <a href="#" class="prof_link">professor neil degrasse tyson</a><br>
-            <a href="#" class="school_link">harvard university</a>
+            <a href="#" class="prof_link">{{ course.object.instructor.name }}</a><br>
+            <a href="#" class="school_link">{{ course.object.school.name }}</a>
           </div><!-- /activity_details_context -->
           <div class="row">
             <div class="one columns">
               <div class="course_meta_stat">
-                27
+                27 {# TODO #}
               </div>
               <div class="course_meta_name">
                 notes
@@ -35,7 +37,7 @@
             </div>
             <div class="one columns end">
               <div class="course_meta_stat">
-                43
+                43 {# TODO #}
               </div>
               <div class="course_meta_name">
                 students
@@ -45,6 +47,7 @@
         </div>
       </div>
     </div><!-- /course_result -->
+    {% endfor %}
 
     <div class="row course_result row_alt_on">
       <div class="one columns course_meta">
@@ -87,92 +90,12 @@
       </div>
     </div><!-- /course_result -->
 
-    <div class="row course_result">
-      <div class="one columns course_meta">
-          <div class="course_meta_action course_meta_join">
-            join
-          </div>
-      </div><!-- /course_meta -->
-
-      <div class="eleven columns">
-        <div class="activity_details">
-          <div class="activity_timestamp">
-            last updated october 23, 2012 4:45pm
-          </div><!-- /activity_timestamp -->
-          <div class="activity_details_action">
-            Dilemmas in Bio-Medical Ethics: Playing God or Doing good?
-          </div><!-- /activity_details_action -->
-          <div class="activity_details_context">
-            <a href="#" class="prof_link">professor neil degrasse tyson</a><br>
-            <a href="#" class="school_link">harvard university</a>
-          </div><!-- /activity_details_context -->
-          <div class="row">
-            <div class="one columns">
-              <div class="course_meta_stat">
-                27
-              </div>
-              <div class="course_meta_name">
-                notes
-              </div>
-            </div>
-            <div class="one columns end">
-              <div class="course_meta_stat">
-                43
-              </div>
-              <div class="course_meta_name">
-                students
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /course_result -->
-
-    <div class="row course_result row_alt_on">
-      <div class="one columns course_meta">
-          <div class="course_meta_action course_meta_drop">
-            drop
-          </div>
-      </div><!-- /course_meta -->
-
-      <div class="eleven columns">
-        <div class="activity_details">
-          <div class="activity_timestamp">
-            last updated october 23, 2012 4:45pm
-          </div><!-- /activity_timestamp -->
-          <div class="activity_details_action">
-            Dilemmas in Bio-Medical Ethics: Playing God or Doing good?
-          </div><!-- /activity_details_action -->
-          <div class="activity_details_context">
-            <a href="#" class="prof_link">professor neil degrasse tyson</a><br>
-            <a href="#" class="school_link">harvard university</a>
-          </div><!-- /activity_details_context -->
-          <div class="row">
-            <div class="one columns">
-              <div class="course_meta_stat">
-                27
-              </div>
-              <div class="course_meta_name">
-                notes
-              </div>
-            </div>
-            <div class="one columns end">
-              <div class="course_meta_stat">
-                43
-              </div>
-              <div class="course_meta_name">
-                students
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /course_result -->
   </div><!-- /courses -->
 
   </div>
 </div><!-- /columns -->
 
+{% comment %}
 <div class="row">
   <div class="twelve columns">
     <div id="search_pagination" style="width: 232px"><!-- WIDTH SHOULD BE SET DYNAMICALLY TO ENABLE MARGIN: AUTO -->
@@ -195,3 +118,4 @@
     </div><!-- /search_pagination -->
   </div>
 </div>
+{% endcomment %}
