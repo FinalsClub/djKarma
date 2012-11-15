@@ -1,5 +1,5 @@
 <div class="row prof_result_container">
-  <div class="twelve columns prof_result">
+  <div class="twelve columns prof_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
     <div class="row">
       <div class="four columns">
         <img src="static/img/dashboard_profile_avatar_ad.jpg" alt="dashboard_profile_avatar_ad" width="45" height="45" />

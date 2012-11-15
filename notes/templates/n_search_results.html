@@ -61,12 +61,11 @@
       </div><!-- /column_header -->
 
       {% for course in courses|slice:":3" %}
-        {% include 'course_result_short.html' %}
+        {% include 'partials/course_result_short.html' %}
       {% endfor %}
 
     </div><!-- /courses -->
   <!-- end Course results -->
-
 
   <!-- Note results -->
     <div class="four columns"><!-- notes -->
@@ -75,7 +74,7 @@
       </div><!-- /column_header -->
 
       {% for note in notes|slice:":3" %}
-        {% include 'note_result_short.html' %}
+        {% include 'partials/note_result_short.html' %}
       {% endfor %}
 
     </div><!-- /notes -->
@@ -88,7 +87,7 @@
       </div><!-- /column_header -->
 
       {% for instructor in instructors|slice:":1" %}
-        {% include 'prof_result_short.html %}
+        {% include 'partials/prof_result_short.html %}
       {% endfor %}
 
   <!-- School results -->
@@ -97,7 +96,7 @@
       </div><!-- /column_header -->
 
       {% for school in schools|slice:":1" %}
-        {% include 'school_result_short.html %}
+        {% include 'partials/school_result_short.html %}
       {% endfor %}
 
       {% comment %}
@@ -114,7 +113,7 @@
       </div><!-- /column_header -->
 
       {% for usser in users|slice:":1" %}
-        {% include 'user_result_short.html %}
+        {% include 'partials/user_result_short.html %}
       {% endfor %}
 
     </div>

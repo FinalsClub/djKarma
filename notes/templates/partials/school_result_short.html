@@ -1,5 +1,5 @@
 <div class="row school_result_container">
-  <div class="twelve columns school_result">
+  <div class="twelve columns school_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
     <div class="row">
       <div class="four columns">
         {# TODO: replace this with school icon #}
