@@ -32,5 +32,15 @@ $(document).ready(function(){
     $("form#login_form").submit();
   });
 
+  // Search results
+  var side_out = {'direction': 'left', 'mode': 'hide'};
+  var side_in = {'direction': 'left', 'mode': 'show'};
+
+  $(".filter_button").click(function() {
+    $(".results_container").effect("slide", slide_out, 1000);
+    $($(this).data('target')).effect("slide", slide_in, 1000);
+  });
+
+
 
 });
