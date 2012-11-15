@@ -38,7 +38,7 @@ $(document).ready(function(){
 
   $(".filter_button").click(function() {
     // Slide out the current content
-    $(".results_container").effect("slide", slide_out, 1000);
+    $(".results_container").effect("slide", slide_out, 500);
     // remove the current active button
     $(".filter_button.button_interior").parent().removeClass("button_bevel");
     $(".filter_button.button_interior").removeClass("button_interior");
@@ -46,7 +46,7 @@ $(document).ready(function(){
     $(this).parent().addClass("button_bevel");
     $(this).addClass("button_interior");
     // Slide in the new content
-    $($(this).data('target')).effect("slide", slide_in, 1000);
+    $($(this).data('target')).effect("slide", slide_in, 500);
   });
 
 
