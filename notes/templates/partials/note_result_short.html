@@ -4,11 +4,11 @@
       5pm // tues nov 23 2012 -- {{ note.object.timestamp }}
     </div>
     <div class="activity_details_action">
-      <a href="#" class="activity_target">{{ note.object.title }}</a>
+      <a href="{{ note.object.get_absolute_url }}" class="activity_target">{{ note.object.title }}</a>
     </div>
     <div class="activity_details_context">
       {# TODO: Hook up absolute URLS #}
-      <a href="#" class="course_link">{{ note.object.course.title }}</a>//<a href="#" class="school_link">{{ note.object.school.name }}</a>
+      <a href="{{ note.object.course.get_absolute_url }}" class="course_link">{{ note.object.course.title }}</a>//<a href="{{ note.object.school.get_absolute_url }}" class="school_link">{{ note.object.school.name }}</a>
     </div>
     <div class="activity_details_callout">
       <div class="activity_details_callout_copy">

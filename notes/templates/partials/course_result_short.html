@@ -1,6 +1,6 @@
-<div class="row course_result">
+<div class="row course_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
 
-  <div class="two columns course_meta {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+  <div class="two columns course_meta">
       <div class="course_meta_stat">
         27
       </div>
@@ -24,11 +24,13 @@
         last updated {# FIXME: not implemented #} -- october 23, 2012 4:45pm
       </div><!-- /activity_timestamp -->
       <div class="activity_details_action">
-        {{ course.object.title }}
+        <a class="activity_target" href="{{ course.object.get_absolute_url }}">
+          {{ course.object.title }}
+        </a>
       </div><!-- /activity_details_action -->
       <div class="activity_details_context">
         <a href="#" class="prof_link">{{ course.object.instructor.name }}</a><br>
-        <a href="{{ course.object.get_absolute_url }}" class="school_link">{{ course.object.school.name }}</a>
+        <a href="{{ course.object.school.get_absolute_url }}" class="school_link">{{ course.object.school.name }}</a>
       </div><!-- /activity_details_context -->
     </div>
   </div>

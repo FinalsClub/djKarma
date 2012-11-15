@@ -7,7 +7,7 @@
       </div>
       {# TODO: add school name? #}
       <div class="eight columns school_name half-padding">
-        {{ school.object.name }}
+        <a href="{{ school.object.get_absolute_url }}">{{ school.object.name }}</a>
       </div> <!-- /school_name -->
     </div>
   </div><!-- /school_result -->

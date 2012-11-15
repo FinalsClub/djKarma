@@ -12,10 +12,10 @@
           {{ note.object.timestamp }} -- 5pm // tues nov 23 2012
         </div>
         <div class="activity_details_action">
-          <a href="#" class="activity_target">{{ note.object.title }}</a>
+          <a href="{{ note.object.get_absolute_url }}" class="activity_target">{{ note.object.title }}</a>
         </div>
         <div class="activity_details_context">
-          <a href="#" class="course_link">{{ note.object.course.title }}</a>//<a href="#" class="school_link">{{ note.object.school.name }}</a>
+          <a href="{{ note.object.get_absolute_url }}" class="course_link">{{ note.object.course.title }}</a>//<a href="{{ note.object.get_absolute_url }}" class="school_link">{{ note.object.school.name }}</a>
         </div>
         <div class="activity_details_callout">
           <div class="row">
@@ -37,121 +37,6 @@
     </div><!-- /notes_result_container -->
     {% endfor %}
 
-    <div class="row notes_result_container wide">
-      <div class="twelve columns notes_result row_alt_on">
-        <div class="activity_timestamp">
-          5pm // tues nov 23 2012
-        </div>
-        <div class="activity_details_action">
-          <a href="#" class="activity_actor">You</a> added <a href="#" class="activity_target">Tango For Beginners</a>
-        </div>
-        <div class="activity_details_context">
-          <a href="#" class="course_link">latin dancing</a>//<a href="#" class="school_link">harvard university</a>
-        </div>
-        <div class="activity_details_callout">
-          <div class="row">
-            <div class="one column">
-              <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-            </div>
-            <div class="eleven columns activity_details_callout_copy">
-              Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="twelve columns activity_details_status">
-            So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-          </div><!-- /activity_details_status -->
-        </div>
-      </div><!-- /notes_result -->
-    </div><!-- /notes_result_container -->
-
-    <div class="row notes_result_container wide">
-      <div class="twelve columns notes_result">
-        <div class="activity_timestamp">
-          5pm // tues nov 23 2012
-        </div>
-        <div class="activity_details_action">
-          <a href="#" class="activity_actor">You</a> added <a href="#" class="activity_target">Tango For Beginners</a>
-        </div>
-        <div class="activity_details_context">
-          <a href="#" class="course_link">latin dancing</a>//<a href="#" class="school_link">harvard university</a>
-        </div>
-        <div class="activity_details_callout">
-          <div class="row">
-            <div class="one column">
-              <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-            </div>
-            <div class="eleven columns activity_details_callout_copy">
-              Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="twelve columns activity_details_status">
-            So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-          </div><!-- /activity_details_status -->
-        </div>
-      </div><!-- /notes_result -->
-    </div><!-- /notes_result_container -->
-
-    <div class="row notes_result_container wide">
-      <div class="twelve columns notes_result row_alt_on">
-        <div class="activity_timestamp">
-          5pm // tues nov 23 2012
-        </div>
-        <div class="activity_details_action">
-          <a href="#" class="activity_actor">You</a> added <a href="#" class="activity_target">Tango For Beginners</a>
-        </div>
-        <div class="activity_details_context">
-          <a href="#" class="course_link">latin dancing</a>//<a href="#" class="school_link">harvard university</a>
-        </div>
-        <div class="activity_details_callout">
-          <div class="row">
-            <div class="one column">
-              <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-            </div>
-            <div class="eleven columns activity_details_callout_copy">
-              Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="twelve columns activity_details_status">
-            So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-          </div><!-- /activity_details_status -->
-        </div>
-      </div><!-- /notes_result -->
-    </div><!-- /notes_result_container -->
-
-    <div class="row notes_result_container wide">
-      <div class="twelve columns notes_result">
-        <div class="activity_timestamp">
-          5pm // tues nov 23 2012
-        </div>
-        <div class="activity_details_action">
-          <a href="#" class="activity_actor">You</a> added <a href="#" class="activity_target">Tango For Beginners</a>
-        </div>
-        <div class="activity_details_context">
-          <a href="#" class="course_link">latin dancing</a>//<a href="#" class="school_link">harvard university</a>
-        </div>
-        <div class="activity_details_callout">
-          <div class="row">
-            <div class="one column">
-              <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-            </div>
-            <div class="eleven columns activity_details_callout_copy">
-              Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="twelve columns activity_details_status">
-            So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-          </div><!-- /activity_details_status -->
-        </div>
-      </div><!-- /notes_result -->
-    </div><!-- /notes_result_container -->
 
   </div><!-- /notes -->
 

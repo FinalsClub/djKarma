@@ -817,6 +817,8 @@ def multisearch(request):
         response['schools'] = SearchQuerySet().filter(content__icontains=query).models(School)
         response['courses'] = SearchQuerySet().filter(content__icontains=query).models(Course)
         response['notes'] = SearchQuerySet().filter(content__icontains=query).models(File)
+        response['instructors'] = []
+        response['users'] = []
 
         results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
         return render(request, 'n_search_results.html', response)
