@@ -83,7 +83,9 @@
       <div id="logo_container" class="five columns offset-by-one">
         <div class="row">
           <div class="five columns">
-            <img src="/static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+            <a href="http://karmanotes.org">
+              <img src="/static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+            </a>
           </div>
           <div class="seven columns">
             <div id="search_container">
@@ -149,21 +151,23 @@
 
               <div id="global_header_avatar_moreinfo" style="display:none;">
                 <div class="row" id="global_header_avatar_moreinfo_content">
-                  <div class="nine columns">
-                    <div class="row">
-                      <div class="twelve columns" id="global_header_avatar_moreinfo_name">
-                        {{ user.get_profile.get_name }}
-                      </div><!-- /global_header_avatar_moreinfo_name -->
+                  <a href="{% url 'dashboard' %}">
+                    <div class="nine columns">
+                      <div class="row">
+                        <div class="twelve columns" id="global_header_avatar_moreinfo_name">
+                          {{ user.get_profile.get_name }}
+                        </div><!-- /global_header_avatar_moreinfo_name -->
+                      </div>
+                      <div class="row">
+                        <div class="twelve columns" id="global_header_avatar_moreinfo_school">
+                          {{ user.get_profile.school }}
+                        </div><!-- /global_header_avatar_moreinfo_school -->
+                      </div>
                     </div>
-                    <div class="row">
-                      <div class="twelve columns" id="global_header_avatar_moreinfo_school">
-                        {{ user.get_profile.school }}
-                      </div><!-- /global_header_avatar_moreinfo_school -->
-                    </div>
-                  </div>
-                  <div id="global_header_avatar_moreinfo_gear" class="three columns">
-                    <img src="/static/img/global_header_gear.png" alt="global_header_gear" width="12" height="14" />
-                  </div><!-- /global_header_avatar_moreinfo_gear -->
+                    <div id="global_header_avatar_moreinfo_gear" class="three columns">
+                      <img src="/static/img/global_header_gear.png" alt="global_header_gear" width="12" height="14" />
+                    </div><!-- /global_header_avatar_moreinfo_gear -->
+                  </a>
                 </div>
                 <div class="row">
                   <div class="twelve columns" id="global_header_avatar_moreinfo_mynotes">
