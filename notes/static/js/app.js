@@ -95,5 +95,39 @@ $(document).ready(function(){
   });
   });
 
+  $('.class_select').click( function() {
+    course_pk = $(this).data('id');
+    console.log("course selected");
+  });
+
+  function load_upload_data(){
+    var upload_data = {};
+    upload_data.school_pk = school_pk;
+    upload_data.course_pk = course_pk;
+    upload_data.file_pk = file_pk;
+    upload_data.title = $("#add_note_title_txt").val();
+    upload_data.description = $("#add_note_description_txt").val();
+    console.log(upload_data);
+    return upload_data;
+  }
+
+  $("#modal_upload_button").click( function() {
+    var res = load_upload_data();
+    $.ajax({
+      url: '/filemeta',
+      data: res,
+      success: function(data){
+        if(data.status === 'success'){
+          console.log('success');
+        }
+        else{
+          alert(data.message);
+        }
+      },
+      type: 'POST'
+    });
+    
+  });
+
 
 });
