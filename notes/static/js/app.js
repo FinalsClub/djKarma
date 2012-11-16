@@ -22,6 +22,11 @@ $(document).ready(function(){
     $("#lightbox_signup").toggle();
   });
 
+  // Show Add Note lightbox
+  $("#global_header_addnote").click(function() {
+    $("#lightbox_add_note").toggle();
+  });
+
   // Dismiss all lightboxes
   $(".lightbox_close").click(function() {
     $(".modal_content").hide();
