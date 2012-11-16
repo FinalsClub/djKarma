@@ -70,7 +70,7 @@ def home(request):
     """ Landing Page [static] """
 
     if request.user.is_authenticated():
-        return profile(request)
+        return dashboard(request)
     else:
         # Get the 'singleton' SiteStats instance
         stats = SiteStats.objects.get(pk=1)
