@@ -23,7 +23,7 @@
         <div id="note_back_to_course" class="twelve columns">
           <a href="{{ file.course.get_absolute_url }}">
             {# TODO: style this not like a link #}
-            <img src="/static/img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />&nbsp;back to micro-economics
+            <img src="/static/img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />&nbsp;back to {{ file.course.title }}
           </a>
 
         </div>
@@ -31,7 +31,7 @@
 
       <div class="row">
         <div id="note_name" class="twelve columns">
-          Week 3 Notes: Fractals
+          {{ file.title }}
         </div><!-- /note_name -->
       </div>
 

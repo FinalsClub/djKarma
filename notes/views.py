@@ -484,7 +484,7 @@ def browse_one_course(request, course_query, school):
             else:
                 response['flagged_files'].append(file.id)
 
-    return render(request, 'browse_one_course.html', response)
+    return render(request, 'n_course.html', response)
 
 
 @login_required
