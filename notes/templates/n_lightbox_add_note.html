@@ -1,0 +1,136 @@
+{% load url from future %}
+  <section id="lightbox_add_note" class="modal_content">
+
+    <script>
+      var ajax_upload_url = "{% url 'ajax_upload' %}";
+      var csrf_token = "{{ csrf_token }}";
+    </script>
+
+    <div class="row">
+      <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
+        <div class="row">
+          <div class="lightbox_header modal_header twelve columns">
+            Add Notes
+          </div><!-- /modal_header -->
+        </div>
+
+        <form id="modal-school-form">
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Your School
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="eight columns">
+              <div class="lightbox_copy">
+                Harvard University
+              </div><!-- /lightbox_copy -->
+              <div class="lightbox_instruction">
+                Not your school? <a href="#">Edit it now.</a>
+              </div>
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Which course would you like to add notes to?
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="four columns">
+              <div class="inverted_button">
+                My Courses <img class="button_arrow" src="/static/img/global_button_orange_arrow.png" alt="global_button_orange_arrow" width="8" height="5" />
+              </div><!-- /inverted_button -->
+            </div>
+            <div class="three columns end">
+              <div class="lightbox_instruction">
+                Don't see the course you want to add to?<br><a href="#">Join it now.</a>
+              </div><!-- /lightbox_instruction -->
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div style="text-align:center;" id="file-uploader">
+            <noscript>
+              <p>Please enable JavaScript to use file uploader.</p>
+            </noscript>
+          </div> <!-- #file-uploader -->
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Upload File
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="four columns">
+              <div class="inverted_button">
+                Browse
+              </div><!-- /inverted_button -->
+              <div id="file-uploader-label" style="display:none;text-align:center">
+              </div>
+            </div>
+            <div class="three columns end">
+              <div class="lightbox_instruction">
+                Don't see the course you want to add to?<br><a href="#">Join it now.</a>
+              </div><!-- /lightbox_instruction -->
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Title of Notes
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="seven columns end">
+              <input type="text" class="lightbox_textfield" id="add_note_title_txt">
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Date Created
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="eight columns">
+              <div class="lightbox_copy">
+                7/25/2012
+              </div><!-- /lightbox_copy -->
+              <div class="lightbox_instruction">
+                Not correct? <a href="#">Edit it now.</a>
+              </div><!-- /lightbox_instruction -->
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                What type of notes are you adding?
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="seven columns end">
+              <input type="text" class="lightbox_textfield" id="add_note_type_txt" placeholder="Syllabus, Notes, Study Guide…">
+            </div>
+          </div><!-- /lightbox_row -->
+
+          <div class="row lightbox_row">
+            <div class="three columns offset-by-one">
+              <label class="lightbox_label">
+                Describe your notes
+              </label><!-- lightbox_label -->
+            </div>
+            <div class="seven columns end">
+              <textarea class="lightbox_textfield lightbox_textarea" id="add_note_description_txt" placeholder="These notes are the bomb because…"></textarea>
+            </div>
+          </div><!-- /lightbox_row -->
+          {# TODO: This is not the right styling, fixme #}
+          <div class="form-actions" id="modal-upload-button">
+            <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
+          </div>
+        </form>
+
+        <div class="lightbox_close"></div>
+
+      </div><!-- /lightbox_modal -->
+    </div>
+
+  </section><!-- /modal_content -->

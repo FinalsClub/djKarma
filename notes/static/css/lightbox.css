@@ -177,3 +177,9 @@
   background: rgba(0, 0, 0, .8) url(../img/lightbox_close_x.png) 50% 50% no-repeat!important;
   cursor: pointer;
 }
+
+/* HAXs! */
+div#file-uploader-label h2
+{
+  font-size: 12pt;
+}
