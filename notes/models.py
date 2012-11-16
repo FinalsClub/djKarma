@@ -359,6 +359,7 @@ class File(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
+        print "\t", self.id, self.title, self.school.slug, self.course.slug
         if self.school is None or self.course is None:
             return ('file', [str(self.pk)])
         else:

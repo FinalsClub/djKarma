@@ -25,7 +25,7 @@
               {% if event.user == request.user %}
                 You
               {% else %}
-                {{ event.get_profile.get_name }}
+                {{ event.user.get_profile.get_name }}
               {% endif %}
               </a>
               {# Action and Subject #}

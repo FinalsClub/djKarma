@@ -151,23 +151,27 @@
 
               <div id="global_header_avatar_moreinfo" style="display:none;">
                 <div class="row" id="global_header_avatar_moreinfo_content">
-                  <a href="{% url 'dashboard' %}">
-                    <div class="nine columns">
-                      <div class="row">
-                        <div class="twelve columns" id="global_header_avatar_moreinfo_name">
+                  <div class="nine columns">
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_name">
+                        <a href="{% url 'dashboard' %}">
                           {{ user.get_profile.get_name }}
-                        </div><!-- /global_header_avatar_moreinfo_name -->
-                      </div>
-                      <div class="row">
-                        <div class="twelve columns" id="global_header_avatar_moreinfo_school">
-                          {{ user.get_profile.school }}
-                        </div><!-- /global_header_avatar_moreinfo_school -->
-                      </div>
+                        </a>
+                      </div><!-- /global_header_avatar_moreinfo_name -->
                     </div>
-                    <div id="global_header_avatar_moreinfo_gear" class="three columns">
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_school">
+                        <a href="{{ user.get_profile.school.get_absolute_url }}">
+                          {{ user.get_profile.school }}
+                        </a>
+                      </div><!-- /global_header_avatar_moreinfo_school -->
+                    </div>
+                  </div>
+                  <div id="global_header_avatar_moreinfo_gear" class="three columns">
+                    <a href="{% url 'dashboard' %}">
                       <img src="/static/img/global_header_gear.png" alt="global_header_gear" width="12" height="14" />
-                    </div><!-- /global_header_avatar_moreinfo_gear -->
-                  </a>
+                    </a>
+                  </div><!-- /global_header_avatar_moreinfo_gear -->
                 </div>
                 <div class="row">
                   <div class="twelve columns" id="global_header_avatar_moreinfo_mynotes">

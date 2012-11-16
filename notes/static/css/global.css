@@ -242,7 +242,7 @@ header#global_header
   width: 203px;
 }
 
-#global_header_avatar_moreinfo_name
+#global_header_avatar_moreinfo_name a
 {
   padding-top: 20px;
   font-size: 17px;
@@ -250,7 +250,7 @@ header#global_header
   color: #FFF;
 }
 
-#global_header_avatar_moreinfo_school
+#global_header_avatar_moreinfo_school a
 {
   padding-top: 5px;
   padding-bottom: 20px;
