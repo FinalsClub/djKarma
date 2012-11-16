@@ -11,9 +11,9 @@
 {% elif event.type.title == 'lecture-note' %}
   uploaded lecture notes to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'exam-or-quiz' %}
-  uploaded a exam or quiz to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
+  uploaded an exam or quiz to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'equation-sheet' %}
-  uploaded a equation sheet to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
+  uploaded an equation sheet to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'essay-large' %}
   uploaded an essay to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'essay-medium' %}
@@ -27,7 +27,7 @@
 {% elif event.type.title == 'assignment' %}
   uploaded an assignment to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'course-url' %}
-  added a course homepage to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
+  created the course <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'like' %}
   thanked {{ event.target.username }} for their file <a class="activity_target" href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a>
 {% elif event.type.title == 'flag' %}
