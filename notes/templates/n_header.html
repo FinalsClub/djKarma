@@ -83,13 +83,15 @@
       <div id="logo_container" class="five columns offset-by-one">
         <div class="row">
           <div class="five columns">
-            <a href="http://karmanotes.org">
+            <a href="/">
               <img src="/static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
             </a>
           </div>
           <div class="seven columns">
             <div id="search_container">
-              <input type="text" id="search_txt">
+              <form id="search" method="GET" action="/multisearch/">
+                <input type="text" id="search_txt" name="q">
+              </form>
             </div>
           </div>
         </div>
