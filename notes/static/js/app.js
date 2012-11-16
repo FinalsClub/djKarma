@@ -1,6 +1,11 @@
 $(document).ready(function(){
 
-// Click Handlers
+  // Click Handlers
+  // Dismiss cover and play video
+  $("#home_video_overlay").click(function(){
+    $("#home_video_overlay").hide();
+  });
+
   // Toggle: Login box dropdown
   $("span#login_toggle").click(function(){
     $("#login_box").toggle();
