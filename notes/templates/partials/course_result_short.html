@@ -13,9 +13,15 @@
       <div class="course_meta_name">
         students
       </div>
-      <div class="course_meta_action course_meta_join">
-        join
-      </div>
+      {% if course.object in user.get_profile.courses.all %}
+        <div class="course_meta_action course_meta_drop" data-id="{{ course.object.id }}">
+          drop
+        </div>
+      {% else %}
+        <div class="course_meta_action course_meta_join" data-id="{{ course.object.id }}">
+          join
+        </div>
+      {% endif %}
   </div><!-- /course_meta -->
 
   <div class="ten columns">

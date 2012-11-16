@@ -8,10 +8,15 @@
     {% for course in courses %}
     <div class="row course_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
       <div class="one columns course_meta">
-          {# TODO: make contextual and connect to join course js #}
-          <div class="course_meta_action course_meta_join">
+        {% if course in user.get_profile.courses.all %}
+          <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
+            drop
+          </div>
+        {% else %}
+          <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
             join
           </div>
+        {% endif %}
       </div><!-- /course_meta -->
 
       <div class="eleven columns end">
