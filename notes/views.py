@@ -214,15 +214,12 @@ def file(request, note_pk, action=None):
         raise Http404
     # If the user does not have read permission, and the
     # Requested files is not theirs
-    '''
-    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        #file_denied(request, note_pk)
-        pass
-    '''
     try:
+        # TODO: implement as get_or_404
         file = File.objects.get(pk=note_pk)
     except:
         raise Http404
+
     # Increment note view count
     file.viewCount += 1
     file.save()
@@ -238,7 +235,9 @@ def file(request, note_pk, action=None):
         profile.save()
 
     # This is ugly, but is needed to be able to get the note type full name
+    # FIXME: the choice field should be selectable, this is crap
     file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+
     url = iri_to_uri(file.file.url)
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
@@ -252,7 +251,7 @@ def file(request, note_pk, action=None):
         response['editing_file'] = False
         #print 'ACTION NONE'
 
-    return render(request, 'view-file.html', response)
+    return render(request, 'n_note.html', response)
 
 
 

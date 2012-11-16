@@ -33,7 +33,11 @@
               {{ user.get_profile.karma }} <!-- user's karma -->
             </div><!-- /stat_earned -->
             <div class="three columns stat_number stat_uploaded">
-              {{ user.get_profile.files.count }} {# FIXME: this includes downloads, use files with owner == user #} <!-- user's file count -->
+              {% if user.get_profile.notes %}
+                {{ user.get_profile.notes.count }} <!-- user's file count -->
+              {% else %}
+                0 <!-- user's file count -->
+              {% endif %}
             </div><!-- /stat_uploaded -->
             <div class="three columns stat_number stat_downloaded">
               {{ user.get_profile.files.count }} {# TODO: something like profile.files.count #}

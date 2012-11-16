@@ -1,10 +1,30 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
+{% endblock %}
+
+{% block pagescripts %}
+<script>
+  var view_file_html = "{{ file.html|safe }} ";
+  var view_file_pk = {{file.pk}};
+  var view_file_title = "{{file.title}}";
+  var view_file_description = "{{file.description}}";
+</script>
+<script src="{{ STATIC_URL }}/js/view-file.js" ></script>
+{% endblock %}
+
+{% block content %}
   <section id="note_content">
 
     <div id="note_header" class="hero_gradient_bar">
       <div class="row">
         <div id="note_back_to_course" class="twelve columns">
-
-          <img src="img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />&nbsp;back to micro-economics
+          <a href="{{ file.course.get_absolute_url }}">
+            {# TODO: style this not like a link #}
+            <img src="/static/img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />&nbsp;back to micro-economics
+          </a>
 
         </div>
       </div>
@@ -18,14 +38,19 @@
       <div class="row">
         <div id="note_status" class="twelve columns">
           <div class="activity_details_status">
-            So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes. <span class="activity_details_status_secondary_number">283</span> people have viewed them.
+            So far, <span class="activity_details_status_number">{{ file.numUpVotes }}</span> people have completely fallen in love with with these notes. <span class="activity_details_status_secondary_number">{{ file.viewCount }}</span> people have viewed them.
           </div><!-- /activity_details_status -->
         </div><!-- /note_status -->
       </div>
 
       <div class="row">
         <div id="note_author" class="twelve columns">
-          uploaded by <a href="#">john howrey</a>
+          uploaded by 
+          {% if owns_file %}
+            you
+          {% else %}
+            {{ file.owner.get_profile.get_name }}
+          {% endif %}
         </div><!-- /note_author -->
       </div>
 
@@ -33,13 +58,13 @@
         <div id="note_actions" class="three columns centered">
           <div class="row">
             <div class="four column">
-              <img src="img/note_flag.png" alt="note_flag" width="25" height="35" />
+              <img src="/static/img/note_flag.png" alt="note_flag" width="25" height="35" />
             </div>
             <div class="four column">
-              <img src="img/note_thank.png" alt="note_thank" width="34" height="34" />
+              <img src="/static/img/note_thank.png" alt="note_thank" width="34" height="34" />
             </div>
             <div class="four column">
-              <img src="img/note_download.png" alt="note_download" width="51" height="36" />
+              <img src="/static/img/note_download.png" alt="note_download" width="51" height="36" />
             </div>
           </div>
         </div><!-- /note_actions -->
@@ -55,9 +80,16 @@
 
           <h1>description</h1>
 
-          <p>Cupcake ipsum dolor sit amet candy. Croissant sesame snaps cupcake donut croissant. Pudding apple pie wafer I love. Donut jelly beans I love muffin macaroon. Chocolate sesame snaps halvah muffin sweet roll jujubes jelly-o. Dragée carrot cake muffin tiramisu fruitcake I love wafer tart applicake. I love halvah chupa chups cake I love sweet roll cheesecake.</p>
+          <p>{{ file.description }}</p>
 
           <h1>notes</h1>
+
+          <div class="note-text">
+            <iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
+          </div> <!-- .note-text -->
+          <div class="note-error" style="display:none">
+            This document's content is currently unavailable. It's likely the document is still being processed. Please try again later.
+          </div>
 
           <p>Muffin chocolate cake dragée candy I love. Muffin lemon drops halvah. Lollipop cake caramels. Toffee jelly beans marzipan gingerbread danish danish faworki. I love chupa chups jujubes lemon drops. Cotton candy I love cookie fruitcake I love lollipop faworki donut fruitcake. Wypas topping croissant apple pie powder lollipop pastry topping. Caramels jelly bonbon biscuit.</p>
 
@@ -78,23 +110,4 @@
 
 
   </section><!--/note_content-->
-
-
-  <footer id="global_footer">
-    <div class="row">
-      <div id="footer_links_container" class="eleven columns offset-by-one">
-        <a href="#">About</a>&nbsp;|&nbsp;<a href="#">Terms</a>&nbsp;|&nbsp;<a href="#">Code</a>&nbsp;|&nbsp;<a href="#">Discussions</a>&nbsp;|&nbsp;<a href="#">Donate</a>
-      </div><!--/footer_links_container-->
-    </div>
-
-    <div class="row">
-      <div id="colophon" class="eleven columns offset-by-one">
-          <img src="img/global_footer_cc_logo.png" id="cc_logo" alt="global_footer_cc_logo" width="30" height="30" align="left"/>
-          This work is licensed under a <a href="#">Creative Commons</a> Attribution-ShareAlike 3.0 Unported License.<br>
-          <a href="/">KarmaNotes.org</a> is a non-profit project brought to you by the <a href="#">Finals Club Foundation</a>.
-      </div><!--/colophon-->
-    </div>
-  </footer><!--/global footer-->
-
-</body>
-</html>
+{% endblock %}
