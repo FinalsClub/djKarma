@@ -54,6 +54,46 @@ $(document).ready(function(){
     $(this).addClass("button_interior");
   });
 
+  // Join a course to your profile
+  $(".course_meta_action.course_meta_join").on("click", function(){
+    //var response = serializeCourseFormData();
+    $.ajax({
+      url: '/add-course',
+      data: {'id': $(this).data('id')},
+      context: this,
+      success: function(data){
+        // put callback here to clear form and tell of success
+        if(data.status === 'success'){
+          console.log("added course to profile");
+          $(this).removeClass('course_meta_join');
+          $(this).addClass('course_meta_drop');
+          $(this).text('drop');
+        }
+      },
+      type: 'POST'
+  });
+  });
+
+  // Drop a course from your profile
+  $(".course_meta_action.course_meta_drop").on("click", function(){
+    //var response = serializeCourseFormData();
+    $.ajax({
+      url: '/drop-course',
+      data: {'id': $(this).data('id')},
+      context: this,
+      success: function(data){
+        // put callback here to clear form and tell of success
+        if(data.status === 'success'){
+          console.log("dropped course from profile");
+          console.log($(this));
+          $(this).removeClass('course_meta_drop');
+          $(this).addClass('course_meta_join');
+          $(this).text('join');
+        }
+      },
+      type: 'POST'
+  });
+  });
 
 
 });

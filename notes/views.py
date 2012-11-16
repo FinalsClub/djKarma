@@ -625,6 +625,8 @@ def add_course_to_profile(request):
         alternatively, to be used when the 'are you in this course' checkbox
         is selected in the upload modal
     """
+    print "adding course"
+    print request.POST
     if request.is_ajax() and request.method == 'POST':
         user_profile = request.user.get_profile()
         if 'title' in request.POST:
@@ -633,10 +635,17 @@ def add_course_to_profile(request):
             status = user_profile.add_course(course_id=request.POST['id'])
 
         if status:
+            print "success"
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
             return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
+def drop_course(request):
+    if request.is_ajax() and request.method == 'POST':
+        user_profile = request.user.get_profile()
+        course = Course.objects.get(id=request.POST['id'])
+        user_profile.courses.remove(course)
+        return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
 
 def instructors(request):
     """ Ajax: Instructor autcomplete form field """

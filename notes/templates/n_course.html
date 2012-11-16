@@ -34,9 +34,16 @@
         <div id="course_actions" class="two columns centered">
           <div class="row">
             <div class="six columns">
-              <div class="course_meta_action course_meta_drop">
-                drop
-              </div>
+              {% if course in user.get_profile.courses.all %}
+                <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
+                  drop
+                </div>
+              {% else %}
+                <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
+
+                  join
+                </div>
+              {% endif %}
             </div>
             <div id="course_meta_action_gear" class="six columns">
               <img src="/static/img/course_action_gear.png" alt="course_action_gear" width="39" height="37" />

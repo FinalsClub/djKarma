@@ -81,6 +81,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     # Ajax request to add a course to a user's profile
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
+    url(r'^drop-course', 'notes.views.drop_course', name='drop-course'),
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),
     # Edit course
