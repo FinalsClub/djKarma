@@ -250,6 +250,8 @@ class Course(models.Model):
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
+    last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
 
     def __unicode__(self):
         # Note: these must be unicode objects
@@ -391,6 +393,12 @@ class File(models.Model):
             self.cleaned = True
 
         super(File, self).save(*args, **kwargs)
+        # update associated course last_updated
+        try:
+            self.course.last_updated = datetime.datetime.now()
+            self.course.save
+        except:
+            pass
 
     def ownedBy(self, user_pk):
         """ Returns true if the user owns or has "paid" for this file
