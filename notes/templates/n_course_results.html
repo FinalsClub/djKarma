@@ -1,4 +1,3 @@
-
 <div class="row"><!-- columns -->
   <div class="ten columns offset-by-one"><!-- courses -->
     <div class="column_header">
@@ -34,7 +33,7 @@
           <div class="row">
             <div class="one columns">
               <div class="course_meta_stat">
-                27 {# TODO #}
+                {{ course.object.files.all.count }}
               </div>
               <div class="course_meta_name">
                 notes
@@ -42,7 +41,7 @@
             </div>
             <div class="one columns end">
               <div class="course_meta_stat">
-                43 {# TODO #}
+                {{ course.object.userprofile_set.count }}
               </div>
               <div class="course_meta_name">
                 students

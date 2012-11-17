@@ -2,13 +2,13 @@
 
   <div class="two columns course_meta">
       <div class="course_meta_stat">
-        27
+        {{ course.object.files.all.count }}
       </div>
       <div class="course_meta_name">
         notes
       </div>
       <div class="course_meta_stat">
-        43
+        {{ course.object.userprofile_set.count }}
       </div>
       <div class="course_meta_name">
         students
