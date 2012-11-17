@@ -60,45 +60,51 @@ $(document).ready(function(){
   });
 
   // Join a course to your profile
-  $(".course_meta_action.course_meta_join").on("click", function(){
+  function addCourse(e){
     //var response = serializeCourseFormData();
     $.ajax({
       url: '/add-course',
-      data: {'id': $(this).data('id')},
-      context: this,
+      data: {'id': $(e).data('id')},
+      context: e,
       success: function(data){
         // put callback here to clear form and tell of success
         if(data.status === 'success'){
-          console.log("added course to profile");
-          $(this).removeClass('course_meta_join');
-          $(this).addClass('course_meta_drop');
-          $(this).text('drop');
+          $(e).removeClass('course_meta_join');
+          $(e).addClass('course_meta_drop');
+          $(e).text('drop');
+          // resetting button to drop the added course without refreshing
+          $(e).on("click", function(){dropCourse(e)});
         }
       },
       type: 'POST'
-  });
-  });
+    });
+  }
 
   // Drop a course from your profile
-  $(".course_meta_action.course_meta_drop").on("click", function(){
+  function dropCourse(e){
     //var response = serializeCourseFormData();
     $.ajax({
       url: '/drop-course',
-      data: {'id': $(this).data('id')},
-      context: this,
+      data: {'id': $(e).data('id')},
+      context: e,
       success: function(data){
         // put callback here to clear form and tell of success
         if(data.status === 'success'){
-          console.log("dropped course from profile");
-          console.log($(this));
-          $(this).removeClass('course_meta_drop');
-          $(this).addClass('course_meta_join');
-          $(this).text('join');
+          $(e).removeClass('course_meta_drop');
+          $(e).addClass('course_meta_join');
+          $(e).text('join');
+          // reset handler to re-add course
+          $(e).on("click", function(){addCourse(e)});
         }
       },
       type: 'POST'
-  });
-  });
+    });
+  }
+
+  // set join/drop handlers
+  $(".course_meta_action.course_meta_join").click(function(){addCourse(this)});
+  $(".course_meta_action.course_meta_drop").click(function(){dropCourse(this)});
+
 
   $('.class_select').click( function() {
     course_pk = $(this).data('id');
