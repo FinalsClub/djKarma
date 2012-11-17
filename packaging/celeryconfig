@@ -4,10 +4,13 @@ CELERYD_NODES="w1"
 #CELERYD_NODES="w1 w2 w3"
 
 # Where to chdir at start.
+# the path to your repo if not on beta
 CELERYD_CHDIR="/var/www/beta"
 
 # How to call "manage.py celeryd_multi"
 CELERYD_MULTI="$CELERYD_CHDIR/manage.py celeryd_multi"
+# you have to migrate the djcelery tables first
+# ./manage.py migrate djcelery
 
 # How to call "manage.py celeryctl"
 CELERYCTL="$CELERYD_CHDIR/manage.py celeryctl"
@@ -25,6 +28,7 @@ CELERYD_PID_FILE="/var/run/celery/%n.pid"
 # Workers should run as an unprivileged user.
 CELERYD_USER="celery"
 CELERYD_GROUP="celery"
+# the user that you created as instructed in README.md
 
 # Name of the projects settings module.
-export DJANGO_SETTINGS_MODULE="settings"
+export DJANGO_SETTINGS_MODULE="KNotes.settings"
