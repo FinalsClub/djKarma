@@ -54,6 +54,7 @@ sudo service postgresql restart
 
 see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html).
 
+http://apache.cs.utah.edu/lucene/solr/3.6.1/apache-solr-3.6.1.zip
 
 #### Maintaining the Search Index
 
