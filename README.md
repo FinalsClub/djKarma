@@ -113,6 +113,8 @@ To install and run the celery task server:
 6. chmod +x /etc/init.d/celeryd
 7. run /etc/init.d/celeryd start
 
+When running on your local, make sure the celery user understands the local path of your repo.
+
 ###Production Note:
 On the new Amazon instance, celery logs are located at:
 
@@ -220,3 +222,5 @@ Management Commands (manage.py \<command name>)
 + **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
    + Necessary when a backup of the notes app database is made separate of the User table 
 
+### Creating default user
+On your local machine create a KarmaNotes default user and make sure that it has a unique email address.  The UserProfile.gravatar field is a hash of user.email and is required to be unique.  This doesn't tell you WHY creating a user will not work, it just wont.
