@@ -40,7 +40,7 @@
               Harvard University
             </div><!-- /lightbox_copy -->
             <div class="lightbox_instruction">
-              Not your school? <a href="#">Edit it now.</a>
+              {# Not your school? <a href="#">Edit it now.</a> #}
             </div>
           </div>
         </div><!-- /lightbox_row -->
@@ -68,26 +68,29 @@
           </div>
         </div><!-- /lightbox_row -->
 
-        <div style="text-align:center;" id="file-uploader">
-          <noscript>
-            <p>Please enable JavaScript to use file uploader.</p>
-          </noscript>
-        </div> <!-- #file-uploader -->
         <div class="row lightbox_row">
           <div class="three columns offset-by-one">
             <label class="lightbox_label">
               Upload File
             </label><!-- lightbox_label -->
           </div>
-          <div class="four columns">
+          <div class="four columns browse_file_button">
+            {% comment %}
             <div class="inverted_button">
               Browse
             </div><!-- /inverted_button -->
-            <div id="file-uploader-label" style="display:none;text-align:center">
+            <input type="file" id="browse_for_file" name="file">
+            {% endcomment %}
+            <div> <!-- this allows the _parent insert -->
+              <div style="text-align:center;" id="file-uploader">
+                <noscript>
+                  <p>Please enable JavaScript to use file uploader.</p>
+                </noscript>
+              </div> <!-- #file-uploader -->
             </div>
           </div>
           <div class="three columns end">
-            <div class="lightbox_instruction">
+            <div id="lightbox_instruction_file_info" class="lightbox_instruction">
               Don't see the course you want to add to?<br><a href="#">Join it now.</a>
             </div><!-- /lightbox_instruction -->
           </div>
