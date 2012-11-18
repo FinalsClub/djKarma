@@ -203,7 +203,8 @@ def file(request, note_pk, action=None):
             note_pk: file_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
-
+    print "reversing file url lookup using views.file()"
+    print "\t", request, note_pk, action
     # Check that user has permission to read
     #profile = request.user.get_profile()
     response = nav_helper(request)
@@ -259,80 +260,82 @@ def file(request, note_pk, action=None):
 """ ==============
     AJAX endpoints
     ============== """
-# AJAX
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
     response = {}
 
-    if request.method == "POST" and request.is_ajax():
-        form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
-        if form.is_valid():
-            file = File.objects.get(pk=form.cleaned_data["file_pk"])
-            file.type = form.cleaned_data["type"]
-            file.title = form.cleaned_data["title"]
-            file.description = form.cleaned_data["description"]
-            if request.user.is_authenticated():
-                file.owner = request.user
-            else:
-                file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
-                # Perform reCAPTCHA check
-                if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
-                    print 'challenge: ' + str(request.POST['recaptcha_challenge'])
-                    print 'response: ' + str(request.POST['recaptcha_response'])
-                    print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
-                    check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
-                        request.POST['recaptcha_response'],
-                        settings.RECAPTCHA_PRIVATE_KEY, {})
-                else:
-                    print 'recaptcha keys not found in request.POST'
-                    raise Http404
-
-                if not check_captcha.is_valid:
-                    print check_captcha.error_code
-                    response['status'] = 'invalid'
-                    response['message'] = 'Incorrect captcha response. Please try again.'
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-            try:
-                _school_id = int(form.cleaned_data["school_pk"])
-                _course_id = int(form.cleaned_data["course_pk"])
-                file.school = School.objects.get(pk=_school_id)
-                file.course = Course.objects.get(pk=_course_id)
-            except Exception, e:
-                print "school/course error: " + str(e)
-
-            if _course_id is not None and form.cleaned_data['in_course'] == "True":
-                # if in_course selected, add the course to their profile
-                request.user.get_profile().add_course(course_id=_course_id)
-            # process Tags
-            #processCsvTags(file, form.cleaned_data['tags'])
-            print "file.save()"
-            file.save()
-            response = {}
-            response["status"] = "success"
-            response["file_pk"] = file.pk
-            response["karma"] = file.karmaValue()
-            print "fileMeta form valid! " + str(file.pk)
-            # lets us use django's messaging system for alert-notifications
-            # in our design on upload success at the top of the profile
-            # FIXME: fix this message with proper html
-            if request.user.is_authenticated():
-                messages.add_message(request, messages.SUCCESS,
-                "Success! You uploaded a file (message: Django Messaging!")
-            # If user is not authenticated, store this file pk in their session
-            # TODO: IF a user isn't authenticated - present them
-            # an indication that they can claim karma by logging in
-        else:
-            # Form is invalid
-            print form.errors
-            print "fileMeta form NOT valid!"
-            response["status"] = "invalid"
-            response["form"] = form
-            response["message"] = "Please check your form data."
-            return HttpResponse(json.dumps(response), mimetype="application/json")
-
-    else:
-        # if not POST or not ajax
+    if request.method != "POST":
+        # This is the wrong way to use fileMeta, exit
         response["status"] = "invalid"
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+ 
+    form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
+
+    if not form.is_valid():
+        # Form is invalid
+        print form.errors
+        print "fileMeta form NOT valid!"
+        response["status"] = "invalid"
+        #response["form"] = form
+        response["message"] = "Please check your form data."
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    file = File.objects.get(pk=form.cleaned_data["file_pk"])
+    file.type = form.cleaned_data["type"]
+    file.title = form.cleaned_data["title"]
+    file.description = form.cleaned_data["description"]
+    if request.user.is_authenticated():
+        file.owner = request.user
+    else:
+        file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
+        # Perform reCAPTCHA check
+        if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
+            print 'challenge: ' + str(request.POST['recaptcha_challenge'])
+            print 'response: ' + str(request.POST['recaptcha_response'])
+            print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
+            check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
+                request.POST['recaptcha_response'],
+                settings.RECAPTCHA_PRIVATE_KEY, {})
+        else:
+            print 'recaptcha keys not found in request.POST'
+            raise Http404
+
+        if not check_captcha.is_valid:
+            print check_captcha.error_code
+            response['status'] = 'invalid'
+            response['message'] = 'Incorrect captcha response. Please try again.'
+            return HttpResponse(json.dumps(response), mimetype="application/json")
+    try:
+        _school_id = int(form.cleaned_data["school_pk"])
+        _course_id = int(form.cleaned_data["course_pk"])
+        file.school = School.objects.get(pk=_school_id)
+        file.course = Course.objects.get(pk=_course_id)
+    except Exception, e:
+        print "school/course error: " + str(e)
+
+    if _course_id is not None and form.cleaned_data['in_course'] == "True":
+        # if in_course selected, add the course to their profile
+        request.user.get_profile().add_course(course_id=_course_id)
+    # process Tags
+    #processCsvTags(file, form.cleaned_data['tags'])
+    print "file.save()"
+    file.save()
+    response = {}
+    response["status"] = "success"
+    response["file_pk"] = file.pk
+    response["karma"] = file.karmaValue()
+    print "fileMeta form valid! " + str(file.pk)
+    # lets us use django's messaging system for alert-notifications
+    # in our design on upload success at the top of the profile
+    # FIXME: fix this message with proper html
+    if request.user.is_authenticated():
+        messages.add_message(request, messages.SUCCESS,
+        "Success! You uploaded a file (message: Django Messaging!")
+    # If user is not authenticated, store this file pk in their session
+    # TODO: IF a user isn't authenticated - present them
+    # an indication that they can claim karma by logging in
+
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 

@@ -5,6 +5,20 @@
       var ajax_upload_url = "{% url 'ajax_upload' %}";
       var csrf_token = "{{ csrf_token }}";
       var school_pk = {{ user.get_profile.school.id }};
+      {% if not user.is_authenticated %}
+        // show terms of service and recaptcha if user not authenticated
+        var anon_user = true; 
+        /* Note: This is verified by server, tampering with this value will not
+           allow anon users to submit form without captcha. It will prevent the
+           captcha from displaying. */
+      {% else %}
+      var anon_user = false;
+        {% if user.school != None %}
+          var user_school_pk = {{school_pk}};
+        {% else %}
+          var user_school_pk = 0;
+        {% endif %}
+      {% endif %}
     </script>
 
     <div class="row">
@@ -126,9 +140,7 @@
           </div>
         </div><!-- /lightbox_row -->
         {# TODO: This is not the right styling, fixme #}
-        <div class="form-actions" id="modal-upload-button">
-          <a class="button" id="modal-meta-submit" type="submit">FINISH UPLOAD</a>
-        </div>
+        <a class="button" id="submit-lightbox-form" type="submit">FINISH UPLOAD</a>
 
 
         <div class="lightbox_close"></div>

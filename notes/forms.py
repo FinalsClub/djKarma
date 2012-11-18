@@ -78,7 +78,7 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                         attrs={'id': 'file-form-course_pk'}
                     )
                 )
-    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    type        = forms.ChoiceField(choices=File.FILE_PTS, required=False)
     title       = forms.CharField(max_length=50,
                     error_messages={'required': 'Enter a title.'},
                     widget=forms.TextInput(attrs={'class': 'text-input'})

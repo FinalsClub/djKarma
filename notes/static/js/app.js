@@ -122,11 +122,11 @@ $(document).ready(function(){
     return upload_data;
   }
 
-  $("#modal_upload_button").click( function() {
+  $("#submit-lightbox-form").click( function() {
     var res = load_upload_data();
     $.ajax({
       url: '/filemeta',
-      data: res,
+      data: load_upload_data(),
       success: function(data){
         if(data.status === 'success'){
           console.log('success');
