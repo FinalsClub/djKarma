@@ -97,7 +97,7 @@ urlpatterns = patterns('',
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
 
     # useful only for direct linking to file, and for ajaxuploader reverse url lookup
-    url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
+    url(r'^file/(?P<note_pk>\d{1,9999})$', 'notes.views.file', name='file'),
 
     #   ---------------------------------------------------
     # Auth
