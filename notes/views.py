@@ -289,6 +289,7 @@ def fileMeta(request):
         file.owner = request.user
     else:
         file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
+        file.owner.save()
         # Perform reCAPTCHA check
         if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
             print 'challenge: ' + str(request.POST['recaptcha_challenge'])
@@ -309,6 +310,8 @@ def fileMeta(request):
     try:
         _school_id = int(form.cleaned_data["school_pk"])
         _course_id = int(form.cleaned_data["course_pk"])
+        print "School id for karmaevent: %s" % _school_id
+        print "course id for karmaevent: %s" % _course_id
         file.school = School.objects.get(pk=_school_id)
         file.course = Course.objects.get(pk=_course_id)
     except Exception, e:
@@ -329,6 +332,7 @@ def fileMeta(request):
     # lets us use django's messaging system for alert-notifications
     # in our design on upload success at the top of the profile
     # FIXME: fix this message with proper html
+    # render an html partial and then send it in json to jquery
     if request.user.is_authenticated():
         messages.add_message(request, messages.SUCCESS,
         "Success! You uploaded a file (message: Django Messaging!")

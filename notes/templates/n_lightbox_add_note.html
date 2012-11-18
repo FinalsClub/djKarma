@@ -52,15 +52,17 @@
             </label><!-- lightbox_label -->
           </div>
           <div class="four columns">
-            <div class="inverted_button">
+            <div id="button_my_course" class="inverted_button show_select" data-target="#upload_course_select_box">
               My Courses <img class="button_arrow" src="/static/img/global_button_orange_arrow.png" alt="global_button_orange_arrow" width="8" height="5" />
             </div><!-- /inverted_button -->
+            <div id="upload_course_select_box" class="select_box">
             {% for course in user.get_profile.courses.all %}
-              <div class="class_select lightbox_instruction" data-id="{{ course.id }}" style="cursor: pointer;">{{ course.title }} </div>
+              <div class="course-select lightbox_instruction" data-id="{{ course.id }}" style="cursor: pointer;">{{ course.title }} </div>
             {% endfor %}
+            </div>
           </div>
           <div class="three columns end">
-            <div class="lightbox_instruction">
+            <div id="lightbox_upload_course_sidebar" class="lightbox_instruction">
               Don't see the course you want to add to?<br><a href="#">Join it now.</a>
             </div><!-- /lightbox_instruction -->
           </div>

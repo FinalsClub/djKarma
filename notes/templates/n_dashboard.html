@@ -101,13 +101,16 @@
                 {% endfor %}
               </ul>
             </div>
+            {% comment %}
             <div id="profile_courses_links">
               <a href="#">See All</a>
               <a href="#">Add A Course</a>
             </div>
+            {% endcomment %}
           </div><!-- /profile_courses -->
 
           <div class="three columns" id="profile_actions">
+            {% comment %}
             <div id="profile_actions_add_course">
               <a href="#"><img src="/static/img/dashboard_profile_plusicon.png" alt="dashboard_profile_plusicon" width="20" height="20" align="middle"/> ADD A COURSE</a>
             </div>
@@ -117,6 +120,7 @@
             <div id="profile_actions_add_course">
               <a href="#"><img src="/static/img/dashboard_profile_foldericon.png" alt="dashboard_profile_foldericon" width="20" height="20" align="middle"/> VIEW MY NOTES</a>
             </div>
+            {% endcomment %}
           </div><!-- /profile_actions -->
         </div>
       </div><!-- /profile_box -->
@@ -133,264 +137,8 @@
       {% for event in events %}
         {% include 'n_activity_item.html' %}
       {% endfor %}
-      <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one">
 
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">You</a> downloaded <a class="activity_target">Class Notes for Week 5 by John Howrey</a>
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_context">
-                    <a href="#" class="course_link">economics 101</a>//<a href="#" class="school_link">harvard university</a>
-                  </div><!-- /activity_details_context -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-      <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one row_alt_on">
-
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar_jh.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">John Howrey</a> added <a href="#" class="activity_target">Class Notes for Week 5</a>
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_context">
-                    <a href="#" class="course_link">economics 101</a>//<a href="#" class="school_link">harvard university</a>
-                  </div><!-- activity_details_context -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_callout">
-                    <div class="row">
-                      <div class="one column">
-                        <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-                      </div>
-                      <div class="eleven columns activity_details_callout_copy">
-                        Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-                      </div>
-                    </div>
-                  </div><!-- /activity_details_callout -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_status">
-                    So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-                  </div><!-- /activity_details_status -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-       <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one">
-
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">You</a> added <a href="#" class="course_link">Class Economics 101</a> at <a href="#" class="school_link">Harvard University</a> to your list of courses
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_status">
-                    So far, <span class="activity_details_status_number">13</span> people have completely fallen in love with with these notes.
-                  </div><!-- /activity_details_status -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-      <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one row_alt_on">
-
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar_dm.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">Andrew Mogliozzi</a> downloaded your notes, <a href="#" class="activity_target">Tango for Beginners</a>.
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_status">
-                    That just earned you <span class="activity_details_status_number">5</span> Karma points.
-                  </div><!-- /activity_details_status -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-      <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one">
-
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar_gs.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">Gabi Schaffzin</a> tought your notes, <a href="#" class="activity_target">Tango for Beginners</a>, were the créme de la créme.
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_status">
-                    That just earned you <span class="activity_details_status_number">1</span> Karma point.
-                  </div><!-- /activity_details_status -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-      <div class="row"><!-- activity_item_container -->
-        <div class="ten columns offset-by-one row_alt_on">
-
-          <div class="activity_item">
-
-            <div class="row">
-              <div class="twelve columns">
-                <div class="activity_timestamp">
-                  <span class="activity_time">5pm</span> // <span class="activity_date">tues nov 23 2012</span>
-                </div><!-- /activity_timestamp -->
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="one column">
-                <img src="/static/img/dashboard_profile_avatar.jpg" alt="dashboard_profile_avatar" width="71" height="71" />
-              </div>
-
-              <div class="eleven columns activity_details">
-                <div class="row">
-                  <div class="twleve columns activity_details_action">
-                    <a href="#" class="activity_actor">You</a> added <a href="#" class="activity_target">Tango for Beginners</a>
-                  </div><!-- /activity_details_action -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_context">
-                    <a href="#" class="course_link">economics 101</a>//<a href="#" class="school_link">harvard university</a>
-                  </div><!-- activity_details_context -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_callout">
-                    <div class="row">
-                      <div class="one column">
-                        <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
-                      </div>
-                      <div class="eleven columns activity_details_callout_copy">
-                        Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
-                      </div>
-                    </div>
-                  </div><!-- /activity_details_callout -->
-                </div>
-                <div class="row">
-                  <div class="twelve columns activity_details_status">
-                    So far, <span class="activity_details_status_number">2</span> people have found these notes mind-blowing.
-                  </div><!-- /activity_details_status -->
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /activity_item -->
-
-        </div>
-      </div><!-- /activity_item_container -->
-
-    </div><!-- /activity_container -->
-
+    {% comment %}
     <div class="row">
       <div class="twelve columns">
         <div id="activity_more">
@@ -398,6 +146,7 @@
         </div><!-- /activity_more -->
       </div>
     </div>
+    {% endcomment %}
 
   </section><!--/dashboard_content-->
 {% endblock %}

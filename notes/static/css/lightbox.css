@@ -183,3 +183,7 @@ div#file-uploader-label h2
 {
   font-size: 12pt;
 }
+
+.select_box {
+  display:none;
+}

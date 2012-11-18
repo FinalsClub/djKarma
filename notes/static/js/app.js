@@ -42,6 +42,11 @@ $(document).ready(function(){
     $("form#login_form").submit();
   });
 
+  // Display course select box
+  $(".show_select").click(function(){
+    $($(this).data('target')).show()
+  });
+
   // Search results
   var slide_out = {'direction': 'left', 'mode': 'hide'};
   var slide_in = {'direction': 'left', 'mode': 'show'};
@@ -106,9 +111,16 @@ $(document).ready(function(){
   $(".course_meta_action.course_meta_drop").click(function(){dropCourse(this)});
 
 
-  $('.class_select').click( function() {
+  // Choose a course, hide the select field
+  $('.course-select').click( function() {
     course_pk = $(this).data('id');
     console.log("course selected");
+    // fill the lightbox_instructyion with the chosen course's title
+    $('#lightbox_upload_course_sidebar').text($(this).text());
+    // hide the my courses button
+    $(".select_box").effect("slide", slide_out, 500);
+    //$('#button_my_course').hide();
+    // TODO: register handler for clicking mycourses reshow the my courses button
   });
 
   function load_upload_data(){
@@ -130,6 +142,8 @@ $(document).ready(function(){
       success: function(data){
         if(data.status === 'success'){
           console.log('success');
+          $('#lightbox_add_note').hide();
+          
         }
         else{
           alert(data.message);
