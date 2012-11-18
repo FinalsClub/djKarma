@@ -207,7 +207,8 @@ def file(request, note_pk, action=None):
     print "\t", request, note_pk, action
     # Check that user has permission to read
     #profile = request.user.get_profile()
-    response = nav_helper(request)
+    #response = nav_helper(request)
+    response = {}
     user = request.user
     try:
         profile = user.get_profile()
