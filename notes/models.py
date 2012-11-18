@@ -276,7 +276,7 @@ class Course(models.Model):
         else:
             print "No course found, so no notes"
             raise Http404
-        return _course, File.objects.filter(course=_course).distinct()
+        return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
 
 
     def save(self, *args, **kwargs):
@@ -361,8 +361,12 @@ class File(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        print "\t", self.id, self.title, self.school.slug, self.course.slug
+        print "getting file absolute URL"
+        print self.id, self.course, self.school
+        #print "\t", self.id, self.title, self.school.slug, self.course.slug
         if self.school is None or self.course is None:
+            print "using the file and pk based absolute url"
+            # This code path is run on initial upload before course exists
             return ('file', [str(self.pk)])
         else:
             return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
@@ -807,11 +811,13 @@ class UserProfile(models.Model):
 #
 ############################## ##############################
 
+"""
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
+"""
 
 
 def facebook_extra_data(sender, user, response, details, **kwargs):

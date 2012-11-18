@@ -64,7 +64,7 @@
       <div class="row">
         <div class="ten columns offset-by-one">
 
-          {% for file in files %}
+          {% for file in files.reverse %}
 
           <div class="row notes_result_container wide">
             <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
