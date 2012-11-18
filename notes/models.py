@@ -373,12 +373,9 @@ class File(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # If this is a new file, increment SiteStat
-        if not self.pk:
-            increment(self)
-
-        print "awarded_karma : %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME):
+        # FIXME: this is getting run on the first file save from async upload
+        # this needs to only be run on fileMeta
+        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME) and self.school != None:
             print "awarding karma for file!"
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:
@@ -387,7 +384,8 @@ class File(models.Model):
                 #Default note type
                 karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
+            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
+            user_profile.save()
             self.awarded_karma = True
 
         # Escape html field only once
@@ -723,7 +721,7 @@ class UserProfile(models.Model):
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()
-            return True
+            return self
         except Exception, e:
             print "error in awardKarma:"
             print e

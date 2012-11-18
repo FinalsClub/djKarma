@@ -13,7 +13,9 @@
 
       <div class="row">
         <div class="one column">
-          {# FIXME: if event belongs to self, a lot of this would have shorter lookups #}
+          {% comment %}
+            FIXME: if event belongs to self, a lot of this would have shorter lookups
+          {% endcomment %}
           <img src="{{ event.user.get_profile.picture_url_large }}" alt="dashboard_profile_avatar" width="71" height="71" />
         </div>
 
@@ -21,7 +23,7 @@
           <div class="row">
             <div class="twleve columns activity_details_action">
               {% if request.user == event.user %}
-                {# FIXME: only shows events you comitted, like uploading a file, not uploads to classes you are in #"
+                {# FIXME: only shows events you comitted, like uploading a file, not uploads to classes you are in #}
                 {# Actor #}
                 <a href="#" class="activity_actor">
                 {% if event.user == request.user %}

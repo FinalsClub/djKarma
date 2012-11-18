@@ -310,8 +310,6 @@ def fileMeta(request):
     try:
         _school_id = int(form.cleaned_data["school_pk"])
         _course_id = int(form.cleaned_data["course_pk"])
-        print "School id for karmaevent: %s" % _school_id
-        print "course id for karmaevent: %s" % _course_id
         file.school = School.objects.get(pk=_school_id)
         file.course = Course.objects.get(pk=_course_id)
     except Exception, e:
@@ -322,13 +320,12 @@ def fileMeta(request):
         request.user.get_profile().add_course(course_id=_course_id)
     # process Tags
     #processCsvTags(file, form.cleaned_data['tags'])
-    print "file.save()"
     file.save()
     response = {}
     response["status"] = "success"
     response["file_pk"] = file.pk
     response["karma"] = file.karmaValue()
-    print "fileMeta form valid! " + str(file.pk)
+    #print "fileMeta form valid! " + str(file.pk)
     # lets us use django's messaging system for alert-notifications
     # in our design on upload success at the top of the profile
     # FIXME: fix this message with proper html
