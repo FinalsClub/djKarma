@@ -235,14 +235,12 @@ def file(request, note_pk, action=None):
         profile.files.add(file)
         profile.save()
 
-    # This is ugly, but is needed to be able to get the note type full name
-    # FIXME: the choice field should be selectable, this is crap
-    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+    #file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
 
     url = iri_to_uri(file.file.url)
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
-    response['file_type'] = file_type
+    #response['file_type'] = file_type
     response['url'] = url
 
     if action == 'edit':

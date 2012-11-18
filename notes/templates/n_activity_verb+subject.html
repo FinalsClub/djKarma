@@ -9,7 +9,7 @@
 {% elif event.type.title == 'mid-term-study-guide' %}
   uploaded a mid-term study guide to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'lecture-note' %}
-  uploaded lecture notes to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
+  uploaded the note <a class="activity_target" href="{{ event.file.get_absolute_url }}">{{ event.file.title }}</a> to
 {% elif event.type.title == 'exam-or-quiz' %}
   uploaded an exam or quiz to <a class="activity_target" href="{{ event.course.get_absolute_url }}">{{ event.course.title }}</a>
 {% elif event.type.title == 'equation-sheet' %}

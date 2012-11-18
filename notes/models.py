@@ -384,7 +384,7 @@ class File(models.Model):
                 #Default note type
                 karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
+            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner, file=self)
             user_profile.save()
             self.awarded_karma = True
 

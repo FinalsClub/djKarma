@@ -111,6 +111,9 @@ $(document).ready(function(){
   $(".course_meta_action.course_meta_drop").click(function(){dropCourse(this)});
 
 
+/* Upload functions */
+// TODO: split off into upload.js
+
   // Choose a course, hide the select field
   $('.course-select').click( function() {
     course_pk = $(this).data('id');
