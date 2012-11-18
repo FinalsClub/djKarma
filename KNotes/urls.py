@@ -96,6 +96,9 @@ urlpatterns = patterns('',
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
 
+    # useful only for direct linking to file, and for ajaxuploader reverse url lookup
+    url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
+
     #   ---------------------------------------------------
     # Auth
     # This logout allows us to pass a redirect:
@@ -132,5 +135,4 @@ urlpatterns = patterns('',
     # latest browse views, must come last because they are greedy
     #url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
     # Note View
-    #url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
     #url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),
