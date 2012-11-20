@@ -128,7 +128,6 @@ urlpatterns = patterns('',
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     # Not being used and might be depricated
     #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    #url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
     #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
     #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),

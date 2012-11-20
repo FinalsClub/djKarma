@@ -203,17 +203,8 @@ def file(request, note_pk, action=None):
             note_pk: file_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
-    print "reversing file url lookup using views.file()"
-    print "\t", request, note_pk, action
-    # Check that user has permission to read
-    #profile = request.user.get_profile()
-    #response = nav_helper(request)
     response = {}
-    user = request.user
-    try:
-        profile = user.get_profile()
-    except:
-        raise Http404
+    profile = request.user.get_profile()
     # If the user does not have read permission, and the
     # Requested files is not theirs
     try:
@@ -228,7 +219,7 @@ def file(request, note_pk, action=None):
 
     # If this file is not in the user's collection, karmic purchase occurs
     #if file not in profile.files.all():
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
+    if(not userCanView(request.user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
         profile.awardKarma('view-file', school=profile.school, course=file.course, file=file, user=request.user)
@@ -252,8 +243,6 @@ def file(request, note_pk, action=None):
         #print 'ACTION NONE'
 
     return render(request, 'n_note.html', response)
-
-
 
 
 """ ==============
@@ -755,33 +744,6 @@ def searchBySchool(request):
         #return HttpResponse(data, mimetype='application/json')
         #json_serializer = serializers.get_serializer("json")()
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
-
-
-def notesOfCourse(request, course_pk):
-    """ Ajax: Return all notes belonging to a course
-        Used by search page javascript
-    """
-    # If user id is sent with search, send moderation data per note
-    # i.e: has a user voted on this note?
-    if request.is_ajax():
-        if request.user.is_authenticated:
-            user_pk = request.user.pk
-        else:
-            user_pk = -1
-        # Validate request parameters
-        if not Course.objects.filter(pk=course_pk).exists():
-            raise Http404
-        response_json = []
-        #notes = Note.objects.get(school.pk=school_pk)
-        course = Course.objects.get(pk=course_pk)
-        print "notes request for course " + str(course.pk) + " by user " + str(user_pk)
-        #print jsonifyModel(school, depth=2)
-        response_json.append(jsonifyModel(course, depth=1, user_pk=user_pk))
-            #response_json.append(school_json)
-        #print json.dumps(response_json)
-        return HttpResponse(json.dumps(response_json), mimetype="application/json")
-    else:
-        raise Http404
 
 
 @login_required
