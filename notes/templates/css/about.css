@@ -1,0 +1,161 @@
+/* ABOUT */
+
+#about_content
+{
+  padding-top: 46px;
+}
+
+#about_rule
+{
+  border-bottom: solid 1px #d2d2d2;
+}
+
+/* HERO */
+
+#hero_image
+{
+  height: 525px;
+  background: url(../img/about_hero.jpg);
+}
+
+#hero_image_caption_container
+{
+  position: absolute;
+  z-index: 5;
+  bottom: 20px;
+}
+
+#hero_image_caption
+{
+  font-family: "MuseoSlab-700";
+  font-size: 17px;
+  color: #FFF;
+  line-height: 150%;
+}
+
+/* COPY */
+
+#about_copy_header
+{
+  padding-top: 40px;
+  color: #f05a28;
+  font-family: "MuseoSlab-700";
+  font-size: 38px;
+}
+
+#about_copy_body
+{
+  padding-bottom: 40px;
+}
+
+#about_copy_body p
+{
+  font-family: "MuseoSlab-500";
+  font-size: 17px;
+  margin: 20px 0 0;
+  line-height: 150%;
+}
+
+#about_copy_body p a
+{
+  color: #f05a28;
+  text-decoration: underline;
+}
+
+/* DONATE */
+
+#donate_container
+{
+  background-color: #efefef;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#d7d7d8)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #efefef, #d7d7d8); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #efefef, #d7d7d8); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #efefef, #d7d7d8); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #efefef, #d7d7d8); /* Firefox 16+, IE10, Opera 12.50+ */
+  border-top: 1px solid white;
+  border-bottom: 1px solid #c5c5c5;
+  height: 149px;
+}
+
+#donate_copy_header
+{
+  font-family: "MuseoSlab-700";
+  font-size: 40px;
+  color: #3a3a3a;
+  padding-top: 28px;
+}
+
+#donate_copy_body
+{
+  font-family: "MuseoSlab-700";
+  font-size: 20px;
+  color: #3a3a3a;
+  padding-top: 10px;
+  padding-bottom: 28px;
+}
+
+#donate_button_container
+{
+  height: 70px;
+  margin-top: 40px;
+}
+
+#donate_button
+{
+  height: 66px;
+  margin: 1px;
+  font-family: "MuseoSlab-900";
+  font-size: 32px;
+  text-align: center;
+  color: #FFF;
+  padding-top: 20px;
+}
+
+/* LEADERBOARD */
+
+#leaderboard_header
+{
+  padding-top: 75px;
+  font-family: "MuseoSlab-700";
+  font-size: 25px;
+}
+
+#leaderboard_copy
+{
+  font-family: "MuseoSlab-500";
+  font-size: 17px;
+  padding-top: 3px;
+  padding-bottom: 30px;
+}
+
+#leaderboard_table
+{
+  padding-bottom: 85px;
+}
+
+#leaderboard_table .leaderboard_item:last-child
+{
+  border: none;
+  padding-bottom: 0px;
+}
+
+.leaderboard_item
+{
+  border-bottom: 1px solid #000;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.leaderboard_rank
+{
+  font-family: "MuseoSans-900";
+  font-size: 14px;
+  width: 20px!important;
+  padding-top: 4px;
+}
+
+.leaderboard_school, .leaderboard_score
+{
+  font-family: "MuseoSlab-500";
+  font-size: 19px;
+}

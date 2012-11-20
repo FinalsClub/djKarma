@@ -1,0 +1,102 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
+{% endblock %}
+
+{% block pagescripts %}
+<script>
+  var view_file_html = "{{ file.html|safe }}";
+  var view_file_pk = {{ file.pk }};
+  var view_file_title = "{{ file.title }}";
+  var view_file_description = "{{ file.description }}";
+  var editing_file = false;
+</script>
+<script src="{{ STATIC_URL }}/js/view-file.js" ></script>
+{% endblock %}
+
+{% block content %}
+  <section id="note_content">
+
+    <div id="note_header" class="hero_gradient_bar">
+      <div class="row">
+        <div id="note_back_to_course" class="twelve columns">
+          <a href="{{ file.course.get_absolute_url }}">
+            {# TODO: style this not like a link #}
+            <img src="/static/img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />&nbsp;back to {{ file.course.title }}
+          </a>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="note_name" class="twelve columns">
+          {{ file.title }}
+        </div><!-- /note_name -->
+      </div>
+
+      <div class="row">
+        <div id="note_status" class="twelve columns">
+          <div class="activity_details_status">
+            So far, <span class="activity_details_status_number">{{ file.numUpVotes }}</span> people have completely fallen in love with with these notes. <span class="activity_details_status_secondary_number">{{ file.viewCount }}</span> people have viewed them.
+          </div><!-- /activity_details_status -->
+        </div><!-- /note_status -->
+      </div>
+
+      <div class="row">
+        <div id="note_author" class="twelve columns">
+          uploaded by 
+          {% if owns_file %}
+            you
+          {% else %}
+            {{ file.owner.get_profile.get_name }}
+          {% endif %}
+        </div><!-- /note_author -->
+      </div>
+
+      <div class="row">
+        <div id="note_actions" class="three columns centered">
+          <div class="row">
+            <div class="four column">
+              <img src="/static/img/note_flag.png" alt="note_flag" width="25" height="35" />
+            </div>
+            <div class="four column">
+              <img src="/static/img/note_thank.png" alt="note_thank" width="34" height="34" />
+            </div>
+            <div class="four column">
+              <img src="/static/img/note_download.png" alt="note_download" width="51" height="36" />
+            </div>
+          </div>
+        </div><!-- /note_actions -->
+      </div>
+
+    </div><!-- /note_header -->
+
+
+    <div id="note_container">
+
+      <div class="row">
+        <div class="eight columns centered body_copy">
+
+          <h1>description</h1>
+
+          <p>{{ file.description }}</p>
+
+          <h1>notes</h1>
+
+          <div class="note-text">
+            <iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
+          </div> <!-- .note-text -->
+          <div class="note-error" style="display:none">
+            This document's content is currently unavailable. It's likely the document is still being processed. Please try again later.
+          </div>
+
+        </div><!-- /body_copy -->
+      </div>
+
+    </div><!-- /note_container -->
+
+
+  </section><!--/note_content-->
+{% endblock %}

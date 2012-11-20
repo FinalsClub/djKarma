@@ -44,6 +44,7 @@ urlpatterns = patterns('',
     # Static pages
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
+    url(r'^dashboard$', 'notes.views.dashboard', name='dashboard'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
@@ -57,6 +58,7 @@ urlpatterns = patterns('',
     #   ---------------------------------------------------
     # Search
     url(r'^search/', 'notes.views.search'),
+    url(r'^multisearch/', 'notes.views.multisearch'),
 
     #   ---------------------------------------------------
     ## Ajax endpoints
@@ -79,6 +81,7 @@ urlpatterns = patterns('',
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     # Ajax request to add a course to a user's profile
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
+    url(r'^drop-course', 'notes.views.drop_course', name='drop-course'),
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),
     # Edit course
@@ -92,6 +95,9 @@ urlpatterns = patterns('',
     url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)$', 'notes.views.b_school_course', name='browse-course'),
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
+
+    # useful only for direct linking to file, and for ajaxuploader reverse url lookup
+    url(r'^file/(?P<note_pk>\d{1,9999})$', 'notes.views.file', name='file'),
 
     #   ---------------------------------------------------
     # Auth
@@ -122,12 +128,10 @@ urlpatterns = patterns('',
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     # Not being used and might be depricated
     #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    #url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
     #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
     #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
     # latest browse views, must come last because they are greedy
     #url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
     # Note View
-    #url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
     #url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),

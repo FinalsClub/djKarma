@@ -71,7 +71,7 @@ def nav_helper(request, response={}):
         #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
     response['messages'] = complete_profile_prompt(user_profile)
-    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.getName())
+    response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.get_name())
     response['user_profile'] = user_profile
     response = get_upload_form(response)
 
@@ -148,7 +148,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
 
         # If the file has an owner, provide it
         if model.owner != None:
-            json_result["user"] = model.owner.get_profile().getName()
+            json_result["user"] = model.owner.get_profile().get_name()
         else:
             json_result["user"] = "KN Staff"
 

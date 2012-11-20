@@ -54,6 +54,7 @@ sudo service postgresql restart
 
 see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html).
 
+http://apache.cs.utah.edu/lucene/solr/3.6.1/apache-solr-3.6.1.zip
 
 #### Maintaining the Search Index
 
@@ -111,6 +112,8 @@ To install and run the celery task server:
         chown celery:celery /var/run/celery
 6. chmod +x /etc/init.d/celeryd
 7. run /etc/init.d/celeryd start
+
+When running on your local, make sure the celery user understands the local path of your repo.
 
 ###Production Note:
 On the new Amazon instance, celery logs are located at:
@@ -219,3 +222,5 @@ Management Commands (manage.py \<command name>)
 + **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
    + Necessary when a backup of the notes app database is made separate of the User table 
 
+### Creating default user
+On your local machine create a KarmaNotes default user and make sure that it has a unique email address.  The UserProfile.gravatar field is a hash of user.email and is required to be unique.  This doesn't tell you WHY creating a user will not work, it just wont.

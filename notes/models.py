@@ -250,6 +250,8 @@ class Course(models.Model):
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
+    last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
 
     def __unicode__(self):
         # Note: these must be unicode objects
@@ -274,7 +276,7 @@ class Course(models.Model):
         else:
             print "No course found, so no notes"
             raise Http404
-        return _course, File.objects.filter(course=_course).distinct()
+        return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
 
 
     def save(self, *args, **kwargs):
@@ -359,19 +361,21 @@ class File(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
+        print "getting file absolute URL"
+        print self.id, self.course, self.school
+        #print "\t", self.id, self.title, self.school.slug, self.course.slug
         if self.school is None or self.course is None:
+            print "using the file and pk based absolute url"
+            # This code path is run on initial upload before course exists
             return ('file', [str(self.pk)])
         else:
             return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
 
     def save(self, *args, **kwargs):
 
-        # If this is a new file, increment SiteStat
-        if not self.pk:
-            increment(self)
-
-        print "awarded_karma : %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME):
+        # FIXME: this is getting run on the first file save from async upload
+        # this needs to only be run on fileMeta
+        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME) and self.school != None:
             print "awarding karma for file!"
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:
@@ -380,7 +384,8 @@ class File(models.Model):
                 #Default note type
                 karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
+            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner, file=self)
+            user_profile.save()
             self.awarded_karma = True
 
         # Escape html field only once
@@ -390,6 +395,12 @@ class File(models.Model):
             self.cleaned = True
 
         super(File, self).save(*args, **kwargs)
+        # update associated course last_updated
+        try:
+            self.course.last_updated = datetime.datetime.now()
+            self.course.save
+        except:
+            pass
 
     def ownedBy(self, user_pk):
         """ Returns true if the user owns or has "paid" for this file
@@ -417,7 +428,7 @@ class File(models.Model):
             self.numUpVotes += 1
             # Award karma corresponding to "upvote" ReputationEventType to file owner
             if self.owner is not None:
-                self.owner.get_profile().awardKarma(event="upvote")
+                self.owner.get_profile().awardKarma(event="upvote", course=self.course, school=self.school, user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
         elif int(vote_value) == -1:
@@ -651,7 +662,7 @@ class UserProfile(models.Model):
 
     # Get the "name" of this user for display
     # If no first_name, user username
-    def getName(self):
+    def get_name(self):
         """ Generate the front-facing username for this user.
             Prefer user-supplied alias first,
             Second, username given on standard account signup
@@ -710,7 +721,7 @@ class UserProfile(models.Model):
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()
-            return True
+            return self
         except Exception, e:
             print "error in awardKarma:"
             print e
@@ -771,15 +782,13 @@ class UserProfile(models.Model):
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
         if self.grad_year != "" and self.grad_year is not None and not self.submitted_grad_year:
-            print "grad year submitted"
             self.submitted_grad_year = True
-            self.awardKarma('profile-grad-year')
+            self.awardKarma('profile-grad-year', user=self.user)
 
         # School set for first time, award karma
         if self.school is not None and not self.submitted_school:
-            print "submitted school!"
             self.submitted_school = True
-            self.awardKarma('profile-school')
+            self.awardKarma('profile-school', user=self.user)
 
         # Add read permissions if Prospect karma level is reached
         if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
@@ -800,11 +809,13 @@ class UserProfile(models.Model):
 #
 ############################## ##############################
 
+"""
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
+"""
 
 
 def facebook_extra_data(sender, user, response, details, **kwargs):

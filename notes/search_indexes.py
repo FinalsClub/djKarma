@@ -55,7 +55,7 @@ class FileIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
     title = CharField(model_attr='title')
     school = CharField(null=True)
-    corse = CharField(null=True)
+    course = CharField(null=True)
 
     # An EdgeNgramField for partial-match queries
     content_auto = EdgeNgramField(model_attr='title')

@@ -2,6 +2,8 @@
 # -*- coding:utf8 -*-
 """ Copyright (C) 2012  FinalsClub Foundation """
 
+import datetime
+
 from apiclient.discovery import build
 import httplib2
 from oauth2client.client import flow_from_clientsecrets
@@ -13,6 +15,7 @@ GOOGLE_USER = 'seth.woodworth@gmail.com'
 def build_flow():
     """ Create an oauth2 autentication object with our preferred details """
     scopes = [
+        'https://www.googleapis.com/auth/drive',
         'https://www.googleapis.com/auth/drive.file',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile',
@@ -42,6 +45,7 @@ def accept_auth(code):
     creds = flow.step2_exchange(code)
     return creds
 
+
 def build_api_service(creds):
     http = httplib2.Http()
     http = creds.authorize(http)
@@ -65,7 +69,7 @@ def check_and_refresh(creds, auth, http):
     return creds, auth
 
 
-def list_files(http=http):
+def list_files(http):
     """ list the google drive files uploaded via this session/cred
         :http:  authenticated httplib2 instance
         :returns: list of files

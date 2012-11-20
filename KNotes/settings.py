@@ -232,7 +232,7 @@ AUTH_PROFILE_MODULE = 'notes.UserProfile'
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'
-LOGIN_REDIRECT_URL = '/profile'
+LOGIN_REDIRECT_URL = '/dashboard'
 #LOGIN_ERROR_URL    = '/login/'
 
 #If we want a different redirect for social login:
@@ -262,6 +262,7 @@ TEMPLATE_DIRS = (
 
     # Wherever you go, there you are
     os.path.join(os.path.dirname(__file__), 'templates'),
+    './notes/templates',
     './KNotes/templates/models',
     './KNotes/templates/modal',
     './KNotes/templates/ajax',

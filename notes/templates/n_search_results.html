@@ -1,0 +1,155 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/search_results.css">
+{% endblock %}
+
+
+{% block content %}
+<section id="results_content">
+
+  <div id="search_header" class="hero_gradient_bar">
+    <div class="row">
+      <div id="searched_for_leadin" class="twelve columns">
+        YOU SEARCHED FOR
+      </div><!-- /searched_for_leadin -->
+    </div>
+
+    <div class="row">
+      <div id="searched_for_term" class="twelve columns">
+        {{ query }}
+      </div><!-- /searched_for_term -->
+    </div>
+
+    <div class="row">
+      <div class="twelve columns">
+        <div id="search_filters">
+          <ul>
+            <li class="button_bevel">
+              {# TODO: Selected == button_interior #}
+              {# TODO: shift content on button click #}
+              <div id="search_main" class="filter_button button_interior" data-target="#all_results">top results</div>
+            </li>
+            <li>
+              <div id="search_notes" class="filter_button" data-target='#note_results'>notes</div>
+            </li>
+            <li>
+              <div id="search_courses" class="filter_button" data-target='#course_results'>courses</div>
+            </li>
+            {% if instructors|length > 0 %}
+            <li>
+              {# TODO: disable, not implemented yet #}
+              <div id="search_professors" class="filter_button">professors</div>
+            </li>
+            {% endif %}
+            {% if schools|length > 0 %}
+            <li>
+              <div id="search_schools" class="filter_button">schools</div>
+            </li>
+            {% endif %}
+            {% if users|length > 0 %}
+            <li>
+              <div id="search_users" class="filter_button">users</div>
+            </li>
+            {% endif %}
+          </ul>
+        </div><!-- /search_filters -->
+      </div>
+    </div>
+  </div><!-- /search_header -->
+
+  <div id="all_results" class="results_container">
+      <!-- Course results -->
+      <div class="row"><!-- columns -->
+        <div class="four columns offset-by-one"><!-- courses -->
+          <div class="column_header">
+            courses
+          </div><!-- /column_header -->
+
+          {% for course in courses|slice:":3" %}
+            {% include 'partials/course_result_short.html' %}
+          {% endfor %}
+
+        </div><!-- /courses -->
+      <!-- end Course results -->
+
+      <!-- Note results -->
+        <div class="four columns"><!-- notes -->
+          <div class="column_header">
+            notes
+          </div><!-- /column_header -->
+
+          {% for note in notes|slice:":3" %}
+            {% include 'partials/note_result_short.html' %}
+          {% endfor %}
+
+        </div><!-- /notes -->
+      <!-- end Note results -->
+
+        <div class="two columns end">
+        <!-- Prof results -->
+        {% if instructors|length > 0 %}
+          <div class="column_header">
+            professors
+          </div><!-- /column_header -->
+
+
+          {% for instructor in instructors|slice:":1" %}
+            {% include 'partials/prof_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+
+        {% if schools|length > 0 %}
+          <!-- School results -->
+          <div class="column_header">
+            schools
+          </div><!-- /column_header -->
+
+          {% for school in schools|slice:":1" %}
+            {% include 'partials/school_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+          {% comment %}
+          <div class="row school_result_container">
+            <div class="twelve columns user_result no_result">
+              No schools are associated with this search. Better luck next time.
+            </div>
+          </div>
+          {% endcomment %}
+
+        <!-- User results -->
+        {% if users|length > 0 %}
+          <div class="column_header">
+            users
+          </div><!-- /column_header -->
+
+          {% for user in users|slice:":1" %}
+            {% include 'partials/user_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+        </div>
+      </div><!-- /columns -->
+  </div><!-- #all_results .results_container -->
+  {% if course|length > 0 %}
+  <div id="course_results" class="results_container" style="display:none">
+    {% include 'n_course_results.html' %}
+  </div><!-- #course_results .results_container -->
+  {% endif %}
+  {% if notes|length > 0 %}
+  <div id="note_results" class="results_container" style="display:none">
+    {% include 'n_note_results.html' %}
+  </div><!-- #note_results .results_container -->
+  {% endif %}
+
+  <div class="row">
+    <div id="add_result" class="six columns centered">
+      Don't see what you're looking for? Add your <a href="#">note</a> or <a href="#">course</a> now.
+    </div>
+  </div>
+
+</section><!--/results_content-->
+{% endblock %}

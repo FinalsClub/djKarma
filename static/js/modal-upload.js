@@ -38,6 +38,7 @@
           cancelled = false;
           // hide upload button and show progress bar
           $('.qq-upload-button').slideUp('fast', function(){
+            // FIXME: not implemented
             $('#modal-body-progress').slideDown('fast');
             $('#modal-metadata-form').slideDown('fast');
           });
@@ -45,10 +46,21 @@
         onComplete: function(id, fileName, responseJSON) {
           console.log(responseJSON);
             if(responseJSON.success) {
-                //alert("success! file_pk: " + responseJSON.file_pk);
                 file_pk = responseJSON.file_pk;
                 file_url = responseJSON.file_url;
-                //$('#new-file-link').attr('href',file_url);
+                // move qq-upload-file -size information to the lightbox_instruction
+
+                $('#lightbox_instruction_file_info').replaceWith(
+                  // replace the sidebox on success with the file info
+                  $('#lightbox_instruction_file_info').replaceWith($("#lightbox_info_replacement"))
+                );
+                // this has to happen after the lightbox_instruction replace because it is contained in .browse_file_button
+                $('.browse_file_button').text("Success!")
+                // try to populate the title field with the filename
+                if ($('#add_note_title_txt').val() === ""){
+                  $('#add_note_title_txt').val( fileName );
+                }
+
 
             }
         },
