@@ -86,7 +86,7 @@ def nav_helper(request, response={}):
     if not user_profile.grad_year:
         response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
     '''
-    response['available_schools'] = [(str(school.name), school.pk) for school in School.objects.all().order_by('name')]
+    response['available_schools'] = [(unicode(school.name), school.pk) for school in School.objects.all().order_by('name')]
     response['available_years'] = range(datetime.datetime.now().year, datetime.datetime.now().year + 10)
 
     return response
