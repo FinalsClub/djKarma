@@ -242,7 +242,7 @@ header#global_header
   width: 203px;
 }
 
-#global_header_avatar_moreinfo_name a
+#global_header_avatar_moreinfo_name a, #global_header_avatar_moreinfo_mynotes a
 {
   padding-top: 20px;
   font-size: 17px;
