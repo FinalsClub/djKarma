@@ -259,7 +259,7 @@ class Course(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('browse-course', [str(self.school.slug), str(self.slug)])
+        return ('browse-course', [unicode(self.school.slug), unicode(self.slug)])
 
     @staticmethod
     def get_notes(course_query, school):
