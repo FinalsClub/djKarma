@@ -49,13 +49,13 @@ $(document).ready(function(){
 
   // Search results
   var slide_out = {'direction': 'left', 'mode': 'hide'};
-  var slide_in = {'direction': 'left', 'mode': 'show'};
+  var slide_in = {'direction': 'right', 'mode': 'show'};
 
   $(".filter_button").click(function() {
     // Slide out the current content
-    $(".results_container").effect("slide", slide_out, 500);
+    $(".results_container").effect("slide", slide_out, 300);
     // Slide in the new content
-    $($(this).data('target')).effect("slide", slide_in, 500);
+    $($(this).data('target')).effect("slide", slide_in, 300);
     // remove the current active button
     $(".filter_button.button_interior").parent().removeClass("button_bevel");
     $(".filter_button.button_interior").removeClass("button_interior");
