@@ -3,7 +3,7 @@ $(document).ready(function(){
   // Click Handlers
   // Dismiss cover and play video
   $("#home_video_overlay").click(function(){
-    $("#home_video_overlay").hide();
+    $(this).hide();
   });
 
   // Toggle: Login box dropdown
