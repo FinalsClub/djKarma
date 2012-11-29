@@ -781,7 +781,7 @@ class UserProfile(models.Model):
         """
         # If there is not a gravatar hash, and the user registered by email
         # make a gravatar hash
-        if not self.gravatar and not self.fb_id:
+        if not self.gravatar and not self.fb_id and self.user:
             self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
 
         # Regenerate the picture_urls for easy access
