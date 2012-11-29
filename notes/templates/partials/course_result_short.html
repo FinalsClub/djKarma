@@ -2,23 +2,23 @@
 
   <div class="two columns course_meta">
       <div class="course_meta_stat">
-        {{ course.object.files.all.count }}
+        {{ course.files.all.count }}
       </div>
       <div class="course_meta_name">
         notes
       </div>
       <div class="course_meta_stat">
-        {{ course.object.userprofile_set.count }}
+        {{ course.userprofile_set.count }}
       </div>
       <div class="course_meta_name">
         students
       </div>
-      {% if course.object in user.get_profile.courses.all %}
-        <div class="course_meta_action course_meta_drop" data-id="{{ course.object.id }}">
+      {% if course in user.get_profile.courses.all %}
+        <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
           drop
         </div>
       {% else %}
-        <div class="course_meta_action course_meta_join" data-id="{{ course.object.id }}">
+        <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
           join
         </div>
       {% endif %}
@@ -30,13 +30,13 @@
         last updated {# FIXME: not implemented #} -- october 23, 2012 4:45pm
       </div><!-- /activity_timestamp -->
       <div class="activity_details_action">
-        <a class="activity_target" href="{{ course.object.get_absolute_url }}">
-          {{ course.object.title }}
+        <a class="activity_target" href="{{ course.get_absolute_url }}">
+          {{ course.title }}
         </a>
       </div><!-- /activity_details_action -->
       <div class="activity_details_context">
-        <a href="#" class="prof_link">{{ course.object.instructor.name }}</a><br>
-        <a href="{{ course.object.school.get_absolute_url }}" class="school_link">{{ course.object.school.name }}</a>
+        <a href="#" class="prof_link">{{ course.instructor.name }}</a><br>
+        <a href="{{ course.school.get_absolute_url }}" class="school_link">{{ course.school.name }}</a>
       </div><!-- /activity_details_context -->
     </div>
   </div>
