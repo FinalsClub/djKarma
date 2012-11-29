@@ -340,7 +340,6 @@ class File(models.Model):
     course      = models.ForeignKey(Course, blank=True, null=True, related_name="files")
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
-    html        = models.TextField(blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
     timestamp   = models.DateTimeField(default=datetime.datetime.now())
     viewCount   = models.IntegerField(default=0)
@@ -355,6 +354,16 @@ class File(models.Model):
     cleaned     = models.BooleanField(default=False)
     # on metadata save, award karma and set this flag
     awarded_karma = models.BooleanField(default=False)
+
+    ## post gdrive conversion data
+    # for pdfs
+    is_pdf      = models.BooleanField(default=False)
+    embed_url   = models.TextField(blank=True, null=True)
+    # for word processor documents
+    html        = models.TextField(blank=True, null=True)
+    text        = models.TextField(blank=True, null=True)
+    # download url to serve from google drive
+    gdrive_url  = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s at %s" % (self.title, self.course)

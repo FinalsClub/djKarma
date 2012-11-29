@@ -3,14 +3,20 @@
 """ Copyright (C) 2012  FinalsClub Foundation """
 
 import datetime
+import mimetypes
+import os
 
-from apiclient.discovery import build
 import httplib2
+from apiclient.discovery import build
+from apiclient.http import MediaFileUpload
 from oauth2client.client import flow_from_clientsecrets
+
+from notes.models import DriveAuth
 
 CLIENT_SECRET = './notes/client_secrets.json'
 #from credentials import GOOGLE_USER
 GOOGLE_USER = 'seth.woodworth@gmail.com'
+EXT_TO_MIME = {'.docx': 'application/msword'}
 
 def build_flow():
     """ Create an oauth2 autentication object with our preferred details """
@@ -63,6 +69,8 @@ def check_and_refresh(creds, auth, http):
     if creds.token_expiry < datetime.datetime.utcnow():
         # if we are passed the token expiry, 
         # refresh the creds and store them
+        http = httplib2.Http()
+        http = creds.authorize(http)
         creds.refresh(http)
         auth.credentials = creds.to_json()
         auth.save()
@@ -77,20 +85,21 @@ def list_files(http):
     return service.files().list().execute()
 
 
-def convert_with_google_drive(File):
-    """ Upload a local File and download HTML
+def convert_with_google_drive(u_file):
+    """ Upload a local u_file and download HTML
         using Google Drive
+        :u_file: a u_file model instance
     """
     # Get file_type and encoding of uploaded file
     # i.e: file_type = 'text/plain', encoding = None
-    (file_type, encoding) = mimetypes.guess_type(File.file.path)
+    (file_type, encoding) = mimetypes.guess_type(u_file.file.path)
 
     # If mimetype cannot be guessed
     # Check against known issues, then
     # finally, Raise Exception
     # Extract file extension and compare it to EXT_TO_MIME dict
 
-    fileName, fileExtension = os.path.splitext(File.file.path)
+    fileName, fileExtension = os.path.splitext(u_file.file.path)
 
     if file_type == None:
 
@@ -102,11 +111,13 @@ def convert_with_google_drive(File):
             raise Exception('Unknown file type')
 
     resource = {
-                'title':    File.title,
-                'desc':     File.description,
+                'title':    u_file.title,
+                'desc':     u_file.description,
                 'mimeType': file_type
             }
-    media = MediaFileUpload(File.file.path, mimetype=file_type,
+    # TODO: set the permission of the file to permissive so we can use the 
+    #       gdrive_url to serve files directly to users
+    media = MediaFileUpload(u_file.file.path, mimetype=file_type,
                 chunksize=1024*1024, resumable=True)
 
     auth = DriveAuth.objects.filter(email=GOOGLE_USER).all()[0]
@@ -114,14 +125,38 @@ def convert_with_google_drive(File):
 
     service = build_api_service(creds)
 
-    creds, auth = check_and_update(creds, auth, http=service)
+    creds, auth = check_and_refresh(creds, auth, http=service)
 
     # Upload the file
     # TODO: wrap this in a try loop that does a token refresh if it fails
-    try:
-        resource = service.files().insert(body=resource, media_body=med).execute()
-    except: # FIXME: handle exceptions specifically
-        pass
-    # FIXME: Now redownload the file
-    # file_gid is google's id for the file
-    file_gid = resource[u'id']
+    print "Trying to upload document"
+    file_dict = service.files().insert(body=resource, media_body=media, convert=True).execute()
+
+    # set u_file.is_pdf
+    if file_type == 'application/pdf':
+        # If it's a pdf, instead save an embed_url from resource['selfLink']
+        u_file.is_pdf = True
+        u_file.embed_url = file_dict[u'selfLink']
+        u_file.gdrive_url = file_dict[u'downloadUrl']
+    else:
+        # get the converted filetype urls
+        download_urls = {}
+        download_urls['html'] = file_dict[u'exportLinks']['text/html']
+        download_urls['text'] = file_dict[u'exportLinks']['text/plain']
+        # set the .odt as the download from google link
+        u_file.gdrive_url = file_dict[u'exportLinks']['application/vnd.oasis.opendocument.text']
+
+        h = httplib2.Http('')
+        for download_type, download_url in download_urls.items():
+            resp, content = h.request(download_url, "GET")
+
+            if resp.status in [200]:
+                # save to the File.property resulting field
+                u_file.__dict__[download_type] = content
+
+    # Finally, save whatever data we got back from google
+    u_file.save()
+
+
+if __name__=='__main__':
+    print "You have to run this via ./manage.py shell, which is rediculous."
