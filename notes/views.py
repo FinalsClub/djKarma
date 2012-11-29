@@ -93,10 +93,6 @@ def terms(request):
     return render(request, 'static/ToS.html')
 
 
-def browse(request):
-    pass
-
-
 @login_required
 def confirm_email(request, confirmation_code):
     ''' Confirm email
@@ -795,6 +791,18 @@ def multisearch(request):
 
         results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
         return render(request, 'n_search_results.html', response)
+
+def browse(request):
+    response = {}
+
+    response['schools'] = School.objects.filter(browsable=True)
+    response['courses'] = Course.objects.filter(browsable=True)
+    response['notes'] = File.objects.filter(browsable=True)
+    response['instructors'] = []
+    response['users'] = []
+
+    return render(request, 'n_search_results.html', response)
+
 
 ''' Search testing '''
 def search(request):
