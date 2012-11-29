@@ -177,6 +177,7 @@ class School(models.Model):
 
     # Facebook keeps a unique identifier for all schools
     facebook_id = models.BigIntegerField(blank=True, null=True)
+    browsable = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
@@ -252,6 +253,7 @@ class Course(models.Model):
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
     last_updated    = models.DateTimeField(default=datetime.datetime.now)
     # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
+    browsable       = models.BooleanField(default=False)
 
     def __unicode__(self):
         # Note: these must be unicode objects
@@ -364,6 +366,8 @@ class File(models.Model):
     text        = models.TextField(blank=True, null=True)
     # download url to serve from google drive
     gdrive_url  = models.TextField(blank=True, null=True)
+
+    browsable = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u"%s at %s" % (self.title, self.course)
