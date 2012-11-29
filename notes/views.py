@@ -787,13 +787,18 @@ def multisearch(request):
         query = request.GET.get("q", "")
         response['query'] = query
 
-        response['schools'] = SearchQuerySet().filter(content__icontains=query).models(School)
-        response['courses'] = SearchQuerySet().filter(content__icontains=query).models(Course)
-        response['notes'] = SearchQuerySet().filter(content__icontains=query).models(File)
+        schools = SearchQuerySet().filter(content__icontains=query) \
+                    .models(School).load_all()
+        response['schools'] = [s.object for s in schools]
+        courses = SearchQuerySet().filter(content__icontains=query) \
+                    .models(Course).load_all()
+        response['courses'] = [c.object for c in courses]
+        notes = SearchQuerySet().filter(content__icontains=query) \
+                    .models(File).load_all()
+        response['notes'] = [n.object for n in notes]
         response['instructors'] = []
         response['users'] = []
 
-        results = SearchQuerySet().filter(content__icontains=query).order_by('django_ct')
         return render(request, 'n_search_results.html', response)
 
 ''' Search testing '''

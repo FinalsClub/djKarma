@@ -68,6 +68,7 @@
           </div><!-- /column_header -->
 
           {% for course in courses|slice:":3" %}
+            {# TODO: put the loop variable in the included partial #}
             {% include 'partials/course_result_short.html' %}
           {% endfor %}
 

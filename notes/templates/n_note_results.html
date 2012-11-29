@@ -9,13 +9,13 @@
     <div class="row notes_result_container wide">
       <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
         <div class="activity_timestamp">
-          {{ note.object.timestamp }} -- 5pm // tues nov 23 2012
+          {{ note.timestamp }} -- 5pm // tues nov 23 2012
         </div>
         <div class="activity_details_action">
-          <a href="{{ note.object.get_absolute_url }}" class="activity_target">{{ note.object.title }}</a>
+          <a href="{{ note.get_absolute_url }}" class="activity_target">{{ note.title }}</a>
         </div>
         <div class="activity_details_context">
-          <a href="{{ note.object.get_absolute_url }}" class="course_link">{{ note.object.course.title }}</a>//<a href="{{ note.object.get_absolute_url }}" class="school_link">{{ note.object.school.name }}</a>
+          <a href="{{ note.get_absolute_url }}" class="course_link">{{ note.course.title }}</a>//<a href="{{ note.get_absolute_url }}" class="school_link">{{ note.school.name }}</a>
         </div>
         <div class="activity_details_callout">
           <div class="row">
@@ -30,7 +30,7 @@
         </div>
         <div class="row">
           <div class="twelve columns activity_details_status">
-            So far, <span class="activity_details_status_number">{{ note.object.numUpVotes }}</span> people have completely fallen in love with with these notes.
+            So far, <span class="activity_details_status_number">{{ note.numUpVotes }}</span> people have completely fallen in love with with these notes.
           </div><!-- /activity_details_status -->
         </div>
       </div><!-- /notes_result -->
