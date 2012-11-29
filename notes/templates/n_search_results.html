@@ -10,6 +10,8 @@
 <section id="results_content">
 
   <div id="search_header" class="hero_gradient_bar">
+
+    {% if query %}
     <div class="row">
       <div id="searched_for_leadin" class="twelve columns">
         YOU SEARCHED FOR
@@ -21,7 +23,8 @@
         {{ query }}
       </div><!-- /searched_for_term -->
     </div>
-
+    {% endif %}
+    
     <div class="row">
       <div class="twelve columns">
         <div id="search_filters">
