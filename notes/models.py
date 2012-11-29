@@ -818,13 +818,11 @@ class UserProfile(models.Model):
 #
 ############################## ##############################
 
-"""
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         UserProfile.objects.create(user=kwargs.get('instance'))
 
 post_save.connect(ensure_profile_exists, sender=User)
-"""
 
 
 def facebook_extra_data(sender, user, response, details, **kwargs):
