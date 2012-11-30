@@ -58,12 +58,11 @@ def build_api_service(creds):
     return build('drive', 'v2', http=http)
 
 
-def check_and_refresh(creds, auth, http):
+def check_and_refresh(creds, auth):
     """ Check a Credentials object's expiration token
         if it is out of date, refresh the token and save
         :creds: a Credentials object
         :auth:  a DriveAuth that backs the cred object
-        :http:  authenitcated httplib2 session
         :returns: updated creds and auth objects
     """
     if creds.token_expiry < datetime.datetime.utcnow():
@@ -88,7 +87,7 @@ def list_files(http):
 def convert_with_google_drive(u_file):
     """ Upload a local u_file and download HTML
         using Google Drive
-        :u_file: a u_file model instance
+        :u_file: a File model instance
     """
     # Get file_type and encoding of uploaded file
     # i.e: file_type = 'text/plain', encoding = None
@@ -125,7 +124,7 @@ def convert_with_google_drive(u_file):
 
     service = build_api_service(creds)
 
-    creds, auth = check_and_refresh(creds, auth, http=service)
+    creds, auth = check_and_refresh(creds, auth)
 
     # Upload the file
     # TODO: wrap this in a try loop that does a token refresh if it fails
