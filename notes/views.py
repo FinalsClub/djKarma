@@ -607,6 +607,48 @@ def addModel(request):
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
 
+
+def create_course(request):
+    """ Form to add a new course to our db
+    """
+
+    def custom_validate(form_dict):
+        if form_dict['id_title'] == '': return False
+
+    response = {}
+
+    if request.method == 'POST':
+        form = KarmaForms.CreateCourseForm(request.POST)
+        print 'request method is POST'
+
+        if form.is_valid():
+            print "Form is VALID"
+            user_profile = request.user.get_profile()
+            new_course = Course()
+
+            print form.cleaned_data.keys()
+
+            #instructor_id = int(form.cleaned_data['id_instructor'])
+
+            new_course.instructor_email = form.cleaned_data['instructor_email']
+            new_course.title = form.cleaned_data['title']
+            new_course.desc = form.cleaned_data['desc']
+            new_course.school = user_profile.school
+            new_course.save()
+
+            user_profile.courses.add(new_course)
+            user_profile.save()
+
+        else:
+            #TODO: have ajax display error messages
+            print "Form is INVALID: %s" % form.errors
+
+    else:
+        # request method is NOT POST
+        form = KarmaForms.CreateCourseForm()
+
+    return render(request, 'n_lightbox_create_course.html', {'form': form})
+
 @login_required
 def add_course_to_profile(request):
     """ ajax endpoint to add a course to a user's profile

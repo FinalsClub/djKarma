@@ -251,7 +251,9 @@ class Course(models.Model):
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
+    instructor_email= models.EmailField(blank=True, null=True)
     last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    desc            = models.TextField(max_length=1023, blank=True, null=True)
     # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
     browsable       = models.BooleanField(default=False)
 
@@ -261,6 +263,7 @@ class Course(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
+        #TODO: if a course does not have a school, this will fail
         return ('browse-course', [unicode(self.school.slug), unicode(self.slug)])
 
     @staticmethod

@@ -11,6 +11,11 @@ $(document).ready(function(){
     $("#login_box").toggle();
   });
 
+  //
+  $("#global_header_add_course").click(function(){
+    $("#create_course").show();
+  });
+
   // Toggle: my courses dropdown
   $("#global_header_mycourses_copy").click(function(){
     $("#global_header_mycourses_list").toggle();

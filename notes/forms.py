@@ -156,6 +156,14 @@ class CharCourseField(forms.CharField):
         return course
 
 
+# CreateCourseForm is not currently used. Just used it to autorender the needed html
+class CreateCourseForm(forms.ModelForm):
+    """ Form used when creating a new course
+    """
+    class Meta:
+        model = Course
+        fields = ('title', 'field', 'instructor_email', 'desc')
+
 class GenericCharForm(forms.Form):
     """ Provides a means to sanitize generic text received via GET/POST """
     text = forms.CharField(max_length=255)
