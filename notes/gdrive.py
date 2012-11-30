@@ -14,8 +14,7 @@ from oauth2client.client import flow_from_clientsecrets
 from notes.models import DriveAuth
 
 CLIENT_SECRET = './notes/client_secrets.json'
-#from credentials import GOOGLE_USER
-GOOGLE_USER = 'seth.woodworth@gmail.com'
+from credentials import GOOGLE_USER
 EXT_TO_MIME = {'.docx': 'application/msword'}
 
 def build_flow():
