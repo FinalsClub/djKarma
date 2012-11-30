@@ -138,7 +138,6 @@ $(document).ready(function(){
   }
 
   $("#submit-lightbox-form").click( function() {
-    var res = load_upload_data();
     $.ajax({
       url: '/filemeta',
       data: load_upload_data(),
