@@ -15,6 +15,8 @@
         {# TODO: slice of raw_text, or html for now? #}
         {% if note.text %}
           {{ note.text|slice:500 }}
+        {% else %}
+          {{ note.description }}
         {% endif %}
       </div>
     </div>
