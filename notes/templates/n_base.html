@@ -16,7 +16,7 @@
   <script src="/static/js/app.js"></script>
 
 <script src="{{ STATIC_URL }}ajaxuploader/js/fileuploader.js" ></script>
-<script src="{{ STATIC_URL }}/js/modal-upload.js" ></script>
+{#<script src="{{ STATIC_URL }}/js/modal-upload.js" ></script> #}
 <link href="{{ STATIC_URL }}ajaxuploader/css/fileuploader.css" media="screen" rel="stylesheet" type="text/css" />
 
   {% block pagescripts %}
@@ -34,8 +34,11 @@
 {% block content %}
 {% endblock %}
 
-{% include 'n_lightbox_signup.html' %}
-{% include 'n_lightbox_add_note.html' %}
+{% if user.is_authenticated %}
+  {% include 'n_lightbox_add_note.html' %}
+{% else %}
+  {% include 'n_lightbox_signup.html' %}
+{% endif%}
 
 <!-- footer include -->
 {% include 'n_footer.html' %}
