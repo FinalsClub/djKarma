@@ -1,107 +1,115 @@
-  <section id="lightbox_signup" class="modal_content">
+{% load url from future %}
+<section id="lightbox_signup" class="modal_content">
 
-    <div class="row">
-      {# The following style is a hack, but I can't figure out how to arrange the classes to keep margin-top #}
-      <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
-        <div class="row">
-          <div class="lightbox_header twelve columns short_row">
-            Sign Up
-          </div><!-- /modal_header -->
+  <div class="row">
+    {# The following style is a hack, but I can't figure out how to arrange the classes to keep margin-top #}
+    <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
+      <div class="row">
+        <div class="lightbox_header twelve columns short_row">
+          Sign Up
+        </div><!-- /modal_header -->
+      </div>
+
+      <div class="row">
+        <div class="ten columns centered lightbox_subhead">
+          Signing up for KarmaNotes is totaly easy.
         </div>
+      </div>
 
-        <div class="row">
-          <div class="ten columns centered lightbox_subhead">
-            Signing up for KarmaNotes is totaly easy.
-          </div>
+      <div class="row">
+        <div class="six columns centered join_course_row">
+          <img src="/static/img/lightbox_signu_fb_lage.jpg" alt="lightbox_signu_fb_lage" width="314" height="63" />
+        </div><!-- /join_course_row -->
+      </div>
+
+      <div class="row">
+        <div class="eight columns centered join_course_row">
+          <div id="join_course_or">&#8212;or&#8212;</div>
+        </div><!-- /join_course_row -->
+      </div>
+
+      <form method="post" action="{% url 'register_account' None %}">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="six columns centered signup_course_row">
+          <div class="lightbox_field_label">
+            Username
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input name="username" type="text" class="lightbox_textfield" id="id_username">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+
+      <div class="row">
+        <div class="six columns centered signup_course_row">
+          <div class="lightbox_field_label">
+            Last Name
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input name="last_name" type="text" class="lightbox_textfield" id="id_last_name">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+
+      {% comment %}
+      {# disabling school select on user create #}
+      <div class="row">
+        <div class="six columns centered signup_course_row">
+          <div class="lightbox_field_label">
+            School
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input type="text" class="lightbox_textfield" id="lightbox_school_txt">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+      {% endcomment %}
+
+      <div class="row">
+        <div class="six columns centered signup_course_row">
+          <div class="lightbox_field_label">
+            Email
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input name="email" type="text" class="lightbox_textfield" id="id_email">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+
+      <div class="row">
+        <div class="six columns centered signup_course_row">
+          <div class="lightbox_field_label">
+            Password
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input name="password1" type="password" class="lightbox_textfield" id="id_password">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+
+      <div class="row">
+        <div class="six columns centered join_course_row">
+          <div class="lightbox_field_label">
+            Password, One Mo' Time
+          </div><!-- /inverted_button -->
+          <div class="lightbox_field">
+            <input name="password2" type="password" class="lightbox_textfield" id="id_password2">
+          </div><!-- search_container -->
+        </div><!-- /join_course_row -->
+      </div>
+
+      <div id="lightbox_signup_submit">
+        <div class="lightbox_bevel">
+          <input class="button_interior" type="submit" value="Sign Up" />
         </div>
+      </div>
+      </form>
 
-        <div class="row">
-          <div class="six columns centered join_course_row">
-            <img src="/static/img/lightbox_signu_fb_lage.jpg" alt="lightbox_signu_fb_lage" width="314" height="63" />
-          </div><!-- /join_course_row -->
-        </div>
+      <div class="lightbox_close"></div>
 
-        <div class="row">
-          <div class="eight columns centered join_course_row">
-            <div id="join_course_or">&#8212;or&#8212;</div>
-          </div><!-- /join_course_row -->
-        </div>
+    </div><!-- /lightbox_modal -->
+  </div>
 
-        <div class="row">
-          <div class="six columns centered signup_course_row">
-            <div class="lightbox_field_label">
-              First Name
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="text" class="lightbox_textfield" id="lightbox_firstname_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-        <div class="row">
-          <div class="six columns centered signup_course_row">
-            <div class="lightbox_field_label">
-              Last Name
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="text" class="lightbox_textfield" id="lightbox_lastname_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-        <div class="row">
-          <div class="six columns centered signup_course_row">
-            <div class="lightbox_field_label">
-              School
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="text" class="lightbox_textfield" id="lightbox_school_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-        <div class="row">
-          <div class="six columns centered signup_course_row">
-            <div class="lightbox_field_label">
-              Email
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="text" class="lightbox_textfield" id="lightbox_email_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-        <div class="row">
-          <div class="six columns centered signup_course_row">
-            <div class="lightbox_field_label">
-              Password
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="password" class="lightbox_textfield" id="lightbox_password_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-        <div class="row">
-          <div class="six columns centered join_course_row">
-            <div class="lightbox_field_label">
-              Password, One Mo' Time
-            </div><!-- /inverted_button -->
-            <div class="lightbox_field">
-              <input type="password" class="lightbox_textfield" id="lightbox_passwordconfirm_txt">
-            </div><!-- search_container -->
-          </div><!-- /join_course_row -->
-        </div>
-
-          <div id="lightbox_signup_submit">
-            <div class="lightbox_bevel">
-              <div class="button_interior">Sign Up</div>
-            </div>
-          </div>
-
-        <div class="lightbox_close"></div>
-
-      </div><!-- /lightbox_modal -->
-    </div>
-
-  </section><!-- /modal_content -->
+</section><!-- /modal_content -->
