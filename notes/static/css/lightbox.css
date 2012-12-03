@@ -129,6 +129,19 @@
   padding-bottom: 15px;
 }
 
+a#submit-lightbox-upload
+{
+  color: #FFF;
+  cursor: pointer;
+}
+
+a#submit-lightbox-upload:hover
+{
+  color: #FFF;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 #lightbox_signup_submit
 {
   margin: 0 auto;

@@ -19,6 +19,7 @@
           var user_school_pk = 0;
         {% endif %}
       {% endif %}
+
     </script>
 
     <div class="row">
@@ -145,7 +146,15 @@
           </div>
         </div><!-- /lightbox_row -->
         {# TODO: This is not the right styling, fixme #}
-        <a class="button" id="submit-lightbox-form" type="submit">FINISH UPLOAD</a>
+        <div class="row lightbox_row">
+          <div class="three columns offset-by-one">
+            <label class="lightbox_label">
+            </label><!-- lightbox_label -->
+          </div>
+          <div class="seven columns end">
+            <a class="button" id="submit-lightbox-upload" type="submit">FINISH UPLOAD</a>
+          </div>
+        </div><!-- /lightbox_row -->
 
 
         <div class="lightbox_close"></div>
