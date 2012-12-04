@@ -347,7 +347,7 @@ class File(models.Model):
     file        = models.FileField(upload_to="uploads/notes")
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
     timestamp   = models.DateTimeField(default=datetime.datetime.now)
-    created_on  = models.DateField(blank=True, null=True)
+    created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
     viewCount   = models.IntegerField(default=0)
     votes       = models.ManyToManyField(Vote, blank=True, null=True)
     numUpVotes  = models.IntegerField(default=0)
