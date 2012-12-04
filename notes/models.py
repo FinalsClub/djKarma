@@ -174,6 +174,7 @@ class School(models.Model):
     name        = models.CharField(max_length=255)
     slug        = models.SlugField(null=True)
     location    = models.CharField(max_length=255, blank=True, null=True)
+    karma       = models.IntegerField(default=0)
 
     # Facebook keeps a unique identifier for all schools
     facebook_id = models.BigIntegerField(blank=True, null=True)
@@ -212,6 +213,19 @@ class School(models.Model):
             raise Http404
         # if I found a _school
         return _school, Course.objects.filter(school=_school).distinct()
+
+    def sum_karma(self):
+        """calculate and save the total karama for all courses at this school
+        """
+        karma = 0
+        courses = self.course_set.all()
+        for course in courses:
+            course.sum_karma()
+            karma += course.karma
+
+        self.karma = karma
+        self.save()
+
 
     def save(self, *args, **kwargs):
         # If a new School is being saved, increment SiteStat School count
@@ -256,6 +270,7 @@ class Course(models.Model):
     desc            = models.TextField(max_length=1023, blank=True, null=True)
     # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
     browsable       = models.BooleanField(default=False)
+    karma           = models.IntegerField(default=0)
 
     def __unicode__(self):
         # Note: these must be unicode objects
@@ -283,6 +298,16 @@ class Course(models.Model):
             raise Http404
         return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
 
+    def sum_karma(self):
+        """calculate the total karma for all ReputationEvents for this course 
+        """
+        events = self.reputationevent_set.all()
+        karma = 0
+        for event in events:
+            karma += event.type.actor_karma
+
+        self.karma = karma
+        self.save()
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
