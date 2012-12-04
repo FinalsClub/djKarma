@@ -51,7 +51,9 @@ import_uploader = AjaxFileUploader()
 
 """  Static pages, or nearly static pages  """
 def about(request):
-    return render(request, 'n_about.html')
+    response = {}
+    response['leader_schools'] = School.objects.order_by('-karma')[:3]
+    return render(request, 'n_about.html', response)
 
 
 def e404(request):

@@ -285,6 +285,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.humanize',
 
     # 3rd party packages
     'simple_autocomplete',
