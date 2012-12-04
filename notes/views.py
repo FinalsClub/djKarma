@@ -145,7 +145,7 @@ def register(request, invite_user):
                                     password=request.POST['password1'])  # Authenticate the new user
 
             login(request, new_user)  # Login in the new user
-            return HttpResponseRedirect("/profile")
+            return HttpResponseRedirect("/dashboard")
         else:
             return render(request, "registration/register.html", {
         'form': form})

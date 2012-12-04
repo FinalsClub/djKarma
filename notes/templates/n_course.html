@@ -83,7 +83,12 @@
                     <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
                   </div>
                   <div class="eleven columns activity_details_callout_copy">
-                    {{ file.description }}
+
+                    {% if file.text %}
+                      {{ file.text|slice:500 }}
+                    {% else %}
+                      {{ file.description }}
+                    {% endif %}
                   </div>
                 </div>
               </div>

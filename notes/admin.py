@@ -17,6 +17,7 @@ import models
 # Register the database models described in model
 # present them to show up in admin interface
 admin.site.register(models.School)
+admin.site.register(models.DriveAuth)
 admin.site.register(models.Course)
 admin.site.register(models.Instructor)
 admin.site.register(models.File)

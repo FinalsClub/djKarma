@@ -52,6 +52,9 @@ $(document).ready(function(){
     $($(this).data('target')).show()
   });
 
+  // setup the lightbox_add_note#datepicker created_on jqueryui datepicker
+  $( "#datepicker" ).datepicker();
+
   // Search results
   var slide_out = {'direction': 'left', 'mode': 'hide'};
   var slide_in = {'direction': 'right', 'mode': 'show'};
@@ -138,11 +141,14 @@ $(document).ready(function(){
     upload_data.file_pk = file_pk;
     upload_data.title = $("#add_note_title_txt").val();
     upload_data.description = $("#add_note_description_txt").val();
+    // TODO: make this default to {{ today }} if empty
+    upload_data.created_on = $("#datepicker").val();
     console.log(upload_data);
     return upload_data;
   }
 
-  $("#submit-lightbox-form").click( function() {
+
+  $("#submit-lightbox-upload").click( function() {
     $.ajax({
       url: '/filemeta',
       data: load_upload_data(),
@@ -150,7 +156,7 @@ $(document).ready(function(){
         if(data.status === 'success'){
           console.log('success');
           $('#lightbox_add_note').hide();
-          
+
         }
         else{
           alert(data.message);
@@ -158,8 +164,23 @@ $(document).ready(function(){
       },
       type: 'POST'
     });
-    
+
   });
+
+  function setupAjax(){
+    // Assumes variable csrf_token is made available
+    // by embedding document
+    $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                  // Only send the token to relative URLs i.e. locally.
+                  xhr.setRequestHeader("X-CSRFToken", csrf_token);
+              }
+          }
+    });
+  }
+
+  setupAjax();
 
 
 });

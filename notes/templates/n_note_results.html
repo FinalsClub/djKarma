@@ -24,7 +24,11 @@
             </div>
             <div class="eleven columns activity_details_callout_copy">
               {# TODO: preview of raw text #}
-              Bacon ipsum dolor sit amet pancetta capicola pork belly strip steak tri-tip turkey ribeye shank meatloaf tongue pork shankle venison turducken corned beef. Swine jowl meatball bresaola, tongue jerky turducken ham hock strip steak ground round filet mignon. Corned beef ground round pork chop, turducken
+              {% if note.text %}
+                {{ note.text|slice:500 }}
+              {% else %}
+                {{ note.description }}
+              {% endif %}
             </div>
           </div>
         </div>
