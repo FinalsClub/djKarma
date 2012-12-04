@@ -4,6 +4,7 @@
     <script>
       var ajax_upload_url = "{% url 'ajax_upload' %}";
       var csrf_token = "{{ csrf_token }}";
+      var today = "{{ today }}";
       var school_pk = {{ user.get_profile.school.id }};
       {% if not user.is_authenticated %}
         // show terms of service and recaptcha if user not authenticated
@@ -114,13 +115,11 @@
               Date Created
             </label><!-- lightbox_label -->
           </div>
-          <div class="eight columns">
+          <div class="seven columns end">
+            <input type="text" class="lightbox_textfield" id="datepicker" name="date" placeholder="{{ today }}">
             <div class="lightbox_copy">
-              7/25/2012
             </div><!-- /lightbox_copy -->
-            <div class="lightbox_instruction">
-              Not correct? <a href="#">Edit it now.</a>
-            </div><!-- /lightbox_instruction -->
+
           </div>
         </div><!-- /lightbox_row -->
 
