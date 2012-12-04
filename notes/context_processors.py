@@ -13,4 +13,4 @@ def datetime_today(request):
         :request: django httprequest object
         :returns: dictionary containing today's date
     """
-    return {'today': datetime.datetime.now().strftime('%m/%d/%Y')}
+    return {'today': datetime.date.today().strftime('%m/%d/%Y')}
