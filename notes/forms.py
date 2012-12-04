@@ -79,6 +79,7 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                     )
                 )
     type        = forms.ChoiceField(choices=File.FILE_PTS, required=False)
+    created_on        = forms.DateField(required=False)
     title       = forms.CharField(max_length=50,
                     error_messages={'required': 'Enter a title.'},
                     widget=forms.TextInput(attrs={'class': 'text-input'})
@@ -87,6 +88,7 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                     error_messages={'required': 'Enter a description.'},
                     widget=forms.Textarea(attrs={'class': 'text-input'})
                 )
+
 
     #tags        = forms.CharField(required=False, max_length=511, \
     #                label="Tags", \

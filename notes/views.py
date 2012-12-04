@@ -269,6 +269,8 @@ def fileMeta(request):
     file.type = form.cleaned_data["type"]
     file.title = form.cleaned_data["title"]
     file.description = form.cleaned_data["description"]
+    file.created_on = form.cleaned_data["created_on"]
+
     if request.user.is_authenticated():
         file.owner = request.user
     else:
