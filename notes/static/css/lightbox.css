@@ -129,13 +129,13 @@
   padding-bottom: 15px;
 }
 
-a#submit-lightbox-upload
+a#submit-lightbox-upload, a#submit-lightbox-create-course
 {
   color: #FFF;
   cursor: pointer;
 }
 
-a#submit-lightbox-upload:hover
+a#submit-lightbox-upload:hover, a#submit-lightbox-create-course:hover
 {
   color: #FFF;
   cursor: pointer;
