@@ -13,7 +13,7 @@ $(document).ready(function(){
 
   //
   $("#global_header_add_course").click(function(){
-    $("#create_course").show();
+    $("#lightbox_create_course").show();
   });
 
   // Toggle: my courses dropdown
@@ -147,6 +147,15 @@ $(document).ready(function(){
     return upload_data;
   }
 
+  function load_course_data(){
+    var course_data = {};
+    course_data.title = $('#id_title').val();
+    course_data.field = $('#id_field').val()
+    course_data.instructor_email = $('#id_instructor_email').val();
+    course_data.desc = $('#id_desc').val();
+    return course_data;
+  }
+
 
   $("#submit-lightbox-upload").click( function() {
     $.ajax({
@@ -165,6 +174,19 @@ $(document).ready(function(){
       type: 'POST'
     });
 
+  });
+
+  $("#submit-lightbox-create-course").click(function() {
+    $.ajax({
+      url: '/create-course',
+      data: load_course_data(),
+      success: function(data){
+        alert(data);
+        $('#lightbox_create_course').hide();
+
+      },
+      type: 'POST'
+    });
   });
 
   function setupAjax(){

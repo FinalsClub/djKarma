@@ -20,6 +20,7 @@
     //.doc, .docx, .pdf, .rtf, and .txt file
     // Configure AJAX file uploader
     var cancelled = false;
+    // FIXME: move this out of this file into app.js or into upload.js
     var uploader = new qq.FileUploader({
         action: ajax_upload_url,
         element: $('#file-uploader')[0],

@@ -7,13 +7,13 @@ import json
 class Command(BaseCommand):
     args = 'none'
     help = ('imports notes that have been exported in JSON form from a MongoDB')
-    
-    def index_archive(self, items):   
+
+    def index_archive(self, items):
         new_items = {}
         for item in items:
                 item_id = item['id']
                 new_items[item_id] = item
-        return new_items 
+        return new_items
 
     def load_archives(self):
         """ loads json files and returns indexed archives for courses/subjects/notes """
@@ -65,7 +65,7 @@ class Command(BaseCommand):
                         temp_course.academic_year = year
                         temp_course.instructor = temp_instructor
                         temp_course.save()
-        
+
                 # now for actually uploading notes
                 temp_note, created = File.objects.get_or_create(title = note['topic'],
                                                                                         description = note['topic'],

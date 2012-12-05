@@ -1,11 +1,76 @@
-<section id="create_course" class="modal_content">
-  <form method="post"><div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='NpoIHaWogPSJj77Tfl8zWBsjM9zYuhC0' /></div>
-    <tr><th><label for="id_title">Title:</label></th><td><input id="id_title" type="text" name="title" maxlength="255" /></td></tr>
-    <tr><th><label for="id_field">Field:</label></th><td><input id="id_field" type="text" name="field" maxlength="255" /></td></tr>
-    {# <tr><th><label for="id_instructor">Instructor:</label></th><td><input id="id_instructor" type="text" name="instructor" maxlength="255" /></td></tr> #}
-    <tr><th><label for="id_instructor_email">Instructor email:</label></th><td><input id="id_instructor_email" type="text" name="instructor_email" maxlength="75" /></td></tr>
-    <tr><th><label for="id_desc">Desc:</label></th><td><textarea id="id_desc" rows="10" cols="40" name="desc"></textarea></td></tr>
-    <input type="submit" value="Submit" />
-  </form>
+<section id="lightbox_create_course" class="modal_content">
+
+  <div class="row">
+    <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
+      <div class="row">
+        <div class="lightbox_header modal_header twelve columns">
+          Create a new course
+        </div><!-- /modal_header -->
+      </div>
+
+
+      {# I don't think this is used <form method="post"><div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='NpoIHaWogPSJj77Tfl8zWBsjM9zYuhC0' /></div>#}
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Title of Course:
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <input id="id_title" class="lightbox_textfield" type="text" name="title" maxlength="255" />
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Subject:
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <input id="id_field" class="lightbox_textfield" type="text" name="field" maxlength="255" />
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Instructor Email:
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <input id="id_instructor_email" class="lightbox_textfield" type="text" name="instructor_email" maxlength="75" />
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Description:
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <textarea id="id_desc" class="lightbox_textfield lightbox_textarea" rows="4" cols="40" name="desc"></textarea>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <a class="button" id="submit-lightbox-create-course" type="submit">CREATE COURSE</a>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="lightbox_close"></div>
+
+      <input type="submit" value="Submit" />
+    </div> <!-- .lightbox_modal -->
+  </div> <!-- .row -->
+
+
 </section><!--add_course_content-->
 

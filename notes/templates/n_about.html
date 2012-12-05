@@ -1,5 +1,6 @@
 {% extends "n_base.html" %}
 {% load url from future %}
+{% load humanize %}
 
 {% block pagestyle %}
   <link rel="stylesheet" type="text/css" media="all" href="/static/css/about.css">
@@ -77,41 +78,19 @@
     <div class="row">
       <div id="leaderboard_table" class="ten columns offset-by-one">
 
+        {% for school in leader_schools %}
         <div class="row leaderboard_item">
           <div class="one column leaderboard_rank">
-            1
+            {{ forloop.counter }}
           </div>
           <div class="eight columns leaderboard_school">
-            Massachusetts Institute of Technology
+            {{ school.name }}
           </div><!-- /leaderboard_school -->
           <div class="one column leaderboard_score">
-            15,189
+            {{ school.karma|intcomma }}
           </div><!-- /leaderboard_score -->
         </div><!-- /leaderboard_item -->
-
-         <div class="row leaderboard_item">
-          <div class="one column leaderboard_rank">
-            2
-          </div>
-          <div class="eight columns leaderboard_school">
-            University of California Berkeley
-          </div><!-- /leaderboard_school -->
-          <div class="one column leaderboard_score">
-            8,720
-          </div><!-- /leaderboard_score -->
-        </div><!-- /leaderboard_item -->
-
-        <div class="row leaderboard_item">
-          <div class="one column leaderboard_rank">
-            3
-          </div>
-          <div class="eight columns leaderboard_school">
-            Carnegie Melon University
-          </div><!-- /leaderboard_school -->
-          <div class="one column leaderboard_score">
-            5,130
-          </div><!-- /leaderboard_score -->
-        </div><!-- /leaderboard_item -->
+        {% endfor %}
 
       </div><!-- /leaderboard_table -->
     </div>

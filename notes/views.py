@@ -51,7 +51,9 @@ import_uploader = AjaxFileUploader()
 
 """  Static pages, or nearly static pages  """
 def about(request):
-    return render(request, 'n_about.html')
+    response = {}
+    response['leader_schools'] = School.objects.order_by('-karma')[:3]
+    return render(request, 'n_about.html', response)
 
 
 def e404(request):
@@ -269,6 +271,8 @@ def fileMeta(request):
     file.type = form.cleaned_data["type"]
     file.title = form.cleaned_data["title"]
     file.description = form.cleaned_data["description"]
+    file.created_on = form.cleaned_data["created_on"]
+
     if request.user.is_authenticated():
         file.owner = request.user
     else:
