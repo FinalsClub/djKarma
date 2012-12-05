@@ -227,11 +227,12 @@ def file(request, note_pk, action=None):
 
     #file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
 
-    url = iri_to_uri(file.file.url)
+    # Not currently providing a download url on the view file page
+    #url = iri_to_uri(file.file.url)
+    #response['url'] = url
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
     #response['file_type'] = file_type
-    response['url'] = url
 
     if action == 'edit':
         #print 'ACTION EDIT'
