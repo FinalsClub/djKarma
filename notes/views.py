@@ -418,6 +418,21 @@ def browse_schools(request):
         # this converts the QuerySet into a list, so this is not typesafe, but django templates do not care
     return render(request, 'browse_schools.html', response)
 
+def school(request, school_query):
+    """ View for a school, lists courses and school activity 
+        :school_query: comes as unicode, if can be int, pass as int
+    """
+    response = {}
+    try:
+        school_query = int(school_query)
+    except ValueError:
+        # cant be cast as an int, so we will search for it as a string
+        pass
+    # FIXME: does this work _instead_ or despite of int() casting?
+    response['school'], response['courses'] = School.get_courses(school_query)
+    return render(request, 'n_school.html', response)
+
+
 
 def browse_courses(request, school_query):
     """ View for courses beloging to :school_query:
