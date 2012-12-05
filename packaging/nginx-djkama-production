@@ -1,0 +1,34 @@
+upstream django-beta  {                                                                                                                                                 
+    server  127.0.0.1:7000;
+}
+
+server {
+    server_name karmanotes.org;
+    client_max_body_size 20M;
+
+    location /static/admin/ {
+        root /usr/local/lib/python2.7/dist-packages/django/contrib/admin;
+    }
+
+    location /library/ {
+        alias /var/www/djkarma/;
+    }
+
+    location /static/ {
+        alias /var/www/static/;
+    }
+
+    location / {
+        proxy_pass         http://django-beta;
+        proxy_redirect     off;
+        proxy_set_header   Host             $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    }
+
+}
+
+server {
+    server_name karmanotes.com www.karmanotes.com;
+    rewrite ^ http://karmanotes.org$request_uri? permanent;
+}

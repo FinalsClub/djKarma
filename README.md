@@ -224,3 +224,29 @@ Importing finalsclub database
 * Dump from mongodb archivedcourse, archivedsubjects, archivednotes as json files
 * move those files to the root of the djkarma directory
 * run `./manage.py import_archive`
+
+# Revised deployment to production.
+
+1. Review settings,
+
+2. Check out new repo.
+
+3. install requirements 
+	
+	sudo pip install -r requirements.txt
+4. Re-populate the contents of the static
+
+	./manage.py collectstatic
+
+5. Update Database schema 
+	./manage.py schemamigration notes --auto
+
+If app HAS NOT!!! been converted to south!!!!!! 
+
+	./manage.py syncdb
+
+No
+
+6. 
+
+
