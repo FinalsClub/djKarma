@@ -210,3 +210,33 @@ Management Commands (manage.py \<command name>)
 
 ### Creating default user
 On your local machine create a KarmaNotes default user and make sure that it has a unique email address.  The UserProfile.gravatar field is a hash of user.email and is required to be unique.  This doesn't tell you WHY creating a user will not work, it just wont.
+
+
+
+# Revised deployment to production.
+
+1. Review settings,
+
+2. Check out new repo.
+
+3. install requirements 
+	
+	sudo pip install -r requirements.txt
+4. Re-populate the contents of the static
+
+	./manage.py collectstatic
+
+5. Update Database schema 
+	./manage.py schemamigration notes --auto
+
+If app HAS NOT!!! been converted to south!!!!!! 
+
+	./manage.py syncdb
+
+No
+
+6. 
+
+
+
+
