@@ -175,10 +175,11 @@ class School(models.Model):
     slug        = models.SlugField(null=True)
     location    = models.CharField(max_length=255, blank=True, null=True)
     karma       = models.IntegerField(default=0)
-
+    browsable   = models.BooleanField(default=False)
     # Facebook keeps a unique identifier for all schools
     facebook_id = models.BigIntegerField(blank=True, null=True)
-    browsable = models.BooleanField(default=False)
+    # adding school url, available via accredited schools list or users
+    url         = models.URLField(max_length=511, blank=True)
 
     def __unicode__(self):
         return self.name
