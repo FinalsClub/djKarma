@@ -273,6 +273,9 @@ class UsdeSchool(models.Model):
     # periods = models.CharField(max_length='255')
     # last_action = models.CharField(max_length='255')
 
+    def __unicode__(self):
+        return self.institution_name
+
 
 class Instructor(models.Model):
     name = models.CharField(max_length=255)
