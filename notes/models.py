@@ -241,6 +241,42 @@ class School(models.Model):
 post_delete.connect(decrement, sender=School)
 
 
+class UsdeSchool(models.Model):
+    """Table of schools imported from the U.S. Department of Education 
+    Database of Accredited Postsecondary Institutions and Programs
+    """
+    institution_id = models.CharField(max_length='255', unique=True)
+    institution_name = models.CharField(max_length='255')
+    institution_address = models.CharField(max_length='255')
+    institution_city = models.CharField(max_length='255')
+    institution_state = models.CharField(max_length='255')
+    institution_zip = models.CharField(max_length='255')
+    institution_phone = models.CharField(max_length='255')
+    institution_opeid = models.CharField(max_length='255')
+    institution_ipeds_unitid = models.CharField(max_length='255')
+    institution_web_address = models.CharField(max_length='255')
+
+    # TODO: if we want to import this info, it should be part of a different class
+    # campus_id = models.CharField(max_length='255')
+    # campus_name = models.CharField(max_length='255')
+    # campus_address = models.CharField(max_length='255')
+    # campus_city = models.CharField(max_length='255')
+    # campus_state = models.CharField(max_length='255')
+    # campus_zip = models.CharField(max_length='255')
+    # campus_ipeds_unitid = models.CharField(max_length='255')
+    # accreditation_type = models.CharField(max_length='255')
+    # agency_name = models.CharField(max_length='255')
+    # agency_status = models.CharField(max_length='255')
+    # program_name = models.CharField(max_length='255')
+    # accreditation_status = models.CharField(max_length='255')
+    # accreditation_date_type = models.CharField(max_length='255')
+    # periods = models.CharField(max_length='255')
+    # last_action = models.CharField(max_length='255')
+
+    def __unicode__(self):
+        return self.institution_name
+
+
 class Instructor(models.Model):
     name = models.CharField(max_length=255)
     school = models.ForeignKey(School, blank=True, null=True)
