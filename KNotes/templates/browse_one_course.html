@@ -58,6 +58,33 @@ var editing_course = false;
 var view_course_pk = {{ course.pk }};
 var view_course_title = "{{ course.title }}";
 var view_course_professor = "{{course.instructor.name}}";
+
+$(document).ready(function(){
+  $("#add-this-course").on("click", function(){
+    //var response = serializeCourseFormData();
+    // TODO: replace this anon function with a addThisCourse function
+    $.ajax({
+      url: '/add-course',
+      data: {'id': parseInt($(this).attr('data-course-id'))},
+      success: function(data){
+        // put callback here to clear form and tell of success
+        if(data.status === 'success'){
+          //$('#modal-upload-button').hide();
+          //$('#modal-upload-success').show();
+          //alert('success!');
+          $('#modal-addcourse-input').val("");
+          //$('#modal-course-submit').hide();
+          indicateSuccess();
+        }
+        else{
+          alert('Please check your form input');
+        }
+      },
+      type: 'POST'
+  });
+  });
+});
+
 </script>
 <script src="{{ STATIC_URL }}/js/view-course.js" ></script>
 {% endblock %}

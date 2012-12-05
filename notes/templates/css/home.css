@@ -1,0 +1,120 @@
+/* HOME */
+
+#home_content
+{
+  padding-top: 46px;
+}
+
+/* VIDEO */
+
+#home_video
+{
+  margin-left: -10px;
+}
+
+#home_video_overlay
+{
+  background-image: url(../img/home_video_screen_80opacity.png);
+  position: absolute;
+  top: -574px;
+  height: 575px;
+  width: 1020px;
+  color: #FFF;
+  cursor: pointer;
+}
+
+#home_video_overlay_headline
+{
+  padding-top: 76px;
+  font-size: 60px;
+}
+
+#home_video_overlay_more
+{
+  padding-top: 164px;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+#home_video_overlay_more_arrow
+{
+  margin-top: -20px;
+}
+
+/* HOMEPAGE RECENT */
+
+#recent_uploaded_container
+{
+  background-color: #000;
+}
+
+#recent_uploaded_headline
+{
+  text-transform: uppercase;
+  font-size: 10px;
+  color: #c0c0c0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 170px!important;
+}
+
+#recent_uploaded_scroller_screen
+{
+  position: absolute;
+  height: 34px;
+  width: 140px;
+  background: url(../img/home_recent_uploaded_scroller_screen.png) repeat-y;
+  z-index: 2;
+}
+
+#recent_uploaded_scroller_screen_right
+{
+  position: absolute;
+  height: 34px;
+  width: 140px;
+  background: url(../img/home_recent_uploaded_scroller_screen_right.png) repeat-y;
+  z-index: 2;
+  margin-left: 475px;
+}
+
+#recent_uploaded_scroller_sled
+{
+  position: absolute;
+  top: -15px;
+  color: #FFF;
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 613px;
+}
+
+#recent_uploaded_scroller_sled ul li.recent_upload_note_name, #recent_uploaded_scroller_sled ul li.recent_upload_note_school
+{
+  list-style: none;
+  font-size: 13px;
+  display: inline-block;
+  margin: 0 5px;
+}
+
+#recent_uploaded_scroller_sled ul li.recent_upload_note_name
+{
+  color: #f1592a;
+  font-size: 13px;
+}
+
+#recent_uploaded_scroller_sled ul li.recent_upload_note_school
+{
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding-top: 2px;
+}
+
+
+/* HOMEPAGE COPY */
+
+#home_copy p
+{
+  font-family: "MuseoSlab-700";
+  font-size: 25px;
+  margin: 40px 0;
+}

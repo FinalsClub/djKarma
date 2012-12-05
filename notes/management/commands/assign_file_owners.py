@@ -29,7 +29,7 @@ class Command(BaseCommand):
                         self.stdout.write('\n')
                 else:
                     for candidate in potential_owners:
-                        self.stdout.write('> %s \n' % candidate.getName())
+                        self.stdout.write('> %s \n' % candidate.get_name())
                     self.stdout.write(' > Assigning first candidate \n')
                     file.owner = potential_owners[0].user
                     do_save = True

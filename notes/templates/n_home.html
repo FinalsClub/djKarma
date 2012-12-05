@@ -1,0 +1,85 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/home.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="home_content">
+
+    <div class="row" id="home_video_container">
+      <div class="twelve columns">
+        <div class="row">
+          <div class="twelve columns">
+            <div class="flex-video widescreen" id="home_video">
+              <iframe src="http://player.vimeo.com/video/52954469?badge=0" width="1020" height="574" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="twelve columns">
+            <div class="row" id="home_video_overlay">
+              <div class="twelve columns">
+                <div class="row">
+                  <div class="ten columns offset-by-one" id="home_video_overlay_headline">
+                    KarmaNotes changes how students make and share knowledge.
+                  </div><!--/home_video_overlay_headline-->
+                </div>
+                <div class="row">
+                  <div class="ten columns offset-by-one" id="home_video_overlay_more">
+                    Watch and learn.
+                    <img src="/static/img/home_video_arrow.png" id="home_video_overlay_more_arrow" alt="home_video_arrow" width="77" height="85" align="middle"/>
+                  </div><!--/home_video_overlay_more-->
+                </div>
+              </div>
+            </div><!--/home_video_overlay-->
+          </div>
+        </div>
+      </div>
+    </div><!--/home_video_container-->
+
+    <div class="row" id="recent_uploaded_container">
+
+      <div class="ten columns offset-by-one">
+        <div class="row">
+          <div class="three columns" id="recent_uploaded_headline">
+            recently&nbsp;uploaded&nbsp;notes
+          </div>
+          <div class="eight columns end" id="recent_uploaded_scroller">
+            <div id="recent_uploaded_scroller_screen">
+              &nbsp;
+            </div>
+            <div id="recent_uploaded_scroller_sled">
+              <ul>
+                <li class="recent_upload_note_name">Study Guide: Justice and the American Way</li>
+                <li class="recent_upload_note_school">Harvard University</li>
+                <li class="recent_upload_note_name">Themes and Motifs With Johnson</li>
+                <li class="recent_upload_note_school">Massachusetts College of Art & Design</li>
+              </ul>
+            </div>
+            <div id="recent_uploaded_scroller_screen_right">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!--/recent_uploaded_container-->
+
+    <div class="row" id="home_copy">
+      <div class="ten columns offset-by-one">
+        <p>
+          KarmaNotes is a shared collection of digital learning resources curated by students for students. 
+          Together we constitute a community of scholars trying to transform education, one lecture at a time.
+        </p>
+        <p>
+          This project is made possible by the William and Flora Hewlett Foundation.   
+        </p>
+      </div>
+    </div>
+
+  </section><!--/home_content-->
+{% endblock %}

@@ -1,0 +1,531 @@
+/* GLOBAL */
+
+body
+{
+  font-family: "MuseoSlab-700";
+}
+
+.half-padding
+{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.no-padding
+{
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* GLOBAL HEADER */
+
+header#global_header
+{
+  background-color: #45484c;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#45484c), to(#000000)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #45484c, #000000); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #45484c, #000000); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #45484c, #000000); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #45484c, #000000); /* Firefox 16+, IE10, Opera 12.50+ */
+  height: 46px;
+  width: 100%;
+  position: fixed;
+  z-index: 100;
+}
+
+#logo_container
+{
+  padding-top: 4px;
+}
+
+#logo_container img
+{
+  margin-top: 10px;
+}
+
+#browse_container
+{
+  padding-top: 19px;
+  font-family: "MuseoSlab-700";
+  font-size: 13px;
+  color: #FFF;
+}
+
+#search_container
+{
+  margin-top: 7px;
+  background: url(../img/global_header_search.png);
+  width: 227px;
+  height: 25px;
+}
+
+#search_txt
+{
+  width: 200px;
+  height: 25px;
+  font-size: 12px;
+  background: none;
+  border: none;
+  margin-left: 27px;
+  margin-top: 5px;
+}
+
+#login_container
+{
+  color: #FFF;
+  padding-top: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  padding-bottom: 16px;
+}
+
+#login_container.clicked
+{
+  background-color: black;
+  color: #f05a28;
+}
+
+#login_box
+{
+  margin-top: 15px;
+  cursor: default;
+}
+
+#login_fb
+{
+  background: url(../img/global_header_login_fbbg.png);
+  cursor: pointer;
+  padding-top: 5px;
+}
+
+#login_form
+{
+  background: url(../img/global_header_login_formbg.png);
+}
+
+#login_form input
+{
+  height: 34px;
+  font-size: 20px;
+  margin-top: 15px;
+}
+
+#login_form .columns
+{
+  font-size: 14px;
+}
+
+#login_submit, #login_signup
+{
+  background-color: #f05a28;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+#login_submit .columns, #login_signup .columns
+{
+  font-size: 14px;
+  text-align: center;
+}
+
+/* LOGGED IN */
+
+#global_header_logged_in_content
+{
+  width: 320px;
+}
+
+#global_header_addnote
+{
+  text-align: right;
+}
+
+#global_header_mycourses
+{
+  padding-top: 15px;
+  cursor: pointer;
+  padding-bottom: 16px;
+}
+
+#global_header_mycourses_copy
+{
+  font-size: 15px;
+  color: #fff;
+}
+
+#global_header_mycourses_copy.clicked
+{
+  background-color: black;
+  color: #f05a28;
+}
+
+#global_header_mycourses_list
+{
+  margin-top: 16px;
+  width: 223px;
+  background: url(../img/home_video_screen_60opacity.png);
+}
+
+#global_header_mycourses_list ul
+{
+  margin: 0px;
+}
+
+#global_header_mycourses_list li
+{
+  padding-top: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+  list-style: none;
+  font-family: "MuseoSlab-500";
+  font-size: 17px;
+}
+
+#global_header_mycourses_list li:last-child
+{
+  border: none;
+}
+
+#global_header_add_course
+{
+  background-color: #f05a28;
+  width: 223px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
+#global_header_avatar_menu
+{
+  cursor: pointer;
+  height: 33px;
+  width: 82px;
+  margin-top: 6px;
+}
+
+#global_header_avatar_container
+{
+  height: 33px!important;
+  width: 31px!important;
+  overflow: hidden;
+}
+
+#global_header_note_count
+{
+  color: #FFF;
+  background-color: #f05a28;
+  font-size: 12px;
+  height: 33px;
+  padding: 12px 0px;
+  text-align: center;
+}
+
+#global_header_arrow_container
+{
+  width: 9px!important;
+}
+
+#global_header_arrow_container img
+{
+  padding-bottom: 6px;
+}
+
+#global_header_avatar_moreinfo_content
+{
+  background: url(../img/home_video_screen_60opacity.png);
+}
+
+#global_header_avatar_moreinfo
+{
+  width: 203px;
+}
+
+#global_header_avatar_moreinfo_name a, #global_header_avatar_moreinfo_mynotes a
+{
+  padding-top: 20px;
+  font-size: 17px;
+  font-family: "MuseoSlab-500";
+  color: #FFF;
+}
+
+#global_header_avatar_moreinfo_school a
+{
+  padding-top: 5px;
+  padding-bottom: 20px;
+  font-size: 12px;
+  font-family: "MuseoSans-700";
+  color: #FFF;
+  text-transform: uppercase;
+}
+
+#global_header_avatar_moreinfo_gear
+{
+  padding-top: 16px;
+  text-align: left;
+}
+
+#global_header_avatar_moreinfo_mynotes
+{
+  background-color: #f05a28;
+  padding-bottom: 3px;
+}
+
+/* INTERFACE ELEMENTS */
+
+.hero_gradient_bar
+{
+  background-color: #ffffff;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e8e8e8)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #ffffff, #e8e8e8); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #ffffff, #e8e8e8); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #ffffff, #e8e8e8); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #ffffff, #e8e8e8); /* Firefox 16+, IE10, Opera 12.50+ */
+  border-bottom: solid 1px #bdbcbd;
+  -webkit-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .35); /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+          box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .35); /* Opera 10.5, IE9+, Firefox 4+, Chrome 6+, iOS 5 */
+  width: 100%;
+}
+
+.button_bevel
+{
+  -webkit-border-radius: 10px; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 10px; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+
+  /* useful if you don't want a bg color from leaking outside the border: */
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  background-color: #eff0ef;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#eff0ef), to(#a4a5a5)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #eff0ef, #a4a5a5); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #eff0ef, #a4a5a5); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #eff0ef, #a4a5a5); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #eff0ef, #a4a5a5); /* Firefox 16+, IE10, Opera 12.50+ */
+  border: solid 1px #eff0ef;
+  cursor: pointer;
+}
+
+.button_interior
+{
+  -webkit-border-radius: 8px; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 8px; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+
+  /* useful if you don't want a bg color from leaking outside the border: */
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  background-color: #f05a28;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f05a28), to(#c73e11)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #f05a28, #c73e11); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #f05a28, #c73e11); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #f05a28, #c73e11); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #f05a28, #c73e11); /* Firefox 16+, IE10, Opera 12.50+ */
+}
+
+.inverted_button
+{
+  -webkit-border-radius: 8px; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 8px; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+
+  /* useful if you don't want a bg color from leaking outside the border: */
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  background-color: #ebebeb;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ebebeb), to(#cfcfcf)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #ebebeb, #cfcfcf); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #ebebeb, #cfcfcf); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #ebebeb, #cfcfcf); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #ebebeb, #cfcfcf); /* Firefox 16+, IE10, Opera 12.50+ */
+  border-top: solid 1px #fefefe;
+  color: #f05a28;
+  font-family: "MuseoSlab-700";
+  font-size: 16px;
+  text-align: center;
+  padding: 10px 19px;
+  cursor: pointer;
+}
+
+.button_arrow
+{
+  padding-bottom: 2px;
+}
+
+.column_header
+{
+  font-family: "MuseoSlab-900";
+  font-size: 10px;
+  color: #8e8e8e;
+  border-bottom: 1px solid #8e8e8e;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding-left: 0px;
+}
+
+/* GLOBAL ACTIVITY ITEMS */
+
+a.course_link, a.course_link:hover, a.school_link, a.school_link:hover, a.prof_link, a.prof_link:hover
+{
+  text-decoration: underline;
+  color: #555555;
+}
+
+.activity_timestamp
+{
+  font-family: "MuseoSlab-500";
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 5px 0;
+}
+
+.row_alt_on
+{
+  background: url(../img/dashboard_activity_alt_on_bg.gif);
+  padding: 5px 0;
+}
+
+.activity_details_action, .activity_details_action a
+{
+  font-family: "MuseoSlab-500";
+  font-size: 20px;
+  line-height: 125%;
+}
+
+a.activity_actor, a.activity_actor:hover
+{
+  color: #f1592a;
+  text-decoration: underline;
+}
+
+a.activity_target, a.activity_target:hover
+{
+  color: #9ccf00;
+  text-decoration: underline;
+}
+
+.activity_details_context, .activity_details_context a
+{
+  font-family: "MuseoSlab-900";
+  font-size: 11px;
+  text-transform: uppercase;
+  line-height: 200%;
+}
+
+.activity_details_callout
+{
+  padding: 20px 25px;
+  margin: 15px 0 13px;
+  background-color: #c8cdb8;
+}
+
+.activity_details_callout_copy
+{
+  font-family: "MuseoSans-900";
+  font-size: 12px;
+  color: #3a3a3a;
+  line-height: 125%;
+}
+
+.activity_details_status
+{
+  font-size: 13px;
+  font-family: "MuseoSans-500";
+  color: #232323;
+}
+
+.activity_details_status_number
+{
+  color: #f1592a;
+  font-family: "MuseoSans-900";
+}
+
+.activity_details_status_secondary_number
+{
+  font-family: "MuseoSlab-900";
+}
+
+.course_meta_action
+{
+  height: 36px;
+  width: 39px;
+  font-family: "MuseoSlab-900";
+  font-size: 9px;
+  color: #FFF;
+  text-align: center;
+  padding-top: 13px;
+  margin-top: 20px; /* POSITION WITH JAVASCRIPT */
+}
+
+.course_meta_join
+{
+  background: url(../img/course_meta_join_bg.png) no-repeat;
+  text-transform: uppercase;
+}
+
+.course_meta_drop
+{
+  background: url(../img/course_meta_drop_bg.png) no-repeat;
+  text-transform: uppercase;
+}
+
+/* COPY */
+
+.body_copy h1
+{
+  font-family: "MuseoSlab-700";
+  font-size: 15px;
+  text-transform: uppercase;
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+.body_copy p
+{
+  font-family: "MuseoSlab-500";
+  font-size: 15px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* GLOBAL FOOTER */
+
+footer#global_footer
+{
+  width: 100%;
+  height: 164px;
+  color: #FFF;
+  padding-top: 36px;
+  background-color: #000;
+}
+
+footer#global_footer a
+{
+  color: #FFF;
+}
+
+#footer_links_container
+{
+  font-size: 13px;
+  padding-bottom: 54px;
+}
+
+#colophon
+{
+  font-family: "MuseoSlab-500";
+  font-size: 11px;
+  line-height: 175%;
+}
+
+#colophon a
+{
+  color: #FFF;
+  text-decoration: underline;
+}
+
+#cc_logo
+{
+  margin-right: 5px;
+  margin-top: 3px;
+}
+
+/* EDITS POST DESIGN */
+ul#course_menu li a
+{
+  color: white;
+}

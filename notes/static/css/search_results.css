@@ -1,0 +1,254 @@
+/* DASHBOARD */
+
+#results_content
+{
+  padding-top: 46px;
+}
+
+/* SEARCH HEADER BAR */
+
+#search_header
+{
+  height: 140px;
+  margin-bottom: 50px;
+}
+
+#searched_for_leadin
+{
+  font-family: "MuseoSans-900";
+  font-size: 10px;
+  text-align: center;
+  padding-top: 39px;
+}
+
+#searched_for_term
+{
+  font-family: "MuseoSlab-500";
+  font-size: 24px;  
+  text-align: center;
+  padding-top: 9px;
+}
+
+#search_filters
+{
+  height: 33px;
+  width: 580px;
+  margin: 0 auto;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+#search_filters ul
+{
+  margin: 0;
+}
+
+#search_filters li
+{
+  list-style: none;
+  float: left;
+  cursor: pointer;
+}
+
+#search_filters .filter_button
+{
+  margin: 1px;
+  padding: 8px 13px 4px;
+  font-family: "MuseoSlab-700";
+  font-size: 12px;
+  text-align: center;
+  color: #000;
+  text-transform: uppercase;
+}
+
+#search_filters .filter_button.button_interior
+{
+  color: #FFF;
+}
+
+/* COLUMNS */
+
+.course_result, .notes_result
+{
+  margin-bottom: 20px!important;
+}
+
+.no_result
+{
+  font-family: "MuseoSlab-500";
+  font-size: 11px;
+  color: #555;
+  line-height: 150%;
+}
+
+/* COURSE COLUMN */
+
+.course_meta_stat
+{
+  font-family: "MuseoSlab-900";
+  font-size: 33px;
+  color: #bababa;
+}
+
+.course_meta_name
+{
+  font-family: "MuseoSlab-900";
+  font-size: 8px;
+  color: #bababa;
+}
+
+/* NOTES COLUMN */
+
+.notes_result_container
+{
+  padding: 0 10px;
+}
+
+.notes_result
+{
+  padding: 10px;
+}
+
+.wide .notes_result
+{
+  padding: 10px 20px;
+}
+
+/* PROF, SCHOOLS, USERS COLUMN */
+
+.prof_result_container, .school_result_container, .user_result_container
+{
+  padding: 0 10px;
+}
+
+.prof_result, .school_result, .user_result
+{
+  margin-bottom: 10px!important;
+  padding: 5px 5px 0px;
+  margin-top: -10px!important;
+}
+
+.user_karma_points
+{
+  color: #FFF;
+  background-color: #f05a28;
+  font-family: "MuseoSlab-900";
+  font-size: 11px;
+  padding: 2px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.prof_school
+{
+  font-family: "MuseoSans-700";
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.school_result.tall, .user_result.tall
+{
+  padding: 10px!important;
+}
+
+.result_grid_row
+{
+  padding-bottom: 10px;
+}
+
+.prof_name, .user_name, .school_name
+{
+  font-family: "MuseoSlab-700";
+  font-size: 13px;
+}
+
+.school_result_points
+{
+  background-color: #f05a28;
+  color: #FFF;
+  font-family: "MuseoSlab-900";
+  text-align: center;
+  width: 45px;
+  height: 45px;
+  padding: 5px 1px;
+  float: right;
+  margin-bottom: 5px;
+}
+
+.school_result_points_count
+{
+  font-size: 18px;
+}
+
+.school_result_points_caption
+{
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.school_result_name
+{
+  font-family: "MuseoSlab-700";
+  font-size: 13px;
+}
+
+/* PAGINATION */
+
+#search_pagination
+{
+  margin: 45px auto;
+  padding-bottom: 45px;
+}
+
+#search_pagination_left, #search_pagination_right
+{
+  float: left;
+  width: 21px;
+  cursor: pointer;
+}
+
+#search_pagination_left img, #search_pagination_right img
+{
+  padding-bottom: 8px;
+
+}
+
+#search_pagination_numbers ul
+{
+  margin: 0;
+}
+
+#search_pagination_numbers li
+{
+  list-style: none;
+  float: left;
+  font-family: "MuseoSlab-700";
+  font-size: 15px;
+  padding: 0 11px;
+  cursor: pointer;
+}
+
+#search_pagination_numbers li.button_interior
+{
+  color: #FFF;
+}
+
+#search_pagination_right
+{
+  text-align: right;
+}
+
+/* ADD */
+#add_result
+{
+  background-color: #d3d3d3;
+  padding: 25px 45px;
+  font-family: "MuseoSlab-500";
+  font-size: 12px;
+}
+
+#add_result a
+{
+  color: #000;
+  text-decoration: underline;
+}

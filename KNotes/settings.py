@@ -23,6 +23,11 @@ from notes.credentials import PROD_UPLOAD_ROOT
 
 from notes.credentials import RECAPTCHA_PRIVATE_KEY
 
+from notes.credentials import SMTP_USERNAME
+from notes.credentials import SMTP_PASSWORD
+
+from notes.credentials import DEFAULT_FROM_EMAIL
+
 import os
 import djcelery
 
@@ -81,7 +86,8 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
      ("Seth Woodworth", 'seth@finalsclub.org'),
-     ("David Brodsky", 'david@finalsclub.org')
+     ("David Brodsky", 'david@finalsclub.org'),
+     ("Charles Holbrow", 'charles@finalsclub.org')
 )
 
 MANAGERS = ADMINS
@@ -227,7 +233,7 @@ AUTH_PROFILE_MODULE = 'notes.UserProfile'
 SOCIAL_AUTH_DEFAULT_USERNAME = 'noteworthy_notetaker'
 
 #LOGIN_URL          = '/login/'
-LOGIN_REDIRECT_URL = '/profile'
+LOGIN_REDIRECT_URL = '/dashboard'
 #LOGIN_ERROR_URL    = '/login/'
 
 #If we want a different redirect for social login:
@@ -257,6 +263,7 @@ TEMPLATE_DIRS = (
 
     # Wherever you go, there you are
     os.path.join(os.path.dirname(__file__), 'templates'),
+    './notes/templates',
     './KNotes/templates/models',
     './KNotes/templates/modal',
     './KNotes/templates/ajax',
@@ -264,8 +271,9 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.request", # Makes request accessible to templates
-    "django.core.context_processors.static", # Makes STATIC_URL available
+    "django.core.context_processors.request",  # Makes request accessible to templates
+    "django.core.context_processors.static",  # Makes STATIC_URL available
+    "notes.context_processors.datetime_today"
 )
 
 INSTALLED_APPS = (
@@ -277,6 +285,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.humanize',
 
     # 3rd party packages
     'simple_autocomplete',
@@ -284,10 +293,9 @@ INSTALLED_APPS = (
     'south',
     'gunicorn',
     'simplemathcaptcha',
-    'ajaxuploader', # Ajax fileUpload
+    'ajaxuploader',  # Ajax fileUpload
     'djcelery',     # Django-Celery apps:
     'kombu.transport.django',
-    # Not sure this is necessary, yet
     'haystack',
 
     # our app(s)
@@ -343,6 +351,15 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_USE_TLS       = True
+EMAIL_HOST          = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_HOST_USER     = SMTP_USERNAME
+EMAIL_HOST_PASSWORD = SMTP_PASSWORD
+EMAIL_PORT          = 587
+
+TEMPLATED_EMAIL_TEMPLATE_DIR = 'templated_email/'  # use '' for top level template dir, ensure there is a trailing slash
+TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
 
 try:
     # For development, mv the initial file `dev_settings.py` to be named `local_settings.py`

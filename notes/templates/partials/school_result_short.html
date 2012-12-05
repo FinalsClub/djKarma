@@ -1,0 +1,14 @@
+<div class="row school_result_container">
+  <div class="twelve columns school_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+    <div class="row">
+      <div class="four columns">
+        {# TODO: replace this with school icon #}
+        <img src="/static/img/dashboard_profile_avatar_ad.jpg" alt="dashboard_profile_avatar_ad" width="45" height="45" />
+      </div>
+      {# TODO: add school name? #}
+      <div class="eight columns school_name half-padding">
+        <a href="{{ school.get_absolute_url }}">{{ school.name }}</a>
+      </div> <!-- /school_name -->
+    </div>
+  </div><!-- /school_result -->
+</div><!-- /school_result_container -->

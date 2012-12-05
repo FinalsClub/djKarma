@@ -4,6 +4,8 @@ import datetime
 import json
 
 from ajaxuploader.views import AjaxFileUploader
+from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -19,11 +21,14 @@ from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.encoding import iri_to_uri
 from haystack.query import SearchQuerySet
+from recaptcha.client import captcha as recaptcha
 
 import forms as KarmaForms
 #Avoid collision with django.contrib.auth.forms
 
+from notes.gdrive import accept_auth
 from KNotes import settings
+from templated_email import send_templated_mail
 
 from models import School
 from models import Course
@@ -39,7 +44,6 @@ from utils import jsonifyModel
 from utils import nav_helper
 from utils import userCanView
 
-from recaptcha.client import captcha as recaptcha
 
 # For Ajax Uploader
 import_uploader = AjaxFileUploader()
@@ -47,7 +51,9 @@ import_uploader = AjaxFileUploader()
 
 """  Static pages, or nearly static pages  """
 def about(request):
-    return render(request, 'static/about.html')
+    response = {}
+    response['leader_schools'] = School.objects.order_by('-karma')[:3]
+    return render(request, 'n_about.html', response)
 
 
 def e404(request):
@@ -55,11 +61,18 @@ def e404(request):
     return render(request, '404.html', response)
 
 
+def dashboard(request):
+    """ Render the new template style dashboard """
+    response = {}
+    response['events']= request.user.get_profile().reputationEvents.order_by('-id').all()
+    return render(request, 'n_dashboard.html', response)
+
+
 def home(request):
     """ Landing Page [static] """
 
     if request.user.is_authenticated():
-        return profile(request)
+        return dashboard(request)
     else:
         # Get the 'singleton' SiteStats instance
         stats = SiteStats.objects.get(pk=1)
@@ -68,7 +81,7 @@ def home(request):
                 .order_by('-timestamp')[:7]
         #print recent_files
         file_count = File.objects.count()
-        return render(request, 'home.html',
+        return render(request, 'n_home.html',
                 {'stats': stats, 'recent_files': recent_files,\
                 'file_count': file_count})
 
@@ -82,6 +95,20 @@ def terms(request):
     return render(request, 'static/ToS.html')
 
 
+@login_required
+def confirm_email(request, confirmation_code):
+    ''' Confirm email
+    '''
+    user_profile = request.user.get_profile()
+    if confirmation_code == user_profile.email_confirmation_code:
+        user_profile.email_confirmed = True
+        user_profile.save()
+        #return HttpResponseRedirect(reverse('profile'))
+        return render(request, 'email_confirmed.html', {'redirect_url': reverse('profile')})
+    else:
+        return HttpResponse('Invalid email confirmation code.')
+
+
 def register(request, invite_user):
     """ Display user login and signup screens
         the registration/login.html template redirects login attempts
@@ -93,15 +120,34 @@ def register(request, invite_user):
         #Fill form with POSTed data
         form = KarmaForms.UserCreateForm(request.POST)
         if form.is_valid():
-            print 'form valid'
-            #Save the new user from form data
-            new_user = form.save()
-            #Authenticate the new user
+
+            new_user = form.save()  # Save the new user from form data
+            confirmation_code = new_user.get_profile().setEmailConfirmationCode()
+            # TODO: switch to django-templated-email
+            activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
+            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
+
+            send_templated_mail(
+                template_name='confirm_email',
+                from_email='info@karmanotes.org',
+                recipient_list=[new_user.email],
+                context={
+                    'username': new_user.username,
+                    'activation_link': activation_link
+                },
+                # Optional:
+                # cc=['cc@example.com'],
+                # bcc=['bcc@example.com'],
+                # headers={'My-Custom-Header':'Custom Value'},
+                # template_prefix="my_emails/",
+                template_suffix="email",
+            )
+
             new_user = authenticate(username=request.POST['username'],
-                                    password=request.POST['password1'])
-            #Login in the new user
-            login(request, new_user)
-            return HttpResponseRedirect("/profile")
+                                    password=request.POST['password1'])  # Authenticate the new user
+
+            login(request, new_user)  # Login in the new user
+            return HttpResponseRedirect("/dashboard")
         else:
             return render(request, "registration/register.html", {
         'form': form})
@@ -155,46 +201,36 @@ def file(request, note_pk, action=None):
             note_pk: file_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
-
-    # Check that user has permission to read
-    #profile = request.user.get_profile()
-    response = nav_helper(request)
-    user = request.user
-    try:
-        profile = user.get_profile()
-    except:
-        raise Http404
+    response = {}
+    profile = request.user.get_profile()
     # If the user does not have read permission, and the
     # Requested files is not theirs
-    '''
-    if not profile.can_read and not userCanView(request.user, File.objects.get(pk=note_pk)):
-        #file_denied(request, note_pk)
-        pass
-    '''
     try:
+        # TODO: implement as get_or_404
         file = File.objects.get(pk=note_pk)
     except:
         raise Http404
+
     # Increment note view count
     file.viewCount += 1
     file.save()
 
     # If this file is not in the user's collection, karmic purchase occurs
     #if file not in profile.files.all():
-    if(not userCanView(user, File.objects.get(pk=note_pk))):
+    if(not userCanView(request.user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
         # awardKarma will handle deducting appropriate karma
-        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file)
+        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file, user=request.user)
         # Add 'purchased' file to user's collection
         profile.files.add(file)
         profile.save()
 
-    # This is ugly, but is needed to be able to get the note type full name
-    file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+    #file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
+
     url = iri_to_uri(file.file.url)
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
-    response['file_type'] = file_type
+    #response['file_type'] = file_type
     response['url'] = url
 
     if action == 'edit':
@@ -204,88 +240,91 @@ def file(request, note_pk, action=None):
         response['editing_file'] = False
         #print 'ACTION NONE'
 
-    return render(request, 'view-file.html', response)
-
-
+    return render(request, 'n_note.html', response)
 
 
 """ ==============
     AJAX endpoints
     ============== """
-# AJAX
 def fileMeta(request):
     """ Takes async uploaded metadata using the FileMetaDataForm """
     response = {}
 
-    if request.method == "POST" and request.is_ajax():
-        form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
-        if form.is_valid():
-            file = File.objects.get(pk=form.cleaned_data["file_pk"])
-            file.type = form.cleaned_data["type"]
-            file.title = form.cleaned_data["title"]
-            file.description = form.cleaned_data["description"]
-            if request.user.is_authenticated():
-                file.owner = request.user
-            else:
-                file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
-                # Perform reCAPTCHA check
-                if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
-                    print 'challenge: ' + str(request.POST['recaptcha_challenge'])
-                    print 'response: ' + str(request.POST['recaptcha_response'])
-                    print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
-                    check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
-                        request.POST['recaptcha_response'],
-                        settings.RECAPTCHA_PRIVATE_KEY, {})
-                else:
-                    print 'recaptcha keys not found in request.POST'
-                    raise Http404
-
-                if not check_captcha.is_valid:
-                    print check_captcha.error_code
-                    response['status'] = 'invalid'
-                    response['message'] = 'Incorrect captcha response. Please try again.'
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-            try:
-                _school_id = int(form.cleaned_data["school_pk"])
-                _course_id = int(form.cleaned_data["course_pk"])
-                file.school = School.objects.get(pk=_school_id)
-                file.course = Course.objects.get(pk=_course_id)
-            except Exception, e:
-                print "school/course error: " + str(e)
-
-            if _course_id is not None and form.cleaned_data['in_course'] == "True":
-                # if in_course selected, add the course to their profile
-                _add_course(request.user.get_profile(), course_id=_course_id)
-            # process Tags
-            #processCsvTags(file, form.cleaned_data['tags'])
-            print "file.save()"
-            file.save()
-            response = {}
-            response["status"] = "success"
-            response["file_pk"] = file.pk
-            response["karma"] = file.karmaValue()
-            print "fileMeta form valid! " + str(file.pk)
-            # lets us use django's messaging system for alert-notifications
-            # in our design on upload success at the top of the profile
-            # FIXME: fix this message with proper html
-            if request.user.is_authenticated():
-                messages.add_message(request, messages.SUCCESS,
-                "Success! You uploaded a file (message: Django Messaging!")
-            # If user is not authenticated, store this file pk in their session
-            # TODO: IF a user isn't authenticated - present them
-            # an indication that they can claim karma by logging in
-        else:
-            # Form is invalid
-            print form.errors
-            print "fileMeta form NOT valid!"
-            response["status"] = "invalid"
-            response["form"] = form
-            response["message"] = "Please check your form data."
-            return HttpResponse(json.dumps(response), mimetype="application/json")
-
-    else:
-        # if not POST or not ajax
+    if request.method != "POST":
+        # This is the wrong way to use fileMeta, exit
         response["status"] = "invalid"
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+ 
+    form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
+
+    if not form.is_valid():
+        # Form is invalid
+        print form.errors
+        print "fileMeta form NOT valid!"
+        response["status"] = "invalid"
+        #response["form"] = form
+        response["message"] = "Please check your form data."
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    file = File.objects.get(pk=form.cleaned_data["file_pk"])
+    file.type = form.cleaned_data["type"]
+    file.title = form.cleaned_data["title"]
+    file.description = form.cleaned_data["description"]
+    file.created_on = form.cleaned_data["created_on"]
+
+    if request.user.is_authenticated():
+        file.owner = request.user
+    else:
+        file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
+        file.owner.save()
+        # Perform reCAPTCHA check
+        if 'recaptcha_challenge' in request.POST and 'recaptcha_response' in request.POST:
+            print 'challenge: ' + str(request.POST['recaptcha_challenge'])
+            print 'response: ' + str(request.POST['recaptcha_response'])
+            print 'private_key: ' + settings.RECAPTCHA_PRIVATE_KEY
+            check_captcha = recaptcha.submit(request.POST['recaptcha_challenge'],
+                request.POST['recaptcha_response'],
+                settings.RECAPTCHA_PRIVATE_KEY, {})
+        else:
+            print 'recaptcha keys not found in request.POST'
+            raise Http404
+
+        if not check_captcha.is_valid:
+            print check_captcha.error_code
+            response['status'] = 'invalid'
+            response['message'] = 'Incorrect captcha response. Please try again.'
+            return HttpResponse(json.dumps(response), mimetype="application/json")
+    try:
+        _school_id = int(form.cleaned_data["school_pk"])
+        _course_id = int(form.cleaned_data["course_pk"])
+        file.school = School.objects.get(pk=_school_id)
+        file.course = Course.objects.get(pk=_course_id)
+    except Exception, e:
+        print "school/course error: " + str(e)
+
+    if _course_id is not None and form.cleaned_data['in_course'] == "True":
+        # if in_course selected, add the course to their profile
+        request.user.get_profile().add_course(course_id=_course_id)
+    # process Tags
+    #processCsvTags(file, form.cleaned_data['tags'])
+    file.save()
+    response = {}
+    response["status"] = "success"
+    response["file_pk"] = file.pk
+    response["karma"] = file.karmaValue()
+    #print "fileMeta form valid! " + str(file.pk)
+    # lets us use django's messaging system for alert-notifications
+    # in our design on upload success at the top of the profile
+    # FIXME: fix this message with proper html
+    # render an html partial and then send it in json to jquery
+    if request.user.is_authenticated():
+        messages.add_message(request, messages.SUCCESS,
+        "Success! You uploaded a file (message: Django Messaging!")
+    # If user is not authenticated, store this file pk in their session
+    # TODO: IF a user isn't authenticated - present them
+    # an indication that they can claim karma by logging in
+
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -390,40 +429,12 @@ def browse_courses(request, school_query):
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    # pass the school query to
-    courses = _get_courses(request, school_query)
+    courses = School.get_courses(school_query)
     if isinstance(courses, tuple):  # FIXME
         response['school'], response['courses'] = courses
         return render(request, 'browse_courses.html', response)
     else:
         raise Http404
-
-
-def _get_courses(request, school_query=None):
-    """ Private search method.
-        :school_query: unicode or int, will search for a the courses with that school matching
-        returns: School, Courses+
-    """
-    # TODO: move this to School
-    if isinstance(school_query, int):
-        #_school = School.objects.get_object_or_404(pk=school_query)
-        _school = get_object_or_404(School, pk=school_query)
-    elif isinstance(school_query, unicode):
-        #_school = get_object_or_404(School, name__icontains=school_query)
-        #_school = School.objects.filter(name__icontains=school_query).all()[0]
-        # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
-        _school_q = School.objects.filter(slug=school_query) \
-                        .annotate(course_count=Count('course')) \
-                        .order_by('-course_count')
-        if len(_school_q) != 0:
-            _school = _school_q[0]
-        else:
-            return Http404
-    else:
-        print "No courses found for this query"
-        return Http404
-    # if I found a _school
-    return _school, Course.objects.filter(school=_school).distinct()
 
 
 def b_school_course(request, school_query, course_query):
@@ -438,22 +449,21 @@ def browse_one_course(request, course_query, school):
     """ View for viewing notes from a fuzzy course search
         :course_query: unicode url match, to be type parsed
     """
-    # TODO: combine these function with `b_school_course`
-    # TOOD: move this to Course
+    # TODO: combine this function with `b_school_course`
     response = nav_helper(request)
     try:
         course_query = int(course_query)
     except ValueError:
         # cant be cast as an int, so we will search for it as a string
         pass
-    course, files = _get_notes(request, course_query, school)
+    course, files = Course.get_notes(course_query, school)
     response['course'], response['files'] = course, files
     # get the users who are members of the course
-    response['users'] = course.userprofile_set.all()
-    # get the karma events associaged with the course
+    response['profiles'] = course.userprofile_set.all()
+
+    # get the karma events associated with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     response['viewed_files'] = request.user.get_profile().files.all()
-    #response['thanked_files'] = [file.id for file in files if request.user in [vote.user for vote in file.votes.all()]]
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
@@ -466,25 +476,7 @@ def browse_one_course(request, course_query, school):
             else:
                 response['flagged_files'].append(file.id)
 
-    return render(request, 'browse_one_course.html', response)
-
-
-def _get_notes(request, course_query, school):
-    """ Private search method for a course and it's files
-        :course_query:
-            if int: Course.pk
-            if unicode: Course.title
-        returns Course, Notes+
-    """
-    if isinstance(course_query, int):
-        _course = get_object_or_404(Course, pk=course_query)
-    elif isinstance(course_query, unicode):
-        _course = get_object_or_404(Course, slug=course_query, school=school)
-    else:
-        print "No course found, so no notes"
-        return Http404
-    return _course, File.objects.filter(course=_course).distinct()
-
+    return render(request, 'n_course.html', response)
 
 
 @login_required
@@ -603,8 +595,7 @@ def editCourseMeta(request):
 
 @login_required
 def addModel(request):
-    ''' This replaces addCourseOrSchool in the new
-        modal-upload process
+    ''' AJAX: add a new course or school
     '''
     if request.is_ajax() and request.method == 'POST':
         if 'type' in request.POST:
@@ -620,42 +611,75 @@ def addModel(request):
                 return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
     raise Http404
 
+
+def create_course(request):
+    """ Form to add a new course to our db
+    """
+
+    def custom_validate(form_dict):
+        if form_dict['id_title'] == '': return False
+
+    response = {}
+
+    if request.method == 'POST':
+        form = KarmaForms.CreateCourseForm(request.POST)
+        print 'request method is POST'
+
+        if form.is_valid():
+            print "Form is VALID"
+            user_profile = request.user.get_profile()
+            new_course = Course()
+
+            print form.cleaned_data.keys()
+
+            #instructor_id = int(form.cleaned_data['id_instructor'])
+
+            new_course.instructor_email = form.cleaned_data['instructor_email']
+            new_course.title = form.cleaned_data['title']
+            new_course.desc = form.cleaned_data['desc']
+            new_course.school = user_profile.school
+            new_course.save()
+
+            user_profile.courses.add(new_course)
+            user_profile.save()
+
+        else:
+            #TODO: have ajax display error messages
+            print "Form is INVALID: %s" % form.errors
+
+    else:
+        # request method is NOT POST
+        form = KarmaForms.CreateCourseForm()
+
+    return render(request, 'n_lightbox_create_course.html', {'form': form})
+
 @login_required
 def add_course_to_profile(request):
     """ ajax endpoint to add a course to a user's profile
         alternatively, to be used when the 'are you in this course' checkbox
         is selected in the upload modal
     """
+    print "adding course"
+    print request.POST
     if request.is_ajax() and request.method == 'POST':
-        print "this is the add_course request\n\t %s" % request.POST
         user_profile = request.user.get_profile()
-        status = _add_course(user_profile, course_title=request.POST['title'])
+        if 'title' in request.POST:
+            status = user_profile.add_course(course_title=request.POST['title'])
+        elif 'id' in request.POST:  # passing the course ID rather than title
+            status = user_profile.add_course(course_id=request.POST['id'])
+
         if status:
+            print "success"
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
         else:
-            print "There was an error adding a course to a profile"
-            print "\t profile: %s %s, course: %s" % (user_profile, user_profile.id, request.POST['title'])
+            return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
-def _add_course(user_profile, course_title=None, course_id=None):
-    """ Helper function to add a course to a userprofile
-        for avoiding duplicate code
-        :user_profile: `notes.models.UserProfile`
-        :course_title:    `notes.models.Course.title`
-        :course_id:    `notes.models.Course.id`
-    """
-    # TODO make a @staticmethod on UserProfile
-    # FIXME: add conditional logic to see if course is already added and error handling
-    if course_title is not None:
-        course = Course.objects.get(title=course_title)
-    elif course_id is not None:
-        course = Course.objects.get(pk=course_id)
-    else:
-        print "[_add_course]: you passed neither a course_title nor a course_id, \
-        nothing to add"
-        return False
-    user_profile.courses.add(course) # implies save()
-    return True
-
+def drop_course(request):
+    if request.is_ajax() and request.method == 'POST':
+        user_profile = request.user.get_profile()
+        course = Course.objects.get(id=request.POST['id'])
+        user_profile.courses.remove(course)
+        return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
 
 def instructors(request):
     """ Ajax: Instructor autcomplete form field """
@@ -764,33 +788,6 @@ def searchBySchool(request):
         #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 
-def notesOfCourse(request, course_pk):
-    """ Ajax: Return all notes belonging to a course
-        Used by search page javascript
-    """
-    # If user id is sent with search, send moderation data per note
-    # i.e: has a user voted on this note?
-    if request.is_ajax():
-        if request.user.is_authenticated:
-            user_pk = request.user.pk
-        else:
-            user_pk = -1
-        # Validate request parameters
-        if not Course.objects.filter(pk=course_pk).exists():
-            raise Http404
-        response_json = []
-        #notes = Note.objects.get(school.pk=school_pk)
-        course = Course.objects.get(pk=course_pk)
-        print "notes request for course " + str(course.pk) + " by user " + str(user_pk)
-        #print jsonifyModel(school, depth=2)
-        response_json.append(jsonifyModel(course, depth=1, user_pk=user_pk))
-            #response_json.append(school_json)
-        #print json.dumps(response_json)
-        return HttpResponse(json.dumps(response_json), mimetype="application/json")
-    else:
-        raise Http404
-
-
 @login_required
 def vote(request, file_pk):
     vote_value = int(request.POST.get('vote', 0))
@@ -825,12 +822,40 @@ def vote(request, file_pk):
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
 
+def multisearch(request):
+    if request.GET.get("q", "") != "":
+        response = {}
 
-'''
-    Search testing
-'''
+        query = request.GET.get("q", "")
+        response['query'] = query
+
+        schools = SearchQuerySet().filter(content__icontains=query) \
+                    .models(School).load_all()
+        response['schools'] = [s.object for s in schools]
+        courses = SearchQuerySet().filter(content__icontains=query) \
+                    .models(Course).load_all()
+        response['courses'] = [c.object for c in courses]
+        notes = SearchQuerySet().filter(content__icontains=query) \
+                    .models(File).load_all()
+        response['notes'] = [n.object for n in notes]
+        response['instructors'] = []
+        response['users'] = []
+
+        return render(request, 'n_search_results.html', response)
+
+def browse(request):
+    response = {}
+
+    response['schools'] = School.objects.filter(browsable=True)
+    response['courses'] = Course.objects.filter(browsable=True)
+    response['notes'] = File.objects.filter(browsable=True)
+    response['instructors'] = []
+    response['users'] = []
+
+    return render(request, 'n_search_results.html', response)
 
 
+''' Search testing '''
 def search(request):
     results = []
     # Process query and return results
@@ -874,4 +899,15 @@ def captcha(request):
     form = KarmaForms.CaptchaForm()
     return TemplateResponse(request, 'captcha.html', {'form': form})
 
-
+def gdrive_oauth_handshake(request):
+    """ Take the oauth authentication_code and finish the oauth2 handshake """
+    print "loading gdrive oauth 2"
+    print request.GET, dir(request.GET)
+    auth_code = request.GET['code']
+    print "auth_code:\n"
+    print auth_code
+    print type(auth_code)
+    print dir(auth_code)
+    creds = accept_auth(auth_code)
+    print creds
+    return HttpResponse(creds)

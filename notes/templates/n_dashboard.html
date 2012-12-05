@@ -1,0 +1,152 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/dashboard.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="dashboard_content">
+
+    <div id="stats_container" class="hero_gradient_bar">
+      <div class="row">
+        <div class="ten columns offset-by-one">
+
+          <div class="row">
+            <div class="three columns stat_lead_in">
+              you've earned
+            </div>
+            <div class="three columns stat_lead_in">
+              you've uploaded
+            </div>
+            <div class="three columns stat_lead_in">
+              you've downloaded
+            </div>
+            <div class="three columns stat_lead_in">
+              you've liked
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="three columns stat_number stat_earned">
+              {{ user.get_profile.karma }} <!-- user's karma -->
+            </div><!-- /stat_earned -->
+            <div class="three columns stat_number stat_uploaded">
+              {% if user.get_profile.notes %}
+                {{ user.get_profile.notes.count }} <!-- user's file count -->
+              {% else %}
+                0 <!-- user's file count -->
+              {% endif %}
+            </div><!-- /stat_uploaded -->
+            <div class="three columns stat_number stat_downloaded">
+              {{ user.get_profile.files.count }} {# TODO: something like profile.files.count #}
+            </div><!-- /stat_downloaded -->
+            <div class="three columns stat_number stat_liked">
+              72 {# profile.repEvents.type == vote #}
+            </div><!-- /stat_liked -->
+          </div>
+
+          <div class="row">
+            <div class="three columns stat_object stat_earned">
+              karma points
+            </div><!-- /stat_earned -->
+            <div class="three columns stat_object stat_uploaded">
+              items
+            </div><!-- /stat_uploaded -->
+            <div class="three columns stat_object stat_downloaded">
+              things
+            </div><!-- /stat_downloaded -->
+            <div class="three columns stat_object stat_liked">
+              posts
+            </div><!-- /stat_liked -->
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /stats_container -->
+
+    <div class="row">
+      <div id="profile_box_container" class="eleven columns centered">
+        <div id="profile_box" class="row">
+
+          <div class="three columns">
+            <div class="row">
+              <div class="four columns">
+                <img src="{{ user.get_profile.picture_url_large }}" alt="dashboard_profile_avatar" align="top"/>
+              </div>
+              <div id="profile_name" class="eight columns">
+                {{ user.get_profile.get_name }}
+              </div><!-- /profile_name -->
+            </div>
+          </div>
+
+          <div class="three columns" id="profile_school">
+            <div id="profile_school_header">
+              My School
+            </div><!-- /profile_school_header -->
+            <div id="profile_school_list">
+              {{ user.get_profile.school }}
+            </div><!-- /profile_school_list -->
+          </div><!-- /profile_school -->
+
+          <div class="three columns" id="profile_courses">
+            <div id="profile_courses_header">
+              My Courses
+            </div>
+            <div id="profile_courses_list">
+              <ul>
+                {% for course in user.get_profile.courses.all %}
+                  <li><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% comment %}
+            <div id="profile_courses_links">
+              <a href="#">See All</a>
+              <a href="#">Add A Course</a>
+            </div>
+            {% endcomment %}
+          </div><!-- /profile_courses -->
+
+          <div class="three columns" id="profile_actions">
+            {% comment %}
+            <div id="profile_actions_add_course">
+              <a href="#"><img src="/static/img/dashboard_profile_plusicon.png" alt="dashboard_profile_plusicon" width="20" height="20" align="middle"/> ADD A COURSE</a>
+            </div>
+            <div id="profile_actions_add_course">
+              <a href="#"><img src="/static/img/dashboard_profile_plusicon.png" alt="dashboard_profile_plusicon" width="20" height="20" align="middle"/> ADD A NOTE</a>
+            </div>
+            <div id="profile_actions_add_course">
+              <a href="#"><img src="/static/img/dashboard_profile_foldericon.png" alt="dashboard_profile_foldericon" width="20" height="20" align="middle"/> VIEW MY NOTES</a>
+            </div>
+            {% endcomment %}
+          </div><!-- /profile_actions -->
+        </div>
+      </div><!-- /profile_box -->
+    </div>
+
+    <div id="activity_container">
+
+      <div class="row">
+        <div class="ten columns offset-by-one column_header">
+            latest activity
+        </div>
+      </div>
+
+      {% for event in events %}
+        {% include 'n_activity_item.html' %}
+      {% endfor %}
+
+    {% comment %}
+    <div class="row">
+      <div class="twelve columns">
+        <div id="activity_more">
+          <img src="/static/img/dashboard_more_plusicon.png" alt="dashboard_more_plusicon" width="179" height="24" />
+        </div><!-- /activity_more -->
+      </div>
+    </div>
+    {% endcomment %}
+
+  </section><!--/dashboard_content-->
+{% endblock %}

@@ -1,0 +1,196 @@
+{% load url from future %}
+{% if not user.is_authenticated %}
+{# Logged out #}
+  <header id="global_header">
+    <div class="row">
+      <div id="logo_container" class="two columns offset-by-one">
+        <img src="/static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+      </div><!--/logo container-->
+
+      <div id="browse_container" class="one column">
+        <a href="{% url 'browse' %}">Browse</a>
+      </div><!--/browse_container-->
+
+      <div id="login_container" class="three columns offset-by-four end">
+        <span id="login_toggle">
+          LOGIN/SIGNUP <img src="/static/img/global_header_login_menu_arrow.png" alt="Open Login" id="login_arrow" width="9" height="6" />
+        </span>
+
+        <div id="login_box" style="display:none">
+          <div class="row">
+            <div class="twelve columns">
+
+              <div class="row" id="login_signup">
+                <div class="twelve columns">
+                  SIGN UP
+                </div>
+              </div><!--/login_signup-->
+
+              <div class="row" id="login_fb">
+                <div class="twelve columns">
+                  <a href="{% url 'socialauth_begin' 'facebook' %}">
+                    <img src="/static/img/global_header_login_fbbtn.png" alt="global_header_login_fbbtn" width="223" height="45" />
+                  </a>
+                </div>
+              </div><!--/login_fb-->
+
+
+              <div class="row" id="login_form">
+                <div class="twelve columns">
+                  <form id="login_form" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+
+                    <div class="row">
+                      <div class="twelve columns">
+                        <input type="text" name="username">
+                      </div>
+                      <div class="twelve columns">
+                        Username
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="twelve columns">
+                        <input type="password" name="password">
+                      </div>
+                      <div class="twelve columns">
+                        Password
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div><!--/login_form-->
+
+              <div class="row" id="login_submit">
+                <div class="twelve columns">
+                    LOG IN
+                </div>
+              </div><!--/login_submit-->
+
+
+            </div>
+          </div>
+        </div>
+
+      </div><!--/login container-->
+    </div>
+  </header><!--/global header-->
+
+{% else %}
+{# Logged IN #}
+  <header id="global_header">
+    <div class="row">
+      <div id="logo_container" class="five columns offset-by-one">
+        <div class="row">
+          <div class="five columns">
+            <a href="/">
+              <img src="/static/img/global_header_logo.png" alt="global_header_logo" width="144" height="17" />
+            </a>
+          </div>
+          <div class="seven columns">
+            <div id="search_container">
+              <form id="search" method="GET" action="/multisearch/">
+                <input type="text" id="search_txt" name="q">
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div><!--/logo container-->
+
+      <div id="browse_container" class="one column">
+        <a href="{% url 'browse' %}">Browse</a>
+      </div><!--/browse_container-->
+
+      <div class="four columns end">
+        <div id="global_header_logged_in_content">
+          <div class="row">
+
+            <div class="five columns half-padding" id="global_header_addnote">
+              <img src="/static/img/global_header_plusnote.png" alt="global_header_plusnote" width="115" height="67" />
+            </div><!-- /global_header_addnote -->
+
+            <div class="four columns half-padding" id="global_header_mycourses">
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_mycourses_copy">
+                  My Courses <img src="/static/img/global_header_login_menu_arrow.png" alt="global_header_login_menu_arrow" width="9" height="6" />
+                </div><!-- /global_header_mycourses_copy -->
+              </div>
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_mycourses_list" style="display:none;">
+                  <ul id="course_menu">
+                    {% for course in user.get_profile.courses.all %}
+                      <li><a href="{{ course.get_absolute_url }}"> {{ course.title }} </a></li>
+                    {% endfor %}
+                  </ul>
+                </div><!-- /global_header_mycourses_list -->
+              </div>
+
+              <div class="row">
+                <div class="twelve columns" id="global_header_add_course" style="display:none;">
+                  <img src="/static/img/global_header_add_course.png" alt="global_header_add_course" width="132" height="20" />
+                </div><!-- /global_header_add_course -->
+              </div>
+
+            </div><!-- /global_header_mycourses -->
+
+            <div class="three columns">
+              <div id="global_header_avatar_menu">
+                <div class="row">
+                  <div class="five columns no-padding" id="global_header_avatar_container">
+                    <img alt="" src="{{ user.get_profile.picture_url_small }}" width="31" height="33">
+                  </div>
+                  <div class="six columns no-padding" id="global_header_note_count">
+                    {{ user.get_profile.karma }}
+                  </div>
+                  <div class="one column half-padding" id="global_header_arrow_container">
+                    <img src="/static/img/global_header_login_menu_arrow.png" alt="global_header_login_menu_arrow" width="9" height="6" />
+                  </div>
+                </div>
+              </div><!-- /global_haader_avatar_menu -->
+
+              <div id="global_header_avatar_moreinfo" style="display:none;">
+                <div class="row" id="global_header_avatar_moreinfo_content">
+                  <div class="nine columns">
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_name">
+                        <a href="{% url 'dashboard' %}">
+                          {{ user.get_profile.get_name }}
+                        </a>
+                      </div><!-- /global_header_avatar_moreinfo_name -->
+                    </div>
+                    <div class="row">
+                      <div class="twelve columns" id="global_header_avatar_moreinfo_school">
+                        <a href="{{ user.get_profile.school.get_absolute_url }}">
+                          {{ user.get_profile.school }}
+                        </a>
+                      </div><!-- /global_header_avatar_moreinfo_school -->
+                    </div>
+                  </div>
+                  <div id="global_header_avatar_moreinfo_gear" class="three columns">
+                    <a href="{% url 'dashboard' %}">
+                      <img src="/static/img/global_header_gear.png" alt="global_header_gear" width="12" height="14" />
+                    </a>
+                  </div><!-- /global_header_avatar_moreinfo_gear -->
+                </div>
+                <div class="row">
+                  <div class="twelve columns" id="global_header_avatar_moreinfo_mynotes">
+                    <a href="/accounts/logout/">log out</a>
+                    <!-- disabling link to my notes
+                    <img src="/static/img/global_header_my_notes.png" alt="global_header_my_notes" width="105" height="20" />
+                    -->
+                  </div><!-- /global_header_add_course -->
+                </div>
+              </div><!-- /global_header_avatar_moreinfo -->
+
+            </div>
+          </div>
+        </div><!-- /global_header_logged_in_content -->
+      </div>
+
+    </div>
+
+  </header><!--/global header-->
+{% endif %}

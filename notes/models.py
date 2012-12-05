@@ -1,18 +1,61 @@
-# Copyright (C) 2012  FinalsClub Foundation
+#!/usr/bin/python2.7
+# -*- coding:utf8 -*-
+""" Copyright (C) 2012  FinalsClub Foundation """
 
 import datetime
 import hashlib
 import re
+import os
+from binascii import hexlify
 
-from KNotes.settings import DEFAULT_UPLOADER_USERNAME
-from KNotes.settings import BETA
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Count
 from django.db.models.signals import post_save, post_delete
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
+from oauth2client.client import Credentials
 
 from social_auth.backends.facebook import FacebookBackend
 from social_auth.signals import socialauth_registered
+
+from KNotes.settings import DEFAULT_UPLOADER_USERNAME
+from KNotes.settings import BETA
+from notes.credentials import GOOGLE_USER
+
+
+class DriveAuth(models.Model):
+    """ stored google drive authentication and refresh token
+        used for interacting with google drive """
+
+    email = models.EmailField(default=GOOGLE_USER)
+    # JSON representation of Oauth2Credential object
+    credentials = models.TextField()
+    stored_at = models.DateTimeField(auto_now=True)
+
+
+    @staticmethod
+    def get(email=GOOGLE_USER):
+        # FIXME: this is untested
+        DriveAuth.objects.filter(email=email).reverse()[0]
+
+
+    def store(self, creds):
+        """ Transform an existing credentials object to a db serialized """
+        self.email = creds.id_token['email']
+        self.credentials = creds.to_json()
+        self.save()
+
+
+    def transform_to_cred(self):
+        """ take stored credentials and produce a Credentials object """
+        return Credentials.new_from_json(self.credentials)
+
+
+    def __unicode__(self):
+        return u'Gdrive auth for %s created/updated at %s' % \
+                    (self.email, self.stored_at)
 
 
 class Level(models.Model):
@@ -131,9 +174,11 @@ class School(models.Model):
     name        = models.CharField(max_length=255)
     slug        = models.SlugField(null=True)
     location    = models.CharField(max_length=255, blank=True, null=True)
+    karma       = models.IntegerField(default=0)
 
     # Facebook keeps a unique identifier for all schools
     facebook_id = models.BigIntegerField(blank=True, null=True)
+    browsable = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
@@ -141,6 +186,46 @@ class School(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('browse-courses', [str(self.slug)])
+
+    @staticmethod
+    def get_courses(school_query=None):
+        """ Private search method.
+            :school_query: unicode or int, will search for a the courses with that school matching
+            returns: School, Courses+
+        """
+        # TODO: move this to School
+        if isinstance(school_query, int):
+            #_school = School.objects.get_object_or_404(pk=school_query)
+            _school = get_object_or_404(School, pk=school_query)
+        elif isinstance(school_query, unicode):
+            #_school = get_object_or_404(School, name__icontains=school_query)
+            #_school = School.objects.filter(name__icontains=school_query).all()[0]
+            # FIXME: this ordering might be the wrong way around, if so, remove the '-' from order_by
+            _school_q = School.objects.filter(slug=school_query) \
+                            .annotate(course_count=Count('course')) \
+                            .order_by('-course_count')
+            if len(_school_q) != 0:
+                _school = _school_q[0]
+            else:
+                raise Http404
+        else:
+            print "No courses found for this query"
+            raise Http404
+        # if I found a _school
+        return _school, Course.objects.filter(school=_school).distinct()
+
+    def sum_karma(self):
+        """calculate and save the total karama for all courses at this school
+        """
+        karma = 0
+        courses = self.course_set.all()
+        for course in courses:
+            course.sum_karma()
+            karma += course.karma
+
+        self.karma = karma
+        self.save()
+
 
     def save(self, *args, **kwargs):
         # If a new School is being saved, increment SiteStat School count
@@ -180,6 +265,12 @@ class Course(models.Model):
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
+    instructor_email= models.EmailField(blank=True, null=True)
+    last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    desc            = models.TextField(max_length=1023, blank=True, null=True)
+    # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
+    browsable       = models.BooleanField(default=False)
+    karma           = models.IntegerField(default=0)
 
     def __unicode__(self):
         # Note: these must be unicode objects
@@ -187,7 +278,36 @@ class Course(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('browse-course', [str(self.school.slug), str(self.slug)])
+        #TODO: if a course does not have a school, this will fail
+        return ('browse-course', [unicode(self.school.slug), unicode(self.slug)])
+
+    @staticmethod
+    def get_notes(course_query, school):
+        """ Search method for a course and it's files
+            :course_query:
+                if int: Course.pk
+                if unicode: Course.title
+            returns Course, Notes+
+        """
+        if isinstance(course_query, int):
+            _course = get_object_or_404(Course, pk=course_query)
+        elif isinstance(course_query, unicode):
+            _course = get_object_or_404(Course, slug=course_query, school=school)
+        else:
+            print "No course found, so no notes"
+            raise Http404
+        return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
+
+    def sum_karma(self):
+        """calculate the total karma for all ReputationEvents for this course 
+        """
+        events = self.reputationevent_set.all()
+        karma = 0
+        for event in events:
+            karma += event.type.actor_karma
+
+        self.karma = karma
+        self.save()
 
     def save(self, *args, **kwargs):
         # If a new Course is being saved, increment SiteStat Course count
@@ -250,9 +370,9 @@ class File(models.Model):
     course      = models.ForeignKey(Course, blank=True, null=True, related_name="files")
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes")
-    html        = models.TextField(blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
-    timestamp   = models.DateTimeField(default=datetime.datetime.now())
+    timestamp   = models.DateTimeField(default=datetime.datetime.now)
+    created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
     viewCount   = models.IntegerField(default=0)
     votes       = models.ManyToManyField(Vote, blank=True, null=True)
     numUpVotes  = models.IntegerField(default=0)
@@ -266,24 +386,38 @@ class File(models.Model):
     # on metadata save, award karma and set this flag
     awarded_karma = models.BooleanField(default=False)
 
+    ## post gdrive conversion data
+    # for pdfs
+    is_pdf      = models.BooleanField(default=False)
+    embed_url   = models.TextField(blank=True, null=True)
+    # for word processor documents
+    html        = models.TextField(blank=True, null=True)
+    text        = models.TextField(blank=True, null=True)
+    # download url to serve from google drive
+    gdrive_url  = models.TextField(blank=True, null=True)
+
+    browsable = models.BooleanField(default=False)
+
     def __unicode__(self):
         return u"%s at %s" % (self.title, self.course)
 
     @models.permalink
     def get_absolute_url(self):
+        print "getting file absolute URL"
+        print self.id, self.course, self.school
+        #print "\t", self.id, self.title, self.school.slug, self.course.slug
         if self.school is None or self.course is None:
+            print "using the file and pk based absolute url"
+            # This code path is run on initial upload before course exists
             return ('file', [str(self.pk)])
         else:
             return ('nurl_file', [str(self.school.slug), str(self.course.slug), str(self.pk)])
 
     def save(self, *args, **kwargs):
 
-        # If this is a new file, increment SiteStat
-        if not self.pk:
-            increment(self)
-
-        print "awarded_karma : %s, self.owner: %s" % (self.awarded_karma, self.owner)
-        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME):
+        # FIXME: this is getting run on the first file save from async upload
+        # this needs to only be run on fileMeta
+        if not self.awarded_karma and self.owner is not None and self.owner != User.objects.get(username=DEFAULT_UPLOADER_USERNAME) and self.school != None:
             print "awarding karma for file!"
             # FIXME: award karma based on submission type
             if self.type in self.KARMA_TYPES:
@@ -292,7 +426,8 @@ class File(models.Model):
                 #Default note type
                 karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner)
+            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner, file=self)
+            user_profile.save()
             self.awarded_karma = True
 
         # Escape html field only once
@@ -302,6 +437,12 @@ class File(models.Model):
             self.cleaned = True
 
         super(File, self).save(*args, **kwargs)
+        # update associated course last_updated
+        try:
+            self.course.last_updated = datetime.datetime.now()
+            self.course.save
+        except:
+            pass
 
     def ownedBy(self, user_pk):
         """ Returns true if the user owns or has "paid" for this file
@@ -329,7 +470,7 @@ class File(models.Model):
             self.numUpVotes += 1
             # Award karma corresponding to "upvote" ReputationEventType to file owner
             if self.owner is not None:
-                self.owner.get_profile().awardKarma(event="upvote")
+                self.owner.get_profile().awardKarma(event="upvote", course=self.course, school=self.school, user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
         elif int(vote_value) == -1:
@@ -427,6 +568,9 @@ class UserProfile(models.Model):
     complete_profile    = models.BooleanField(default=False)
     invited_friend      = models.BooleanField(default=False)
 
+    email_confirmation_code = models.CharField(max_length=254, blank=True, null=True)
+    email_confirmed = models.BooleanField(default=False)
+
     # karma will be calculated based on ReputationEvents
     # it is more efficient to incrementally tally the total value
     # vs summing all ReputationEvents every time karma is needed
@@ -460,15 +604,45 @@ class UserProfile(models.Model):
     # While stil allowing user to switch school /year
     submitted_school = models.BooleanField(default=False)
     submitted_grad_year = models.BooleanField(default=False)
-    # TODO: On post_save, check to see if school, grad year not NOne
+    # TODO: On post_save, check to see if school, grad year not None
     # set appropriate Bool True and award karma points
 
     # TODO: store all reputation-related activity
     # To a separate file
 
+    def setEmailConfirmationCode(self):
+        ''' Generates email confirmation code
+            and returns activation url for inclusion
+            in email
+        '''
+        # Returns 254 chars
+        confirmation = hexlify(os.urandom(127))
+        self.email_confirmation_code = confirmation
+        self.save()
+        return confirmation
+
     def __unicode__(self):
         #Note these must be unicode objects
         return u"%s at %s" % (self.user.username, self.school)
+
+    def add_course(self, course_title=None, course_id=None):
+        """ Helper function to add a course to a userprofile
+            for avoiding duplicate code
+            :user_profile: `notes.models.UserProfile`
+            :course_title:    `notes.models.Course.title`
+            :course_id:    `notes.models.Course.id`
+        """
+        # FIXME: add conditional logic to see if course is already added and error handling
+        if course_title is not None:
+            course = Course.objects.get(title=course_title)
+        elif course_id is not None:
+            course = Course.objects.get(pk=course_id)
+        else:
+            print "[_add_course]: you passed neither a course_title nor a course_id, \
+            nothing to add"
+            return False
+        self.courses.add(course) # implies save()
+        return True
 
     def getLevel(self):
         """ Determine the current level of the user
@@ -530,7 +704,7 @@ class UserProfile(models.Model):
 
     # Get the "name" of this user for display
     # If no first_name, user username
-    def getName(self):
+    def get_name(self):
         """ Generate the front-facing username for this user.
             Prefer user-supplied alias first,
             Second, username given on standard account signup
@@ -589,7 +763,7 @@ class UserProfile(models.Model):
             self.reputationEvents.add(event)
             # Don't self.save(), because this method is called
             # from UserProfile.save()
-            return True
+            return self
         except Exception, e:
             print "error in awardKarma:"
             print e
@@ -640,7 +814,7 @@ class UserProfile(models.Model):
         """
         # If there is not a gravatar hash, and the user registered by email
         # make a gravatar hash
-        if not self.gravatar and not self.fb_id:
+        if not self.gravatar and not self.fb_id and self.user:
             self.gravatar = hashlib.md5(self.user.email.lower()).hexdigest()
 
         # Regenerate the picture_urls for easy access
@@ -649,16 +823,14 @@ class UserProfile(models.Model):
 
         # Grad year was set for the first time, award karma
         #print (self.grad_year == "")
-        if self.grad_year != "" and not self.submitted_grad_year:
-            print "grad year submitted"
+        if self.grad_year != "" and self.grad_year is not None and not self.submitted_grad_year:
             self.submitted_grad_year = True
-            self.awardKarma('profile-grad-year')
+            self.awardKarma('profile-grad-year', user=self.user)
 
         # School set for first time, award karma
         if self.school is not None and not self.submitted_school:
-            print "submitted school!"
             self.submitted_school = True
-            self.awardKarma('profile-school')
+            self.awardKarma('profile-school', user=self.user)
 
         # Add read permissions if Prospect karma level is reached
         if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
@@ -715,3 +887,4 @@ def facebook_extra_data(sender, user, response, details, **kwargs):
     user_profile.save()
 
 socialauth_registered.connect(facebook_extra_data, sender=FacebookBackend)
+

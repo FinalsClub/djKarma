@@ -1,0 +1,24 @@
+<div class="row notes_result_container">
+  <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+    <div class="activity_timestamp">
+      5pm // tues nov 23 2012 -- {{ note.timestamp }}
+    </div>
+    <div class="activity_details_action">
+      <a href="{{ note.get_absolute_url }}" class="activity_target">{{ note.title }}</a>
+    </div>
+    <div class="activity_details_context">
+      {# TODO: Hook up absolute URLS #}
+      <a href="{{ note.course.get_absolute_url }}" class="course_link">{{ note.course.title }}</a>//<a href="{{ note.school.get_absolute_url }}" class="school_link">{{ note.school.name }}</a>
+    </div>
+    <div class="activity_details_callout">
+      <div class="activity_details_callout_copy">
+        {# TODO: slice of raw_text, or html for now? #}
+        {% if note.text %}
+          {{ note.text|slice:500 }}
+        {% else %}
+          {{ note.description }}
+        {% endif %}
+      </div>
+    </div>
+  </div><!-- /notes_result -->
+</div><!-- /notes_result_container -->

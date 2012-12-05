@@ -1,0 +1,72 @@
+<div class="row"><!-- columns -->
+
+  <div class="ten columns offset-by-one"><!-- notes -->
+    <div class="column_header">
+      notes
+    </div><!-- /column_header -->
+
+    {% for note in notes %}
+    <div class="row notes_result_container wide">
+      <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+        <div class="activity_timestamp">
+          {{ note.timestamp }} -- 5pm // tues nov 23 2012
+        </div>
+        <div class="activity_details_action">
+          <a href="{{ note.get_absolute_url }}" class="activity_target">{{ note.title }}</a>
+        </div>
+        <div class="activity_details_context">
+          <a href="{{ note.get_absolute_url }}" class="course_link">{{ note.course.title }}</a>//<a href="{{ note.get_absolute_url }}" class="school_link">{{ note.school.name }}</a>
+        </div>
+        <div class="activity_details_callout">
+          <div class="row">
+            <div class="one column">
+              <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
+            </div>
+            <div class="eleven columns activity_details_callout_copy">
+              {# TODO: preview of raw text #}
+              {% if note.text %}
+                {{ note.text|slice:500 }}
+              {% else %}
+                {{ note.description }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="twelve columns activity_details_status">
+            So far, <span class="activity_details_status_number">{{ note.numUpVotes }}</span> people have completely fallen in love with with these notes.
+          </div><!-- /activity_details_status -->
+        </div>
+      </div><!-- /notes_result -->
+    </div><!-- /notes_result_container -->
+    {% endfor %}
+
+
+  </div><!-- /notes -->
+
+</div><!-- /columns -->
+
+{% comment %}
+<div class="row">
+  <div class="twelve columns">
+    <div id="search_pagination" style="width: 232px"><!-- WIDTH SHOULD BE SET DYNAMICALLY TO ENABLE MARGIN: AUTO -->
+      <div id="search_pagination_left">
+        <img src="/static/img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />
+      </div><!-- /search_pagination_left -->
+      <div id="search_pagination_numbers">
+        <ul>
+          <li class="button_interior">1</li>
+          <li>2</li>
+          <li>3</li>
+          <li>4</li>
+          <li>5</li>
+          <li>6</li>
+        </ul>
+      </div><!-- /search_pagination_numbers -->
+      <div id="search_pagination_right">
+        <img src="/static/img/search_arrow_right.png" alt="search_arrow_right" width="5" height="10" />
+      </div><!-- /search_pagination_right -->
+    </div><!-- /search_pagination -->
+  </div>
+</div>
+{% endcomment %}

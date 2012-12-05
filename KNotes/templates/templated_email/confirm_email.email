@@ -1,0 +1,11 @@
+{% block subject %}Confirm your KarmaNotes email {% endblock %}
+
+{% block html %}
+  <h3>Hey {{username}},</h3>
+
+  <p>Welcome to <b>Karma<span style="color:#8C1274">Notes</span></b>! Please confirm your email with the link below:</p>
+
+  <p><a href="{{activation_link}}"><h2>Confirm Email</h2></a></p>
+
+  <p>Cheers!<br/>Team <b>Karma<span style="color:#8C1274">Notes</span></b></p>
+{% endblock %}

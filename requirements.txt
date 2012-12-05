@@ -1,4 +1,4 @@
-Django>=1.4
+Django>=1.4.2
 gdata==2.0.16
 django-simple-autocomplete==0.2
 django-social-auth==0.6.7
@@ -15,4 +15,10 @@ pysolr==2.1.0-beta
 celery==2.5.3
 django-celery==2.5.5
 recaptcha-client==1.0.6
+django-templated-email==0.4.7
 -e git://github.com/FinalsClub/django-ajax-uploader.git#egg=ajaxuploader-dev
+apiclient==1.0.2
+oauth2client==1.0
+google-api-python-client==1.0
+urllib3==1.5
+pytz==2012h

@@ -1,0 +1,43 @@
+<div class="row course_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+
+  <div class="two columns course_meta">
+      <div class="course_meta_stat">
+        {{ course.files.all.count }}
+      </div>
+      <div class="course_meta_name">
+        notes
+      </div>
+      <div class="course_meta_stat">
+        {{ course.userprofile_set.count }}
+      </div>
+      <div class="course_meta_name">
+        students
+      </div>
+      {% if course in user.get_profile.courses.all %}
+        <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
+          drop
+        </div>
+      {% else %}
+        <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
+          join
+        </div>
+      {% endif %}
+  </div><!-- /course_meta -->
+
+  <div class="ten columns">
+    <div class="activity_details">
+      <div class="activity_timestamp">
+        last updated {# FIXME: not implemented #} -- october 23, 2012 4:45pm
+      </div><!-- /activity_timestamp -->
+      <div class="activity_details_action">
+        <a class="activity_target" href="{{ course.get_absolute_url }}">
+          {{ course.title }}
+        </a>
+      </div><!-- /activity_details_action -->
+      <div class="activity_details_context">
+        <a href="#" class="prof_link">{{ course.instructor.name }}</a><br>
+        <a href="{{ course.school.get_absolute_url }}" class="school_link">{{ course.school.name }}</a>
+      </div><!-- /activity_details_context -->
+    </div>
+  </div>
+</div><!-- /course_result -->

@@ -15,11 +15,11 @@ from models import School, Course, File, Tag, Instructor
 
 
 class UserCreateForm(UserCreationForm):
-    email = forms.EmailField(required=True, help_text='Pick your on-site avatar with <a href=\"http://www.gravatar.com\">Gravatar</a>')
+    email = forms.EmailField(required=True, help_text='We\'ll send you a confirmation message. Your on-site avatar is linked to your email with <a href=\"http://www.gravatar.com\">Gravatar</a>')
  
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ("username", "email", "password1", "password2", "first_name", "last_name")
  
     def save(self, commit=True):
         user = super(UserCreateForm, self).save(commit=False)
@@ -78,7 +78,8 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                         attrs={'id': 'file-form-course_pk'}
                     )
                 )
-    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    type        = forms.ChoiceField(choices=File.FILE_PTS, required=False)
+    created_on        = forms.DateField(required=False)
     title       = forms.CharField(max_length=50,
                     error_messages={'required': 'Enter a title.'},
                     widget=forms.TextInput(attrs={'class': 'text-input'})
@@ -87,6 +88,7 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                     error_messages={'required': 'Enter a description.'},
                     widget=forms.Textarea(attrs={'class': 'text-input'})
                 )
+
 
     #tags        = forms.CharField(required=False, max_length=511, \
     #                label="Tags", \
@@ -155,6 +157,14 @@ class CharCourseField(forms.CharField):
             raise forms.ValidationError("Sorry, the seleted Course does not exist.")
         return course
 
+
+# CreateCourseForm is not currently used. Just used it to autorender the needed html
+class CreateCourseForm(forms.ModelForm):
+    """ Form used when creating a new course
+    """
+    class Meta:
+        model = Course
+        fields = ('title', 'field', 'instructor_email', 'desc')
 
 class GenericCharForm(forms.Form):
     """ Provides a means to sanitize generic text received via GET/POST """

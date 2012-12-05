@@ -54,6 +54,7 @@ sudo service postgresql restart
 
 see the [official Solr tutorial](http://lucene.apache.org/solr/api-3_6_0/doc-files/tutorial.html).
 
+http://apache.cs.utah.edu/lucene/solr/3.6.1/apache-solr-3.6.1.zip
 
 #### Maintaining the Search Index
 
@@ -67,9 +68,9 @@ When changes are made to the search index schema (./notes/search_indexes.py), th
 1. **Build the Index Schema**. You can generate the schema from the django application (once Haystack is installed and setup) by running:
 
 		 ./manage.py build_solr_schema > /path/to/solr/conf/schema.xml
-		 
+
 2. **Restart Solr**
-3. **Build the Search Index**. A shortcut for clear_index followed by update_index. 
+3. **Build the Search Index**. A shortcut for clear_index followed by update_index.
 
 		./manage.py rebuild_index
 
@@ -78,12 +79,12 @@ If you've added new models in Django, and haven't touched search_index.py:
 
 		./manage.py update_index
 
-###### Note on Solr location: 
-	
+###### Note on Solr location:
+
 With Solr installed using Homebrew on Mac OS X, the default path will be:
-        
+
         /usr/local/Cellar/solr/3.6.0/libexec/example/solr/conf/schema.xml
-		 
+
 On the current server, the path to the solr schema is:
 
 		/home/dbro/apache-solr-3.6.0/example/solr/conf/schema.xml
@@ -103,7 +104,7 @@ To install and run the celery task server:
 3. Place the celery config file (./packaging/celeryconfig) in /etc/default
 4. Make an unprivileged, non-password-enabled user and group to run celery
         useradd celery
-        
+
 5. make a spot for the logs and the pid files
         mkdir /var/log/celery
         mkdir /var/run/celery
@@ -111,6 +112,8 @@ To install and run the celery task server:
         chown celery:celery /var/run/celery
 6. chmod +x /etc/init.d/celeryd
 7. run /etc/init.d/celeryd start
+
+When running on your local, make sure the celery user understands the local path of your repo.
 
 ###Production Note:
 On the new Amazon instance, celery logs are located at:
@@ -158,21 +161,21 @@ If you'd like to copy the current production database and use it during your dev
 1. checkout the commit corresponding to the production project state
 2. Make sure south is commented out in settings.INSTALLED_APPS
 3. manage.py syncdb (do NOT create superuser when prompted)
-		
-	+ If syncdb loads fixtures: 
+
+	+ If syncdb loads fixtures:
 	    a. manage.py createsuperuser
 	+ Else:
-		a. manage.py loaddata ./path/to/fixtures.json 
-		    + *Note:* fixtures.json was initial_data.json earlier in the project history. 
+		a. manage.py loaddata ./path/to/fixtures.json
+		    + *Note:* fixtures.json was initial_data.json earlier in the project history.
 		b. Then manage.py createsuperuser
-4. manage.py loaddata ~/dumps.json 
+4. manage.py loaddata ~/dumps.json
 
 5. Now un-comment south from settings.INSTALLED_APPS and manage.py syncdb
 6. manage.py convert_to_south notes
 7. git pull origin master
 8. manage.py schemamigration notes --auto
-9. if schemamigration prompts you for a default value. i.e: 
-	
+9. if schemamigration prompts you for a default value. i.e:
+
 		Added field owner on notes.File
 		? The field 'File.type' does not have a default specified, yet is NOT NULL.
  		? Since you are making this field nullable, you MUST specify a default
@@ -181,7 +184,7 @@ If you'd like to copy the current production database and use it during your dev
  		?  2. Specify a one-off value to use for existing columns now
  		?  3. Disable the backwards migration by raising an exception.
  		? Please select a choice: 2
- 	
+
  	Simply enter 2 and enter a one-off value (In this case 'N' for Note) if you understand the data model. Else specify 3. In development, losing the ability to backwards migrate is not a big deal.
 
 10. manage.py migrate notes
@@ -197,25 +200,13 @@ Note on Google Documents API
  In my testing I haven't yet had the oauth token expire, but I'll have to investigate further.
 
 
-Style compilation
------------------
-To recompile css from the less source files, install the latest Node js, which comes with the npm package manager and install 'less'
 
-## TODO automate this process, either with a make script or as a django ./manage.py command
-
-less source files live in `djKarma/static/less` To recompile `style.css`, you must install lessc
-
-    sudo npm install -g less
-
-You will now have the command lessc available to you. run this command from the root of the project repo
-
-    lessc ./static/less/styles.less ./static/css/styles.css
-   
-  
 Management Commands (manage.py \<command name>)
 -----------------------------------
 + **default_courses**: Assign default values to Course fields required by Solr indexing, but not enforced by models.py spec.
    + Checks School, Academic Year, Semester fields of all Course objects.
 + **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
-   + Necessary when a backup of the notes app database is made separate of the User table 
+   + Necessary when a backup of the notes app database is made separate of the User table
 
+### Creating default user
+On your local machine create a KarmaNotes default user and make sure that it has a unique email address.  The UserProfile.gravatar field is a hash of user.email and is required to be unique.  This doesn't tell you WHY creating a user will not work, it just wont.

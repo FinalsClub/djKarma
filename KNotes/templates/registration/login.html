@@ -27,6 +27,7 @@
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
   <p>Sign in with your KarmaNotes account.<br/> Need one? <a href="{% url 'register_account' None %}">Sign up.</a></p>
+  <p><a href="{% url 'password_reset' %}">Reset Password</a></p>
 </div>
 
 {% endblock %}

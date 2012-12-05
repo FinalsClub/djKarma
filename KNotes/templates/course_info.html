@@ -39,10 +39,15 @@
 
 	<div class="users">
 	  <h4>Students Enrolled</h4>
-      {# TODO: find limit of horizontal space and set upper bound to forloop #}
-      {% for user in users %}
-        <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
-      {% endfor %}
+    {# TODO: find limit of horizontal space and set upper bound to forloop #}
+    {% for user in profiles %}
+      <img title="{{ user.getName }}" src="{{ user.picture_url_small }}">
+    {% endfor %}
+
+    {% if user.get_profile not in profiles %}
+      <a id="add-this-course" data-course-id="{{ course.id }}" href="">add this course to my profile</a>
+    {% endif %}
+
 	</div> <!-- .users -->
   <div class="clear"></div>
 </div>

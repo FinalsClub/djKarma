@@ -1,0 +1,202 @@
+/* MODAL CONTENT */
+.modal_content
+{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: rgba(0, 0, 0, .8);
+  z-index: 999;
+  display:none;
+}
+
+.lightbox_modal
+{
+  margin: 121px auto 0px;
+  background-color: #000;
+  border: solid 1px rgba(255, 255, 255, .5);
+}
+
+.lightbox_header
+{
+  font-family: "MuseoSlab-700";
+  font-size: 43px;
+  text-align: center;
+  padding-top: 65px;
+  padding-bottom: 54px;
+  color: #FFF;
+}
+
+.lightbox_header.short_row
+{
+  padding-bottom: 15px!important;
+}
+
+.lightbox_subhead
+{
+  font-family: "MuseoSlab-500";
+  font-size: 19px;
+  color: #FFF;
+  text-align: center;
+  padding-bottom: 35px;
+}
+
+/* FORM CONTENT */
+.lightbox_row
+{
+  padding-bottom: 25px;
+}
+
+.lightbox_label
+{
+  font-family: "MuseoSlab-500";
+  font-size: 14px;
+  color: #9f9e9e;
+}
+
+.lightbox_copy
+{
+  font-family: "MuseoSlab-500";
+  font-size: 18px;
+  color: #FFF;
+}
+
+.lightbox_instruction
+{
+  font-family: "MuseoSans-500";
+  font-size: 12px;
+  color: #fff;
+  padding-top: 5px;
+}
+
+.lightbox_instruction a
+{
+  color: #fff;
+  text-decoration: underline;
+}
+
+.lightbox_textfield
+{
+  -webkit-border-radius: 8px!important; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 8px!important; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+  font-size: 18px!important;
+  font-family: "MuseoSlab-500"!important;
+  height: 34px!important;
+  background-color: #e3e3e3!important;
+  border: 1px solid #333!important;
+  -webkit-box-shadow: inset 0px 0px 4px 0px rgba( 0, 0, 0, .75 )!important; /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+          box-shadow: inset 0px 0px 4px 0px rgba( 0, 0, 0, .75 )!important; /* Opera 10.5, IE9+, Firefox 4+, Chrome 6+, iOS 5 */
+}
+
+.lightbox_textarea
+{
+  height: 138px!important;
+}
+
+/* JOIN COURSE */
+.join_course_row
+{
+  text-align: center;
+  padding-bottom: 27px;
+}
+
+#join_course_or
+{
+  font-family: "MuseoSans-300";
+  font-size: 14px;
+  color: #fff;
+}
+
+.lightbox_field_label
+{
+  font-family: "MuseoSlab-700";
+  font-size: 16px;
+  color: #f05a28;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+#lightbox_search_txt
+{
+  background: url(../img/lightbox_search_icon.png) 5px no-repeat;
+  padding-left: 28px;
+}
+
+.signup_course_row
+{
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+a#submit-lightbox-upload, a#submit-lightbox-create-course
+{
+  color: #FFF;
+  cursor: pointer;
+}
+
+a#submit-lightbox-upload:hover, a#submit-lightbox-create-course:hover
+{
+  color: #FFF;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#lightbox_signup_submit
+{
+  margin: 0 auto;
+  width: 108px;
+  padding-bottom: 27px;
+}
+
+#lightbox_signup_submit .lightbox_bevel
+{
+  -webkit-border-radius: 8px; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 8px; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+          /* useful if you don't want a bg color from leaking outside the border: */
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  background-color: #505050;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#505050), to(#414141)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #505050, #414141); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #505050, #414141); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #505050, #414141); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #505050, #414141); /* Firefox 16+, IE10, Opera 12.50+ */
+  padding-bottom: 1px;
+}
+
+#lightbox_signup_submit .button_interior
+{
+  margin-top: -1px;
+  text-align: center;
+  font-family: "MuseoSlab-700";
+  font-size: 16px;
+  padding: 8px;
+  color: #FFF;
+  border: 1px solid #000;
+}
+
+/* LIGHTBOX CLOSE */
+.lightbox_close
+{
+  width: 38px;
+  height: 38px;
+  -webkit-border-radius: 19px; /* Safari 3-4, iOS 1-3.2, Android ≤1.6 */
+          border-radius: 19px; /* Opera 10.5, IE9+, Safari 5, Chrome, Firefox 4+, iOS 4, Android 2.1+ */
+  position: absolute;
+  z-index: 2;
+  top: -19px;
+  right: -19px;
+  border: solid 2px rgba( 255, 255, 255, .5 ) !important;
+  background: rgba(0, 0, 0, .8) url(../img/lightbox_close_x.png) 50% 50% no-repeat!important;
+  cursor: pointer;
+}
+
+/* HAXs! */
+div#file-uploader-label h2
+{
+  font-size: 12pt;
+}
+
+.select_box {
+  display:none;
+}

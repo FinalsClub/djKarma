@@ -1,0 +1,170 @@
+/* DASHBOARD */
+
+#dashboard_content
+{
+  padding-top: 46px;
+}
+
+/* STATS */
+#stats_container
+{
+  height: 130px;
+}
+
+.stat_lead_in
+{
+  padding-top: 25px;
+  font-family: "MuseoSlab-900";
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.stat_number
+{
+  font-family: "MuseoSlab-900";
+  font-size: 57px;
+  padding-top: 5px;
+}
+
+.stat_object
+{
+  font-family: "MuseoSlab-900";
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stat_earned
+{
+  color: #f05a28;
+}
+
+.stat_uploaded
+{
+  color: #9ccf00;
+}
+
+.stat_downloaded
+{
+  color: #00cf9c;
+}
+
+.stat_liked
+{
+  color: #009ccf;
+}
+
+/* PROFILE */
+#profile_box_container
+{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #efefef;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#d7d7d8)); /* Safari 4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #efefef, #d7d7d8); /* Chrome 10+, Safari 5.1+, iOS 5+ */
+  background-image:    -moz-linear-gradient(top, #efefef, #d7d7d8); /* Firefox 3.6-15 */
+  background-image:      -o-linear-gradient(top, #efefef, #d7d7d8); /* Opera 11.10-12.00 */
+  background-image:         linear-gradient(to bottom, #efefef, #d7d7d8); /* Firefox 16+, IE10, Opera 12.50+ */
+  border: solid 1px #c5c5c5;
+  margin-bottom: 29px;
+}
+
+#profile_box
+{
+  margin: 0 20px;
+}
+
+#profile_name
+{
+  font-family: "MuseoSlab-500";
+  font-size: 20px;
+  padding-left: 0px;
+}
+
+#profile_school
+{
+  font-family: "MuseoSans-700";
+  text-transform: uppercase;
+}
+
+#profile_school_header
+{
+  font-size: 8px;
+  padding-bottom: 5px;
+  border-bottom: solid 1px #3a3426;
+}
+
+#profile_school_list
+{
+  padding-top: 5px;
+  font-size: 12px;
+}
+
+#profile_courses
+{
+  font-family: "MuseoSans-700";
+  text-transform: uppercase;
+}
+
+#profile_courses_header
+{
+  font-size: 8px;
+  padding-bottom: 5px;
+  margin-bottom: 2px;
+  border-bottom: solid 1px #3a3426;
+}
+
+#profile_courses_list ul
+{
+  margin-bottom: 0px;
+}
+
+#profile_courses_list li
+{
+  list-style: none;
+  font-size: 12px;
+}
+
+#profile_courses_links
+{
+  padding-top: 5px;
+  font-size: 9px;
+}
+
+#profile_courses_links a
+{
+  color: #f05a28;
+  font-size: 9px;
+  text-decoration: underline;
+  margin-right: 16px;
+}
+
+#profile_actions
+{
+  padding-right: 20px;
+}
+
+#profile_actions img
+{
+  padding-bottom: 10px;
+}
+
+#profile_actions div, #profile_actions a
+{
+  font-family: "MuseoSlab-700";
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #f05a28;
+}
+
+/* ACTIVITY */
+
+.activity_item
+{
+  margin: 20px 20px;
+}
+
+#activity_more
+{
+  text-align: center;
+  padding: 20px 0;
+}

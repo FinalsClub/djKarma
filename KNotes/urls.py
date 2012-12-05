@@ -19,6 +19,9 @@ from django.contrib import admin
 
 #from django.conf.urls.defaults import *
 from django.contrib.auth.views import password_reset
+from django.contrib.auth.views import password_reset_done
+from django.contrib.auth.views import password_reset_confirm
+from django.contrib.auth.views import password_reset_complete
 
 from haystack.query import SearchQuerySet
 
@@ -41,6 +44,7 @@ urlpatterns = patterns('',
     # Static pages
     url(r'^$', 'notes.views.home', name='home'),
     url(r'^about$', 'notes.views.about', name='about'),
+    url(r'^dashboard$', 'notes.views.dashboard', name='dashboard'),
     url(r'^terms$', 'notes.views.terms', name='terms'),
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
@@ -54,6 +58,7 @@ urlpatterns = patterns('',
     #   ---------------------------------------------------
     # Search
     url(r'^search/', 'notes.views.search'),
+    url(r'^multisearch/', 'notes.views.multisearch'),
 
     #   ---------------------------------------------------
     ## Ajax endpoints
@@ -75,7 +80,9 @@ urlpatterns = patterns('',
     url(r'^instructors$', 'notes.views.instructors'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     # Ajax request to add a course to a user's profile
+    url(r'^create-course', 'notes.views.create_course', name='create-course'),
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
+    url(r'^drop-course', 'notes.views.drop_course', name='drop-course'),
     # Add Course, School forms
     url(r'^add', 'notes.views.addModel', name='add'),
     # Edit course
@@ -90,17 +97,27 @@ urlpatterns = patterns('',
     # Browse the courses of one school
     url(r'^b/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'),
 
+    # useful only for direct linking to file, and for ajaxuploader reverse url lookup
+    url(r'^file/(?P<note_pk>\d{1,9999})$', 'notes.views.file', name='file'),
+
+    url(r'^browse$', 'notes.views.browse', name='browse'),
+
     #   ---------------------------------------------------
     # Auth
     # This logout allows us to pass a redirect:
     # <a href="{% url auth_logout_next /some/location %}">Logout</a>
     #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
+    url(r'^accounts/confirm/(?P<confirmation_code>[^/]+)$', 'notes.views.confirm_email', name='confirm_email'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
     # accepts the username that invited
     url(r'^accounts/register/(?P<invite_user>[0-9A-Fa-f]*)$', 'notes.views.register', name='register_account'),
     url(r'', include('social_auth.urls')),
-    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'password_reset.html'}),
+    url(r'^accounts/password/reset/$', password_reset, {'template_name': 'registration/password_reset.html', 'post_reset_redirect': '/accounts/password/reset/done/'}, name='password_reset'),
+    url(r'^accounts/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', password_reset_confirm, {'template_name': 'registration/password_reset.html',  'post_reset_redirect': '/'}, name='password_reset_confirm'),
+    url(r'^accounts/password/reset/done/?$', password_reset_done, {'template_name': 'registration/password_reset_done.html'}),
+    url(r'^accounts/password/reset/confirm/?$', password_reset_confirm, {'template_name': 'registration/password_reset_confirm.html'}),
+    url(r'^accounts/password/reset/complete/?$', password_reset_complete, {'template_name': 'registration/password_reset_complete.html'}),
     #url(r'^accounts/password/reset/$', password_reset, {}),
 
     # admin documentation:
@@ -108,16 +125,16 @@ urlpatterns = patterns('',
 
     # admin:
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^oauth2callback', 'notes.views.gdrive_oauth_handshake'),
 )
     # Ajax requests from search page to populate 'Browse by School and Course' accordion
     # Not being used and might be depricated
     #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    #url(r'^browseByCourse/(\d{1,99})$', 'notes.views.notesOfCourse'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
     #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
     #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
     # latest browse views, must come last because they are greedy
     #url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
     # Note View
-    #url(r'^file/(?P<note_pk>\d{1,99})$', 'notes.views.file', name='file'),
     #url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),

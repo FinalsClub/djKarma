@@ -4,7 +4,13 @@
 *.sql
 *.sql-journal
 *credentials.py
+tags
+/src
+/new
 /uploads
+/new_uploads
+/django-ajax-uploader
+/django_static
 /notes/migrations
 *local_settings.py
 static/css/mixins.css

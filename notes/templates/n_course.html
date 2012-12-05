@@ -1,0 +1,133 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="course_content">
+
+    <div id="course_header" class="hero_gradient_bar">
+      <div class="row">
+        <div id="course_subhead" class="twelve columns">
+          course
+        </div><!-- /course_subhead -->
+      </div>
+
+      <div class="row">
+        <div id="note_name" class="twelve columns">
+          {{ course.title }}
+        </div><!-- /note_name -->
+      </div>
+
+      <div class="row">
+        <div id="course_meta" class="twelve columns">
+          <div class="activity_details_context">
+            <a href="#" class="prof_link">{{ course.instructor.name }}</a> // <a href="{{ course.school.get_absolute_url }}" class="school_link">{{ course.school.name }}</a>
+          </div><!-- /activity_details_context -->
+        </div><!-- /course_meta -->
+      </div>
+
+      <div class="row">
+        <div id="course_actions" class="two columns centered">
+          <div class="row">
+            <div class="six columns">
+              {% if course in user.get_profile.courses.all %}
+                <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
+                  drop
+                </div>
+              {% else %}
+                <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
+                  join
+                </div>
+              {% endif %}
+            </div>
+            <div id="course_meta_action_gear" class="six columns">
+              <img src="/static/img/course_action_gear.png" alt="course_action_gear" width="39" height="37" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="course_description" class="eight columns centered">
+          <!-- TODO: We don't provide a course description -->
+        </div><!-- /course_description -->
+      </div>
+
+    </div><!-- /course_header -->
+
+
+    <div id="course_container">
+      <div class="row">
+        <div class="ten columns offset-by-one">
+
+          {% for file in files.reverse %}
+
+          <div class="row notes_result_container wide">
+            <div class="twelve columns notes_result {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+              <div class="activity_timestamp">
+                {{ file.timestamp|date:"gA" }} // {{ file.timestamp|date:"D M d o" }}
+              </div>
+              <div class="activity_details_action">
+                <a href="#" class="activity_actor">{{ file.owner.get_profile.get_name }}</a> added <a href="{{ file.get_absolute_url }}" class="activity_target">{{ file.title }}</a>
+              </div>
+              <div class="activity_details_context">
+                <a href="{{ course.get_absolute_url }}" class="course_link">{{ course.title }}</a>//<a href="{{ course.school.get_absolute_url }}" class="school_link">{{ course.school.name }}</a>
+              </div>
+              <div class="activity_details_callout">
+                <div class="row">
+                  <div class="one column">
+                    <img src="/static/img/dashboard_activity_callout_icon_notebook.png" alt="dashboard_activity_callout_icon_notebook" width="44" height="44" />
+                  </div>
+                  <div class="eleven columns activity_details_callout_copy">
+
+                    {% if file.text %}
+                      {{ file.text|slice:500 }}
+                    {% else %}
+                      {{ file.description }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="twelve columns activity_details_status">
+                  So far, <span class="activity_details_status_number">{{ file.numUpVotes }}</span> people have completely fallen in love with with these notes. <span class="activity_details_status_secondary_number">{{ file.viewCount }}</span> people have viewed them.
+                </div><!-- /activity_details_status -->
+              </div>
+            </div><!-- /notes_result -->
+          </div><!-- /notes_result_container -->
+          {% endfor %}
+        </div>
+      </div>
+
+    </div><!-- /note_container -->
+
+    {% comment %}
+    <div class="row">
+      <div class="twelve columns">
+        <div id="search_pagination" style="width: 232px"><!-- WIDTH SHOULD BE SET DYNAMICALLY TO ENABLE MARGIN: AUTO -->
+          <div id="search_pagination_left">
+            <img src="img/search_arrow_left.png" alt="search_arrow_left" width="5" height="10" />
+          </div><!-- /search_pagination_left -->
+          <div id="search_pagination_numbers">
+            <ul>
+              <li class="button_interior">1</li>
+              <li>2</li>
+              <li>3</li>
+              <li>4</li>
+              <li>5</li>
+              <li>6</li>
+            </ul>
+          </div><!-- /search_pagination_numbers -->
+          <div id="search_pagination_right">
+            <img src="img/search_arrow_right.png" alt="search_arrow_right" width="5" height="10" />
+          </div><!-- /search_pagination_right -->
+        </div><!-- /search_pagination -->
+      </div>
+    </div>
+    {% endcomment %}
+  </section><!--/note_content-->
+{% endblock %}
