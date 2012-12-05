@@ -29,6 +29,11 @@ Deployment
 7. Start Apache Solr search engine (see section)
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
+
+### Migration CAVEATS
+
+If an ALTER TABLE postgres job is hanging, restart the psql server with `sudo service postgresql restart` and the migration should work fine
+
 ### Future
 
 8. copy $(djKarma_src)/bin/knotes -> /etc/init.d/knotes . This is the init script for running karmanotes at startup. Please
@@ -207,6 +212,41 @@ Management Commands (manage.py \<command name>)
    + Checks School, Academic Year, Semester fields of all Course objects.
 + **assign_file_owners**: Assign File.owner fields based on User.files and/or a prompted default user.
    + Necessary when a backup of the notes app database is made separate of the User table
++ **import_archive**: Import old finalsclub database into the karmanotes database, see `Importing finalsclub database`
 
 ### Creating default user
 On your local machine create a KarmaNotes default user and make sure that it has a unique email address.  The UserProfile.gravatar field is a hash of user.email and is required to be unique.  This doesn't tell you WHY creating a user will not work, it just wont.
+
+
+Importing finalsclub database
+=============================
+
+* Dump from mongodb archivedcourse, archivedsubjects, archivednotes as json files
+* move those files to the root of the djkarma directory
+* run `./manage.py import_archive`
+
+# Revised deployment to production.
+
+1. Review settings,
+
+2. Check out new repo.
+
+3. install requirements 
+	
+	sudo pip install -r requirements.txt
+4. Re-populate the contents of the static
+
+	./manage.py collectstatic
+
+5. Update Database schema 
+	./manage.py schemamigration notes --auto
+
+If app HAS NOT!!! been converted to south!!!!!! 
+
+	./manage.py syncdb
+
+No
+
+6. 
+
+
