@@ -24,7 +24,7 @@
               you've viewed
             </div>
             <div class="three columns stat_lead_in">
-              you've liked
+              you've thanked
             </div>
           </div>
 
@@ -43,7 +43,7 @@
               {{ user.get_profile.files.count }} {# TODO: something like profile.files.count #}
             </div><!-- /stat_downloaded -->
             <div class="three columns stat_number stat_liked">
-              72 {# profile.repEvents.type == vote #}
+              {{ upvote_count }}
             </div><!-- /stat_liked -->
           </div>
 
@@ -58,7 +58,7 @@
               things
             </div><!-- /stat_downloaded -->
             <div class="three columns stat_object stat_liked">
-              posts
+              notes
             </div><!-- /stat_liked -->
           </div>
 

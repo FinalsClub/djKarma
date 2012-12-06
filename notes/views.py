@@ -66,6 +66,9 @@ def dashboard(request):
     response = {}
     response['events']= request.user.get_profile().reputationEvents.order_by('-id').all()
     response['upload_count'] = File.objects.filter(owner=request.user).count()
+
+    # Count the reputation events where the user was the actor and the type was 'upvote'
+    response['upvote_count'] = request.user.actor.filter(type__title='upvote').count()
     return render(request, 'n_dashboard.html', response)
 
 
