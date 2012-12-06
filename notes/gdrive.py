@@ -54,7 +54,7 @@ def accept_auth(code):
 def build_api_service(creds):
     http = httplib2.Http()
     http = creds.authorize(http)
-    return build('drive', 'v2', http=http)
+    return build('drive', 'v2', http=http), http
 
 
 def check_and_refresh(creds, auth):
@@ -72,7 +72,7 @@ def check_and_refresh(creds, auth):
         creds.refresh(http)
         auth.credentials = creds.to_json()
         auth.save()
-    return creds, auth, http
+    return creds, auth
 
 
 def list_files(http):
@@ -123,9 +123,9 @@ def convert_with_google_drive(u_file):
     creds = auth.transform_to_cred()
 
 
-    creds, auth, http = check_and_refresh(creds, auth)
+    creds, auth = check_and_refresh(creds, auth)
 
-    service = build_api_service(creds)
+    service, http = build_api_service(creds)
 
     # Upload the file
     # TODO: wrap this in a try loop that does a token refresh if it fails
