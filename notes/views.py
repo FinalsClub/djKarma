@@ -65,6 +65,7 @@ def dashboard(request):
     """ Render the new template style dashboard """
     response = {}
     response['events']= request.user.get_profile().reputationEvents.order_by('-id').all()
+    response['upload_count'] = File.objects.filter(owner=request.user).count()
     return render(request, 'n_dashboard.html', response)
 
 

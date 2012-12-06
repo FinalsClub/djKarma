@@ -21,7 +21,7 @@
               you've uploaded
             </div>
             <div class="three columns stat_lead_in">
-              you've downloaded
+              you've viewed
             </div>
             <div class="three columns stat_lead_in">
               you've liked
@@ -33,8 +33,8 @@
               {{ user.get_profile.karma }} <!-- user's karma -->
             </div><!-- /stat_earned -->
             <div class="three columns stat_number stat_uploaded">
-              {% if user.get_profile.notes %}
-                {{ user.get_profile.notes.count }} <!-- user's file count -->
+              {% if upload_count > 0 %}
+                {{ upload_count }} <!-- user's file count -->
               {% else %}
                 0 <!-- user's file count -->
               {% endif %}
