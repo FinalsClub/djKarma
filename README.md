@@ -4,16 +4,59 @@ The KarmaNotes Django Experiment
 Dependencies
 ------------
 
- + Python2.7
- + django1.4
- + Solr3.6.0
+ + Python 2.7
+ + celery 2.5.3
+ + django 1.4.2
+ + Solr 3.6.0
  + django-celery2.5.5
 
+Deployment (Fresh Install)
+----------------
 
-To install python package dependencies run:
+1. Checkout code from the git repository.
 
-    pip install -r requirements.txt
+2. install requirements with : `sudo pip install -r requirements` from `$SRC_ROOT`.
 
+### Deployment database
+To initially deploy the postgres backup on a fresh debian based system:
+```
+sudo apt-get install postgresql-9.1 python-psycopg2
+sudo passwd postgres
+sudo su postgres
+sudo -u postgres createuser -P djkarma
+psql template1
+create database karmanotes owner djkarma encoding 'UTF8';
+#### add this line to your postgres install's /etc/postgresql/9.1/main/pg_hba.conf ####
+local   karmanotes      djkarma                                 md5
+sudo service postgresql restart
+./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
+```
+
+4. Install Apache Solr.
+
+5. install celery
+   a) Create celery user : `sudo adduer celery`
+  
+   b) Add `celery` to `celery` group : `sudo adduser celery celery`
+
+   c) create our `/var/run` and  `/var/log` directories:
+	sudo mkdir /var/run/celeryd
+	sudo mkdir /var/log/celeryd
+
+	chown celery:celery /var/run/celeryd
+	chown celery:celery /var/log/celeryd
+   d) Install the celeryd init script to : `/etc/init.d` and the config
+      file to `/etc/default`.
+
+6. Install apache solr (IMPROVEMENTS NEEDE!!!!)
+   a) get solr 3.6
+   b) 
+
+4. Use south to migrate `djcelery` and `kombu.transport.django`:
+    ./manage.py migrate djcelery
+    ./manage.py migrate kombu.transport.django
+
+5. Create superuser. `./manage.py createsuperuser
 
 Deployment
 ----------
@@ -30,6 +73,29 @@ Deployment
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
 
+## Re-Deployment & Updating karmanotes
+
+# Revised deployment to production.
+
+1. Review settings,
+
+2. Check out new repo.
+
+3. install requirements 
+	
+	sudo pip install -r requirements.txt
+4. Re-populate the contents of the static
+
+	./manage.py collectstatic
+
+5. Update Database schema 
+	./manage.py schemamigration notes --auto
+
+If app HAS NOT!!! been converted to south!!!!!! 
+
+	./manage.py syncdb
+
+
 ### Migration CAVEATS
 
 If an ALTER TABLE postgres job is hanging, restart the psql server with `sudo service postgresql restart` and the migration should work fine
@@ -39,21 +105,8 @@ If an ALTER TABLE postgres job is hanging, restart the psql server with `sudo se
 8. copy $(djKarma_src)/bin/knotes -> /etc/init.d/knotes . This is the init script for running karmanotes at startup. Please
 note that the stop / kill options do not work because of pid issues.  A fix is being worked on.
 
-### Deployment database
-To initially deploy the postgres backup on a fresh debian based system:
-```
-sudo apt-get install postgresql-9.1 python-psycopg2
-sudo passwd postgres
-sudo su postgres
-sudo -u postgres createuser -P djkarma
-psql template1
-create database karmanotes owner djkarma encoding 'UTF8';
-#### add this line to your postgres install's /etc/postgresql/9.1/main/pg_hba.conf ####
-local   karmanotes      djkarma                                 md5
-sudo service postgresql restart
-./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
-```
-### Search: Apache Solr 3.6.0
+
+### Search: Apache Solr 3.6.0 ( [REVISE issue #154](https://github.com/FinalsClub/djKarma/issues/154)
 
 #### Installation
 
@@ -123,7 +176,7 @@ When running on your local, make sure the celery user understands the local path
 ###Production Note:
 On the new Amazon instance, celery logs are located at:
 
-	/run/celery
+	/var/log/celery
 
 
 
@@ -245,8 +298,12 @@ If app HAS NOT!!! been converted to south!!!!!!
 
 	./manage.py syncdb
 
-No
 
-6. 
+
+
+
+
+
+
 
 

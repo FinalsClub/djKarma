@@ -1,0 +1,132 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/school.css">
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/search_results.css">
+{% endblock %}
+
+{% block content %}
+  <section id="school_content">
+
+    <div id="school_header" class="hero_gradient_bar">
+      <div class="row">
+        <div id="school_subhead" class="twelve columns">
+          school
+        </div><!-- /course_subhead -->
+      </div>
+
+      <div class="row">
+        <div id="note_name" class="twelve columns">
+          {{ school.name }}
+        </div><!-- /note_name -->
+      </div>
+
+      <div class="row">
+        <div id="school_meta" class="twelve columns">
+          <div class="activity_details_context">
+            <a href="#" class="prof_link">some school metadata</a> // <a href="{{ school.url }}" class="school_link">school website</a>
+          </div><!-- /activity_details_context -->
+        </div><!-- /school_meta -->
+      </div>
+
+      <div class="row">
+        <div id="school_actions" class="two columns centered">
+          <div class="row">
+            {% comment %}
+            <!-- not currently using join school or edit -->
+            <div class="six columns">
+              <div class="course_meta_action course_meta_drop" data-id="">
+                Change school
+              </div>
+            </div>
+            <div id="school_meta_action_gear" class="six columns">
+              <img src="/static/img/course_action_gear.png" alt="course_action_gear" width="39" height="37" />
+            </div>
+            {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div><!-- /school_header -->
+
+    <div id="school_container">
+      <div class="row">
+        <div class="ten columns offset-by-one">
+          <div class="column_header">
+            courses
+          </div><!-- /column_header -->
+
+
+          {% for course in courses %}
+          <div class="row course_result wide {% if forloop.counter|divisibleby:"2" %}row_alt_on{% endif %}">
+
+            <div class="one columns course_meta">
+              {% if course in user.get_profile.courses.all %}
+                <div class="course_meta_action course_meta_drop" data-id="{{ course.id }}">
+                  drop
+                </div>
+              {% else %}
+                <div class="course_meta_action course_meta_join" data-id="{{ course.id }}">
+                  join
+                </div>
+              {% endif %}
+            </div><!-- /course_meta -->
+
+            <div class="eleven columns end">
+              <div class="activity_details">
+                <div class="activity_timestamp">
+                  last updated {{ course.timestamp }} -- october 23, 2012 4:45pm
+                </div><!-- /activity_timestamp -->
+                <div class="activity_details_action">
+                  <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
+                </div><!-- /activity_details_action -->
+                <div class="activity_details_context">
+                  <a href="#" class="prof_link">{{ course.instructor.name }}</a><br>
+                  <a href="{{ course.school.get_absolute_url }}" class="school_link">{{ course.school.name }}</a>
+                </div><!-- /activity_details_context -->
+                <div class="row">
+                  <div class="one columns">
+                    <div class="course_meta_stat">
+                      {{ course.files.all.count }}
+                    </div>
+                    <div class="course_meta_name">
+                      notes
+                    </div>
+                  </div>
+                  <div class="one columns end">
+                    <div class="course_meta_stat">
+                      {{ course.userprofile_set.count }}
+                    </div>
+                    <div class="course_meta_name">
+                      students
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- .course_result -->
+          {% endfor %}
+
+
+
+          </div><!-- /notes_result_container -->
+
+
+
+        </div>
+      </div>
+
+    </div><!-- /course_container -->
+
+
+
+
+
+
+
+
+
+  </section><!--/school_content-->
+{% endblock %}
