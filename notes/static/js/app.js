@@ -165,7 +165,7 @@ $(document).ready(function(){
         if(data.status === 'success'){
           console.log('success');
           $('#lightbox_add_note').hide();
-
+          document.location.reload(true);
         }
         else{
           alert(data.message);
