@@ -53,6 +53,9 @@
 
       <div class="row">
         <div id="course_description" class="eight columns centered">
+         {% if course.desc %}
+            {{ course.desc }}
+         {% endif %}
           <!-- TODO: We don't provide a course description -->
         </div><!-- /course_description -->
       </div>
@@ -103,7 +106,7 @@
         </div>
       </div>
 
-    </div><!-- /note_container -->
+    </div><!-- /course_container -->
 
     {% comment %}
     <div class="row">
