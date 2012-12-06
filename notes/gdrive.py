@@ -72,7 +72,7 @@ def check_and_refresh(creds, auth):
         creds.refresh(http)
         auth.credentials = creds.to_json()
         auth.save()
-    return creds, auth
+    return creds, auth, http
 
 
 def list_files(http):
@@ -80,7 +80,8 @@ def list_files(http):
         :http:  authenticated httplib2 instance
         :returns: list of files
     """
-    return service.files().list().execute()
+    pass
+    #return service.files().list().execute()
 
 
 def convert_with_google_drive(u_file):
@@ -121,9 +122,10 @@ def convert_with_google_drive(u_file):
     auth = DriveAuth.objects.filter(email=GOOGLE_USER).all()[0]
     creds = auth.transform_to_cred()
 
-    service = build_api_service(creds)
 
-    creds, auth = check_and_refresh(creds, auth)
+    creds, auth, http = check_and_refresh(creds, auth)
+
+    service = build_api_service(creds)
 
     # Upload the file
     # TODO: wrap this in a try loop that does a token refresh if it fails
@@ -144,13 +146,17 @@ def convert_with_google_drive(u_file):
         # set the .odt as the download from google link
         u_file.gdrive_url = file_dict[u'exportLinks']['application/vnd.oasis.opendocument.text']
 
-        h = httplib2.Http('')
         for download_type, download_url in download_urls.items():
-            resp, content = h.request(download_url, "GET")
+            print "\n%s -- %s" % (download_type, download_urls)
+            resp, content = http.request(download_url, "GET")
+
 
             if resp.status in [200]:
+                print "\t downloaded!"
                 # save to the File.property resulting field
                 u_file.__dict__[download_type] = content
+            else:
+                print "\t Download failed: %s" % resp.status
 
     # Finally, save whatever data we got back from google
     u_file.save()
