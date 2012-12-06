@@ -463,7 +463,7 @@ class File(models.Model):
                 #Default note type
                 karma_event = 'lecture-note'
             user_profile = self.owner.get_profile()
-            user_profile = user_profile.awardKarma(karma_event, school=self.school, course=self.course, user=self.owner, file=self)
+            user_profile = user_profile.award_karma(karma_event, school=self.school, course=self.course, user=self.owner, file=self)
             user_profile.save()
             self.awarded_karma = True
 
@@ -490,7 +490,7 @@ class File(models.Model):
         return False
 
     def Vote(self, voter, vote_value=0):
-        """ Calls UserProfile.awardKarma
+        """ Calls UserProfile.award_karma
             with the appropriate ReputationEventType slug title("upvote", "downvote")
             and target user (if downvote)
             upvote - vote_value=1 , downvote - vote_value=-1
@@ -507,7 +507,7 @@ class File(models.Model):
             self.numUpVotes += 1
             # Award karma corresponding to "upvote" ReputationEventType to file owner
             if self.owner is not None:
-                self.owner.get_profile().awardKarma(event="upvote", course=self.course, school=self.school, user=voter)
+                self.owner.get_profile().award_karma(event="upvote", course=self.course, school=self.school, user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
         elif int(vote_value) == -1:
@@ -518,7 +518,7 @@ class File(models.Model):
             # "Award" negative karma coresponding to "downvote" ReputationEventType to file owner
             # and negative karma corresponding to "downvote" target user to downvoter
             if self.owner is not None:
-                self.owner.get_profile().awardKarma(event="downvote", target_user=voter)
+                self.owner.get_profile().award_karma(event="downvote", target_user=voter)
             # Add this vote to the file's collection
             self.votes.add(this_vote)
         self.save()
@@ -763,7 +763,7 @@ class UserProfile(models.Model):
             # gibberish name if fb acct used w/out username (rare, bc fb gives first,last name)
             return self.user.username
 
-    def awardKarma(self, event, target_user=None, school=None, course=None, user=None, file=None):
+    def award_karma(self, event, target_user=None, school=None, course=None, user=None, file=None):
         """ Award user karma given a ReputationEventType slug title
             and add a new ReputationEvent to UserProfile.reputationEvents
             Does not call UserProfile.save() because it is used in
@@ -802,7 +802,7 @@ class UserProfile(models.Model):
             # from UserProfile.save()
             return self
         except Exception, e:
-            print "error in awardKarma:"
+            print "error in award_karma:"
             print e
             return False
 
@@ -862,12 +862,12 @@ class UserProfile(models.Model):
         #print (self.grad_year == "")
         if self.grad_year != "" and self.grad_year is not None and not self.submitted_grad_year:
             self.submitted_grad_year = True
-            self.awardKarma('profile-grad-year', user=self.user)
+            self.award_karma('profile-grad-year', user=self.user)
 
         # School set for first time, award karma
         if self.school is not None and not self.submitted_school:
             self.submitted_school = True
-            self.awardKarma('profile-school', user=self.user)
+            self.award_karma('profile-school', user=self.user)
 
         # Add read permissions if Prospect karma level is reached
         if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:

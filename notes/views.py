@@ -223,8 +223,8 @@ def file(request, note_pk, action=None):
     #if file not in profile.files.all():
     if(not userCanView(request.user, File.objects.get(pk=note_pk))):
         # Buy Note viewing privelege for karma
-        # awardKarma will handle deducting appropriate karma
-        profile.awardKarma('view-file', school=profile.school, course=file.course, file=file, user=request.user)
+        # award_karma will handle deducting appropriate karma
+        profile.award_karma('view-file', school=profile.school, course=file.course, file=file, user=request.user)
         # Add 'purchased' file to user's collection
         profile.files.add(file)
         profile.save()
