@@ -1,0 +1,47 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+{% load humanize %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/about.css">
+{% endblock %}
+
+
+{% block title %}
+email confirmed
+{% endblock %}
+
+
+{% block content %}
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+    // redirect to profile in 3 sec
+    setTimeout("location.href='{{redirect_url}}'", 2000);
+  });
+
+</script>
+
+  <section id="about_content">
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        &nbsp;
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="six columns offset-by-three subhead">
+        <h5>Email confirmed</h5>
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="six columns offset-by-three subhead">
+        <p>Redirecting you to your dashboard</p>
+      </div>
+    </div> <!-- .row -->
+
+  </section>
+{% endblock %}

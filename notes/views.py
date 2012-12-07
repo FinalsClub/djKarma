@@ -109,7 +109,7 @@ def confirm_email(request, confirmation_code):
         user_profile.email_confirmed = True
         user_profile.save()
         #return HttpResponseRedirect(reverse('profile'))
-        return render(request, 'email_confirmed.html', {'redirect_url': reverse('profile')})
+        return render(request, 'n_email_confirmed.html', {'redirect_url': reverse('dashboard')})
     else:
         return HttpResponse('Invalid email confirmation code.')
 
