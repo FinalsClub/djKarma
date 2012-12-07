@@ -92,7 +92,8 @@ def home(request):
 
 def jobs(request):
     ''' Jobs listing page '''
-    return render(request, 'jobs.html')
+    print "this is the jobs page"
+    return render(request, 'n_jobs.html')
 
 
 def terms(request):
