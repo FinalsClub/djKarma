@@ -88,7 +88,7 @@
                   <div class="eleven columns activity_details_callout_copy">
 
                     {% if file.text %}
-                      {{ file.text|slice:500 }}
+                      {{ file.text|slice:":500" }}&hellip;
                     {% else %}
                       {{ file.description }}
                     {% endif %}
