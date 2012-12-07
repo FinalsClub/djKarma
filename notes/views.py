@@ -472,7 +472,8 @@ def browse_one_course(request, course_query, school):
         :course_query: unicode url match, to be type parsed
     """
     # TODO: combine this function with `b_school_course`
-    response = nav_helper(request)
+    #response = nav_helper(request)
+    response = {}
     try:
         course_query = int(course_query)
     except ValueError:
