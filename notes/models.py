@@ -403,10 +403,10 @@ class File(models.Model):
     )
 
     title       = models.CharField(max_length=255)
-    description = models.TextField(max_length=511)
+    description = models.TextField(max_length=511, blank=True, null=True)
     course      = models.ForeignKey(Course, blank=True, null=True, related_name="files")
     school      = models.ForeignKey(School, blank=True, null=True)
-    file        = models.FileField(upload_to="uploads/notes")
+    file        = models.FileField(upload_to="uploads/notes", blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
     timestamp   = models.DateTimeField(default=datetime.datetime.now)
     created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
