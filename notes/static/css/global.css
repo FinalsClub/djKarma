@@ -529,3 +529,10 @@ ul#course_menu li a
 {
   color: white;
 }
+
+.subhead
+{
+  color: #F05A28;
+  font-family: "MuseoSlab-700";
+  font-size: 38px;
+}

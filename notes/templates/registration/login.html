@@ -1,0 +1,96 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+{% load humanize %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/about.css">
+{% endblock %}
+
+
+{% block content %}
+  <section id="about_content">
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        &nbsp;
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        Login
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        &nbsp;
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="six columns offset-by-three">
+        <br/>
+        <p>Sign in with your KarmaNotes account.<br/> Need one? <a href="{% url 'register_account' None %}">Sign up.</a></p>
+      </div>
+    </div> <!-- .row -->
+
+    </form>
+
+    <div class="row">
+      <div class="six columns offset-by-three" id=login_fb>
+        <a href="{% url 'socialauth_begin' 'facebook' %}">
+          <img src="/static/img/global_header_login_fbbtn.png"/>
+        </a>
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        or
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="six columns offset-by-three">
+        {% if form.errors %}
+          <p><b>Check your username and password.</b></p>
+        {% endif %}
+      </div>
+    </div> <!-- .row -->
+
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="row">
+        <div class="six columns offset-by-three">
+          {{ field.errors }}</br>
+          {{ field }}
+        </div>
+      </div> <!-- .row -->
+      <div class="row">
+        <div class="six columns offset-by-three">
+          <div class=column_header>{{ field.label }}</div>
+          <span style="opacity:.5">{{ field.help_text|safe }}</span><br>
+        </div>
+      </div> <!-- .row -->
+    {% endfor %}
+      <div class="row">
+        <div class="six columns offset-by-three">
+          <br/>
+          <input class="btn btn-primary" type="submit" value="Login" />
+          <input type="hidden" name="next" value="{{ next }}" />
+        </div>
+      </div> <!-- .row -->
+
+    </form>
+
+    <div class="row">
+      <div class="six columns offset-by-three">
+        <p><a href="{% url 'password_reset' %}">Reset Password</a></p>
+      </div>
+    </div> <!-- .row -->
+
+  </section>
+{% endblock %}
