@@ -536,3 +536,8 @@ ul#course_menu li a
   font-family: "MuseoSlab-700";
   font-size: 38px;
 }
+
+a.white
+{
+  color: white;
+}
