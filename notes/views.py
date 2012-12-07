@@ -445,7 +445,8 @@ def browse_courses(request, school_query):
     """ View for courses beloging to :school_query:
         :school_query: comes as unicode, if can be int, pass as int
     """
-    response = nav_helper(request)
+    #response = nav_helper(request)
+    response = {}
     try:
         school_query = int(school_query)
     except ValueError:
@@ -486,6 +487,8 @@ def browse_one_course(request, course_query, school):
 
     # get the karma events associated with the course
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
+    # we don't use these, FIXME: CLEAN THIS UP
+    """
     response['viewed_files'] = request.user.get_profile().files.all()
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
@@ -498,6 +501,7 @@ def browse_one_course(request, course_query, school):
                 response['thanked_files'].append(file.id)
             else:
                 response['flagged_files'].append(file.id)
+    """
 
     return render(request, 'n_course.html', response)
 
