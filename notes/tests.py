@@ -172,7 +172,7 @@ class ModelTests(TestCase):
         philo_profile = philo.get_profile()
 
         event = "major" # might be u""
-        philo_profile.awardKarma(event, philo)
+        philo_profile.award_karma(event, philo)
         philo_profile.save()
 
         self.assertEqual(philo_profile.karma, 1)
