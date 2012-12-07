@@ -1,0 +1,38 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+{% load humanize %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/about.css">
+{% endblock %}
+
+{% block title %}
+404 page not found :(
+{% endblock %}
+
+
+{% block content %}
+  <section id="about_content">
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        &nbsp;
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="six columns offset-by-three subhead" style="height:500px">
+        <a href="/"><img src="/static/img/error.jpg" style="border:none;"></a>
+      </div>
+    </div> <!-- .row -->
+
+    <div class="row">
+      <div class="three columns offset-by-three subhead">
+        &nbsp;
+      </div>
+    </div> <!-- .row -->
+
+
+
+  </section>
+{% endblock %}

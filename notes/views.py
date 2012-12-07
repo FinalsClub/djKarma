@@ -57,8 +57,7 @@ def about(request):
 
 
 def e404(request):
-    response = nav_helper(request)
-    return render(request, '404.html', response)
+    return render(request, '404.html')
 
 
 def dashboard(request):
