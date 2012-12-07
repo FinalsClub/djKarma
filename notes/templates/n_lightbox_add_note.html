@@ -5,7 +5,7 @@
       var ajax_upload_url = "{% url 'ajax_upload' %}";
       var csrf_token = "{{ csrf_token }}";
       var today = "{{ today }}";
-      var school_pk = {{ user.get_profile.school.id }};
+      var school_pk = {{ user.get_profile.school.id|default:0 }};
       {% if not user.is_authenticated %}
         // show terms of service and recaptcha if user not authenticated
         var anon_user = true; 
