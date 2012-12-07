@@ -113,7 +113,7 @@
             schools
           </div><!-- /column_header -->
 
-          {% for school in schools|slice:":1" %}
+          {% for school in schools|slice:":3" %}
             {% include 'partials/school_result_short.html' %}
           {% endfor %}
         {% endif %}
