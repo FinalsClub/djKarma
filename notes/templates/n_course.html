@@ -5,6 +5,9 @@
   <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
 {% endblock %}
 
+{% block title %}
+  Share Notes for {{ course.title }} | {{ course.school.name }}
+{% endblock %}
 
 {% block content %}
   <section id="course_content">
