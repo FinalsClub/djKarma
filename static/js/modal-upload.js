@@ -25,7 +25,7 @@
         action: ajax_upload_url,
         element: $('#file-uploader')[0],
         allowedExtensions: ['doc', 'docx', 'pdf' ,'txt', 'rtf'],
-        sizeLimit: 2097152,
+        sizeLimit: 10485760,
         multiple: false,
         onCancel: function(id, fileName){
           // hide progress bar and show upload button
