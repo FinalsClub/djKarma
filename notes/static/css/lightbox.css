@@ -197,6 +197,12 @@ div#file-uploader-label h2
   font-size: 12pt;
 }
 
-.select_box {
+.select_box
+{
   display:none;
+}
+
+.qq-upload-list
+{
+  display: none;
 }
