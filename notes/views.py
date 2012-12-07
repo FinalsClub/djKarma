@@ -97,7 +97,8 @@ def jobs(request):
 
 
 def terms(request):
-    return render(request, 'static/ToS.html')
+    """ Terms of Service page """
+    return render(request, 'n_terms.html')
 
 
 @login_required
