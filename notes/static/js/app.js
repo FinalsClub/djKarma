@@ -55,6 +55,39 @@ $(document).ready(function(){
   // setup the lightbox_add_note#datepicker created_on jqueryui datepicker
   $( "#datepicker" ).datepicker();
 
+  // vote buttons
+  $( ".thank" ).click(function(){
+    $.ajax({
+      url: "/vote/"+$(this).data("id"),
+      data: {'vote': 1},
+      type: "POST",
+      context: this,
+      success: function(e) {
+        // grey out button
+        $(this).addClass("disabled_button");
+        //ungray the other button
+        $(".flag").removeClass("disabled_button");
+        // register new click handler to Un-vote
+      }
+    });
+  });
+  $( ".flag" ).click(function(){
+    $.ajax({
+      url: "/vote/"+$(this).data("id"),
+      data: {'vote': -1},
+      type: "POST",
+      context: this,
+      success: function(e) {
+        // grey out button
+        $(this).addClass("disabled_button");
+        //$(this).removeClass("flag");
+        $(".thank").removeClass("disabled_button");
+
+        // register new click handler to Un-vote
+      }
+    });
+  });
+
   // Search results
   var slide_out = {'direction': 'left', 'mode': 'hide'};
   var slide_in = {'direction': 'right', 'mode': 'show'};

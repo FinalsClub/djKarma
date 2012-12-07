@@ -529,3 +529,10 @@ ul#course_menu li a
 {
   color: white;
 }
+
+/* post-designers css hacks */
+.disabled_button img
+{
+  opacity: 0.4;
+  filter: alpha(opacity=40); /* msie */
+}

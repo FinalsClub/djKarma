@@ -206,14 +206,10 @@ def file(request, note_pk, action=None):
             action: last url segment string indicating initial state. i.e: 'edit'
     """
     response = {}
-    profile = request.user.get_profile()
+    user_profile = request.user.get_profile()
     # If the user does not have read permission, and the
     # Requested files is not theirs
-    try:
-        # TODO: implement as get_or_404
-        file = File.objects.get(pk=note_pk)
-    except:
-        raise Http404
+    file = get_object_or_404(File, pk=note_pk)
 
     # Increment note view count
     file.viewCount += 1
@@ -221,13 +217,14 @@ def file(request, note_pk, action=None):
 
     # If this file is not in the user's collection, karmic purchase occurs
     #if file not in profile.files.all():
-    if(not userCanView(request.user, File.objects.get(pk=note_pk))):
+    if not user_profile.files.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
-        profile.award_karma('view-file', school=profile.school, course=file.course, file=file, user=request.user)
+        user_profile.award_karma('view-file', school=user_profile.school, course=file.course, file=file, user=request.user)
         # Add 'purchased' file to user's collection
-        profile.files.add(file)
-        profile.save()
+        user_profile.files.add(file)
+        user_profile.save()
+        print user_profile, 'purchased', file, 'with karma.'
 
     #file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
 
@@ -236,6 +233,20 @@ def file(request, note_pk, action=None):
     #response['url'] = url
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
+
+    # let's get the votes. There should only be ONE, but cause I'm
+    # messing with the DB, there might be more
+    has_voted = file.vote_set.exists()
+    if has_voted:
+        print 'views.file: current user has voted on this file'
+        votes = file.vote_set.filter(user=request.user)
+        vote = votes[0]
+
+    # is the thank button clickable?
+    response['lovable'] = not has_voted or vote.up
+    # is the flag button clickable?
+    response['flagable'] = not has_voted or not vote.up
+
     #response['file_type'] = file_type
 
     if action == 'edit':
@@ -244,6 +255,8 @@ def file(request, note_pk, action=None):
     else:
         response['editing_file'] = False
         #print 'ACTION NONE'
+
+
 
     return render(request, 'n_note.html', response)
 
@@ -812,35 +825,44 @@ def searchBySchool(request):
 def vote(request, file_pk):
     vote_value = int(request.POST.get('vote', 0))
     # Validate vote value
-    if not (vote_value == 0 or vote_value == -1 or vote_value == 1):
+    if vote_value not in (-1, 0, 1):
         raise Http404
 
-    print "note: " + str(file_pk) + " vote: " + str(vote_value) + "user: " + str(request.user.pk)
+    print "note:", str(file_pk)
+    print "vote:", str(vote_value) 
+    print "user:", str(request.user.pk)
+
+    #testing
+    charles = True
 
     # Check that GET parameters are valid
-    if vote_value != 0 and File.objects.filter(pk=file_pk).exists():
-        voting_file = File.objects.get(pk=file_pk)
-        voting_user = request.user
-    else:
-        raise Http404
+    voting_file = get_object_or_404(File, pk=file_pk)
+    voting_user = request.user
+    user_profile = request.user.get_profile()
 
     # If the valid user owns the file or has all ready voted, don't allow voting
-    if voting_file.owner == voting_user:
+    if voting_file.owner == request.user and not charles:
+        print "You cannot vote on a file you uploaded"
         return HttpResponse("You cannot vote on a file you uploaded")
-    # If the valid user has all ready voted, don't allow another vote
-    elif voting_file.votes.filter(user=voting_user).exists():
+
+    #If the valid user has all ready voted, don't allow another vote
+    elif voting_file.vote_set.filter(user=voting_user) is voting_user and not charles:
+        print "You have all ready voted on this file"
         return HttpResponse("You have all ready voted on this file")
+
     # Else If the valid user has viewd the file, allow voting
-    elif voting_user.get_profile().files.filter(pk=voting_file.pk).exists():
+    elif user_profile.files.filter(pk=voting_file.pk).exists():
         print "casting vote"
-        voting_file.Vote(voter=voting_user, vote_value=vote_value)
+        voting_file.vote(voter=voting_user, vote_value=vote_value)
         if vote_value == 1:
-            return HttpResponse("thank recorded")
+            return HttpResponse("views.vote: thank recorded")
         elif vote_value == -1:
-            return HttpResponse("file flagged")
+            return HttpResponse("views.vote: file flagged")
+
     # If valid use does not own file, has not voted, but not viewed the file
     else:
         return HttpResponse("You cannot vote on a file you have not viewed")
+        print "you cannot vote on a file you have not viewed"
 
 def multisearch(request):
     if request.GET.get("q", "") != "":
