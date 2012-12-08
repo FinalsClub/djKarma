@@ -12,7 +12,7 @@
   var view_file_title = "{{ file.title }}";
   var view_file_description = "{{ file.description }}";
   var editing_file = false;
-  //var vote_state = {{ vote_state }};
+  var vote_state = {{ vote_state|default:0 }};
 </script>
 <script src="{{ STATIC_URL }}/js/view-file.js" ></script>
 {% endblock %}
@@ -59,10 +59,10 @@
       <div class="row">
         <div id="note_actions" class="three columns centered">
           <div class="row">
-            <div class="six column thank {% if lovable %} disabled_button {% endif %}" data-id={{ file.id }}>
+            <div class="six column thank {% if not lovable %}button_disabled{% endif %}" data-id={{ file.id }}>
               <img src="/static/img/note_thank.png" alt="note_thank" width="34" height="34" />
             </div>
-            <div class="six column flag {% if flagable %} disabled_button {% endif %}" data-id={{ file.id }}>
+            <div class="six column flag {% if not flagable %}button_disabled{% endif %}" data-id={{ file.id }}>
                <img src="/static/img/note_flag.png" alt="note_flag" width="25" height="35" />
             </div>
             {% comment %}

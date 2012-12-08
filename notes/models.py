@@ -526,6 +526,7 @@ class File(models.Model):
         elif vote_value == 0: 
             # delete the vote object associate TODO: HOW?
             obsolete_vote = self.vote_set.get(user=voter)
+            obsolete_vote.delete()
 
         self.save()
 

@@ -234,18 +234,18 @@ def file(request, note_pk, action=None):
     response['owns_file'] = (file.owner == request.user)
     response['file'] = file
 
+    response['lovable'], response['flagable'] = True, True
     # let's get the votes. There should only be ONE, but cause I'm
     # messing with the DB, there might be more
-    has_voted = file.vote_set.exists()
+    has_voted = file.vote_set.filter(user=request.user).exists()
     if has_voted:
         print 'views.file: current user has voted on this file'
-        votes = file.vote_set.filter(user=request.user)
-        vote = votes[0]
-
-    # is the thank button clickable?
-    response['lovable'] = not has_voted or vote.up
-    # is the flag button clickable?
-    response['flagable'] = not has_voted or not vote.up
+        vote = file.vote_set.get(user=request.user)
+        response['vote_status'] = vote.up
+        if vote.up:
+            response['lovable'] = False
+        else:
+            response['flagable'] = False
 
     #response['file_type'] = file_type
 
@@ -502,7 +502,7 @@ def browse_one_course(request, course_query, school):
     response['thanked_files'] = []
     response['flagged_files'] = []
     for file in files:
-        _vote = file.votes.filter(user=request.user)
+        _vote = file.vote_set.filter(user=request.user)
         if _vote.exists():
             if _vote[0].up: # assuming only one vote result
                 response['thanked_files'].append(file.id)
