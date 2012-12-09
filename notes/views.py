@@ -62,8 +62,18 @@ def e404(request):
 
 def dashboard(request):
     """ Render the new template style dashboard """
+    #print "\nDASHBOARD ----------------------------------------------\n"
+    if request.method == "POST":
+        # If a user is saving data on the dashboard page
+        if 'school' in request.POST:
+            user_profile = request.user.get_profile()
+            user_profile.school = School.objects.get(name=request.POST['school'])
+            user_profile.save()
+
+
     response = {}
-    response['events']= request.user.get_profile().reputationEvents.order_by('-id').all()
+
+    response['events'] = request.user.get_profile().reputationEvents.order_by('-id').all()
     response['upload_count'] = File.objects.filter(owner=request.user).count()
 
     # Count the reputation events where the user was the actor and the type was 'upvote'
@@ -261,7 +271,7 @@ def fileMeta(request):
         response["status"] = "invalid"
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
- 
+
     form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
 
     if not form.is_valid():
@@ -425,7 +435,7 @@ def browse_schools(request):
     return render(request, 'browse_schools.html', response)
 
 def school(request, school_query):
-    """ View for a school, lists courses and school activity 
+    """ View for a school, lists courses and school activity
         :school_query: comes as unicode, if can be int, pass as int
     """
     response = {}

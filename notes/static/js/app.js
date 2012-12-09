@@ -16,6 +16,16 @@ $(document).ready(function(){
     $("#lightbox_create_course").show();
   });
 
+  // Choose school click handlers, show and submit
+  $("#choose_school").click(function(){
+    $("#lightbox_choose_school").show();
+  });
+  $("a#submit-lightbox-create-course").click(function() {
+    $("form#choose_school_form").submit();
+    $("#lightbox_choose_school").hide();
+    // TODO: clear this form after hiding it
+  });
+
   // Toggle: my courses dropdown
   $("#global_header_mycourses_copy").click(function(){
     $("#global_header_mycourses_list").toggle();

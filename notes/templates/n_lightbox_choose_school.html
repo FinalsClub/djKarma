@@ -1,0 +1,73 @@
+{% load url from future %}
+<section id="lightbox_choose_school" class="modal_content">
+    <script type="text/javascript">
+    $(document).ready(function(){
+
+    $("#id_school").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/schools",
+                data: {q: request.term},
+                success: function(data) {
+                    if (data != 'CACHE_MISS')
+                    {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item[1],
+                                value: item[1],
+                                real_value: item[0]
+                            };
+                        }));
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        select: function(event, ui) { $('#id_school').val(ui.item.real_value); },
+        minLength: 3
+    });
+
+    });
+    </script>
+
+  <div class="row">
+    <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
+      <div class="row">
+        <div class="lightbox_header modal_header twelve columns">
+          Choose a school
+        </div><!-- /modal_header -->
+      </div>
+
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            School name
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <form id=choose_school_form action="{% url 'dashboard' %}" method=POST>
+              {% csrf_token %}
+              <input id="id_school" class="lightbox_textfield" type="text" name="school" maxlength="255" />
+            </form>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <a class="button" id="submit-lightbox-create-course" type="submit">Save</a>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="lightbox_close"></div>
+
+    </div> <!-- .lightbox_modal -->
+  </div> <!-- .row -->
+
+
+</section><!--add_course_content-->
+
