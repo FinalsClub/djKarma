@@ -773,19 +773,6 @@ def nurl_file(request, school_query, course_query, file_id, action=None):
     return file(request, file_id, action)
 
 
-def file_denied(request, note_pk):
-    """ What we show someone who is not allowed to view a file
-        NOTE: Not currently used
-        :request:   django request object
-        :note_pk:   id of the file/note
-    """
-    user_karma = profile.karma
-    level = Level.objects.get(title='Prospect')
-    print level.karma
-    progress = (user_karma / float(level.karma)) * 100
-    return TemplateResponse(request, 'karma_wall.html', {'required_level': level, 'progress': progress, 'permission': 'access files'})
-
-
 def searchBySchool(request):
     """ Ajax: Return user's school's courses in JSON
         Used by search page javascript.
