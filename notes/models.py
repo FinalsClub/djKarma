@@ -495,6 +495,17 @@ class File(models.Model):
             print "invalid user"
             return
 
+        # If we have allready voted, then undo that vote
+        if self.vote_set.filter(user=voter).exists():
+            obsolete_vote = self.vote_set.get(user=voter)
+            print "Deleting old vote:", obsolete_vote
+            if obsolete_vote.up: 
+                self.numUpVotes -= 1
+            else: 
+                self.numDownVotes -= 1
+
+            obsolete_vote.delete()
+
         if vote_value in (1, -1):
 
             if vote_value == 1: 
@@ -521,12 +532,6 @@ class File(models.Model):
                     school=self.school, 
                     target_user=self.owner, 
                     user=voter)
-
-        # we want this to only happen when the user has allready voted
-        elif vote_value == 0: 
-            # delete the vote object associate TODO: HOW?
-            obsolete_vote = self.vote_set.get(user=voter)
-            obsolete_vote.delete()
 
         self.save()
 
