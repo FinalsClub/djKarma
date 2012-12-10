@@ -195,6 +195,7 @@ $(document).ready(function(){
     course_data.title = $('#id_title').val();
     course_data.field = $('#id_field').val()
     course_data.instructor_email = $('#id_instructor_email').val();
+    course_data.instructor_name = $('#id_instructor_name').val();
     course_data.desc = $('#id_desc').val();
     return course_data;
   }
@@ -224,9 +225,8 @@ $(document).ready(function(){
       url: '/create-course',
       data: load_course_data(),
       success: function(data){
-        alert(data);
+        // TODO: add the course to my courses list and on dashboard
         $('#lightbox_create_course').hide();
-
       },
       type: 'POST'
     });

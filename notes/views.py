@@ -658,18 +658,14 @@ def create_course(request):
 
     if request.method == 'POST':
         form = KarmaForms.CreateCourseForm(request.POST)
-        print 'request method is POST'
 
         if form.is_valid():
-            print "Form is VALID"
             user_profile = request.user.get_profile()
             new_course = Course()
 
-            print form.cleaned_data.keys()
-
-            #instructor_id = int(form.cleaned_data['id_instructor'])
 
             new_course.instructor_email = form.cleaned_data['instructor_email']
+            new_course.instructor_name = form.cleaned_data['instructor_name']
             new_course.title = form.cleaned_data['title']
             new_course.desc = form.cleaned_data['desc']
             new_course.school = user_profile.school

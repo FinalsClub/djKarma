@@ -302,6 +302,7 @@ class Course(models.Model):
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
     academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
+    instructor_name = models.CharField(max_length=255, blank=True, null=True)
     instructor_email= models.EmailField(blank=True, null=True)
     last_updated    = models.DateTimeField(default=datetime.datetime.now)
     desc            = models.TextField(max_length=1023, blank=True, null=True)

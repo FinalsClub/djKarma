@@ -164,7 +164,7 @@ class CreateCourseForm(forms.ModelForm):
     """
     class Meta:
         model = Course
-        fields = ('title', 'field', 'instructor_email', 'desc')
+        fields = ('title', 'field', 'instructor_email', 'instructor_name', 'desc')
 
 class GenericCharForm(forms.Form):
     """ Provides a means to sanitize generic text received via GET/POST """
