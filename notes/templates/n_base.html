@@ -37,8 +37,11 @@
 
 {% if user.is_authenticated %}
   {% include 'n_lightbox_add_note.html' %}
-  {% include 'n_lightbox_create_course.html' %}
+
+  {% include 'n_lightbox_choose_course.html' %}
   {% include 'n_lightbox_choose_school.html' %}
+  {% include 'n_lightbox_create_course.html' %}
+  {#{% include 'n_lightbox_create_school.html' %} #}h
 {% else %}
   {% include 'n_lightbox_signup.html' %}
 {% endif%}

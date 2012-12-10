@@ -70,7 +70,6 @@ def dashboard(request):
             user_profile.school = School.objects.get(name=request.POST['school'])
             user_profile.save()
 
-
     response = {}
 
     response['events'] = request.user.get_profile().reputationEvents.order_by('-id').all()
@@ -695,22 +694,25 @@ def add_course_to_profile(request):
         alternatively, to be used when the 'are you in this course' checkbox
         is selected in the upload modal
     """
-    print "adding course"
-    print request.POST
-    if request.is_ajax() and request.method == 'POST':
+   #FIXME: this is fragile and ugly
+    if request.method == 'POST':
+        print "is post"
         user_profile = request.user.get_profile()
+        print request.POST
         if 'title' in request.POST:
-            status = user_profile.add_course(course_title=request.POST['title'])
+            title = request.POST['title']
+            print "title: %s" % title
+            status = user_profile.add_course(course_title=title)
+            return HttpResponse(json.dumps({'status': 'success', 'title': title}), mimetype='application/json')
         elif 'id' in request.POST:  # passing the course ID rather than title
             status = user_profile.add_course(course_id=request.POST['id'])
-
-        if status:
-            print "success"
             return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+
         else:
             return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
 def drop_course(request):
+    #FIXME: drop_course removes a course from a profile, and and add_course_to_profile adds a course
     if request.is_ajax() and request.method == 'POST':
         user_profile = request.user.get_profile()
         course = Course.objects.get(id=request.POST['id'])
@@ -745,7 +747,13 @@ def schools(request):
 
 def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
-
+    if request.method == 'POST' and request.is_ajax():
+        print "Got courses autocomplete ajax request"
+        query = request.GET.get('q')
+        courses = Course.objects.filter(name__icontains=query).distinct()
+        response = [(course.pk, course.name) for course in courses]
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+        # jquery autocomplete 
     # Find courses, or school and courses
     if True:  # FIXME: why is this True here?
         query = request.GET.get('q')

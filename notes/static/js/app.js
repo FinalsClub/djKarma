@@ -13,18 +13,43 @@ $(document).ready(function(){
 
   //
   $("#global_header_add_course").click(function(){
-    $("#lightbox_create_course").show();
+    $("#lightbox_choose_school").show();
   });
 
   // Choose school click handlers, show and submit
   $("#choose_school").click(function(){
     $("#lightbox_choose_school").show();
   });
-  $("a#submit-lightbox-create-course").click(function() {
+  $("a#submit-lightbox-choose-school").click(function() {
     $("form#choose_school_form").submit();
     $("#lightbox_choose_school").hide();
     // TODO: clear this form after hiding it
   });
+
+  // Search and join a course handlers
+  $("a.add_course").click(function(){
+    $("#lightbox_choose_course").show();
+  });
+
+  $("#submit-lightbox-choose-course").click(function(){
+    //$("form#choose_course_form").submit();
+    console.log("submitting lightbox choose course");
+    $.ajax({
+      url: '/add-course',
+      data: {'title': $("#id_course").val() },
+      success: function(data) {
+        console.log("added course");
+        console.log(data);
+        $('#added_course_list').append('<p>added: '+ data['title'] +'</p>');
+      },
+      type: 'POST'
+    });
+
+    //$("#lightbox_choose_course").hide();
+  });
+  // If the course can't be found, show the option to create course
+  // NotImplemented
+  // $("#lightbox_create_course").show();
 
   // Toggle: my courses dropdown
   $("#global_header_mycourses_copy").click(function(){
