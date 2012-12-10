@@ -748,11 +748,10 @@ def schools(request):
 def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
     if request.method == 'POST' and request.is_ajax():
-        print "Got courses autocomplete ajax request"
-        query = request.GET.get('q')
-        courses = Course.objects.filter(name__icontains=query).distinct()
+        query = request.POST.get('q')
+        courses = Course.objects.filter(title__icontains=query, school__name=request.user.get_profile().school).distinct()
         response = {}
-        response['courses'] = [(course.pk, course.name) for course in courses]
+        response['courses'] = [(course.pk, course.title) for course in courses]
         if len(response) > 0:
             # if we return more than one course for query, set status
             response['status'] = 'success'
@@ -761,6 +760,7 @@ def courses(request, school_query=None):
             response['status'] = 'fail'
         return HttpResponse(json.dumps(response), mimetype="application/json")
         # jquery autocomplete 
+    # FIXME: check if this is depricated below this line, and delete
     # Find courses, or school and courses
     if True:  # FIXME: why is this True here?
         query = request.GET.get('q')

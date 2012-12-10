@@ -23,7 +23,8 @@
                       $("#create_course_link").show();
                     }
                 },
-                dataType: "json"
+                dataType: "json",
+                type: 'POST'
             });
         },
         select: function(event, ui) { $('#id_course').val(ui.item.real_value); },
