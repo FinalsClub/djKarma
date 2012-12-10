@@ -751,7 +751,14 @@ def courses(request, school_query=None):
         print "Got courses autocomplete ajax request"
         query = request.GET.get('q')
         courses = Course.objects.filter(name__icontains=query).distinct()
-        response = [(course.pk, course.name) for course in courses]
+        response = {}
+        response['courses'] = [(course.pk, course.name) for course in courses]
+        if len(response) > 0:
+            # if we return more than one course for query, set status
+            response['status'] = 'success'
+        else:
+            # if we returned 0 courses for query, return fail
+            response['status'] = 'fail'
         return HttpResponse(json.dumps(response), mimetype="application/json")
         # jquery autocomplete 
     # Find courses, or school and courses

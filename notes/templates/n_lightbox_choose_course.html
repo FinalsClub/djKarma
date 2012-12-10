@@ -1,0 +1,85 @@
+{% load url from future %}
+<section id="lightbox_choose_course" class="modal_content">
+    <script type="text/javascript">
+    $(document).ready(function(){
+
+    $("#id_course").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/courses",
+                data: {q: request.term},
+                success: function(data) {
+                    console.log(data);
+                    if (data['status'] === 'success')
+                    {
+                        response($.map(data['courses'], function(item) {
+                            return {
+                                label: item[1],
+                                value: item[1],
+                                real_value: item[0]
+                            };
+                        }));
+                    } else {
+                      $("#create_course_link").show();
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        select: function(event, ui) { $('#id_course').val(ui.item.real_value); },
+        minLength: 3
+    });
+
+    });
+    </script>
+
+  <div class="row">
+    <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
+      <div class="row">
+        <div class="lightbox_header modal_header twelve columns">
+          Choose a course
+        </div><!-- /modal_header -->
+      </div>
+
+      <div class="row lightbox_row">
+        <div id=added_course_list class="seven columns centered">
+          <p class=added_course></p>
+          <div class="lightbox_field">
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Course name
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <form id=choose_course_form action="{% url 'add-course' %}" method=POST>
+              {% csrf_token %}
+              <input id="id_course" class="lightbox_textfield" type="text" name="title" maxlength="255" />
+            </form>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field body_copy">
+            <p style="display:none;" id=create_course_link>Create new course</p>
+            <a class="button" id="submit-lightbox-choose-course">Save</a> 
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="lightbox_close"></div>
+
+    </div> <!-- .lightbox_modal -->
+  </div> <!-- .row -->
+
+
+</section><!--add_course_content-->
+
