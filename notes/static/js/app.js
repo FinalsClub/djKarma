@@ -13,7 +13,7 @@ $(document).ready(function(){
 
   //
   $("#global_header_add_course").click(function(){
-    $("#lightbox_choose_school").show();
+    $("#lightbox_choose_course").show();
   });
 
   // Choose school click handlers, show and submit
