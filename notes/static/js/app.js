@@ -41,6 +41,7 @@ $(document).ready(function(){
         console.log("added course");
         console.log(data);
         $('#added_course_list').append('<p>added: '+ data['title'] +'</p>');
+        $("#id_course").val('');
       },
       type: 'POST'
     });
