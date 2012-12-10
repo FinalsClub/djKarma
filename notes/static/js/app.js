@@ -45,12 +45,19 @@ $(document).ready(function(){
       },
       type: 'POST'
     });
-
-    //$("#lightbox_choose_course").hide();
-  });
   // If the course can't be found, show the option to create course
-  // NotImplemented
-  // $("#lightbox_create_course").show();
+  // This js logic lives in n_lightbox_choose_course
+
+  });
+
+  $('a.create_course_link').click(function(){
+    // dismisses choose course lightbox and shows create course
+
+    $("#lightbox_choose_course").hide();
+    $("#lightbox_create_course").show();
+    // copy course name from the choose course form to create course form
+    $("#id_title").val($("#id_course").val());
+  });
 
   // Toggle: my courses dropdown
   $("#global_header_mycourses_copy").click(function(){

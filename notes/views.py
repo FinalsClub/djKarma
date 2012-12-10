@@ -751,10 +751,11 @@ def courses(request, school_query=None):
         query = request.POST.get('q')
         courses = Course.objects.filter(title__icontains=query, school__name=request.user.get_profile().school).distinct()
         response = {}
-        response['courses'] = [(course.pk, course.title) for course in courses]
-        if len(response) > 0:
+        courses = [(course.pk, course.title) for course in courses]
+        if len(courses) > 0:
             # if we return more than one course for query, set status
             response['status'] = 'success'
+            response['courses'] = courses
         else:
             # if we returned 0 courses for query, return fail
             response['status'] = 'fail'
