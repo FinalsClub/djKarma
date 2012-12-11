@@ -158,18 +158,6 @@ class Tag(models.Model):
         super(Tag, self).save(*args, **kwargs)
 
 
-class Vote(models.Model):
-    """ Represents a vote cast on a Note
-        if up is true, it is an upvote
-        else, a downvote
-    """
-    user = models.ForeignKey(User)
-    up = models.BooleanField(default=True)
-
-    def __unicode__(self):
-        return u"%s voted %s" % (self.user, str(self.up))
-
-
 class School(models.Model):
     name        = models.CharField(max_length=255)
     slug        = models.SlugField(null=True)
@@ -412,7 +400,6 @@ class File(models.Model):
     timestamp   = models.DateTimeField(default=datetime.datetime.now)
     created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
     viewCount   = models.IntegerField(default=0)
-    votes       = models.ManyToManyField(Vote, blank=True, null=True)
     numUpVotes  = models.IntegerField(default=0)
     numDownVotes = models.IntegerField(default=0)
     type        = models.CharField(blank=True, null=True, max_length=1, choices=FILE_PTS, default='N')
@@ -490,38 +477,63 @@ class File(models.Model):
             return True
         return False
 
-    def Vote(self, voter, vote_value=0):
+    def vote(self, voter, vote_value):
         """ Calls UserProfile.award_karma
             with the appropriate ReputationEventType slug title("upvote", "downvote")
             and target user (if downvote)
             upvote - vote_value=1 , downvote - vote_value=-1
+            :voter: a User object who is trying to register a vote
         """
-        print "Creating Vote object. voter: " + str(voter) + " value: " + str(vote_value)
-        # Abort of note vote_value provided, or voter is not a User object
-        if int(vote_value) == 0 or not isinstance(voter, User):
-            print "invalid vote value or voter"
+        print "models.File.vote: Creating Vote object"
+        print "voter:", voter
+        print "value:", vote_value
+
+        if not vote_value in (-1, 0, 1):
+            print "invalid vote value"
             return
-        if int(vote_value) == 1:
-            this_vote = Vote.objects.create(user=voter, up=True)
-            print "upvote created: " + str(this_vote)
-            # Increment the file's upvote counter
-            self.numUpVotes += 1
-            # Award karma corresponding to "upvote" ReputationEventType to file owner
-            if self.owner is not None:
-                self.owner.get_profile().award_karma(event="upvote", course=self.course, school=self.school, user=voter)
-            # Add this vote to the file's collection
-            self.votes.add(this_vote)
-        elif int(vote_value) == -1:
-            this_vote = Vote.objects.create(user=voter, up=False)
-            print "downvote created: " + str(this_vote)
-            # Increment the file's downvote counter
-            self.numDownVotes += 1
-            # "Award" negative karma coresponding to "downvote" ReputationEventType to file owner
-            # and negative karma corresponding to "downvote" target user to downvoter
-            if self.owner is not None:
-                self.owner.get_profile().award_karma(event="downvote", target_user=voter)
-            # Add this vote to the file's collection
-            self.votes.add(this_vote)
+
+        if not isinstance(voter, User):
+            print "invalid user"
+            return
+
+        # If we have allready voted, then undo that vote
+        if self.vote_set.filter(user=voter).exists():
+            obsolete_vote = self.vote_set.get(user=voter)
+            print "Deleting old vote:", obsolete_vote
+            if obsolete_vote.up: 
+                self.numUpVotes -= 1
+            else: 
+                self.numDownVotes -= 1
+
+            obsolete_vote.delete()
+
+        if vote_value in (1, -1):
+
+            if vote_value == 1: 
+                print "upvote"
+                event = "upvote"
+                up = True
+                self.numUpVotes += 1
+
+            elif vote_value == -1: 
+                print "downvote"
+                event = "downvote"
+                up = False
+                self.numDownVotes += 1
+            
+            # Create vote
+            this_vote = Vote(user=voter, up=up, note=self)
+            this_vote.save()
+
+            # Award karma
+            if self.owner:
+                self.owner.get_profile().award_karma(
+                    event=event, 
+                    course=self.course, 
+                    school=self.school, 
+                    target_user=self.owner, 
+                    user=voter)
+
         self.save()
 
     def karmaValue(self):
@@ -549,6 +561,19 @@ class File(models.Model):
 
 # On File delete, decrement appropriate stat
 post_delete.connect(decrement, sender=File)
+
+
+class Vote(models.Model):
+    """ Represents a vote cast on a Note
+        if up is true, it is an upvote
+        else, a downvote
+    """
+    user = models.ForeignKey(User)
+    up = models.BooleanField(default=True)
+    note = models.ForeignKey(File)
+
+    def __unicode__(self):
+        return u"%s voted %s" % (self.user, str(self.up))
 
 
 class ReputationEventType(models.Model):

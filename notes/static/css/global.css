@@ -541,3 +541,10 @@ a.white
 {
   color: white;
 }
+
+/* post-designers css hacks */
+.button_disabled img
+{
+  opacity: 0.4;
+  filter: alpha(opacity=40); /* msie */
+}

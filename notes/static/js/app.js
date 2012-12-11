@@ -98,6 +98,92 @@ $(document).ready(function(){
   // setup the lightbox_add_note#datepicker created_on jqueryui datepicker
   $( "#datepicker" ).datepicker();
 
+  // vote buttons
+  $( ".thank" ).click(function(){
+    $.ajax({
+      url: "/vote/"+$(this).data("id"),
+      data: {'vote': 1},
+      type: "POST",
+      context: this,
+      success: function(e) {
+        // grey out button
+        $(this).addClass("button_disabled");
+        //ungray the other button
+        $(".flag").removeClass("button_disabled");
+        // register new click handler to Un-vote
+      }
+    });
+  });
+
+
+
+  function vote_thank(e) {
+    console.log("vote_thank:"+vote_state);
+    $.ajax({
+      url: "/vote/"+$(e).data("id"),
+      data: {'vote': 1},
+      type: "POST",
+      context: e,
+      success: function(){
+        console.log("vote_null:"+vote_state);
+        $(e).addClass("button_disabled");
+        $(e).click(function(){vote_null(e)});
+      }
+    });
+  }
+
+  function vote_flag(e) {
+    console.log("vote_flag:"+vote_state);
+    $.ajax({
+      url: "/vote/"+$(e).data("id"),
+      data: {'vote': -1},
+      type: "POST",
+      context: e,
+      success: function(){
+        console.log("vote_null:"+vote_state);
+        $(e).addClass("button_disabled");
+        $(e).click(function(){vote_null(e)});
+      }
+    });
+  }
+
+  function vote_null(e) {
+    console.log("vote_null:"+vote_state);
+    $.ajax({
+      url: "/vote/"+$(e).data("id"),
+      data: {'vote': 0},
+      type: "POST",
+      context: e,
+      success: function(){
+        console.log("vote_null:"+vote_state);
+        $(e).removeClass("button_disabled");
+        if ($(e).hasClass('thank')) {
+          $(e).click(function(){vote_thank(e)});
+        } else {
+          $(e).click(function(){vote_flag(e)});
+        }
+      }
+    });
+  }
+ 
+ $(".flag").click(function(){
+  console.log("vote_null:"+vote_state);
+  if ($(this).hasClass('button_disabled')){
+    $(this).click(function(){vote_null(this)})
+  } else {
+    $(this).click(function(){vote_flag(this)})
+  }
+ })
+
+ $(".thank").click(function(){
+  console.log("vote_null:"+vote_state);
+  if ($(this).hasClass('button_disabled')){
+    $(this).click(function(){vote_null(this)})
+  } else {
+    $(this).click(function(){vote_thank(this)})
+  }
+ })
+
   // Search results
   var slide_out = {'direction': 'left', 'mode': 'hide'};
   var slide_in = {'direction': 'right', 'mode': 'show'};
