@@ -221,10 +221,6 @@ def file(request, note_pk, action=None):
     # Requested files is not theirs
     file = get_object_or_404(File, pk=note_pk)
 
-    # Increment note view count
-    file.viewCount += 1
-    file.save()
-
     # If this file is not in the user's collection, karmic purchase occurs
     #if file not in profile.files.all():
     if not user_profile.files.filter(pk=note_pk).exists():
@@ -235,7 +231,10 @@ def file(request, note_pk, action=None):
         user_profile.files.add(file)
         user_profile.save()
         print user_profile, 'purchased', file, 'with karma.'
-
+        # Increment note view count
+        file.viewCount += 1
+        file.save()
+        
     #file_type = [t[1] for t in file.FILE_TYPES if t[0] == file.type][0]
 
     # Not currently providing a download url on the view file page
