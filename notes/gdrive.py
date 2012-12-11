@@ -134,17 +134,19 @@ def convert_with_google_drive(u_file):
 
     # set u_file.is_pdf
     if file_type == 'application/pdf':
+        # Get a new copy of the file from the database with the new metadata from filemeta
+        new_file = File.objects.get(u_file.id)
         # If it's a pdf, instead save an embed_url from resource['selfLink']
-        u_file.is_pdf = True
-        u_file.embed_url = file_dict[u'selfLink']
-        u_file.gdrive_url = file_dict[u'downloadUrl']
+        new_file.is_pdf = True
+        new_file.embed_url = file_dict[u'selfLink']
+        new_file.gdrive_url = file_dict[u'downloadUrl']
     else:
         # get the converted filetype urls
         download_urls = {}
         download_urls['html'] = file_dict[u'exportLinks']['text/html']
         download_urls['text'] = file_dict[u'exportLinks']['text/plain']
-        # set the .odt as the download from google link
-        u_file.gdrive_url = file_dict[u'exportLinks']['application/vnd.oasis.opendocument.text']
+        content_dict = {}
+
 
         for download_type, download_url in download_urls.items():
             print "\n%s -- %s" % (download_type, download_urls)
@@ -154,12 +156,20 @@ def convert_with_google_drive(u_file):
             if resp.status in [200]:
                 print "\t downloaded!"
                 # save to the File.property resulting field
-                u_file.__dict__[download_type] = content
+                content_dict[download_type] = content
             else:
                 print "\t Download failed: %s" % resp.status
 
+        # Get a new copy of the file from the database with the new metadata from filemeta
+        new_file = File.objects.get(u_file.id)
+
+        # set the .odt as the download from google link
+        new_file.gdrive_url = file_dict[u'exportLinks']['application/vnd.oasis.opendocument.text']
+        new_file.html = content_dict['html']
+        new_file.text = content_dict['text']
+
     # Finally, save whatever data we got back from google
-    u_file.save()
+    new_file.save()
 
 
 if __name__=='__main__':
