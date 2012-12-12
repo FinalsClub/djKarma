@@ -11,7 +11,7 @@ from apiclient.discovery import build
 from apiclient.http import MediaFileUpload
 from oauth2client.client import flow_from_clientsecrets
 
-from notes.models import DriveAuth
+from notes.models import DriveAuth, File
 
 CLIENT_SECRET = './notes/client_secrets.json'
 from credentials import GOOGLE_USER
@@ -161,7 +161,7 @@ def convert_with_google_drive(u_file):
                 print "\t Download failed: %s" % resp.status
 
         # Get a new copy of the file from the database with the new metadata from filemeta
-        new_file = File.objects.get(u_file.id)
+        new_file = File.objects.get(id=u_file.id)
 
         # set the .odt as the download from google link
         new_file.gdrive_url = file_dict[u'exportLinks']['application/vnd.oasis.opendocument.text']

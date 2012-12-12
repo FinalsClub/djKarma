@@ -9,6 +9,7 @@ from notes import tasks
 from notes.gdrive import convert_with_google_drive
 from notes.models import File
 
+
 class Timer(object):
     def __enter__(self):
         self.__start = time.time()
@@ -17,7 +18,8 @@ class Timer(object):
         self.__finish = time.time()
 
     def duration_in_seconds(self):
-        return self.__finish - self.__start
+        return int(round(self.__finish - self.__start))
+
 
 class Command(BaseCommand):
     """ Django management command to reprocess all locally stored
