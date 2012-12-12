@@ -359,7 +359,6 @@ header#global_header
 }
 
 /* GLOBAL ACTIVITY ITEMS */
-
 a.course_link, a.course_link:hover, a.school_link, a.school_link:hover, a.prof_link, a.prof_link:hover
 {
   text-decoration: underline;
@@ -540,6 +539,13 @@ ul#course_menu li a
 a.white
 {
   color: white;
+}
+
+a.white:hover
+{
+  color: #FFF;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 /* post-designers css hacks */
