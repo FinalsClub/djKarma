@@ -135,7 +135,7 @@ def convert_with_google_drive(u_file):
     # set u_file.is_pdf
     if file_type == 'application/pdf':
         # Get a new copy of the file from the database with the new metadata from filemeta
-        new_file = File.objects.get(u_file.id)
+        new_file = File.objects.get(id=u_file.id)
         # If it's a pdf, instead save an embed_url from resource['selfLink']
         new_file.is_pdf = True
         new_file.embed_url = file_dict[u'selfLink']
