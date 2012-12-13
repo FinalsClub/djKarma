@@ -234,6 +234,7 @@ class UsdeSchool(models.Model):
     """Table of schools imported from the U.S. Department of Education 
     Database of Accredited Postsecondary Institutions and Programs
     """
+    # TODO: renamed AccreditedSchool
     institution_id = models.CharField(max_length='255', unique=True)
     institution_name = models.CharField(max_length='255')
     institution_address = models.CharField(max_length='255')

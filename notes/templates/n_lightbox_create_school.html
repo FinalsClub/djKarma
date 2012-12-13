@@ -1,25 +1,29 @@
 {% load url from future %}
-{# TODO: move cursor focus to autocomplete search field on display #}
-<section id="lightbox_choose_school" class="modal_content">
+<section id="lightbox_create_school" class="modal_content">
     <script type="text/javascript">
     $(document).ready(function(){
 
-    $("#id_school").autocomplete({
+    $("#id_accredited_school").autocomplete({
         source: function(request, response){
             $.ajax({
-                url: "/schools",
+                url: "/accredited-schools",
                 data: {q: request.term},
                 success: function(data) {
                     if (data['status'] === 'success')
                     {
-                        response($.map(data['schools'], function(item) {
+                        response($.map(data['accredited_schools'], function(item) {
                             return {
                                 label: item[1],
                                 value: item[1],
-                                real_value: item[0]
+                                real_value: item[0],
+                                school_id: item[0],
+                                city: item[2],
+                                state: item[3]
+
                             };
                         }));
                     } else {
+                      // FIXME: school not found
                       $('#create_school_link').show();
                     }
                 },
@@ -27,18 +31,30 @@
                 type: 'POST'
             });
         },
-        select: function(event, ui) { $('#id_school').val(ui.item.real_value); },
+        select: function(event, ui) { 
+          $('#id_accredited_school').val(ui.item.real_value);
+          console.log(ui);
+          console.log(ui.item);
+          console.log(ui.item.school_id);
+
+          acc_school_id = ui.item.school_id;
+          console.log(acc_school_id)
+          $("span#city").text(ui.item.city);
+          $("span#state").text(ui.item.state);
+          $("#location_box").show();
+          $("#submit-lightbox-choose-school").show();
+
+        },
         minLength: 3
     });
 
     });
     </script>
-
   <div class="row">
     <div class="eight columns centered lightbox_modal" style="margin-top: 121px;">
       <div class="row">
         <div class="lightbox_header modal_header twelve columns">
-          Choose a school
+          Create a new school
         </div><!-- /modal_header -->
       </div>
 
@@ -49,10 +65,21 @@
             School name
           </label><!-- lightbox_label -->
           <div class="lightbox_field">
-            <form id=choose_school_form action="{% url 'dashboard' %}" method=POST>
+            <form id=create_school_form action="{% url 'schools' %}" method=PUT>
               {% csrf_token %}
-              <input id="id_school" class="lightbox_textfield" type="text" name="school" maxlength="255" />
+              <input id="id_accredited_school" class="lightbox_textfield" type="text" name="accredited_school" maxlength="255" />
             </form>
+          </div><!-- .lightbox_filed -->
+        </div><!--  -->
+      </div> <!-- .row .lightbox_row -->
+
+      <div class="row lightbox_row" id=location_box style="display:none;">
+        <div class="seven columns centered">
+          <label class="lightbox_label">
+            Location
+          </label><!-- lightbox_label -->
+          <div class="lightbox_field">
+            <span id=city></span>, <span id=state></span>
           </div><!-- .lightbox_filed -->
         </div><!--  -->
       </div> <!-- .row .lightbox_row -->
@@ -62,10 +89,7 @@
           <label class="lightbox_label">
           </label><!-- lightbox_label -->
           <div class="lightbox_field body_copy">
-            <p style="display:none;" id=create_school_link>
-              We couldn't find your school, would you like to <a class=create_school_link>add a new school</a> from a list of accredited schools?
-            </p>
-            <a class="button white" id="submit-lightbox-choose-school" type="submit">Save</a>
+            <a class="button white" id="submit-lightbox-create-school" type="submit">Save</a>
           </div><!-- .lightbox_filed -->
         </div><!--  -->
       </div> <!-- .row .lightbox_row -->
@@ -74,7 +98,4 @@
 
     </div> <!-- .lightbox_modal -->
   </div> <!-- .row -->
-
-
-</section><!--add_course_content-->
-
+</section>

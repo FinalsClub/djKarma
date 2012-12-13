@@ -59,6 +59,15 @@ $(document).ready(function(){
     $("#id_title").val($("#id_course").val());
   });
 
+  $('a.create_school_link').click(function(){
+    // dismisses choose school lightbox and shows create school
+
+    $("#lightbox_choose_school").hide();
+    $("#lightbox_create_school").show();
+    // copy school name from the choose school form to create school form
+    $("#id_title").val($("#id_school").val());
+  });
+
   // Toggle: my courses dropdown
   $("#global_header_mycourses_copy").click(function(){
     $("#global_header_mycourses_list").toggle();
@@ -304,6 +313,18 @@ $(document).ready(function(){
       type: 'POST'
     });
 
+  });
+
+  $("#submit-lightbox-create-school").click(function() {
+    $.ajax({
+      url: '/schools',
+      data: { 'school_id': acc_school_id },
+      success: function(data){
+        // TODO: add the course to my courses list and on dashboard
+        $('#lightbox_create_school').hide();
+      },
+      type: 'POST'
+    });
   });
 
   $("#submit-lightbox-create-course").click(function() {

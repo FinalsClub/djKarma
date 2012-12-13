@@ -76,7 +76,8 @@ urlpatterns = patterns('',
     url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
     # Ajax requests from note upload form for autocomplete fields
     url(r'^courses$', 'notes.views.courses'),
-    url(r'^schools$', 'notes.views.schools'),
+    url(r'^schools$', 'notes.views.schools', name='schools'),
+    url(r'^accredited-schools$', 'notes.views.accredited_schools'),
     url(r'^instructors$', 'notes.views.instructors'),
     url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     # Ajax request to add a course to a user's profile

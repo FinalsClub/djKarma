@@ -38,6 +38,7 @@ from models import SiteStats
 from models import Level
 from models import Vote
 from models import ReputationEventType
+from models import UsdeSchool
 from profile_tasks import tasks
 from utils import complete_profile_prompt
 from utils import jsonifyModel
@@ -230,7 +231,7 @@ def file(request, note_pk, action=None):
     if not user_profile.files.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
-        user_profile.award_karma('view-file', school=user_profile.school, course=file.course, file=file, user=request.user)
+        user_profile.award_karma('view-file', school=file.school, course=file.course, file=file, user=request.user)
         # Add 'purchased' file to user's collection
         user_profile.files.add(file)
         user_profile.save()
@@ -740,15 +741,44 @@ def instructors(request):
 
     raise Http404
 
+def accredited_schools(request):
+    """ AJAX: UsdeSchools autocomplete form field """
+    print "\nhit accreddited schools view \n\n"
+    if request.is_ajax() and request.method == 'POST':
+        query = request.POST.get('q')
+        print "query: %s" % query
+        usde_schools = UsdeSchool.objects.filter(institution_name__icontains=query).distinct()
+        print len(usde_schools)
+        response = {}
+        if len(usde_schools) > 0:
+            response['accredited_schools'] = [(school.pk, school.institution_name, school.institution_city, school.institution_state) for school in usde_schools]
+            response['status'] = 'success'
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+    raise Http404
+
 
 def schools(request):
     """ Ajax: School autcomplete form field """
-    if request.is_ajax():
-        query = request.GET.get('q')
+    print "schools request %*%&%&#($*&%&         %*%*"
+    print request.POST
+    print request.method, request.POST.has_key('a')
+    if request.is_ajax() and request.method == 'POST' and request.POST.has_key('q'):
+        query = request.POST.get('q')
         schools = School.objects.filter(name__icontains=query).distinct()
-        response = []
-        for school in schools:
-            response.append((school.pk, school.name))
+        response = {}
+        if len(schools) > 0:
+            response['schools'] = [(school.pk, school.name) for school in schools]
+            response['status'] = 'success'
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+    elif request.method == 'POST':
+        # for creating a new school
+        print request.POST
+        # create new school, hasn't been implemented yet
+        print "create a new school!!! not implemented yet"
+        school = School()
+        a_school = UsdeSchool.objects.get(id=request.POST['school_id'])
+        school.name = a_school.institution_name
+        response = {}
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
     raise Http404
