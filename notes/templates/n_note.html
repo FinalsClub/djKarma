@@ -55,9 +55,10 @@
           {% endif %}
         </div><!-- /note_author -->
       </div>
-
+      
       <div class="row">
         <div id="note_actions" class="three columns centered">
+          {% if not owns_file %}
           <div class="row">
             <div class="six column thank" {% if has_voted %} style="display:none" {% endif %} data-id={{ file.id }}>
               <img src="/static/img/note_thank.png" alt="note_thank" width="34" height="34" />
@@ -83,9 +84,9 @@
             </div>
             {% endcomment %}
           </div>
+          {% endif %} <!-- not owns_file -->
         </div><!-- /note_actions -->
       </div>
-
     </div><!-- /note_header -->
 
 
