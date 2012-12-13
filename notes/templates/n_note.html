@@ -59,11 +59,22 @@
       <div class="row">
         <div id="note_actions" class="three columns centered">
           <div class="row">
-            <div class="six column thank {% if not lovable %}button_disabled{% endif %}" data-id={{ file.id }}>
+            <div class="six column thank" {% if has_voted %} style="display:none" {% endif %} data-id={{ file.id }}>
               <img src="/static/img/note_thank.png" alt="note_thank" width="34" height="34" />
             </div>
-            <div class="six column flag {% if not flagable %}button_disabled{% endif %}" data-id={{ file.id }}>
+            <div class="six column flag" {% if has_voted %} style="display:none" {% endif %} data-id={{ file.id }}>
                <img src="/static/img/note_flag.png" alt="note_flag" width="25" height="35" />
+            </div>
+            <div class="twelve column voted_message" data-id={{ file.id }} {% if not has_voted %} style="display:none" {% endif %}>
+              You've 
+              <span id="thanked_or_flagged">
+                {% if not lovable %} 
+                  thanked
+                {% elif not flaggable %}
+                  flagged
+                {% endif %}
+              </span>
+             this file
             </div>
             {% comment %}
             <!-- disabling downloads for now -->

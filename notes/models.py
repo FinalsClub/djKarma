@@ -527,12 +527,16 @@ class File(models.Model):
 
             # Award karma
             if self.owner:
+                print 'models.File.vote: profile', self.owner.get_profile()
                 self.owner.get_profile().award_karma(
                     event=event, 
                     course=self.course, 
                     school=self.school, 
                     target_user=self.owner, 
                     user=voter)
+
+            else:
+                print "models.File.vote: file has no owner:", self
 
         self.save()
 

@@ -554,3 +554,17 @@ a.white:hover
   opacity: 0.4;
   filter: alpha(opacity=40); /* msie */
 }
+
+.voted_message
+{
+  cursor: pointer;
+  font-size: 13px;
+  font-family: "MuseoSans-500";
+  color: #232323;
+}
+
+.voted_message:hover
+{
+  cursor: pointer;
+  text-decoration: underline;
+}
