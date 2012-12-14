@@ -100,6 +100,7 @@ urlpatterns = patterns('',
 
     # useful only for direct linking to file, and for ajaxuploader reverse url lookup
     url(r'^file/(?P<note_pk>\d{1,9999})$', 'notes.views.file', name='file'),
+    url(r'^raw/(?P<note_pk>\d{1,9999})$', 'notes.views.raw_file', name='raw-file'),
 
     url(r'^browse$', 'notes.views.browse', name='browse'),
 

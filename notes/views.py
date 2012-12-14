@@ -205,6 +205,12 @@ def profile(request):
     response['your_files'] = File.objects.filter(owner=request.user).all()
     return render(request, 'navigation.html', response)
 
+@login_required
+def raw_file(request, note_pk):
+    """ Display the raw html from a File object for embedding in an iframe """
+    note = get_object_or_404(File, pk=note_pk)
+    return HttpResponse(note.html)
+
 """ ===========================================
     Viewing and browsing lists and single pages
     =========================================== """

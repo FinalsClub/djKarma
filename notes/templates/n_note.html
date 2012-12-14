@@ -7,14 +7,28 @@
 
 {% block pagescripts %}
 <script>
-  var view_file_html = "{{ file.html|safe }}";
+  //var view_file_html = "{{ file.html|safe }}";
   var view_file_pk = {{ file.pk }};
   var view_file_title = "{{ file.title }}";
   var view_file_description = "{{ file.description }}";
   var editing_file = false;
   var vote_state = {{ vote_state|default:0 }};
+  function autoResize(id){
+      var newheight;
+      var newwidth;
+
+      if(document.getElementById){
+        newheight = document.getElementById(id).contentWindow.document .body.scrollHeight;
+        newwidth = document.getElementById(id).contentWindow.document .body.scrollWidth;
+      }
+
+      document.getElementById(id).height = (newheight+ 10) + "px";
+      document.getElementById(id).width= (newwidth + 5) + "px";
+      //alert('height: ' + newheight);
+  }
+
 </script>
-<script src="{{ STATIC_URL }}/js/view-file.js" ></script>
+{# <script src="{{ STATIC_URL }}/js/view-file.js" ></script> #}
 {% endblock %}
 
 {% block content %}
@@ -90,7 +104,8 @@
           <h1>notes</h1>
 
           <div class="note-text">
-            <iframe style="border:none; width:100%;" id="noteframe" >Note viewing requires iframe support </iframe>
+            <iframe style="border:none; width:100%;" id="noteframe" src="/raw/{{ file.id }}" onload="autoResize('noteframe')">
+            </iframe>
           </div> <!-- .note-text -->
           <div class="note-error" style="display:none">
             This document's content is currently unavailable. It's likely the document is still being processed. Please try again later.
