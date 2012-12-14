@@ -359,7 +359,6 @@ header#global_header
 }
 
 /* GLOBAL ACTIVITY ITEMS */
-
 a.course_link, a.course_link:hover, a.school_link, a.school_link:hover, a.prof_link, a.prof_link:hover
 {
   text-decoration: underline;
@@ -542,9 +541,30 @@ a.white
   color: white;
 }
 
+a.white:hover
+{
+  color: #FFF;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 /* post-designers css hacks */
 .button_disabled img
 {
   opacity: 0.4;
   filter: alpha(opacity=40); /* msie */
+}
+
+.voted_message
+{
+  cursor: pointer;
+  font-size: 13px;
+  font-family: "MuseoSans-500";
+  color: #232323;
+}
+
+.voted_message:hover
+{
+  cursor: pointer;
+  text-decoration: underline;
 }
