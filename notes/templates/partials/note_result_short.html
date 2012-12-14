@@ -14,7 +14,7 @@
       <div class="activity_details_callout_copy">
         {# TODO: slice of raw_text, or html for now? #}
         {% if note.text %}
-          {{ note.text|slice:500 }}
+          {{ note.text|slice:":500" }}
         {% else %}
           {{ note.description }}
         {% endif %}

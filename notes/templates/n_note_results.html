@@ -25,7 +25,7 @@
             <div class="eleven columns activity_details_callout_copy">
               {# TODO: preview of raw text #}
               {% if note.text %}
-                {{ note.text|slice:500 }}
+                {{ note.text|slice:":500" }}
               {% else %}
                 {{ note.description }}
               {% endif %}
