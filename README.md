@@ -4,7 +4,7 @@ KarmaNotes : A free and open note sharing platform.
 Karma Notes is a free and open note sharing platform that is
 designed to get students to share notes and educational materials
 with the academic community. Students share notes and, in return, can
-then view or find notes that others had submitted. 
+then view or find notes that others have submitted. 
 
 Dependencies
 ----------------
