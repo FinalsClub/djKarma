@@ -1,14 +1,25 @@
-The KarmaNotes Django Experiment
+KarmaNotes : A free and open note sharing platform.
 ================================
 
+Karma Notes is a free and open note sharing platform that is
+designed to get students to share notes and educational materials
+with the academic community. Students share notes and, in return, can
+then view or find notes that others had submitted. 
+
 Dependencies
-------------
+----------------
+
+In order to get the most out of Karma Notes, we
+recommend that the following dependencies be installed:
 
  + Python 2.7
  + celery 2.5.3
  + django 1.4.2
  + Solr 3.6.0
  + django-celery2.5.5
+
+http://karmanotes.org install is based upon debain / ubuntu server, 
+other *nix-like platforms can be used.
 
 Deployment (Fresh Install)
 ----------------
@@ -17,7 +28,8 @@ Deployment (Fresh Install)
 
 2. install requirements with : `sudo pip install -r requirements` from `$SRC_ROOT`.
 
-### Deployment database
+3. Setup postresql:
+
 To initially deploy the postgres backup on a fresh debian based system:
 ```
 sudo apt-get install postgresql-9.1 python-psycopg2
@@ -32,7 +44,7 @@ sudo service postgresql restart
 ./manage.py syncdb # if you do not do this `run_gunicorn` will not be a command option
 ```
 
-4. Install Apache Solr.
+4. Install Apache Solr (Needs to be revised)
 
 5. install celery
    a) Create celery user : `sudo adduer celery`
@@ -72,29 +84,6 @@ Deployment
 7. Start Apache Solr search engine (see section)
 
  + TODO: short desc of how to install and deploy on a deployment server, what server packages need to be running/installed, but not how to install them
-
-## Re-Deployment & Updating karmanotes
-
-# Revised deployment to production.
-
-1. Review settings,
-
-2. Check out new repo.
-
-3. install requirements 
-	
-	sudo pip install -r requirements.txt
-4. Re-populate the contents of the static
-
-	./manage.py collectstatic
-
-5. Update Database schema 
-	./manage.py schemamigration notes --auto
-
-If app HAS NOT!!! been converted to south!!!!!! 
-
-	./manage.py syncdb
-
 
 ### Migration CAVEATS
 
@@ -278,6 +267,8 @@ Importing finalsclub database
 * move those files to the root of the djkarma directory
 * run `./manage.py import_archive`
 
+## Re-Deployment & Updating karmanotes
+
 # Revised deployment to production.
 
 1. Review settings,
@@ -298,7 +289,11 @@ If app HAS NOT!!! been converted to south!!!!!!
 
 	./manage.py syncdb
 
+# Importing school data
 
+./manage.py import_usde_csv $FILE_NAME
+
+# 
 
 
 
