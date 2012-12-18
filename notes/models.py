@@ -69,77 +69,6 @@ class Level(models.Model):
         return u"%s %d" % (self.title, self.karma)
 
 
-class SiteStats(models.Model):
-    """ Used to incrementally tally site statistics
-        For display on landing page, etc.
-        This is more efficient then calculating totals on every request
-        Upon installing the app we should initialize ONE instance of SiteStats
-        The increment/decrement methods will act only on the first instance (pk=1)
-    """
-    # TODO: make this class name singular
-    numNotes = models.IntegerField(default=0)
-    numStudyGuides = models.IntegerField(default=0)
-    numSyllabi = models.IntegerField(default=0)
-    numAssignments = models.IntegerField(default=0)
-    numExams = models.IntegerField(default=0)
-
-    numCourses = models.IntegerField(default=0)
-    numSchools = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return u"%d Notes, %d Guides, %d Syllabi, %d Assignments, %d Exams for %d total Courses at %d Schools" % (self.numNotes, self.numStudyGuides, self.numSyllabi, self.numAssignments, self.numExams, self.numCourses, self.numSchools)
-
-
-def decrement(sender, **kwargs):
-    """ Decrease the appropriate stat given a Model
-        Called in Model save() and post_delete() (not delete() due to queryset behavior)
-    """
-    # TODO, impement this as a method on the SiteStat object, rather than in the global scope of models
-    stats = SiteStats.objects.get(pk=1)
-    if isinstance(sender, Note):
-        if sender.type == 'N':
-            stats.numNotes -= 1
-        elif sender.type == 'G':
-            stats.numStudyGuides -= 1
-        elif sender.type == 'S':
-            stats.numSyllabi -= 1
-        elif sender.type == 'A':
-            stats.numAssignments -= 1
-        elif sender.type == 'E':
-            stats.numExams -= 1
-    elif isinstance(sender, School):
-        stats.numSchools -= 1
-    elif isinstance(sender, Course):
-        stats.numCourses -= 1
-    stats.save()
-
-
-def increment(sender, **kwargs):
-    """ Increment the appropriate stat given a Model
-        Called in Model save() and post_delete() (not delete() due to queryset behavior)
-    """
-    # TODO, modify decrement to increment or decrement based on a passed flag, rather than duplicating this if else logic
-    stats = SiteStats.objects.get(pk=1)
-    #print stats.numNotes
-    if isinstance(sender, Note):
-        print sender.type
-        if sender.type == 'N':
-            stats.numNotes += 1
-        elif sender.type == 'G':
-            stats.numStudyGuides += 1
-        elif sender.type == 'S':
-            stats.numSyllabi += 1
-        elif sender.type == 'A':
-            stats.numAssignments += 1
-        elif sender.type == 'E':
-            stats.numExams += 1
-    elif isinstance(sender, School):
-        stats.numSchools += 1
-    elif isinstance(sender, Course):
-        stats.numCourses += 1
-    stats.save()
-
-
 class Tag(models.Model):
     """ This class represents a meta-tag of a note
         Used for searching
@@ -217,17 +146,11 @@ class School(models.Model):
 
 
     def save(self, *args, **kwargs):
-        # If a new School is being saved, increment SiteStat School count
-        if not self.pk:
-            increment(self)
         if not self.slug:
             # FIXME: make this unique
             # TODO: add a legacy slugs table that provide redirects to new slug pages
             self.slug = slugify(self.name)
         super(School, self).save(*args, **kwargs)
-
-# On School delete, decrement numSchools
-post_delete.connect(decrement, sender=School)
 
 
 class UsdeSchool(models.Model):
@@ -337,9 +260,6 @@ class Course(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        # If a new Course is being saved, increment SiteStat Course count
-        if not self.pk:
-            increment(self)
         if not self.slug:
             # FIXME: make this unique
             # TODO: add a legacy slugs table that provide redirects to new slug pages
@@ -355,9 +275,6 @@ class Course(models.Model):
         # /school-name/course-slug
         # can't refer to more than one course
         unique_together = ('school', 'slug')
-
-# On Course delete, decrement numCourses
-post_delete.connect(decrement, sender=Course)
 
 
 class Note(models.Model):
@@ -464,19 +381,9 @@ class Note(models.Model):
 
         super(Note, self).save(*args, **kwargs)
         # update associated course last_updated
-        try:
+        if self.course:
             self.course.last_updated = datetime.datetime.now()
             self.course.save
-        except:
-            pass
-
-    def ownedBy(self, user_pk):
-        """ Returns true if the user owns or has "paid" for this file
-        """
-        # If the file is in the user's collection, or the user owns the file
-        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().viewed_notes.filter(pk=self.pk).exists():
-            return True
-        return False
 
     def vote(self, voter, vote_value):
         """ Calls UserProfile.award_karma
@@ -568,8 +475,6 @@ class Note(models.Model):
         # we re-factored the model. Old name is 'File'. New name is 'Note'
         db_table = 'notes_file'
 
-# On Note delete, decrement appropriate stat
-post_delete.connect(decrement, sender=Note)
 
 
 class Vote(models.Model):

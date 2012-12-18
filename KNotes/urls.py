@@ -49,13 +49,6 @@ urlpatterns = patterns('',
     url(r'^jobs$', 'notes.views.jobs', name='jobs'),
 
     #   ---------------------------------------------------
-    ## Personal pages
-    # Karma events
-    url(r'^getting-started$', 'notes.views.getting_started', name='getting-started'),
-    url(r'^karma-events$', 'notes.views.karma_events', name='karma-events'),
-    url(r'^profile$', 'notes.views.profile', name='profile'),
-
-    #   ---------------------------------------------------
     # Search
     url(r'^search/', 'notes.views.search'),
     url(r'^multisearch/', 'notes.views.multisearch'),

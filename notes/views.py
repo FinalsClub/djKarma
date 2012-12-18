@@ -34,7 +34,6 @@ from models import School
 from models import Course
 from models import Note
 from models import Instructor
-from models import SiteStats
 from models import Level
 from models import Vote
 from models import ReputationEventType
@@ -87,15 +86,13 @@ def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
     else:
-        # Get the 'singleton' SiteStats instance
-        stats = SiteStats.objects.get(pk=1)
         #Get recently uploaded files
         recent_files = Note.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
         file_count = Note.objects.count()
         return render(request, 'n_home.html',
-                {'stats': stats, 'recent_files': recent_files,\
+                {'recent_files': recent_files,\
                 'file_count': file_count})
 
 
