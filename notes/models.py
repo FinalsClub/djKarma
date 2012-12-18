@@ -474,7 +474,7 @@ class Note(models.Model):
         """ Returns true if the user owns or has "paid" for this file
         """
         # If the file is in the user's collection, or the user owns the file
-        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=self.pk).exists():
+        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().viewed_notes.filter(pk=self.pk).exists():
             return True
         return False
 
@@ -850,7 +850,7 @@ class UserProfile(models.Model):
         Note.owner = self.user
         Note.save()
         # Add this file to the user's collection
-        self.files.add(Note)
+        self.viewed_notes.add(Note)
         # Generate a reputation event
         title = ""
         if Note.type == 'N':

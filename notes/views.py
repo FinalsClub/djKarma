@@ -228,12 +228,12 @@ def file(request, note_pk, action=None):
 
     # If this file is not in the user's collection, 
     # add this file to the user_profile as a viewd file
-    if not user_profile.files.filter(pk=note_pk).exists():
+    if not user_profile.viewed_notes.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
         user_profile.award_karma('view-file', school=file.school, course=file.course, file=file, user=request.user)
         # Add 'purchased' file to user's collection
-        user_profile.files.add(file)
+        user_profile.viewed_notes.add(file)
         user_profile.save()
         print user_profile, 'purchased', file, 'with karma.'
         # Increment note view count
@@ -506,7 +506,7 @@ def browse_one_course(request, course_query, school):
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     # we don't use these, FIXME: CLEAN THIS UP
     """
-    response['viewed_files'] = request.user.get_profile().files.all()
+    response['viewed_files'] = request.user.get_profile().viewed_notes.all()
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
@@ -890,7 +890,7 @@ def vote(request, file_pk):
         return HttpResponse("You have all ready voted on this file")
 
     # Else If the valid user has viewd the file, allow voting
-    elif user_profile.files.filter(pk=voting_file.pk).exists():
+    elif user_profile.viewed_notes.filter(pk=voting_file.pk).exists():
         print "casting vote"
         voting_file.vote(voter=voting_user, vote_value=vote_value)
         if vote_value == 1:

@@ -181,7 +181,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
                     json_result["canvote"] = 0
                     json_result["vote"] = 1
                 # Else If the valid user has viewd the file, allow voting
-                elif request_user.get_profile().files.filter(pk=model.pk).exists():
+                elif request_user.get_profile().viewed_notes.filter(pk=model.pk).exists():
                     #print "*** user has viewed file!"
                     json_result["canvote"] = 1
                     json_result["owns"] = 0
@@ -268,7 +268,7 @@ def userCanView(user, file):
         :file: a notes.models.Note object
         returns True/False
     """
-    if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
+    if file.owner == user or user.get_profile().viewed_notes.filter(pk=file.pk).exists():
         print "user can view!"
         return True
     return False

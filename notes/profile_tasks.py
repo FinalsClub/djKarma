@@ -65,7 +65,7 @@ class UploadedFile():
     karma = u"5-10"
 
     def check(self, user_profile):
-        if len(user_profile.files.all()) >= 1:
+        if len(user_profile.viewed_notes.all()) >= 1:
             return True
         return False
 
