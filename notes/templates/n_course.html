@@ -1,6 +1,13 @@
 {% extends "n_base.html" %}
 {% load url from future %}
 
+{% block pagescripts %}
+<script>
+var course_pk = {{ course.id }};
+var course_title = "{{course.title}}";
+</script>
+{% endblock %}
+
 {% block pagestyle %}
   <link rel="stylesheet" type="text/css" media="all" href="/static/css/note_course_pages.css">
 {% endblock %}

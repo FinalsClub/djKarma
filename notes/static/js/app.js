@@ -86,6 +86,9 @@ $(document).ready(function(){
 
   // Show Add Note lightbox
   $("#global_header_addnote").click(function() {
+    if (course_title != null){
+      $("#lightbox_upload_course_sidebar").text(course_title);
+    }
     $("#lightbox_add_note").toggle();
   });
 
@@ -235,14 +238,12 @@ $(document).ready(function(){
 
   // Choose a course, hide the select field
   $('.course-select').click( function() {
-    course_pk = $(this).data('id');
+    var course_pk = $(this).data('id');
     console.log("course selected");
-    // fill the lightbox_instructyion with the chosen course's title
+    // fill the lightbox_instruction with the chosen course's title
     $('#lightbox_upload_course_sidebar').text($(this).text());
-    // hide the my courses button
-    $(".select_box").effect("slide", slide_out, 500);
-    //$('#button_my_course').hide();
-    // TODO: register handler for clicking mycourses reshow the my courses button
+    // hide the my courses drop down
+    $(".select_box").effect("slide", slide_out, 200);
   });
 
   function load_upload_data(){
