@@ -645,13 +645,47 @@ class UserProfile(models.Model):
             response['current_level'] = levels[len(levels) - 1]
         return response
 
+    def get_picture(self, size='small'):
+        """ get the url of an appropriately size image for a user
+            :size:  if size is set to anything but small, it will return a 180px image
+                    if size = default of 'small' then it will return a 50px image
+            returns a facebook url if the user has a fb_id
+            returns a gravatar url if the user has an image there
+            returns a placeholder url if the user has neither
+        """
+        # TODO: get and use default user icon if none, use gravatar's 404 function
+        #
+        # Make absolute url so they work w/ gravatar 404 function
+        if BETA:
+            small_default = u'http://beta.karmanotes.org/static/img/avatar-180.png'
+            large_default = u'http://beta.karmanotes.org/static/img/avatar-50.png'
+        else:
+            small_default = u'http://karmanotes.org/static/img/avatar-180.png'
+            large_default = u'http://karmanotes.org/static/img/avatar-50.png'
+        if self.fb_id:
+            url = u"https://graph.facebook.com/{0}/picture".format(self.user.username)
+            if size == 'small':
+                return url
+            else:
+                return url + u'?type=large'
+        else:
+            if not self.gravatar:
+                gravatar_hash = self.update_gravatar(self)  # FIXME
+            else:
+                gravatar_hash = self.gravatar
+            url = u"https://secure.gravatar.com/avatar/{0}".format(gravatar_hash)
+            if size == 'small':
+                return u'{0}?s=50&d={1}'.format(url, small_default)
+            else:
+                return u'{0}?s=180d={1}'.format(url, large_default)
+
+    # Get the "name" of this user for display
+    # If no first_name, user username
     def get_name(self):
         """ Generate the front-facing username for this user.
             Prefer user-supplied alias first,
             Second, username given on standard account signup
             Lastly, first name last initial (from social login)
-            # Get the "name" of this user for display
-            # If no first_name, user username
         """
         # TODO make a template tag of this
         if self.alias and self.alias != "":
