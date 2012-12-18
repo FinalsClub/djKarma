@@ -96,7 +96,7 @@ def decrement(sender, **kwargs):
     """
     # TODO, impement this as a method on the SiteStat object, rather than in the global scope of models
     stats = SiteStats.objects.get(pk=1)
-    if isinstance(sender, File):
+    if isinstance(sender, Note):
         if sender.type == 'N':
             stats.numNotes -= 1
         elif sender.type == 'G':
@@ -121,7 +121,7 @@ def increment(sender, **kwargs):
     # TODO, modify decrement to increment or decrement based on a passed flag, rather than duplicating this if else logic
     stats = SiteStats.objects.get(pk=1)
     #print stats.numNotes
-    if isinstance(sender, File):
+    if isinstance(sender, Note):
         print sender.type
         if sender.type == 'N':
             stats.numNotes += 1
@@ -295,7 +295,7 @@ class Course(models.Model):
     instructor_email= models.EmailField(blank=True, null=True)
     last_updated    = models.DateTimeField(default=datetime.datetime.now)
     desc            = models.TextField(max_length=1023, blank=True, null=True)
-    # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
+    # last_updated is updated with the datetime of the latest Note.save() ran. Not on user join/drop
     browsable       = models.BooleanField(default=False)
     karma           = models.IntegerField(default=0)
 
@@ -323,7 +323,7 @@ class Course(models.Model):
         else:
             print "No course found, so no notes"
             raise Http404
-        return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
+        return _course, Note.objects.filter(course=_course).order_by('timestamp').distinct()
 
     def sum_karma(self):
         """calculate the total karma for all ReputationEvents for this course 
@@ -360,7 +360,7 @@ class Course(models.Model):
 post_delete.connect(decrement, sender=Course)
 
 
-class File(models.Model):
+class Note(models.Model):
 
     # FIXME: list of tuples can't be addressed, dicts can
     # FILE_TYPES['N']
@@ -462,7 +462,7 @@ class File(models.Model):
             self.html = re.escape(self.html)
             self.cleaned = True
 
-        super(File, self).save(*args, **kwargs)
+        super(Note, self).save(*args, **kwargs)
         # update associated course last_updated
         try:
             self.course.last_updated = datetime.datetime.now()
@@ -485,7 +485,7 @@ class File(models.Model):
             upvote - vote_value=1 , downvote - vote_value=-1
             :voter: a User object who is trying to register a vote
         """
-        print "models.File.vote: Creating Vote object"
+        print "models.Note.vote: Creating Vote object"
         print "voter:", voter
         print "value:", vote_value
 
@@ -528,7 +528,7 @@ class File(models.Model):
 
             # Award karma
             if self.owner:
-                print 'models.File.vote: profile', self.owner.get_profile()
+                print 'models.Note.vote: profile', self.owner.get_profile()
                 self.owner.get_profile().award_karma(
                     event=event, 
                     course=self.course, 
@@ -537,7 +537,7 @@ class File(models.Model):
                     user=voter)
 
             else:
-                print "models.File.vote: file has no owner:", self
+                print "models.Note.vote: file has no owner:", self
 
         self.save()
 
@@ -564,8 +564,12 @@ class File(models.Model):
         except:
             return 0
 
-# On File delete, decrement appropriate stat
-post_delete.connect(decrement, sender=File)
+    class Meta:
+        # we re-factored the model. Old name is 'File'. New name is 'Note'
+        db_table = 'notes_file'
+
+# On Note delete, decrement appropriate stat
+post_delete.connect(decrement, sender=Note)
 
 
 class Vote(models.Model):
@@ -575,7 +579,7 @@ class Vote(models.Model):
     """
     user = models.ForeignKey(User)
     up = models.BooleanField(default=True)
-    note = models.ForeignKey(File)
+    note = models.ForeignKey(Note)
 
     def __unicode__(self):
         return u"%s voted %s" % (self.user, str(self.up))
@@ -609,7 +613,7 @@ class ReputationEvent(models.Model):
     # optional fkeys to related models. used for displaying activity for user/school/course
     user        = models.ForeignKey(User, blank=True, null=True, related_name='actor') # FIXME: rename actor_user
     target      = models.ForeignKey(User, blank=True, null=True, related_name='target')
-    file        = models.ForeignKey(File, blank=True, null=True)
+    file        = models.ForeignKey(Note, blank=True, null=True)
     course      = models.ForeignKey(Course, blank=True, null=True)
     school      = models.ForeignKey(School, blank=True, null=True)
 
@@ -661,7 +665,7 @@ class UserProfile(models.Model):
     can_moderate = models.BooleanField(default=False)
 
     # user-submitted files and those the user has "paid for"
-    files = models.ManyToManyField(File, blank=True, null=True)
+    viewed_notes = models.ManyToManyField(Note, blank=True, null=True)
 
     # courses a user is currently, or has been enrolled
     courses = models.ManyToManyField(Course, null=True, blank=True)
@@ -805,7 +809,7 @@ class UserProfile(models.Model):
             :school: is a School object (optional)
             :course: a Course object (optional)
             :user: a User object (optional), for recalling username when showing other's karmaevents
-            :file: a notes.models.File object (optional)
+            :file: a notes.models.Note object (optional)
             returns True or False
 
         """
@@ -837,27 +841,27 @@ class UserProfile(models.Model):
             print e
             return False
 
-    def addFile(self, File):
-        """ Called by notes.views.upload after saving File
+    def addFile(self, Note):
+        """ Called by notes.views.upload after saving Note
             Generates the appropriate ReputationEvent, and modifies
             the user's karma
         """
-        # Set File.owner to the user
-        File.owner = self.user
-        File.save()
+        # Set Note.owner to the user
+        Note.owner = self.user
+        Note.save()
         # Add this file to the user's collection
-        self.files.add(File)
+        self.files.add(Note)
         # Generate a reputation event
         title = ""
-        if File.type == 'N':
+        if Note.type == 'N':
             title = 'lecture-note'
-        elif File.type == 'G':
+        elif Note.type == 'G':
             title = 'mid-term-study-guide'
-        elif File.type == 'S':
+        elif Note.type == 'S':
             title = 'syllabus'
-        elif File.type == 'A':
+        elif Note.type == 'A':
             title = 'assignment'
-        elif File.type == 'E':
+        elif Note.type == 'E':
             title = 'exam-or-quiz'
 
         # Remember to load all ReputationEventTypes with

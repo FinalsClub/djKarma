@@ -32,7 +32,7 @@ from templated_email import send_templated_mail
 
 from models import School
 from models import Course
-from models import File
+from models import Note
 from models import Instructor
 from models import SiteStats
 from models import Level
@@ -74,7 +74,7 @@ def dashboard(request):
     response = {}
 
     response['events'] = request.user.get_profile().reputationEvents.order_by('-id').all()
-    response['upload_count'] = File.objects.filter(owner=request.user).count()
+    response['upload_count'] = Note.objects.filter(owner=request.user).count()
 
     # Count the reputation events where the user was the actor and the type was 'upvote'
     response['upvote_count'] = request.user.actor.filter(type__title='upvote').count()
@@ -90,10 +90,10 @@ def home(request):
         # Get the 'singleton' SiteStats instance
         stats = SiteStats.objects.get(pk=1)
         #Get recently uploaded files
-        recent_files = File.objects.exclude(title__exact='') \
+        recent_files = Note.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
-        file_count = File.objects.count()
+        file_count = Note.objects.count()
         return render(request, 'n_home.html',
                 {'stats': stats, 'recent_files': recent_files,\
                 'file_count': file_count})
@@ -202,13 +202,13 @@ def profile(request):
     """ User Profile """
     response = nav_helper(request)
     response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
-    response['your_files'] = File.objects.filter(owner=request.user).all()
+    response['your_files'] = Note.objects.filter(owner=request.user).all()
     return render(request, 'navigation.html', response)
 
 @login_required
 def raw_file(request, note_pk):
-    """ Display the raw html from a File object for embedding in an iframe """
-    note = get_object_or_404(File, pk=note_pk)
+    """ Display the raw html from a Note object for embedding in an iframe """
+    note = get_object_or_404(Note, pk=note_pk)
     return HttpResponse(note.html)
 
 """ ===========================================
@@ -224,7 +224,7 @@ def file(request, note_pk, action=None):
     """
     response = {}
     user_profile = request.user.get_profile()
-    file = get_object_or_404(File, pk=note_pk)
+    file = get_object_or_404(Note, pk=note_pk)
 
     # If this file is not in the user's collection, 
     # add this file to the user_profile as a viewd file
@@ -291,7 +291,7 @@ def fileMeta(request):
         response["message"] = "Please check your form data."
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
-    file = File.objects.get(pk=form.cleaned_data["file_pk"])
+    file = Note.objects.get(pk=form.cleaned_data["file_pk"])
     file.type = form.cleaned_data["type"]
     file.title = form.cleaned_data["title"]
     file.description = form.cleaned_data["description"]
@@ -571,7 +571,7 @@ def editFileMeta(request):
         Now, just title and description
     '''
     if request.is_ajax() and 'file_pk' in request.POST:
-        file = get_object_or_404(File, pk=request.POST['file_pk'])
+        file = get_object_or_404(Note, pk=request.POST['file_pk'])
         if request.user == file.owner:
             do_save = False
             response = {}
@@ -875,7 +875,7 @@ def vote(request, file_pk):
 
 
     # Check that GET parameters are valid
-    voting_file = get_object_or_404(File, pk=file_pk)
+    voting_file = get_object_or_404(Note, pk=file_pk)
     voting_user = request.user
     user_profile = request.user.get_profile()
 
@@ -919,7 +919,7 @@ def multisearch(request):
                     .models(Course).load_all()
         response['courses'] = [c.object for c in courses]
         notes = SearchQuerySet().filter(content__icontains=query) \
-                    .models(File).load_all()
+                    .models(Note).load_all()
         response['notes'] = [n.object for n in notes]
         response['instructors'] = []
         response['users'] = []
@@ -931,7 +931,7 @@ def browse(request):
 
     response['schools'] = School.objects.filter(browsable=True)
     response['courses'] = Course.objects.filter(browsable=True)
-    response['notes'] = File.objects.filter(browsable=True)
+    response['notes'] = Note.objects.filter(browsable=True)
     response['instructors'] = []
     response['users'] = []
 
@@ -951,7 +951,7 @@ def search(request):
             #results = SearchQuerySet().filter(content__icontains=query).highlight()
 
             #Exact match results w/Highlighting. Target notes
-            #results = SearchQuerySet().filter(content__icontains=query).models(File).highlight()
+            #results = SearchQuerySet().filter(content__icontains=query).models(Note).highlight()
 
             #highlight = Highlighter(query)
             #highlight_test = highlight.highlight('this is a test ' + query + 'yes, a test')

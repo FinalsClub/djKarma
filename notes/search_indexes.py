@@ -4,7 +4,7 @@ Index descriptions to make various models searchable.
 from haystack.indexes import *
 from haystack.fields import EdgeNgramField
 from haystack import site
-from models import School, Course, File
+from models import School, Course, Note
 
 
 class SchoolIndex(SearchIndex):
@@ -51,7 +51,7 @@ class CourseIndex(SearchIndex):
         return None
 
 
-class FileIndex(SearchIndex):
+class NoteIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
     title = CharField(model_attr='title')
     school = CharField(null=True)
@@ -79,7 +79,7 @@ class FileIndex(SearchIndex):
     # Use Apache Solr's Rich Content Extraction
     # To index document text for search
     def prepare(self, obj):
-        data = super(FileIndex, self).prepare(obj)
+        data = super(NoteIndex, self).prepare(obj)
         try:
             # This could also be a regular Python open() call, a StringIO instance
             # or the result of opening a URL. Note that due to a library limitation
@@ -95,11 +95,11 @@ class FileIndex(SearchIndex):
             data['text'] = t.render(Context({'object': obj,
                                              'extracted': extracted_data}))
         except IOException:
-            print "FileIndex: error accessing " + obj.file.path
+            print "NoteIndex: error accessing " + obj.file.path
             # actual file is not available
         return data
     '''
 
-site.register(File, FileIndex)
+site.register(Note, NoteIndex)
 site.register(School, SchoolIndex)
 site.register(Course, CourseIndex)

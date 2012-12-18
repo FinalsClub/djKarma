@@ -36,7 +36,7 @@
               {{ upload_count|default:"0" }} <!-- user's file count -->
             </div><!-- /stat_uploaded -->
             <div class="three columns stat_number stat_downloaded">
-              {{ user.get_profile.files.count }}
+              {{ user.get_profile.viewed_notes.count|default:"0" }}
             </div><!-- /stat_downloaded -->
             <div class="three columns stat_number stat_liked">
               {{ upvote_count }}

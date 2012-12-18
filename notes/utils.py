@@ -10,7 +10,7 @@ from forms import UploadFileForm
 from simple_autocomplete.widgets import AutoCompleteWidget
 
 from KNotes import settings
-from models import School, Course, File, Tag, UserProfile
+from models import School, Course, Note, Tag, UserProfile
 from notes import profile_tasks
 
 def _post_user_create_session_hook(request):
@@ -25,7 +25,7 @@ def _post_user_create_session_hook(request):
         print 'found unclaimed files session key'
         for unclaimed_file_pk in request.session[settings.SESSION_UNCLAIMED_FILES_KEY]:
             try:
-                unclaimed_file = File.objects.get(pk=unclaimed_file_pk)
+                unclaimed_file = Note.objects.get(pk=unclaimed_file_pk)
                 unclaimed_file.owner = request.user
                 unclaimed_file.save()  # Handles generating Event + Awarding Karma
                 print "saved " + str(unclaimed_file.title)
@@ -68,7 +68,7 @@ def nav_helper(request, response={}):
 
         # If user has a school selected, fetch recent additions to School
         # For the user's news feed
-        #response['recent_files'] = File.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
+        #response['recent_files'] = Note.objects.filter(school=request.user.get_profile().school).order_by('-timestamp')[:5]
 
     response['messages'] = complete_profile_prompt(user_profile)
     response['share_url'] = u"http://karmanotes.org/sign-up/{0}".format(user_profile.get_name())
@@ -139,7 +139,7 @@ def jsonifyModel(model, depth=0, user_pk=-1):
             for note in model.files.all().order_by('-timestamp'):
                 note_json = jsonifyModel(model=note, user_pk=user_pk)
                 json_result["notes"].append(note_json)
-    elif isinstance(model, File):
+    elif isinstance(model, Note):
         json_result["_id"] = model.pk
         json_result["notedesc"] = model.title
         json_result["views"] = model.viewCount
@@ -202,10 +202,10 @@ def jsonifyModel(model, depth=0, user_pk=-1):
 def processCsvTags(file, csvString):
     """ Retrieve or Create a tag corresponding to each string
         and assign it to file
-            file: a File object
+            file: a Note object
             csvString: a csv string of Tags
     """
-    if not isinstance(file, File):
+    if not isinstance(file, Note):
         return False
     tagStrs = csvString.split(',')
     for tagStr in tagStrs:
@@ -265,7 +265,7 @@ def complete_profile_prompt(user_profile):
 
 def userCanView(user, file):
     """ :user: django user
-        :file: a notes.models.File object
+        :file: a notes.models.Note object
         returns True/False
     """
     if file.owner == user or user.get_profile().files.filter(pk=file.pk).exists():
