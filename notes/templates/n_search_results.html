@@ -9,6 +9,15 @@
   Share College Course Notes
 {% endblock %}
 
+{% block pagescripts %}
+  <script>
+    // This is to differentiate search result clicks on .filter_button tabs
+    // from browse page tabs
+    var browse= false;
+  </script>
+{% endblock %}
+
+
 {% block content %}
 <section id="results_content">
 
@@ -43,7 +52,9 @@
               <div id="search_notes" class="filter_button" data-target='#note_results'>notes</div>
             </li>
             <li>
-              <div id="search_courses" class="filter_button" data-target='#course_results'>courses</div>
+              {% if not query %}
+                <div id="search_courses" class="filter_button" data-target='#course_results'>courses</div>
+              {% endif %}
             </li>
             {% if instructors|length > 0 %}
             <li>
@@ -75,10 +86,12 @@
             courses
           </div><!-- /column_header -->
 
-          {% for course in courses|slice:":3" %}
-            {# TODO: put the loop variable in the included partial #}
-            {% include 'partials/course_result_short.html' %}
-          {% endfor %}
+          {% if not query %}
+            {% for course in courses|slice:":3" %}
+              {# TODO: put the loop variable in the included partial #}
+              {% include 'partials/course_result_short.html' %}
+            {% endfor %}
+          {% endif %}
 
         </div><!-- /courses -->
       <!-- end Course results -->
