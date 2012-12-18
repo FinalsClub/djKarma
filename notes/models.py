@@ -58,17 +58,6 @@ class DriveAuth(models.Model):
                     (self.email, self.stored_at)
 
 
-class Level(models.Model):
-    """ Define User Levels
-        Each slug title is related to a minimum karma level
-    """
-    title = models.SlugField(max_length=255)
-    karma = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return u"%s %d" % (self.title, self.karma)
-
-
 class Tag(models.Model):
     """ This class represents a meta-tag of a note
         Used for searching
@@ -621,30 +610,6 @@ class UserProfile(models.Model):
         self.courses.add(course) # implies save()
         return True
 
-    def getLevel(self):
-        """ Determine the current level of the user
-            based on their karma and the Levels.
-            Returns a dictionary of
-            [current_level] -> Level
-            [next_level] -> Next Level
-
-        """
-        response = {}
-        levels = Level.objects.all().order_by('karma')
-        for (counter, level) in enumerate(levels):
-            if self.karma < level.karma:
-                if counter > 0:
-                    response['next_level'] = level
-                    response['current_level'] = levels[counter - 1]
-                else:
-                    # If the user has not surpassed the first level
-                    response['current_level'] = level
-                    response['next_level'] = levels[counter + 1]
-                break
-        if not 'next_level' in response:
-            response['current_level'] = levels[len(levels) - 1]
-        return response
-
     def get_picture(self, size='small'):
         """ get the url of an appropriately size image for a user
             :size:  if size is set to anything but small, it will return a 180px image
@@ -808,16 +773,6 @@ class UserProfile(models.Model):
         if self.school is not None and not self.submitted_school:
             self.submitted_school = True
             self.award_karma('profile-school', user=self.user)
-
-        # Add read permissions if Prospect karma level is reached
-        if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
-            self.can_read = True
-
-        # Add vote permissions if Prospect karma level is reached
-        #if self.can_vote == False and self.karma >= Level.objects.get(title='Prospect').karma:
-        #    self.can_vote = True
-
-        # TODO: Add other permissions...
 
         super(UserProfile, self).save(*args, **kwargs)
 

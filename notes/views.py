@@ -34,14 +34,11 @@ from models import School
 from models import Course
 from models import Note
 from models import Instructor
-from models import Level
 from models import Vote
 from models import ReputationEventType
 from models import UsdeSchool
 from profile_tasks import tasks
 from utils import complete_profile_prompt
-from utils import jsonifyModel
-from utils import nav_helper
 from utils import userCanView
 
 
@@ -797,34 +794,6 @@ def jqueryui_courses(request):
 
 def nurl_file(request, school_query, course_query, file_id, action=None):
     return file(request, file_id, action)
-
-
-def searchBySchool(request):
-    """ Ajax: Return user's school's courses in JSON
-        Used by search page javascript.
-        If user has no school, show all schools
-    """
-    response_json = []
-
-    if request.is_ajax():
-        if request.user.is_authenticated and request.user.get_profile().school is not None:
-            school = get_object_or_404(School, pk=request.user.get_profile().school.pk)
-            response_json.append(jsonifyModel(model=school, depth=1))
-        else:
-            schools = School.objects.all()
-            for school in schools:
-                school_json = jsonifyModel(model=school, depth=1)
-                response_json.append(school_json)
-        #print 'searchBySchool: ' + str(response_json)
-        return HttpResponse(json.dumps(response_json), mimetype="application/json")
-    else:
-        raise Http404
-
-        #A nicer way to do this would be to override the queryset serializer
-        #data = serializers.serialize("json", School.objects.all())
-        #return HttpResponse(data, mimetype='application/json')
-        #json_serializer = serializers.get_serializer("json")()
-        #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 
 @login_required
