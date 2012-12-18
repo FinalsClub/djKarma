@@ -43,9 +43,14 @@ class Command(BaseCommand):
 
         count = 0
         for s in school_dicts:
+            print "\n      ^      \n\n"
             try:
+                print "\t%s" % s['institution_id']
                 usde_school = UsdeSchool.objects.get(institution_id=s['institution_id'])
             except UsdeSchool.DoesNotExist:
+                print "\t"
+                print "\t%s" % s['institution_id']
+                print "\t%s" % s['institution_name']
 
                 count += 1
                 usde_school = UsdeSchool()
