@@ -1,0 +1,54 @@
+{% extends "n_base.html" %}
+{% load url from future %}
+
+{% block pagestyle %}
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/search_results.css">
+{% endblock %}
+
+{% block title %}
+  Share College Course Notes
+{% endblock %}
+
+{% block pagescripts %}
+<script>
+  var browse = true;
+</script>
+{% endblock %}
+
+{% block content %}
+<section id="results_content">
+
+  <div id="search_header" class="hero_gradient_bar">
+
+    <div class="row">
+      <div class="twelve columns">
+        <div id="search_filters">
+          <ul>
+            <li{% if browse_all %} class="button_bevel"{% endif %}>
+              {# TODO: Selected == button_interior #}
+              {# TODO: shift content on button click #}
+              <div id="search_main" class="filter_button{% if browse_all %} button_interior{% endif %}" data-target="#all_results" data-url="{% url 'browse' %}">
+                browse all
+              </div>
+            </li>
+            <li {% if notes and not browse_all %}class="button_bevel"{% endif %}>
+              <div  id="search_notes" 
+                    class="filter_button {% if notes and not browse_all %}button_interior{% endif %}" data-target='#note_results' data-url="{% url 'browse-notes' %}">notes</div>
+            </li>
+            <li {% if courses and not browse_all %}class="button_bevel"{% endif %}>
+              <div id="search_courses" class="filter_button {% if courses and not browse_all %}button_interior{% endif %}" data-target='#course_results' data-url="{% url 'browse-courses' %}">courses</div>
+            </li>
+            <li {% if schools and not browse_all %}class="button_bevel"{% endif %}>
+              <div id="search_schools" class="filter_button{% if schools and not browse_all %} button_interior{% endif %}" data-url="{% url 'schools' %}">schools</div> </li>
+          </ul>
+        </div><!-- /search_filters -->
+      </div>
+    </div>
+  </div><!-- /search_header -->
+
+  {% block results %}
+  {% endblock %}
+
+
+</section><!--/results_content-->
+{% endblock %}

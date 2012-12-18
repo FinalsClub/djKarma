@@ -1,0 +1,15 @@
+{% extends "n_browse_frame.html" %}
+{% load url from future %}
+
+{% block title %}
+  Share College Course Notes
+{% endblock %}
+
+
+{% block results %}
+
+  <div id="course_results" class="results_container">
+    {% include 'n_course_results.html' %}
+  </div><!-- #course_results .results_container -->
+
+{% endblock %}

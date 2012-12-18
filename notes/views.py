@@ -707,9 +707,6 @@ def accredited_schools(request):
 
 def schools(request):
     """ Ajax: School autcomplete form field """
-    print "schools request %*%&%&#($*&%&         %*%*"
-    print request.POST
-    print request.method, request.POST.has_key('a')
     if request.is_ajax() and request.method == 'POST' and request.POST.has_key('q'):
         query = request.POST.get('q')
         schools = School.objects.filter(name__icontains=query).distinct()
@@ -719,18 +716,33 @@ def schools(request):
             response['status'] = 'success'
         return HttpResponse(json.dumps(response), mimetype="application/json")
     elif request.method == 'POST':
-        # for creating a new school
-        print request.POST
+        # for creating a new school from a form
         # create new school, hasn't been implemented yet
-        print "create a new school!!! not implemented yet"
-        school = School()
+        new_school = School()
         a_school = UsdeSchool.objects.get(id=request.POST['school_id'])
-        school.name = a_school.institution_name
+        new_school.name = a_school.institution_name
+        new_school.location = u"%s, %s" % (a_school.institution_city, a_school.institution_state)
+        new_school.url = a_school.institution_web_address
+        new_school.save()
+        request.user.get_profile().school = new_school
+        request.user.get_profile().save()
+
         response = {}
         return HttpResponse(json.dumps(response), mimetype="application/json")
+    else:
+        # render the browse-schools route
+        response = {}
+        response['schools'] = School.objects.order_by('-karma').all()
+        return render(request, 'n_browse_schools.html', response)
+
 
     raise Http404
 
+def notes(request):
+    """ note list controllers """
+    response = {}
+    response['notes'] = File.objects.order_by('-numUpVotes').all()
+    return render(request, 'n_browse_notes.html', response)
 
 def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
@@ -748,24 +760,28 @@ def courses(request, school_query=None):
             response['status'] = 'fail'
         return HttpResponse(json.dumps(response), mimetype="application/json")
         # jquery autocomplete 
-    # FIXME: check if this is depricated below this line, and delete
-    # Find courses, or school and courses
-    if True:  # FIXME: why is this True here?
-        query = request.GET.get('q')
-        school_pk = request.GET.get('school', 0)
-        # If no school provided, search all courses
-        if int(school_pk) == 0:
-            courses = Course.objects.filter(title__icontains=query).distinct()
-        # IF school provided, restrict search
-        else:
-            courses = Course.objects.filter(title__icontains=query, school=School.objects.get(pk=school_pk)).distinct()
-
-    if request.is_ajax():
+    elif request.is_ajax():
         # if an ajax call, create a list of indexes and titles
+        # used for the autocomplete course field
         response = []
         for course in courses:
             response.append((course.pk, course.title))
         return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    else:
+        # when generating a list of all courses to browse
+        # browse courses
+        # request.method == 'GET'
+        response = {}
+        response['courses'] = Course.objects.order_by('-karma').all()
+        return render(request, 'n_browse_courses.html', response)
+
+
+    #query = request.GET.get('q')
+    #school_pk = request.GET.get('school', 0)
+    #courses = Course.objects.filter(title__icontains=query, school=School.objects.get(pk=school_pk)).distinct()
+    #courses = Course.objects.filter(title__icontains=query).distinct()
+
     raise Http404
 
 
@@ -880,15 +896,19 @@ def multisearch(request):
         return render(request, 'n_search_results.html', response)
 
 def browse(request):
+    """ Render a page of the schools courses notes that are marked browseable
+    """
     response = {}
 
+    #TODO: limit these to less than five each
     response['schools'] = School.objects.filter(browsable=True)
     response['courses'] = Course.objects.filter(browsable=True)
     response['notes'] = Note.objects.filter(browsable=True)
     response['instructors'] = []
     response['users'] = []
+    response['browse_all'] = True
 
-    return render(request, 'n_search_results.html', response)
+    return render(request, 'n_browse_all.html', response)
 
 
 ''' Search testing '''
