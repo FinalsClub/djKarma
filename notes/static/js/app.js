@@ -86,7 +86,7 @@ $(document).ready(function(){
 
   // Show Add Note lightbox
   $("#global_header_addnote").click(function() {
-    if (course_title != null){
+    if (typeof course_title != 'undefined'){
       $("#lightbox_upload_course_sidebar").text(course_title);
     }
     $("#lightbox_add_note").toggle();
