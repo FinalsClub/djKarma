@@ -174,37 +174,6 @@ def register(request, invite_user):
 """ =====================================================================
     People pages, pages that are heavily customized for a particular user
     ===================================================================== """
-def getting_started(request):
-    """ View for introducing a user to the site and asking them to accomplish intro tasks """
-    response = nav_helper(request)
-    response['tasks'] = []
-    for task in tasks:
-        t = {}
-        t['message'] = task().message
-        t['status'] = task().check(request.user.get_profile())
-        t['karma'] = task().karma
-        response['tasks'].append(t)
-    return render(request, 'getting-started.html', response)
-
-
-def karma_events(request):
-    """ Shows a time sorted log of your events that affect your
-        karma score positively or negatively.
-    """
-    # navigation.html
-    response = nav_helper(request)
-    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
-    return render(request, 'karma-events.html', response)
-
-
-@login_required
-def profile(request):
-    """ User Profile """
-    response = nav_helper(request)
-    response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
-    response['your_files'] = Note.objects.filter(owner=request.user).all()
-    return render(request, 'navigation.html', response)
-
 @login_required
 def raw_file(request, note_pk):
     """ Display the raw html from a Note object for embedding in an iframe """
@@ -428,20 +397,6 @@ def smartModelQuery(request):
     raise Http404
 
 
-def browse_schools(request):
-    """ Server-side templated browsing of notes by school, course and note """
-    response = nav_helper(request)
-    # make this order by the most notes in a school
-    response['title'] = u"Schools"
-    response['schools'] = School.objects.annotate(num_course=Count('course'))\
-                .order_by('num_course').reverse().filter(num_course__gt=0).all()
-    if request.user.get_profile().school not in response['schools']:
-        # create a new list of the user's school, extend it with the current list of schools
-        # this prepends the user's school to the top of the school list
-        response['schools'] = [request.user.get_profile().school] + list(response['schools'])
-        # this converts the QuerySet into a list, so this is not typesafe, but django templates do not care
-    return render(request, 'browse_schools.html', response)
-
 def school(request, school_query):
     """ View for a school, lists courses and school activity
         :school_query: comes as unicode, if can be int, pass as int
@@ -455,8 +410,6 @@ def school(request, school_query):
     # FIXME: does this work _instead_ or despite of int() casting?
     response['school'], response['courses'] = School.get_courses(school_query)
     return render(request, 'n_school.html', response)
-
-
 
 def browse_courses(request, school_query):
     """ View for courses beloging to :school_query:
