@@ -170,16 +170,20 @@ $(document).ready(function(){
   var slide_in = {'direction': 'right', 'mode': 'show'};
 
   $(".filter_button").click(function() {
-    // Slide out the current content
-    $(".results_container").effect("slide", slide_out, 300);
-    // Slide in the new content
-    $($(this).data('target')).effect("slide", slide_in, 300);
-    // remove the current active button
-    $(".filter_button.button_interior").parent().removeClass("button_bevel");
-    $(".filter_button.button_interior").removeClass("button_interior");
-    // activate the clicked button
-    $(this).parent().addClass("button_bevel");
-    $(this).addClass("button_interior");
+    if( browse === false ) {
+      // Slide out the current content
+      $(".results_container").effect("slide", slide_out, 300);
+      // Slide in the new content
+      $($(this).data('target')).effect("slide", slide_in, 300);
+      // remove the current active button
+      $(".filter_button.button_interior").parent().removeClass("button_bevel");
+      $(".filter_button.button_interior").removeClass("button_interior");
+      // activate the clicked button
+      $(this).parent().addClass("button_bevel");
+      $(this).addClass("button_interior");
+    } else {
+      window.location = $(this).data('url');
+    }
   });
 
   // Join a course to your profile
@@ -292,6 +296,7 @@ $(document).ready(function(){
       success: function(data){
         // TODO: add the course to my courses list and on dashboard
         $('#lightbox_create_school').hide();
+        document.location.reload(true);
       },
       type: 'POST'
     });

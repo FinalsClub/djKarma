@@ -90,7 +90,7 @@ urlpatterns = patterns('',
 
     #   ---------------------------------------------------
     ## Browsing schools, courses and files
-    url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
+    #url(r'^browse/schools$', 'notes.views.browse_schools', name='browse-schools'),
     # TODO: change these routes so they are unique regardless of path query for reverse()
     url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})/(?P<action>[^/]+)$', 'notes.views.nurl_file'),
     url(r'^b/(?P<school_query>[^/]+)/(?P<course_query>[^/]+)/(?P<file_id>\d{1,9999})$', 'notes.views.nurl_file', name='nurl_file'),
@@ -103,6 +103,9 @@ urlpatterns = patterns('',
     url(r'^raw/(?P<note_pk>\d{1,9999})$', 'notes.views.raw_file', name='raw-file'),
 
     url(r'^browse$', 'notes.views.browse', name='browse'),
+    url(r'^browse/courses$', 'notes.views.courses', name='browse-courses'),
+    url(r'^browse/notes$', 'notes.views.notes', name='browse-notes'),
+    url(r'^browse/schools$', 'notes.views.schools', name='browse-schools'),
 
     #   ---------------------------------------------------
     # Auth
