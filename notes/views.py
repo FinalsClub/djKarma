@@ -134,8 +134,8 @@ def register(request, invite_user):
             confirmation_code = new_user.get_profile().setEmailConfirmationCode()
             # TODO: switch to django-templated-email
             activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
-            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
 
+            # FIXME: make from email import from settings
             send_templated_mail(
                 template_name='confirm_email',
                 from_email='info@karmanotes.org',
@@ -205,6 +205,7 @@ def file(request, note_pk, action=None):
 
     response['owns_note'] = (note.owner == request.user)
     response['note'] = note
+    # FIXME: clean lovable and flagable status
     response['lovable'], response['flagable'] = True, True
     has_voted = note.vote_set.filter(user=request.user).exists()
     response['has_voted'] = has_voted
@@ -217,13 +218,6 @@ def file(request, note_pk, action=None):
             response['lovable'] = False
         else:
             response['flagable'] = False
-
-    if action == 'edit':
-        #print 'ACTION EDIT'
-        response['editing_file'] = True
-    else:
-        #print 'ACTION NONE'
-        response['editing_file'] = False
 
     return render(request, 'n_note.html', response)
 
@@ -239,7 +233,6 @@ def fileMeta(request):
         # This is the wrong way to use fileMeta, exit
         response["status"] = "invalid"
         return HttpResponse(json.dumps(response), mimetype="application/json")
-
 
     form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
 
@@ -261,6 +254,8 @@ def fileMeta(request):
     if request.user.is_authenticated():
         file.owner = request.user
     else:
+        # following code is for non-authenticated users upload
+        # currently not being used
         file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
         file.owner.save()
         # Perform reCAPTCHA check
@@ -288,25 +283,19 @@ def fileMeta(request):
     except Exception, e:
         print "school/course error: " + str(e)
 
+    # this lets a user use an autocomplete choose course field in the file upload form 
+    # and optionally joins them to the course
+    # not currently used
     if _course_id is not None and form.cleaned_data['in_course'] == "True":
         # if in_course selected, add the course to their profile
         request.user.get_profile().add_course(course_id=_course_id)
-    # process Tags
-    #processCsvTags(file, form.cleaned_data['tags'])
+
     file.save()
     response = {}
     response["status"] = "success"
     response["file_pk"] = file.pk
-    response["karma"] = file.karmaValue()
-    #print "fileMeta form valid! " + str(file.pk)
-    # lets us use django's messaging system for alert-notifications
-    # in our design on upload success at the top of the profile
-    # FIXME: fix this message with proper html
-    # render an html partial and then send it in json to jquery
-    if request.user.is_authenticated():
-        messages.add_message(request, messages.SUCCESS,
-        "Success! You uploaded a file (message: Django Messaging!")
-    # If user is not authenticated, store this file pk in their session
+
+    # TODO: If user is not authenticated, store this file pk in their session
     # TODO: IF a user isn't authenticated - present them
     # an indication that they can claim karma by logging in
 
