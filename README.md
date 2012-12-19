@@ -26,7 +26,7 @@ Deployment (Fresh Install)
 
 1. Checkout code from the git repository.
 
-2. install requirements with : `sudo pip install -r requirements` from `$SRC_ROOT`.
+2. install requirements with : `sudo pip install -r requirements/common.txt` from `$SRC_ROOT`.
 
 3. Setup postresql:
 
@@ -74,7 +74,7 @@ Deployment
 ----------
 
 1. checkout the git repository, we use `/var/www/djKarma` and will refer to this as the root of the repo
-2. install requirements with `sudo pip install -r requirements.txt`
+2. install requirements with `sudo pip install -r requirements/common.txt`
 3. Create the database if a new deployment with `./manage.py syncdb` If this is not a new deployment, see the section below on database migrations. NOTE: You can't create a superuser BEFORE loading the fixtures.
 4. Use south to migrate `djcelery` and `kombu.transport.django`:
     ./manage.py migrate djcelery
@@ -277,7 +277,7 @@ Importing finalsclub database
 
 3. install requirements 
 	
-	sudo pip install -r requirements.txt
+	sudo pip install -r requirements/common.txt
 4. Re-populate the contents of the static
 
 	./manage.py collectstatic
