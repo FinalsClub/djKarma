@@ -182,38 +182,36 @@ def file(request, note_pk, action=None):
     """ View Note HTML
         Args:
             request: Django request object
-            note_pk: file_pk int
+            note_pk: note_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
     response = {}
     user_profile = request.user.get_profile()
-    file = get_object_or_404(Note, pk=note_pk)
+    note = get_object_or_404(Note, pk=note_pk)
 
-    # If this file is not in the user's collection, 
-    # add this file to the user_profile as a viewd file
+    # If this note is not in the user's collection, 
+    # add this note to the user_profile as a viewd note
     if not user_profile.viewed_notes.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
-        user_profile.award_karma('view-file', school=file.school, course=file.course, file=file, user=request.user)
-        # Add 'purchased' file to user's collection
-        user_profile.viewed_notes.add(file)
+        user_profile.award_karma('view-file', school=note.school, course=note.course, file=note, user=request.user)
+        # Add 'purchased' note to user's collection
+        user_profile.viewed_notes.add(note)
         user_profile.save()
-        print user_profile, 'purchased', file, 'with karma.'
+        print user_profile, 'purchased', note, 'with karma.'
         # Increment note view count
-        file.viewCount += 1
-        file.save()
+        note.viewCount += 1
+        note.save()
 
-    response['owns_file'] = (file.owner == request.user)
-    response['file'] = file
-
+    response['owns_note'] = (note.owner == request.user)
+    response['note'] = note
     response['lovable'], response['flagable'] = True, True
-
-    has_voted = file.vote_set.filter(user=request.user).exists()
+    has_voted = note.vote_set.filter(user=request.user).exists()
     response['has_voted'] = has_voted
 
     if has_voted:
-        print 'views.file: current user has voted on this file'
-        vote = file.vote_set.get(user=request.user)
+        print 'views.note: current user has voted on this note'
+        vote = note.vote_set.get(user=request.user)
         response['vote_status'] = vote.up
         if vote.up:
             response['lovable'] = False
@@ -224,8 +222,8 @@ def file(request, note_pk, action=None):
         #print 'ACTION EDIT'
         response['editing_file'] = True
     else:
-        response['editing_file'] = False
         #print 'ACTION NONE'
+        response['editing_file'] = False
 
     return render(request, 'n_note.html', response)
 
