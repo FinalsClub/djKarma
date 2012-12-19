@@ -48,18 +48,7 @@ def complete_profile_prompt(user_profile):
     # return list of message prompts for the user to be told on the profile page
     messages = [{"body": task.message, "div_id": task.div_id} for task in profile_todo]
     return messages
-
-
-def userCanView(user, file):
-    """ :user: django user
-        :file: a notes.models.Note object
-        returns True/False
-    """
-    if file.owner == user or user.get_profile().viewed_notes.filter(pk=file.pk).exists():
-        print "user can view!"
-        return True
-    return False
-
+    
 
 class Janitor():
     """ Collection of cleanup functions for the notes app """

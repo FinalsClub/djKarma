@@ -19,7 +19,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
-from django.utils.encoding import iri_to_uri
 from haystack.query import SearchQuerySet
 from recaptcha.client import captcha as recaptcha
 
@@ -37,9 +36,6 @@ from models import Instructor
 from models import Vote
 from models import ReputationEventType
 from models import UsdeSchool
-from profile_tasks import tasks
-from utils import complete_profile_prompt
-from utils import userCanView
 
 
 # For Ajax Uploader
