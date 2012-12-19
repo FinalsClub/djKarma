@@ -1,5 +1,9 @@
-# settings.py is part of Karma Notes
-# Django settings for KNotes project.
+#!/usr/bin/python2.7
+# -*- coding:utf8 -*-
+""" Django settings for KNotes project. """
+import os
+
+from djcelery import setup_loader
 
 ''' Secrets '''
 from notes.credentials import FACEBOOK_ID
@@ -28,10 +32,7 @@ from notes.credentials import SMTP_PASSWORD
 
 from notes.credentials import DEFAULT_FROM_EMAIL
 
-import os
-import djcelery
 
-djcelery.setup_loader()
 
 # Is this running on the karmanotes.org box?
 DEPLOY = True
@@ -86,16 +87,12 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
      ("Seth Woodworth", 'seth@finalsclub.org'),
-     ("David Brodsky", 'david@finalsclub.org'),
      ("Charles Holbrow", 'charles@finalsclub.org')
 )
 
 MANAGERS = ADMINS
 
-# For autocomplete
-SIMPLE_AUTOCOMPLETE_MODELS = ('notes.School', 'notes.Course')
-
-TIME_ZONE = 'America/New_York'
+IME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -302,7 +299,12 @@ INSTALLED_APPS = (
     'notes',
 )
 
-# Django-Celery settings
+###===========================
+# django-celery configuration
+
+setup_loader()
+
+# TODO: set up rabbitmq properly
 BROKER_URL = "django://"
 
 if DEPLOY:
@@ -313,8 +315,12 @@ if DEPLOY:
 else:
     CELERY_RESULT_DBURI = "sqlite:///karmaNotes.sql"
 
+# end django-celery conf
+########################
 
-### HAYSTACK Configuration
+###=======================
+## HAYSTACK Configuration
+
 HAYSTACK_SITECONF = 'notes.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'solr'
 
@@ -322,6 +328,9 @@ HAYSTACK_SEARCH_ENGINE = 'solr'
 HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
 # ...or for multicore...
 #HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/mysite'
+
+## end HAYSTACK conf
+###==================
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -352,6 +361,9 @@ LOGGING = {
     }
 }
 
+###===================
+## AWS SES email conf
+
 EMAIL_USE_TLS       = True
 EMAIL_HOST          = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_HOST_USER     = SMTP_USERNAME
@@ -360,6 +372,9 @@ EMAIL_PORT          = 587
 
 TEMPLATED_EMAIL_TEMPLATE_DIR = 'templated_email/'  # use '' for top level template dir, ensure there is a trailing slash
 TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
+
+## end SES email conf
+###===================
 
 try:
     # For development, mv the initial file `dev_settings.py` to be named `local_settings.py`
