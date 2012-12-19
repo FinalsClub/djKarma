@@ -34,60 +34,12 @@ def _post_user_create_session_hook(request):
         del request.session[settings.SESSION_UNCLAIMED_FILES_KEY]
 
 
-def processCsvTags(file, csvString):
-    """ Retrieve or Create a tag corresponding to each string
-        and assign it to file
-            file: a Note object
-            csvString: a csv string of Tags
-    """
-    if not isinstance(file, Note):
-        return False
-    tagStrs = csvString.split(',')
-    for tagStr in tagStrs:
-        # If the tag is empty, ignore it
-        if slugify(tagStr) == "":
-            continue
-        #print tagStr + " : " + str(slugify(tagStr))
-        tag, created = Tag.objects.get_or_create(name=slugify(tagStr))
-        #print "tag created: " + str(created)
-        #print "tag name: " + tag.name
-        file.tags.add(tag)
-    return True
-
-
-def uploadForm(user):
-    """ Creates an UploadFileForm and pre-populates the school field
-        With the user's school, if available
-        is currently unused?
-    """
-    #print request.user.username
-    user_profile = user.get_profile()
-    if user_profile.school:
-        print "The user has a school, so we will auto populate it"
-        # This isn't the ideal way to override the field system. I would rather extend or replicate the existing UploadFileForm, but I am slightly unsure how to do that
-        # Alternatively, I could figure out how to use the 'school' kv argument
-        form = UploadFileForm(initial={'course': -1, 'school': user_profile.school.pk})
-        form.fields['school'] = djangoforms.ModelChoiceField(
-                queryset=School.objects.all(),
-                widget=AutoCompleteWidget(
-                    url='/schools',
-                    initial_display=user_profile.school.name
-                ),
-                error_messages={'invalid_choice': 'Enter a valid school. Begin typing a school name to see available choices.',
-                                'required': 'Enter a school.'},
-            )
-    else:
-        # Provide bogus default school and course data to ensure
-        # legitimate data is chosen
-        form = UploadFileForm(initial={'course': -1, 'school': -1})
-    return form
-
-
 def complete_profile_prompt(user_profile):
     """ Creates a list of prompts for the user to do to complete their profile
         Takes a User object
         Returns a list of template strings
     """
+    #FIXME: not currently used, but for the nag messaging system
     profile_todo = []
     for task in profile_tasks.tasks:
         if not task.check(task(), user_profile):
