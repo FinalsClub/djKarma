@@ -238,8 +238,7 @@ $(document).ready(function(){
 
   // Choose a course, hide the select field
   $('.course-select').click( function() {
-    var course_pk = $(this).data('id');
-    console.log("course selected");
+    course_pk = $(this).data('id');
     // fill the lightbox_instruction with the chosen course's title
     $('#lightbox_upload_course_sidebar').text($(this).text());
     // hide the my courses drop down
