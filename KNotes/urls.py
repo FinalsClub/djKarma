@@ -60,8 +60,6 @@ urlpatterns = patterns('',
     url(r'^create-course', 'notes.views.create_course', name='create-course'),
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
     url(r'^drop-course', 'notes.views.drop_course', name='drop-course'),
-    # Add Course, School forms
-    url(r'^add', 'notes.views.addModel', name='add'),
     # Edit course
 
     #   ---------------------------------------------------
