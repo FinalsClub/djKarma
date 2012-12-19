@@ -13,6 +13,7 @@ from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.db.models import Count
+from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
@@ -35,6 +36,7 @@ from models import Note
 from models import Instructor
 from models import Vote
 from models import ReputationEventType
+from models import ReputationEvent
 from models import UsdeSchool
 
 
@@ -65,11 +67,12 @@ def dashboard(request):
 
     response = {}
 
-    response['events'] = request.user.get_profile().reputationEvents.order_by('-id').all()
+    query = Q(user=request.user) | Q(target=request.user)
+    response['events'] = ReputationEvent.objects.filter(query).order_by('-id').all()
     response['upload_count'] = Note.objects.filter(owner=request.user).count()
 
     # Count the reputation events where the user was the actor and the type was 'upvote'
-    response['upvote_count'] = request.user.actor.filter(type__title='upvote').count()
+    response['upvote_count'] = request.user.reputation_event_actor.filter(type__title='upvote').count()
     return render(request, 'n_dashboard.html', response)
 
 

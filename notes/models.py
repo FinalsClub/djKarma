@@ -505,8 +505,8 @@ class ReputationEvent(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     # optional fkeys to related models. used for displaying activity for user/school/course
-    user        = models.ForeignKey(User, blank=True, null=True, related_name='actor') # FIXME: rename actor_user
-    target      = models.ForeignKey(User, blank=True, null=True, related_name='target')
+    user        = models.ForeignKey(User, blank=True, null=True, related_name='reputation_event_actor') 
+    target      = models.ForeignKey(User, blank=True, null=True, related_name='reputation_event_target')
     file        = models.ForeignKey(Note, blank=True, null=True)
     course      = models.ForeignKey(Course, blank=True, null=True)
     school      = models.ForeignKey(School, blank=True, null=True)
@@ -541,7 +541,6 @@ class UserProfile(models.Model):
     # it is more efficient to incrementally tally the total value
     # vs summing all ReputationEvents every time karma is needed
     karma = models.IntegerField(default=0)
-    reputationEvents = models.ManyToManyField(ReputationEvent, blank=True, null=True)
 
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
@@ -670,7 +669,6 @@ class UserProfile(models.Model):
 
     def award_karma(self, event, target_user=None, school=None, course=None, user=None, file=None):
         """ Award user karma given a ReputationEventType slug title
-            and add a new ReputationEvent to UserProfile.reputationEvents
             Does not call UserProfile.save() because it is used in
             The UserProfile save() method
 
@@ -699,10 +697,13 @@ class UserProfile(models.Model):
                 event.course = course
             if user:
                 event.user = user
+            if target_user:
+                event.target = target_user
+                print 'UserProfile.award_karma: target user set'
             if file:
                 event.file = file
             event.save()  # FIXME: might be called on UserProfile.save()
-            self.reputationEvents.add(event)
+
             # Don't self.save(), because this method is called
             # from UserProfile.save()
             return self
@@ -711,34 +712,35 @@ class UserProfile(models.Model):
             print e
             return False
 
-    def addFile(self, Note):
+    def addFile(self, note):
         """ Called by notes.views.upload after saving Note
             Generates the appropriate ReputationEvent, and modifies
             the user's karma
         """
-        # Set Note.owner to the user
-        Note.owner = self.user
-        Note.save()
+        # Set note.owner to the user
+        note.owner = self.user
+        note.save()
         # Add this file to the user's collection
-        self.viewed_notes.add(Note)
+        self.viewed_notes.add(note)
         # Generate a reputation event
         title = ""
-        if Note.type == 'N':
+        if note.type == 'N':
             title = 'lecture-note'
-        elif Note.type == 'G':
+        elif note.type == 'G':
             title = 'mid-term-study-guide'
-        elif Note.type == 'S':
+        elif note.type == 'S':
             title = 'syllabus'
-        elif Note.type == 'A':
+        elif note.type == 'A':
             title = 'assignment'
-        elif Note.type == 'E':
+        elif note.type == 'E':
             title = 'exam-or-quiz'
 
         # Remember to load all ReputationEventTypes with
         # python manage.py loaddata ./fixtures/data.json
         repType = ReputationEventType.objects.get(title=title)
-        repEvent = ReputationEvent.objects.create(type=repType)
-        self.reputationEvents.add(repEvent)
+        repEvent = ReputationEvent.objects.create(type=repType, 
+            user = self.user,
+            file = note) #FIXME: check if we need to add a school to this list
 
         # Assign user points as prescribed by ReputationEventType
         self.karma += repType.actor_karma
