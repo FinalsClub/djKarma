@@ -25,7 +25,7 @@ class SchoolIndex(SearchIndex):
     '''
     def index_queryset(self):
         """Used when the entire index for model is updated."""
-        return Note.objects.filter(pub_date__lte=datetime.datetime.now())
+        return Note.objects.filter(pub_date__lte=datetime.datetime.utcnow())
     '''
 
 

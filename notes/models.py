@@ -201,11 +201,11 @@ class Course(models.Model):
     url             = models.URLField(max_length=511, blank=True)
     field           = models.CharField(max_length=255, blank=True, null=True)
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
-    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
+    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.utcnow().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
     instructor_name = models.CharField(max_length=255, blank=True, null=True)
     instructor_email= models.EmailField(blank=True, null=True)
-    last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    last_updated    = models.DateTimeField(default=datetime.datetime.utcnow)
     desc            = models.TextField(max_length=1023, blank=True, null=True)
     # last_updated is updated with the datetime of the latest Note.save() ran. Not on user join/drop
     browsable       = models.BooleanField(default=False)
@@ -304,7 +304,7 @@ class Note(models.Model):
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes", blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
-    timestamp   = models.DateTimeField(default=datetime.datetime.now)
+    timestamp   = models.DateTimeField(default=datetime.datetime.utcnow)
     created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
     viewCount   = models.IntegerField(default=0)
     numUpVotes  = models.IntegerField(default=0)
@@ -371,7 +371,7 @@ class Note(models.Model):
         super(Note, self).save(*args, **kwargs)
         # update associated course last_updated
         if self.course:
-            self.course.last_updated = datetime.datetime.now()
+            self.course.last_updated = datetime.datetime.utcnow()
             self.course.save
 
     def vote(self, voter, vote_value):
