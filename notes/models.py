@@ -58,88 +58,6 @@ class DriveAuth(models.Model):
                     (self.email, self.stored_at)
 
 
-class Level(models.Model):
-    """ Define User Levels
-        Each slug title is related to a minimum karma level
-    """
-    title = models.SlugField(max_length=255)
-    karma = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return u"%s %d" % (self.title, self.karma)
-
-
-class SiteStats(models.Model):
-    """ Used to incrementally tally site statistics
-        For display on landing page, etc.
-        This is more efficient then calculating totals on every request
-        Upon installing the app we should initialize ONE instance of SiteStats
-        The increment/decrement methods will act only on the first instance (pk=1)
-    """
-    # TODO: make this class name singular
-    numNotes = models.IntegerField(default=0)
-    numStudyGuides = models.IntegerField(default=0)
-    numSyllabi = models.IntegerField(default=0)
-    numAssignments = models.IntegerField(default=0)
-    numExams = models.IntegerField(default=0)
-
-    numCourses = models.IntegerField(default=0)
-    numSchools = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return u"%d Notes, %d Guides, %d Syllabi, %d Assignments, %d Exams for %d total Courses at %d Schools" % (self.numNotes, self.numStudyGuides, self.numSyllabi, self.numAssignments, self.numExams, self.numCourses, self.numSchools)
-
-
-def decrement(sender, **kwargs):
-    """ Decrease the appropriate stat given a Model
-        Called in Model save() and post_delete() (not delete() due to queryset behavior)
-    """
-    # TODO, impement this as a method on the SiteStat object, rather than in the global scope of models
-    stats = SiteStats.objects.get(pk=1)
-    if isinstance(sender, File):
-        if sender.type == 'N':
-            stats.numNotes -= 1
-        elif sender.type == 'G':
-            stats.numStudyGuides -= 1
-        elif sender.type == 'S':
-            stats.numSyllabi -= 1
-        elif sender.type == 'A':
-            stats.numAssignments -= 1
-        elif sender.type == 'E':
-            stats.numExams -= 1
-    elif isinstance(sender, School):
-        stats.numSchools -= 1
-    elif isinstance(sender, Course):
-        stats.numCourses -= 1
-    stats.save()
-
-
-def increment(sender, **kwargs):
-    """ Increment the appropriate stat given a Model
-        Called in Model save() and post_delete() (not delete() due to queryset behavior)
-    """
-    # TODO, modify decrement to increment or decrement based on a passed flag, rather than duplicating this if else logic
-    stats = SiteStats.objects.get(pk=1)
-    #print stats.numNotes
-    if isinstance(sender, File):
-        print sender.type
-        if sender.type == 'N':
-            stats.numNotes += 1
-        elif sender.type == 'G':
-            stats.numStudyGuides += 1
-        elif sender.type == 'S':
-            stats.numSyllabi += 1
-        elif sender.type == 'A':
-            stats.numAssignments += 1
-        elif sender.type == 'E':
-            stats.numExams += 1
-    elif isinstance(sender, School):
-        stats.numSchools += 1
-    elif isinstance(sender, Course):
-        stats.numCourses += 1
-    stats.save()
-
-
 class Tag(models.Model):
     """ This class represents a meta-tag of a note
         Used for searching
@@ -217,17 +135,11 @@ class School(models.Model):
 
 
     def save(self, *args, **kwargs):
-        # If a new School is being saved, increment SiteStat School count
-        if not self.pk:
-            increment(self)
         if not self.slug:
             # FIXME: make this unique
             # TODO: add a legacy slugs table that provide redirects to new slug pages
             self.slug = slugify(self.name)
         super(School, self).save(*args, **kwargs)
-
-# On School delete, decrement numSchools
-post_delete.connect(decrement, sender=School)
 
 
 class UsdeSchool(models.Model):
@@ -289,13 +201,13 @@ class Course(models.Model):
     url             = models.URLField(max_length=511, blank=True)
     field           = models.CharField(max_length=255, blank=True, null=True)
     semester        = models.IntegerField(choices=SEMESTERS, blank=True, null=True)
-    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.now().year)
+    academic_year   = models.IntegerField(blank=True, null=True, default=datetime.datetime.utcnow().year)
     instructor      = models.ForeignKey(Instructor, blank=True, null=True)
     instructor_name = models.CharField(max_length=255, blank=True, null=True)
     instructor_email= models.EmailField(blank=True, null=True)
-    last_updated    = models.DateTimeField(default=datetime.datetime.now)
+    last_updated    = models.DateTimeField(default=datetime.datetime.utcnow)
     desc            = models.TextField(max_length=1023, blank=True, null=True)
-    # last_updated is updated with the datetime of the latest File.save() ran. Not on user join/drop
+    # last_updated is updated with the datetime of the latest Note.save() ran. Not on user join/drop
     browsable       = models.BooleanField(default=False)
     karma           = models.IntegerField(default=0)
 
@@ -323,7 +235,7 @@ class Course(models.Model):
         else:
             print "No course found, so no notes"
             raise Http404
-        return _course, File.objects.filter(course=_course).order_by('timestamp').distinct()
+        return _course, Note.objects.filter(course=_course).order_by('timestamp').distinct()
 
     def sum_karma(self):
         """calculate the total karma for all ReputationEvents for this course 
@@ -337,9 +249,6 @@ class Course(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        # If a new Course is being saved, increment SiteStat Course count
-        if not self.pk:
-            increment(self)
         if not self.slug:
             # FIXME: make this unique
             # TODO: add a legacy slugs table that provide redirects to new slug pages
@@ -356,11 +265,8 @@ class Course(models.Model):
         # can't refer to more than one course
         unique_together = ('school', 'slug')
 
-# On Course delete, decrement numCourses
-post_delete.connect(decrement, sender=Course)
 
-
-class File(models.Model):
+class Note(models.Model):
 
     # FIXME: list of tuples can't be addressed, dicts can
     # FILE_TYPES['N']
@@ -398,7 +304,7 @@ class File(models.Model):
     school      = models.ForeignKey(School, blank=True, null=True)
     file        = models.FileField(upload_to="uploads/notes", blank=True, null=True)
     tags        = models.ManyToManyField(Tag, blank=True, null=True)
-    timestamp   = models.DateTimeField(default=datetime.datetime.now)
+    timestamp   = models.DateTimeField(default=datetime.datetime.utcnow)
     created_on  = models.DateField(blank=True, null=True, default=datetime.date.today)
     viewCount   = models.IntegerField(default=0)
     numUpVotes  = models.IntegerField(default=0)
@@ -462,21 +368,11 @@ class File(models.Model):
             self.html = re.escape(self.html)
             self.cleaned = True
 
-        super(File, self).save(*args, **kwargs)
+        super(Note, self).save(*args, **kwargs)
         # update associated course last_updated
-        try:
-            self.course.last_updated = datetime.datetime.now()
+        if self.course:
+            self.course.last_updated = datetime.datetime.utcnow()
             self.course.save
-        except:
-            pass
-
-    def ownedBy(self, user_pk):
-        """ Returns true if the user owns or has "paid" for this file
-        """
-        # If the file is in the user's collection, or the user owns the file
-        if self.owner == User.objects.get(pk=user_pk) or User.objects.get(pk=user_pk).get_profile().files.filter(pk=self.pk).exists():
-            return True
-        return False
 
     def vote(self, voter, vote_value):
         """ Calls UserProfile.award_karma
@@ -485,7 +381,7 @@ class File(models.Model):
             upvote - vote_value=1 , downvote - vote_value=-1
             :voter: a User object who is trying to register a vote
         """
-        print "models.File.vote: Creating Vote object"
+        print "models.Note.vote: Creating Vote object"
         print "voter:", voter
         print "value:", vote_value
 
@@ -528,7 +424,7 @@ class File(models.Model):
 
             # Award karma
             if self.owner:
-                print 'models.File.vote: profile', self.owner.get_profile()
+                print 'models.Note.vote: profile', self.owner.get_profile()
                 self.owner.get_profile().award_karma(
                     event=event, 
                     course=self.course, 
@@ -537,7 +433,7 @@ class File(models.Model):
                     user=voter)
 
             else:
-                print "models.File.vote: file has no owner:", self
+                print "models.Note.vote: file has no owner:", self
 
         self.save()
 
@@ -564,8 +460,10 @@ class File(models.Model):
         except:
             return 0
 
-# On File delete, decrement appropriate stat
-post_delete.connect(decrement, sender=File)
+    class Meta:
+        # we re-factored the model. Old name is 'File'. New name is 'Note'
+        db_table = 'notes_file'
+
 
 
 class Vote(models.Model):
@@ -575,7 +473,7 @@ class Vote(models.Model):
     """
     user = models.ForeignKey(User)
     up = models.BooleanField(default=True)
-    note = models.ForeignKey(File)
+    note = models.ForeignKey(Note)
 
     def __unicode__(self):
         return u"%s voted %s" % (self.user, str(self.up))
@@ -607,9 +505,9 @@ class ReputationEvent(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     # optional fkeys to related models. used for displaying activity for user/school/course
-    user        = models.ForeignKey(User, blank=True, null=True, related_name='actor') # FIXME: rename actor_user
-    target      = models.ForeignKey(User, blank=True, null=True, related_name='target')
-    file        = models.ForeignKey(File, blank=True, null=True)
+    user        = models.ForeignKey(User, blank=True, null=True, related_name='reputation_event_actor') 
+    target      = models.ForeignKey(User, blank=True, null=True, related_name='reputation_event_target')
+    file        = models.ForeignKey(Note, blank=True, null=True)
     course      = models.ForeignKey(Course, blank=True, null=True)
     school      = models.ForeignKey(School, blank=True, null=True)
 
@@ -643,7 +541,6 @@ class UserProfile(models.Model):
     # it is more efficient to incrementally tally the total value
     # vs summing all ReputationEvents every time karma is needed
     karma = models.IntegerField(default=0)
-    reputationEvents = models.ManyToManyField(ReputationEvent, blank=True, null=True)
 
     # Optional fields:
     # TODO: update this when User.save() is run, check if gravatar has an image for their email
@@ -661,7 +558,7 @@ class UserProfile(models.Model):
     can_moderate = models.BooleanField(default=False)
 
     # user-submitted files and those the user has "paid for"
-    files = models.ManyToManyField(File, blank=True, null=True)
+    viewed_notes = models.ManyToManyField(Note, blank=True, null=True)
 
     # courses a user is currently, or has been enrolled
     courses = models.ManyToManyField(Course, null=True, blank=True)
@@ -711,30 +608,6 @@ class UserProfile(models.Model):
             return False
         self.courses.add(course) # implies save()
         return True
-
-    def getLevel(self):
-        """ Determine the current level of the user
-            based on their karma and the Levels.
-            Returns a dictionary of
-            [current_level] -> Level
-            [next_level] -> Next Level
-
-        """
-        response = {}
-        levels = Level.objects.all().order_by('karma')
-        for (counter, level) in enumerate(levels):
-            if self.karma < level.karma:
-                if counter > 0:
-                    response['next_level'] = level
-                    response['current_level'] = levels[counter - 1]
-                else:
-                    # If the user has not surpassed the first level
-                    response['current_level'] = level
-                    response['next_level'] = levels[counter + 1]
-                break
-        if not 'next_level' in response:
-            response['current_level'] = levels[len(levels) - 1]
-        return response
 
     def get_picture(self, size='small'):
         """ get the url of an appropriately size image for a user
@@ -796,7 +669,6 @@ class UserProfile(models.Model):
 
     def award_karma(self, event, target_user=None, school=None, course=None, user=None, file=None):
         """ Award user karma given a ReputationEventType slug title
-            and add a new ReputationEvent to UserProfile.reputationEvents
             Does not call UserProfile.save() because it is used in
             The UserProfile save() method
 
@@ -805,7 +677,7 @@ class UserProfile(models.Model):
             :school: is a School object (optional)
             :course: a Course object (optional)
             :user: a User object (optional), for recalling username when showing other's karmaevents
-            :file: a notes.models.File object (optional)
+            :file: a notes.models.Note object (optional)
             returns True or False
 
         """
@@ -825,10 +697,13 @@ class UserProfile(models.Model):
                 event.course = course
             if user:
                 event.user = user
+            if target_user:
+                event.target = target_user
+                print 'UserProfile.award_karma: target user set'
             if file:
                 event.file = file
             event.save()  # FIXME: might be called on UserProfile.save()
-            self.reputationEvents.add(event)
+
             # Don't self.save(), because this method is called
             # from UserProfile.save()
             return self
@@ -837,34 +712,35 @@ class UserProfile(models.Model):
             print e
             return False
 
-    def addFile(self, File):
-        """ Called by notes.views.upload after saving File
+    def addFile(self, note):
+        """ Called by notes.views.upload after saving Note
             Generates the appropriate ReputationEvent, and modifies
             the user's karma
         """
-        # Set File.owner to the user
-        File.owner = self.user
-        File.save()
+        # Set note.owner to the user
+        note.owner = self.user
+        note.save()
         # Add this file to the user's collection
-        self.files.add(File)
+        self.viewed_notes.add(note)
         # Generate a reputation event
         title = ""
-        if File.type == 'N':
+        if note.type == 'N':
             title = 'lecture-note'
-        elif File.type == 'G':
+        elif note.type == 'G':
             title = 'mid-term-study-guide'
-        elif File.type == 'S':
+        elif note.type == 'S':
             title = 'syllabus'
-        elif File.type == 'A':
+        elif note.type == 'A':
             title = 'assignment'
-        elif File.type == 'E':
+        elif note.type == 'E':
             title = 'exam-or-quiz'
 
         # Remember to load all ReputationEventTypes with
         # python manage.py loaddata ./fixtures/data.json
         repType = ReputationEventType.objects.get(title=title)
-        repEvent = ReputationEvent.objects.create(type=repType)
-        self.reputationEvents.add(repEvent)
+        repEvent = ReputationEvent.objects.create(type=repType, 
+            user = self.user,
+            file = note) #FIXME: check if we need to add a school to this list
 
         # Assign user points as prescribed by ReputationEventType
         self.karma += repType.actor_karma
@@ -899,16 +775,6 @@ class UserProfile(models.Model):
         if self.school is not None and not self.submitted_school:
             self.submitted_school = True
             self.award_karma('profile-school', user=self.user)
-
-        # Add read permissions if Prospect karma level is reached
-        if not self.can_read and self.karma >= Level.objects.get(title='Prospect').karma:
-            self.can_read = True
-
-        # Add vote permissions if Prospect karma level is reached
-        #if self.can_vote == False and self.karma >= Level.objects.get(title='Prospect').karma:
-        #    self.can_vote = True
-
-        # TODO: Add other permissions...
 
         super(UserProfile, self).save(*args, **kwargs)
 

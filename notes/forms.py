@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 from simple_autocomplete.widgets import AutoCompleteWidget
 from simplemathcaptcha.fields import MathCaptchaField
 
-from models import School, Course, File, Tag, Instructor
+from models import School, Course, Note, Tag, Instructor
 
 
 class UserCreateForm(UserCreationForm):
@@ -39,7 +39,7 @@ class FileMetaDataForm(forms.Form):
                     widget=forms.HiddenInput(attrs={'id': 'file-form-school_pk'}))
     course_pk      = forms.CharField(max_length=255, \
                     widget=forms.HiddenInput(attrs={'id': 'file-form-course_pk'}))
-    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    type        = forms.ChoiceField(choices=Note.FILE_PTS)
     title       = forms.CharField(max_length=50, \
                     error_messages={'required': 'Enter a title.'}, \
                     widget=forms.TextInput(attrs={'class': 'text-input'}))
@@ -78,7 +78,7 @@ class FileMetaDataFormNoCaptcha(forms.Form):
                         attrs={'id': 'file-form-course_pk'}
                     )
                 )
-    type        = forms.ChoiceField(choices=File.FILE_PTS, required=False)
+    type        = forms.ChoiceField(choices=Note.FILE_PTS, required=False)
     created_on        = forms.DateField(required=False)
     title       = forms.CharField(max_length=50,
                     error_messages={'required': 'Enter a title.'},
@@ -176,7 +176,7 @@ class ModelSearchForm(forms.Form):
 
 
 class UsherUploadFileForm(forms.Form):
-    type        = forms.ChoiceField(choices=File.FILE_PTS)
+    type        = forms.ChoiceField(choices=Note.FILE_PTS)
     title       = forms.CharField(max_length=50, \
                     error_messages={'required': 'Enter a title.'})
     description = forms.CharField(required=False, max_length=511, \
@@ -318,7 +318,7 @@ class SmartSchoolForm(forms.Form):
 
 # Upload file form
 class UploadFileForm(forms.Form):
-    type = forms.ChoiceField(choices=File.FILE_PTS)
+    type = forms.ChoiceField(choices=Note.FILE_PTS)
     title = forms.CharField(max_length=50, error_messages={'required': 'Enter a title.'})
     description = forms.CharField(max_length=511, error_messages={'required': 'Enter a description.'})
     #school = forms.ModelChoiceField(queryset=School.objects.all(), empty_label="")

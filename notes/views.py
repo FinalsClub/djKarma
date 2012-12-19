@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+# -*- coding:utf8 -*-
 # Copyright (C) 2012  FinalsClub Foundation
 
 import datetime
@@ -13,13 +15,13 @@ from django.contrib.auth import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.db.models import Count
+from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
-from django.utils.encoding import iri_to_uri
 from haystack.query import SearchQuerySet
 from recaptcha.client import captcha as recaptcha
 
@@ -32,18 +34,12 @@ from templated_email import send_templated_mail
 
 from models import School
 from models import Course
-from models import File
+from models import Note
 from models import Instructor
-from models import SiteStats
-from models import Level
 from models import Vote
 from models import ReputationEventType
+from models import ReputationEvent
 from models import UsdeSchool
-from profile_tasks import tasks
-from utils import complete_profile_prompt
-from utils import jsonifyModel
-from utils import nav_helper
-from utils import userCanView
 
 
 # For Ajax Uploader
@@ -73,11 +69,12 @@ def dashboard(request):
 
     response = {}
 
-    response['events'] = request.user.get_profile().reputationEvents.order_by('-id').all()
-    response['upload_count'] = File.objects.filter(owner=request.user).count()
+    query = Q(user=request.user) | Q(target=request.user)
+    response['events'] = ReputationEvent.objects.filter(query).order_by('-id').all()
+    response['upload_count'] = Note.objects.filter(owner=request.user).count()
 
     # Count the reputation events where the user was the actor and the type was 'upvote'
-    response['upvote_count'] = request.user.actor.filter(type__title='upvote').count()
+    response['upvote_count'] = request.user.reputation_event_actor.filter(type__title='upvote').count()
     return render(request, 'n_dashboard.html', response)
 
 
@@ -87,15 +84,13 @@ def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
     else:
-        # Get the 'singleton' SiteStats instance
-        stats = SiteStats.objects.get(pk=1)
         #Get recently uploaded files
-        recent_files = File.objects.exclude(title__exact='') \
+        recent_files = Note.objects.exclude(title__exact='') \
                 .order_by('-timestamp')[:7]
         #print recent_files
-        file_count = File.objects.count()
+        file_count = Note.objects.count()
         return render(request, 'n_home.html',
-                {'stats': stats, 'recent_files': recent_files,\
+                {'recent_files': recent_files,\
                 'file_count': file_count})
 
 
@@ -140,8 +135,8 @@ def register(request, invite_user):
             confirmation_code = new_user.get_profile().setEmailConfirmationCode()
             # TODO: switch to django-templated-email
             activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
-            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
 
+            # FIXME: make from email import from settings
             send_templated_mail(
                 template_name='confirm_email',
                 from_email='info@karmanotes.org',
@@ -171,98 +166,60 @@ def register(request, invite_user):
         return render(request, "registration/register.html", {'form': form})
 
 
-""" =====================================================================
-    People pages, pages that are heavily customized for a particular user
-    ===================================================================== """
-def getting_started(request):
-    """ View for introducing a user to the site and asking them to accomplish intro tasks """
-    response = nav_helper(request)
-    response['tasks'] = []
-    for task in tasks:
-        t = {}
-        t['message'] = task().message
-        t['status'] = task().check(request.user.get_profile())
-        t['karma'] = task().karma
-        response['tasks'].append(t)
-    return render(request, 'getting-started.html', response)
-
-
-def karma_events(request):
-    """ Shows a time sorted log of your events that affect your
-        karma score positively or negatively.
-    """
-    # navigation.html
-    response = nav_helper(request)
-    response['events'] = request.user.get_profile().reputationEvents.order_by('-timestamp').all()
-    return render(request, 'karma-events.html', response)
-
-
-@login_required
-def profile(request):
-    """ User Profile """
-    response = nav_helper(request)
-    response['course_json_url'] = '/jq_course'  # FIXME: replace this with a reverse urls.py query
-    response['your_files'] = File.objects.filter(owner=request.user).all()
-    return render(request, 'navigation.html', response)
-
-@login_required
-def raw_file(request, note_pk):
-    """ Display the raw html from a File object for embedding in an iframe """
-    note = get_object_or_404(File, pk=note_pk)
-    return HttpResponse(note.html)
-
 """ ===========================================
     Viewing and browsing lists and single pages
     =========================================== """
+@login_required
+def raw_file(request, note_pk):
+    """ Display the raw html from a Note object for embedding in an iframe """
+    note = get_object_or_404(Note, pk=note_pk)
+    return HttpResponse(note.html)
+
+def nurl_file(request, school_query, course_query, file_id, action=None):
+    # TODO: combine this with file
+    return file(request, file_id, action)
+
 @login_required
 def file(request, note_pk, action=None):
     """ View Note HTML
         Args:
             request: Django request object
-            note_pk: file_pk int
+            note_pk: note_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
     response = {}
     user_profile = request.user.get_profile()
-    file = get_object_or_404(File, pk=note_pk)
+    note = get_object_or_404(Note, pk=note_pk)
 
-    # If this file is not in the user's collection, 
-    # add this file to the user_profile as a viewd file
-    if not user_profile.files.filter(pk=note_pk).exists():
+    # If this note is not in the user's collection, 
+    # add this note to the user_profile as a viewd note
+    if not user_profile.viewed_notes.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
-        user_profile.award_karma('view-file', school=file.school, course=file.course, file=file, user=request.user)
-        # Add 'purchased' file to user's collection
-        user_profile.files.add(file)
+        user_profile.award_karma('view-file', school=note.school, course=note.course, file=note, user=request.user)
+        # Add 'purchased' note to user's collection
+        user_profile.viewed_notes.add(note)
         user_profile.save()
-        print user_profile, 'purchased', file, 'with karma.'
+        print user_profile, 'purchased', note, 'with karma.'
         # Increment note view count
-        file.viewCount += 1
-        file.save()
+        note.viewCount += 1
+        note.save()
 
-    response['owns_file'] = (file.owner == request.user)
-    response['file'] = file
-
+    response['owns_note'] = (note.owner == request.user)
+    response['note'] = note
+    # FIXME: clean lovable and flagable status
     response['lovable'], response['flagable'] = True, True
-
-    has_voted = file.vote_set.filter(user=request.user).exists()
+    has_voted = note.vote_set.filter(user=request.user).exists()
     response['has_voted'] = has_voted
 
     if has_voted:
-        print 'views.file: current user has voted on this file'
-        vote = file.vote_set.get(user=request.user)
+        print 'views.note: current user has voted on this note'
+        vote = note.vote_set.get(user=request.user)
         response['vote_status'] = vote.up
         if vote.up:
             response['lovable'] = False
         else:
             response['flagable'] = False
-
-    if action == 'edit':
-        #print 'ACTION EDIT'
-        response['editing_file'] = True
-    else:
-        response['editing_file'] = False
-        #print 'ACTION NONE'
 
     return render(request, 'n_note.html', response)
 
@@ -279,7 +236,6 @@ def fileMeta(request):
         response["status"] = "invalid"
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
-
     form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
 
     if not form.is_valid():
@@ -291,7 +247,7 @@ def fileMeta(request):
         response["message"] = "Please check your form data."
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
-    file = File.objects.get(pk=form.cleaned_data["file_pk"])
+    file = Note.objects.get(pk=form.cleaned_data["file_pk"])
     file.type = form.cleaned_data["type"]
     file.title = form.cleaned_data["title"]
     file.description = form.cleaned_data["description"]
@@ -300,6 +256,8 @@ def fileMeta(request):
     if request.user.is_authenticated():
         file.owner = request.user
     else:
+        # following code is for non-authenticated users upload
+        # currently not being used
         file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
         file.owner.save()
         # Perform reCAPTCHA check
@@ -327,120 +285,24 @@ def fileMeta(request):
     except Exception, e:
         print "school/course error: " + str(e)
 
+    # this lets a user use an autocomplete choose course field in the file upload form 
+    # and optionally joins them to the course
+    # not currently used
     if _course_id is not None and form.cleaned_data['in_course'] == "True":
         # if in_course selected, add the course to their profile
         request.user.get_profile().add_course(course_id=_course_id)
-    # process Tags
-    #processCsvTags(file, form.cleaned_data['tags'])
+
     file.save()
     response = {}
     response["status"] = "success"
     response["file_pk"] = file.pk
-    response["karma"] = file.karmaValue()
-    #print "fileMeta form valid! " + str(file.pk)
-    # lets us use django's messaging system for alert-notifications
-    # in our design on upload success at the top of the profile
-    # FIXME: fix this message with proper html
-    # render an html partial and then send it in json to jquery
-    if request.user.is_authenticated():
-        messages.add_message(request, messages.SUCCESS,
-        "Success! You uploaded a file (message: Django Messaging!")
-    # If user is not authenticated, store this file pk in their session
+
+    # TODO: If user is not authenticated, store this file pk in their session
     # TODO: IF a user isn't authenticated - present them
     # an indication that they can claim karma by logging in
 
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
-
-def smartModelQuery(request):
-    """ Accessed by charfields corresponding to a model title/name
-        See if model with similiar title exists and return title
-        If not, return model create form with populated title/name
-    """
-    if request.method == 'POST' and request.is_ajax():
-        print "title: " + str(request.POST['title']) + ' type: ' + str(request.POST['type'])
-        search_form = KarmaForms.ModelSearchForm(request.POST)
-        if search_form.is_valid():
-            if request.POST['type'] == "school":
-                # If no school matching text entry exists, present School Form
-                if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
-                    # Return a list of all schools to present to user, ensuring duplicate entires aren't made
-                    #schools = School.objects.all().order_by('name').values('name', 'pk')
-                    schools = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School).values('name', 'pk')
-                    print "smartModelQuery: return create School ajaxFormResponse"
-                    response = {}
-                    response['type'] = 'school'
-                    # Django QuerySets are serializable, but when they're empty, error raised
-                    if schools is not None and len(schools) > 0:
-                        response['suggestions'] = list(schools)
-                        response['status'] = 'suggestion'
-                    else:
-                        response['suggestions'] = []
-                        response['status'] = 'no_match'
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-                # A school matching entry exists
-                else:
-                    # Return a json object: {'status': 'success', 'model': model's pk}
-                    response = {}
-                    response['status'] = 'success'
-                    response['type'] = 'school'
-                    response_school = School.objects.get(name=search_form.cleaned_data['title'])
-                    response['model_pk'] = response_school.pk
-                    response['model_name'] = response_school.name
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-            if request.POST['type'] == "course":
-                # If no course matching text entry exists, present Course Form
-                if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
-                    courses = None
-                    if request.POST.get("school", -1) != -1:
-                        #print "course at school: " + request.POST.get("school")
-                        #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
-                        courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    elif (request.user.is_authenticated() and request.user.get_profile().school is not None):
-                        #print "got school from profile"
-                        courses = SearchQuerySet().filter(school=request.user.get_profile().school.pk, content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    else:
-                        #No school available. Search all schools
-                        courses = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    response = {}
-                    response['type'] = 'course'
-                     # Django QuerySets are serializable, but when they're empty, error raised
-                    if courses is not None and len(courses) > 0:
-                        response['suggestions'] = list(courses)
-                        response['status'] = 'suggestion'
-                    else:
-                        response['suggestions'] = []
-                        response['status'] = 'no_match'
-                    print "smartModelQuery: return create Course suggestion"
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-                # A course matching entry exists
-                else:
-                    # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
-                    response = {}
-                    response['status'] = 'success'
-                    response['type'] = 'course'
-                    response_course = Course.objects.get(title=search_form.cleaned_data['title'])
-                    response['model_pk'] = response_course.pk
-                    response['model_name'] = response_course.title
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-        else:
-            print search_form.errors
-    raise Http404
-
-
-def browse_schools(request):
-    """ Server-side templated browsing of notes by school, course and note """
-    response = nav_helper(request)
-    # make this order by the most notes in a school
-    response['title'] = u"Schools"
-    response['schools'] = School.objects.annotate(num_course=Count('course'))\
-                .order_by('num_course').reverse().filter(num_course__gt=0).all()
-    if request.user.get_profile().school not in response['schools']:
-        # create a new list of the user's school, extend it with the current list of schools
-        # this prepends the user's school to the top of the school list
-        response['schools'] = [request.user.get_profile().school] + list(response['schools'])
-        # this converts the QuerySet into a list, so this is not typesafe, but django templates do not care
-    return render(request, 'browse_schools.html', response)
 
 def school(request, school_query):
     """ View for a school, lists courses and school activity
@@ -455,8 +317,6 @@ def school(request, school_query):
     # FIXME: does this work _instead_ or despite of int() casting?
     response['school'], response['courses'] = School.get_courses(school_query)
     return render(request, 'n_school.html', response)
-
-
 
 def browse_courses(request, school_query):
     """ View for courses beloging to :school_query:
@@ -506,7 +366,7 @@ def browse_one_course(request, course_query, school):
     response['events'] = course.reputationevent_set.order_by('-timestamp').all()  # FIXME: possibly order-by
     # we don't use these, FIXME: CLEAN THIS UP
     """
-    response['viewed_files'] = request.user.get_profile().files.all()
+    response['viewed_files'] = request.user.get_profile().viewed_notes.all()
 
     # FIXME: I don't like this logic one bit, either annotate the db query or fix the schema to NEVER do this
     response['thanked_files'] = []
@@ -571,7 +431,7 @@ def editFileMeta(request):
         Now, just title and description
     '''
     if request.is_ajax() and 'file_pk' in request.POST:
-        file = get_object_or_404(File, pk=request.POST['file_pk'])
+        file = get_object_or_404(Note, pk=request.POST['file_pk'])
         if request.user == file.owner:
             do_save = False
             response = {}
@@ -637,29 +497,10 @@ def editCourseMeta(request):
     raise Http404
 
 
-@login_required
-def addModel(request):
-    ''' AJAX: add a new course or school
-    '''
-    if request.is_ajax() and request.method == 'POST':
-        if 'type' in request.POST:
-            type = request.POST['type']
-            form = KarmaForms.ModelSearchForm(request.POST)
-            if form.is_valid():
-                if type == "course" and request.user.get_profile().school != None:
-                    new_model = Course.objects.create(title=form.cleaned_data['title'], school=request.user.get_profile().school)
-                    # add the newly created course to the requesting user's profile
-                    request.user.get_profile().courses.add(new_model)
-                elif type == "school":
-                    new_model = School.objects.create(name=form.cleaned_data['title'])
-                return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
-    raise Http404
-
-
 def create_course(request):
     """ Form to add a new course to our db
+    Ajax endpoint
     """
-
     def custom_validate(form_dict):
         if form_dict['id_title'] == '': return False
 
@@ -672,7 +513,6 @@ def create_course(request):
             user_profile = request.user.get_profile()
             new_course = Course()
 
-
             new_course.instructor_email = form.cleaned_data['instructor_email']
             new_course.instructor_name = form.cleaned_data['instructor_name']
             new_course.title = form.cleaned_data['title']
@@ -682,16 +522,21 @@ def create_course(request):
 
             user_profile.courses.add(new_course)
             user_profile.save()
+            response['status'] = 'success'
 
         else:
             #TODO: have ajax display error messages
             print "Form is INVALID: %s" % form.errors
+            response['status'] = 'error'
+            response['errors'] = form.errors
 
     else:
         # request method is NOT POST
-        form = KarmaForms.CreateCourseForm()
+        response['status'] = 'invalid'
 
-    return render(request, 'n_lightbox_create_course.html', {'form': form})
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 
 @login_required
 def add_course_to_profile(request):
@@ -716,6 +561,7 @@ def add_course_to_profile(request):
         else:
             return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
+@login_required
 def drop_course(request):
     #FIXME: drop_course removes a course from a profile, and and add_course_to_profile adds a course
     if request.is_ajax() and request.method == 'POST':
@@ -832,51 +678,6 @@ def courses(request, school_query=None):
     raise Http404
 
 
-def jqueryui_courses(request):
-    """ Ajax: Course autocomplete for jqueryui.autocomplete """
-    # TODO: add optional filter by school and the javascript to support it
-    query = request.GET.get('term')
-    print "query %s" % query
-    courses = Course.objects.filter(title__icontains=query).distinct()
-    print "courses %s %s" % (len(courses), courses)
-    response = [(course.id, course.title) for course in courses]
-    print json.dumps(response)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-
-def nurl_file(request, school_query, course_query, file_id, action=None):
-    return file(request, file_id, action)
-
-
-def searchBySchool(request):
-    """ Ajax: Return user's school's courses in JSON
-        Used by search page javascript.
-        If user has no school, show all schools
-    """
-    response_json = []
-
-    if request.is_ajax():
-        if request.user.is_authenticated and request.user.get_profile().school is not None:
-            school = get_object_or_404(School, pk=request.user.get_profile().school.pk)
-            response_json.append(jsonifyModel(model=school, depth=1))
-        else:
-            schools = School.objects.all()
-            for school in schools:
-                school_json = jsonifyModel(model=school, depth=1)
-                response_json.append(school_json)
-        #print 'searchBySchool: ' + str(response_json)
-        return HttpResponse(json.dumps(response_json), mimetype="application/json")
-    else:
-        raise Http404
-
-        #A nicer way to do this would be to override the queryset serializer
-        #data = serializers.serialize("json", School.objects.all())
-        #return HttpResponse(data, mimetype='application/json')
-        #json_serializer = serializers.get_serializer("json")()
-        #json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
-
-
 @login_required
 def vote(request, file_pk):
     vote_value = int(request.POST.get('vote', 0))
@@ -891,7 +692,7 @@ def vote(request, file_pk):
 
 
     # Check that GET parameters are valid
-    voting_file = get_object_or_404(File, pk=file_pk)
+    voting_file = get_object_or_404(Note, pk=file_pk)
     voting_user = request.user
     user_profile = request.user.get_profile()
 
@@ -906,7 +707,7 @@ def vote(request, file_pk):
         return HttpResponse("You have all ready voted on this file")
 
     # Else If the valid user has viewd the file, allow voting
-    elif user_profile.files.filter(pk=voting_file.pk).exists():
+    elif user_profile.viewed_notes.filter(pk=voting_file.pk).exists():
         print "casting vote"
         voting_file.vote(voter=voting_user, vote_value=vote_value)
         if vote_value == 1:
@@ -935,7 +736,7 @@ def multisearch(request):
                     .models(Course).load_all()
         response['courses'] = [c.object for c in courses]
         notes = SearchQuerySet().filter(content__icontains=query) \
-                    .models(File).load_all()
+                    .models(Note).load_all()
         response['notes'] = [n.object for n in notes]
         response['instructors'] = []
         response['users'] = []
@@ -950,7 +751,7 @@ def browse(request):
     #TODO: limit these to less than five each
     response['schools'] = School.objects.filter(browsable=True)
     response['courses'] = Course.objects.filter(browsable=True)
-    response['notes'] = File.objects.filter(browsable=True)
+    response['notes'] = Note.objects.filter(browsable=True)
     response['instructors'] = []
     response['users'] = []
     response['browse_all'] = True
@@ -971,7 +772,7 @@ def search(request):
             #results = SearchQuerySet().filter(content__icontains=query).highlight()
 
             #Exact match results w/Highlighting. Target notes
-            #results = SearchQuerySet().filter(content__icontains=query).models(File).highlight()
+            #results = SearchQuerySet().filter(content__icontains=query).models(Note).highlight()
 
             #highlight = Highlighter(query)
             #highlight_test = highlight.highlight('this is a test ' + query + 'yes, a test')
