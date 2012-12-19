@@ -780,7 +780,7 @@ def schools(request):
         # render the browse-schools route
         response = {}
         response['schools'] = School.objects.order_by('-karma').all()
-        return render(request, 'n_browse_courses.html', response)
+        return render(request, 'n_browse_schools.html', response)
 
 
     raise Http404
@@ -789,7 +789,7 @@ def notes(request):
     """ note list controllers """
     response = {}
     response['notes'] = File.objects.order_by('-numUpVotes').all()
-    return render(request, 'n_browse_courses.html', response)
+    return render(request, 'n_browse_notes.html', response)
 
 def courses(request, school_query=None):
     """ Ajax: Course autocomplete form field """
@@ -947,13 +947,15 @@ def browse(request):
     """
     response = {}
 
+    #TODO: limit these to less than five each
     response['schools'] = School.objects.filter(browsable=True)
     response['courses'] = Course.objects.filter(browsable=True)
     response['notes'] = File.objects.filter(browsable=True)
     response['instructors'] = []
     response['users'] = []
+    response['browse_all'] = True
 
-    return render(request, 'n_browse.html', response)
+    return render(request, 'n_browse_all.html', response)
 
 
 ''' Search testing '''

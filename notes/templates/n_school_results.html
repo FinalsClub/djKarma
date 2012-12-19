@@ -1,0 +1,55 @@
+{% load url from future %}
+{% load humanize %}
+
+<div class="row"><!-- columns -->
+  <div class="twelve columns"><!-- courses -->
+    <div id=row>
+      <div class="ten columns offset-by-one column_header">
+        schools
+      </div><!-- /column_header -->
+    </div>
+
+    {% for school in schools %}
+      {% comment %}
+      | this bit is tricky
+      | Every five schools needs to have a separate row and result_grid_row
+      | I am not sure if this is the 'right' way to go about this
+      {% endcomment %}
+
+    {# For the 1st, 6th, and 11th ... schools, prepend a new row #}
+    {% if forloop.first or forloop.counter0|divisibleby:"5" %}
+      <div class="row result_grid_row">
+    {% endif %}
+
+        <a href="{{ school.get_absolute_url }}">
+        <div class="two columns school_result tall
+                    {% if forloop.first or forloop.counter0|divisibleby:"5" %} offset-by-one{% endif %}
+                    {% if forloop.first or forloop.counter0|divisibleby:"2"%} row_alt_on{% endif %}
+                    {% if forloop.counter|divisibleby:"5" or forloop.last %} end{% endif %}">
+          <div class="row">
+            <div class="four columns no-padding">
+              <div class="school_result_points">
+                <div class="school_result_points_count">
+                  {{ school.karma|intcomma|default:0 }}
+                </div>
+                <div class="school_result_points_caption">
+                  karma points
+                </div>
+              </div><!-- /school_result_points -->
+            </div><!-- .four .columns .no-padding -->
+            <div class="eight columns school_result_name half-padding">
+              {{ school.name }}
+            </div><!-- /school_result_name -->
+          </div>
+        </div><!-- /school_result -->
+        </a>
+
+    {# For the 5st, 10th, and 15th ... schools, append end of row #}
+    {% if forloop.counter|divisibleby:"5" or forloop.last %}
+      </div> <!-- ."row result_grid_row" -->
+    {% endif %}
+
+    {% endfor %}
+  </div>
+</div>
+

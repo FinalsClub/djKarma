@@ -1,0 +1,81 @@
+{% extends "n_browse_frame.html" %}
+{% load url from future %}
+
+{% block results %}
+  <div id="all_results" class="results_container">
+      <!-- Course results -->
+      <div class="row"><!-- columns -->
+        <div class="four columns offset-by-one"><!-- courses -->
+          <div class="column_header">
+            courses
+          </div><!-- /column_header -->
+
+          {% for course in courses|slice:":3" %}
+            {# TODO: put the loop variable in the included partial #}
+            {% include 'partials/course_result_short.html' %}
+          {% endfor %}
+
+        </div><!-- /courses -->
+      <!-- end Course results -->
+
+      <!-- Note results -->
+        <div class="four columns"><!-- notes -->
+          <div class="column_header">
+            notes
+          </div><!-- /column_header -->
+
+          {% for note in notes|slice:":3" %}
+            {% include 'partials/note_result_short.html' %}
+          {% endfor %}
+
+        </div><!-- /notes -->
+      <!-- end Note results -->
+
+        <div class="two columns end">
+        <!-- Prof results -->
+        {% if instructors|length > 0 %}
+          <div class="column_header">
+            professors
+          </div><!-- /column_header -->
+
+
+          {% for instructor in instructors|slice:":1" %}
+            {% include 'partials/prof_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+
+        {% if schools|length > 0 %}
+          <!-- School results -->
+          <div class="column_header">
+            schools
+          </div><!-- /column_header -->
+
+          {% for school in schools|slice:":3" %}
+            {% include 'partials/school_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+          {% comment %}
+          <div class="row school_result_container">
+            <div class="twelve columns user_result no_result">
+              No schools are associated with this search. Better luck next time.
+            </div>
+          </div>
+          {% endcomment %}
+
+        <!-- User results -->
+        {% if users|length > 0 %}
+          <div class="column_header">
+            users
+          </div><!-- /column_header -->
+
+          {% for user in users|slice:":1" %}
+            {% include 'partials/user_result_short.html' %}
+          {% endfor %}
+        {% endif %}
+
+        </div>
+      </div><!-- /columns -->
+  </div><!-- #all_results .results_container -->
+{% endblock %}
