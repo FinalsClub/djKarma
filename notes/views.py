@@ -134,8 +134,8 @@ def register(request, invite_user):
             confirmation_code = new_user.get_profile().setEmailConfirmationCode()
             # TODO: switch to django-templated-email
             activation_link = request.build_absolute_uri(reverse('confirm_email', kwargs={'confirmation_code': confirmation_code}))
-            #send_mail(subject='Confirm your email for KarmaNotes.org', message='Please activate your Karma Notes account by following the link below! ' + activation_link, from_email='info@karmanotes.org', recipient_list=[new_user.email], fail_silently=False)
 
+            # FIXME: make from email import from settings
             send_templated_mail(
                 template_name='confirm_email',
                 from_email='info@karmanotes.org',
@@ -165,67 +165,60 @@ def register(request, invite_user):
         return render(request, "registration/register.html", {'form': form})
 
 
-""" =====================================================================
-    People pages, pages that are heavily customized for a particular user
-    ===================================================================== """
+""" ===========================================
+    Viewing and browsing lists and single pages
+    =========================================== """
 @login_required
 def raw_file(request, note_pk):
     """ Display the raw html from a Note object for embedding in an iframe """
     note = get_object_or_404(Note, pk=note_pk)
     return HttpResponse(note.html)
 
-""" ===========================================
-    Viewing and browsing lists and single pages
-    =========================================== """
+def nurl_file(request, school_query, course_query, file_id, action=None):
+    # TODO: combine this with file
+    return file(request, file_id, action)
+
 @login_required
 def file(request, note_pk, action=None):
     """ View Note HTML
         Args:
             request: Django request object
-            note_pk: file_pk int
+            note_pk: note_pk int
             action: last url segment string indicating initial state. i.e: 'edit'
     """
     response = {}
     user_profile = request.user.get_profile()
-    file = get_object_or_404(Note, pk=note_pk)
+    note = get_object_or_404(Note, pk=note_pk)
 
-    # If this file is not in the user's collection, 
-    # add this file to the user_profile as a viewd file
+    # If this note is not in the user's collection, 
+    # add this note to the user_profile as a viewd note
     if not user_profile.viewed_notes.filter(pk=note_pk).exists():
         # Buy Note viewing privelege for karma
         # award_karma will handle deducting appropriate karma
-        user_profile.award_karma('view-file', school=file.school, course=file.course, file=file, user=request.user)
-        # Add 'purchased' file to user's collection
-        user_profile.viewed_notes.add(file)
+        user_profile.award_karma('view-file', school=note.school, course=note.course, file=note, user=request.user)
+        # Add 'purchased' note to user's collection
+        user_profile.viewed_notes.add(note)
         user_profile.save()
-        print user_profile, 'purchased', file, 'with karma.'
+        print user_profile, 'purchased', note, 'with karma.'
         # Increment note view count
-        file.viewCount += 1
-        file.save()
+        note.viewCount += 1
+        note.save()
 
-    response['owns_file'] = (file.owner == request.user)
-    response['file'] = file
-
+    response['owns_note'] = (note.owner == request.user)
+    response['note'] = note
+    # FIXME: clean lovable and flagable status
     response['lovable'], response['flagable'] = True, True
-
-    has_voted = file.vote_set.filter(user=request.user).exists()
+    has_voted = note.vote_set.filter(user=request.user).exists()
     response['has_voted'] = has_voted
 
     if has_voted:
-        print 'views.file: current user has voted on this file'
-        vote = file.vote_set.get(user=request.user)
+        print 'views.note: current user has voted on this note'
+        vote = note.vote_set.get(user=request.user)
         response['vote_status'] = vote.up
         if vote.up:
             response['lovable'] = False
         else:
             response['flagable'] = False
-
-    if action == 'edit':
-        #print 'ACTION EDIT'
-        response['editing_file'] = True
-    else:
-        response['editing_file'] = False
-        #print 'ACTION NONE'
 
     return render(request, 'n_note.html', response)
 
@@ -241,7 +234,6 @@ def fileMeta(request):
         # This is the wrong way to use fileMeta, exit
         response["status"] = "invalid"
         return HttpResponse(json.dumps(response), mimetype="application/json")
-
 
     form = KarmaForms.FileMetaDataFormNoCaptcha(request.POST)
 
@@ -263,6 +255,8 @@ def fileMeta(request):
     if request.user.is_authenticated():
         file.owner = request.user
     else:
+        # following code is for non-authenticated users upload
+        # currently not being used
         file.owner, _created = User.objects.get_or_create(username=u"KarmaNotes")
         file.owner.save()
         # Perform reCAPTCHA check
@@ -290,105 +284,23 @@ def fileMeta(request):
     except Exception, e:
         print "school/course error: " + str(e)
 
+    # this lets a user use an autocomplete choose course field in the file upload form 
+    # and optionally joins them to the course
+    # not currently used
     if _course_id is not None and form.cleaned_data['in_course'] == "True":
         # if in_course selected, add the course to their profile
         request.user.get_profile().add_course(course_id=_course_id)
-    # process Tags
-    #processCsvTags(file, form.cleaned_data['tags'])
+
     file.save()
     response = {}
     response["status"] = "success"
     response["file_pk"] = file.pk
-    response["karma"] = file.karmaValue()
-    #print "fileMeta form valid! " + str(file.pk)
-    # lets us use django's messaging system for alert-notifications
-    # in our design on upload success at the top of the profile
-    # FIXME: fix this message with proper html
-    # render an html partial and then send it in json to jquery
-    if request.user.is_authenticated():
-        messages.add_message(request, messages.SUCCESS,
-        "Success! You uploaded a file (message: Django Messaging!")
-    # If user is not authenticated, store this file pk in their session
+
+    # TODO: If user is not authenticated, store this file pk in their session
     # TODO: IF a user isn't authenticated - present them
     # an indication that they can claim karma by logging in
 
     return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def smartModelQuery(request):
-    """ Accessed by charfields corresponding to a model title/name
-        See if model with similiar title exists and return title
-        If not, return model create form with populated title/name
-    """
-    if request.method == 'POST' and request.is_ajax():
-        print "title: " + str(request.POST['title']) + ' type: ' + str(request.POST['type'])
-        search_form = KarmaForms.ModelSearchForm(request.POST)
-        if search_form.is_valid():
-            if request.POST['type'] == "school":
-                # If no school matching text entry exists, present School Form
-                if not School.objects.filter(name=search_form.cleaned_data['title']).exists():
-                    # Return a list of all schools to present to user, ensuring duplicate entires aren't made
-                    #schools = School.objects.all().order_by('name').values('name', 'pk')
-                    schools = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(School).values('name', 'pk')
-                    print "smartModelQuery: return create School ajaxFormResponse"
-                    response = {}
-                    response['type'] = 'school'
-                    # Django QuerySets are serializable, but when they're empty, error raised
-                    if schools is not None and len(schools) > 0:
-                        response['suggestions'] = list(schools)
-                        response['status'] = 'suggestion'
-                    else:
-                        response['suggestions'] = []
-                        response['status'] = 'no_match'
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-                # A school matching entry exists
-                else:
-                    # Return a json object: {'status': 'success', 'model': model's pk}
-                    response = {}
-                    response['status'] = 'success'
-                    response['type'] = 'school'
-                    response_school = School.objects.get(name=search_form.cleaned_data['title'])
-                    response['model_pk'] = response_school.pk
-                    response['model_name'] = response_school.name
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-            if request.POST['type'] == "course":
-                # If no course matching text entry exists, present Course Form
-                if not Course.objects.filter(title=search_form.cleaned_data['title']).exists():
-                    courses = None
-                    if request.POST.get("school", -1) != -1:
-                        #print "course at school: " + request.POST.get("school")
-                        #courses = Course.objects.filter(school=School.objects.get(pk=int(request.POST.get("school")))).order_by('title').values('title')
-                        courses = SearchQuerySet().filter(school=request.POST.get("school"), content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    elif (request.user.is_authenticated() and request.user.get_profile().school is not None):
-                        #print "got school from profile"
-                        courses = SearchQuerySet().filter(school=request.user.get_profile().school.pk, content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    else:
-                        #No school available. Search all schools
-                        courses = SearchQuerySet().filter(content_auto__contains=search_form.cleaned_data['title']).models(Course).values('title', 'pk')
-                    response = {}
-                    response['type'] = 'course'
-                     # Django QuerySets are serializable, but when they're empty, error raised
-                    if courses is not None and len(courses) > 0:
-                        response['suggestions'] = list(courses)
-                        response['status'] = 'suggestion'
-                    else:
-                        response['suggestions'] = []
-                        response['status'] = 'no_match'
-                    print "smartModelQuery: return create Course suggestion"
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-                # A course matching entry exists
-                else:
-                    # Return a json object: {'status': 'success', 'model': 'model's pk, 'model_title': title}
-                    response = {}
-                    response['status'] = 'success'
-                    response['type'] = 'course'
-                    response_course = Course.objects.get(title=search_form.cleaned_data['title'])
-                    response['model_pk'] = response_course.pk
-                    response['model_name'] = response_course.title
-                    return HttpResponse(json.dumps(response), mimetype="application/json")
-        else:
-            print search_form.errors
-    raise Http404
 
 
 def school(request, school_query):
@@ -584,29 +496,10 @@ def editCourseMeta(request):
     raise Http404
 
 
-@login_required
-def addModel(request):
-    ''' AJAX: add a new course or school
-    '''
-    if request.is_ajax() and request.method == 'POST':
-        if 'type' in request.POST:
-            type = request.POST['type']
-            form = KarmaForms.ModelSearchForm(request.POST)
-            if form.is_valid():
-                if type == "course" and request.user.get_profile().school != None:
-                    new_model = Course.objects.create(title=form.cleaned_data['title'], school=request.user.get_profile().school)
-                    # add the newly created course to the requesting user's profile
-                    request.user.get_profile().courses.add(new_model)
-                elif type == "school":
-                    new_model = School.objects.create(name=form.cleaned_data['title'])
-                return HttpResponse(json.dumps({'type': type, 'status': 'success', 'new_pk': new_model.pk}), mimetype='application/json')
-    raise Http404
-
-
 def create_course(request):
     """ Form to add a new course to our db
+    Ajax endpoint
     """
-
     def custom_validate(form_dict):
         if form_dict['id_title'] == '': return False
 
@@ -619,7 +512,6 @@ def create_course(request):
             user_profile = request.user.get_profile()
             new_course = Course()
 
-
             new_course.instructor_email = form.cleaned_data['instructor_email']
             new_course.instructor_name = form.cleaned_data['instructor_name']
             new_course.title = form.cleaned_data['title']
@@ -629,16 +521,21 @@ def create_course(request):
 
             user_profile.courses.add(new_course)
             user_profile.save()
+            response['status'] = 'success'
 
         else:
             #TODO: have ajax display error messages
             print "Form is INVALID: %s" % form.errors
+            response['status'] = 'error'
+            response['errors'] = form.errors
 
     else:
         # request method is NOT POST
-        form = KarmaForms.CreateCourseForm()
+        response['status'] = 'invalid'
 
-    return render(request, 'n_lightbox_create_course.html', {'form': form})
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 
 @login_required
 def add_course_to_profile(request):
@@ -663,6 +560,7 @@ def add_course_to_profile(request):
         else:
             return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
+@login_required
 def drop_course(request):
     #FIXME: drop_course removes a course from a profile, and and add_course_to_profile adds a course
     if request.is_ajax() and request.method == 'POST':
@@ -777,23 +675,6 @@ def courses(request, school_query=None):
     #courses = Course.objects.filter(title__icontains=query).distinct()
 
     raise Http404
-
-
-def jqueryui_courses(request):
-    """ Ajax: Course autocomplete for jqueryui.autocomplete """
-    # TODO: add optional filter by school and the javascript to support it
-    query = request.GET.get('term')
-    print "query %s" % query
-    courses = Course.objects.filter(title__icontains=query).distinct()
-    print "courses %s %s" % (len(courses), courses)
-    response = [(course.id, course.title) for course in courses]
-    print json.dumps(response)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-
-def nurl_file(request, school_query, course_query, file_id, action=None):
-    return file(request, file_id, action)
 
 
 @login_required

@@ -1,23 +1,9 @@
 # urls.py is part of Karma Notes
 # Copyright (C) 2012  FinalsClub Foundation
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-#from django.conf.urls.defaults import *
 from django.contrib.auth.views import password_reset
 from django.contrib.auth.views import password_reset_done
 from django.contrib.auth.views import password_reset_confirm
@@ -65,20 +51,15 @@ urlpatterns = patterns('',
     url(r'^filemeta$', 'notes.views.fileMeta', name='fileMeta'),
     # Ajax Voting
     url(r'^vote/(\d{1,9999})$', 'notes.views.vote'),
-    # Ajax requests from upload usher. Text input to model get / create
-    url(r'^smartModelQuery$', 'notes.views.smartModelQuery'),
     # Ajax requests from note upload form for autocomplete fields
     url(r'^courses$', 'notes.views.courses'),
     url(r'^schools$', 'notes.views.schools', name='schools'),
     url(r'^accredited-schools$', 'notes.views.accredited_schools'),
     url(r'^instructors$', 'notes.views.instructors'),
-    url(r'^simple-autocomplete/', include('simple_autocomplete.urls')),
     # Ajax request to add a course to a user's profile
     url(r'^create-course', 'notes.views.create_course', name='create-course'),
     url(r'^add-course', 'notes.views.add_course_to_profile', name='add-course'),
     url(r'^drop-course', 'notes.views.drop_course', name='drop-course'),
-    # Add Course, School forms
-    url(r'^add', 'notes.views.addModel', name='add'),
     # Edit course
 
     #   ---------------------------------------------------
@@ -102,9 +83,6 @@ urlpatterns = patterns('',
 
     #   ---------------------------------------------------
     # Auth
-    # This logout allows us to pass a redirect:
-    # <a href="{% url auth_logout_next /some/location %}">Logout</a>
-    #url(r'^logout/(?P<next_page>.*)/$', 'django.contrib.auth.views.logout', name='auth_logout_next'),
     url(r'^accounts/confirm/(?P<confirmation_code>[^/]+)$', 'notes.views.confirm_email', name='confirm_email'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='auth_logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
@@ -126,13 +104,3 @@ urlpatterns = patterns('',
 
     url(r'^oauth2callback', 'notes.views.gdrive_oauth_handshake'),
 )
-    # Ajax requests from search page to populate 'Browse by School and Course' accordion
-    # Not being used and might be depricated
-    #url(r'^browseBySchool/$', 'notes.views.searchBySchool', name='browse'),
-    # TODO: change these routes so they are unique regardless of path query for reverse()
-    #url(r'^browse/(?P<school_query>[^/]+)$', 'notes.views.browse_courses', name='browse-courses'), # This is a duplicate
-    #url(r'^course/(?P<course_query>[^/]+)$', 'notes.views.browse_one_course', name='browse-course'),
-    # latest browse views, must come last because they are greedy
-    #url(r'^schools$', 'notes.views.browse_schools', name='browse-schools'),
-    # Note View
-    #url(r'^file/(?P<note_pk>\d{1,99})/(?P<action>[^/]+)$', 'notes.views.file'),
