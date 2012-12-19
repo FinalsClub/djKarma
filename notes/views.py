@@ -165,18 +165,19 @@ def register(request, invite_user):
         return render(request, "registration/register.html", {'form': form})
 
 
-""" =====================================================================
-    People pages, pages that are heavily customized for a particular user
-    ===================================================================== """
+""" ===========================================
+    Viewing and browsing lists and single pages
+    =========================================== """
 @login_required
 def raw_file(request, note_pk):
     """ Display the raw html from a Note object for embedding in an iframe """
     note = get_object_or_404(Note, pk=note_pk)
     return HttpResponse(note.html)
 
-""" ===========================================
-    Viewing and browsing lists and single pages
-    =========================================== """
+def nurl_file(request, school_query, course_query, file_id, action=None):
+    # TODO: combine this with file
+    return file(request, file_id, action)
+
 @login_required
 def file(request, note_pk, action=None):
     """ View Note HTML
@@ -497,8 +498,8 @@ def editCourseMeta(request):
 
 def create_course(request):
     """ Form to add a new course to our db
+    Ajax endpoint
     """
-
     def custom_validate(form_dict):
         if form_dict['id_title'] == '': return False
 
@@ -511,7 +512,6 @@ def create_course(request):
             user_profile = request.user.get_profile()
             new_course = Course()
 
-
             new_course.instructor_email = form.cleaned_data['instructor_email']
             new_course.instructor_name = form.cleaned_data['instructor_name']
             new_course.title = form.cleaned_data['title']
@@ -521,16 +521,21 @@ def create_course(request):
 
             user_profile.courses.add(new_course)
             user_profile.save()
+            response['status'] = 'success'
 
         else:
             #TODO: have ajax display error messages
             print "Form is INVALID: %s" % form.errors
+            response['status'] = 'error'
+            response['errors'] = form.errors
 
     else:
         # request method is NOT POST
-        form = KarmaForms.CreateCourseForm()
+        response['status'] = 'invalid'
 
-    return render(request, 'n_lightbox_create_course.html', {'form': form})
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 
 @login_required
 def add_course_to_profile(request):
@@ -555,6 +560,7 @@ def add_course_to_profile(request):
         else:
             return HttpResponse(json.dumps({'status': 'fail'}), mimetype='application/json')
 
+@login_required
 def drop_course(request):
     #FIXME: drop_course removes a course from a profile, and and add_course_to_profile adds a course
     if request.is_ajax() and request.method == 'POST':
@@ -669,23 +675,6 @@ def courses(request, school_query=None):
     #courses = Course.objects.filter(title__icontains=query).distinct()
 
     raise Http404
-
-
-def jqueryui_courses(request):
-    """ Ajax: Course autocomplete for jqueryui.autocomplete """
-    # TODO: add optional filter by school and the javascript to support it
-    query = request.GET.get('term')
-    print "query %s" % query
-    courses = Course.objects.filter(title__icontains=query).distinct()
-    print "courses %s %s" % (len(courses), courses)
-    response = [(course.id, course.title) for course in courses]
-    print json.dumps(response)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-
-def nurl_file(request, school_query, course_query, file_id, action=None):
-    return file(request, file_id, action)
 
 
 @login_required
