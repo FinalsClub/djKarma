@@ -1,9 +1,0 @@
-<!-- note the .file-actions class is reused here 
-     because the action widgets should be styled identically -->
-<div class="file-actions" id="course-{{ course.pk }}">
-  {# TODO: Create karma level constants for privileges #}
-  {% if user.get_profile.karma > 200 %}
-    <a class="edit-course" href="{{ course.get_absolute_url }}"><i class="icon-pencil"></i>Edit</a>
-    {# <a href="#"><i class="icon-remove-circle"></i>Delete</a> #}
-  {% endif %}
-</div> <!-- .course-actions -->

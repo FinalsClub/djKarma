@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+# -*- coding:utf8 -*-
 # Copyright (C) 2012  FinalsClub Foundation
 
 import datetime
